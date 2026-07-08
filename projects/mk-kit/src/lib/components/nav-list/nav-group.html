@@ -1,0 +1,24 @@
+@if (collapsible() && !railCollapsed()) {
+  <button
+    type="button"
+    class="mk-nav-group__header mk-nav-group__header--toggle"
+    [attr.aria-expanded]="expanded()"
+    [attr.aria-controls]="regionId"
+    (click)="toggle()"
+  >
+    <span class="mk-nav-group__label">{{ label() }}</span>
+    <span class="mk-nav-group__chevron" aria-hidden="true"></span>
+  </button>
+} @else if (!railCollapsed()) {
+  <p class="mk-nav-group__header">
+    <span class="mk-nav-group__label">{{ label() }}</span>
+  </p>
+}
+
+<div
+  class="mk-nav-group__items"
+  [id]="regionId"
+  [attr.hidden]="itemsVisible() ? null : ''"
+>
+  <ng-content />
+</div>
