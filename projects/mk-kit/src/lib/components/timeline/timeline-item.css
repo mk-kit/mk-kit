@@ -1,0 +1,101 @@
+:host {
+  --_dot: var(--mk-primary);
+  --_marker: 1.75rem;
+
+  display: flex;
+  gap: var(--mk-space-3);
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+}
+
+:host([data-tone='primary']) { --_dot: var(--mk-primary); }
+:host([data-tone='success']) { --_dot: var(--mk-success); }
+:host([data-tone='warning']) { --_dot: var(--mk-warning); }
+:host([data-tone='danger']) { --_dot: var(--mk-danger); }
+:host([data-tone='info']) { --_dot: var(--mk-info); }
+:host([data-tone='neutral']) { --_dot: var(--mk-text-muted); }
+
+/* Marker column: dot at the top, a rail dropping to the next item's dot. */
+.mk-timeline-item__marker {
+  position: relative;
+  flex: none;
+  display: flex;
+  justify-content: center;
+  width: var(--_marker);
+}
+
+.mk-timeline-item__dot {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 0.75rem;
+  height: 0.75rem;
+  margin-top: 0.5rem;
+  border-radius: var(--mk-radius-circle);
+  background-color: var(--_dot);
+  color: var(--mk-primary-contrast);
+  /* Ring in the surface colour so the dot reads cleanly over the rail. */
+  box-shadow: 0 0 0 3px var(--mk-surface);
+}
+
+/* Icon variant: a larger tinted marker holding the glyph. */
+:host(.mk-timeline-item--icon) .mk-timeline-item__dot {
+  width: var(--_marker);
+  height: var(--_marker);
+  margin-top: 0;
+  color: var(--_dot);
+  background-color: color-mix(in srgb, var(--_dot) 16%, var(--mk-surface));
+  box-shadow:
+    0 0 0 3px var(--mk-surface),
+    inset 0 0 0 1.5px color-mix(in srgb, var(--_dot) 40%, transparent);
+}
+
+.mk-timeline-item__connector {
+  position: absolute;
+  top: var(--_marker);
+  bottom: 0;
+  left: 50%;
+  width: 2px;
+  transform: translateX(-50%);
+  background-color: var(--mk-border);
+}
+:host(:last-child) .mk-timeline-item__connector {
+  display: none;
+}
+
+/* Content column */
+.mk-timeline-item__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding-bottom: var(--mk-space-5);
+}
+:host(:last-child) .mk-timeline-item__content {
+  padding-bottom: 0;
+}
+
+.mk-timeline-item__time {
+  display: block;
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+  color: var(--mk-text-subtle);
+}
+
+.mk-timeline-item__heading {
+  margin: 0;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text);
+}
+
+.mk-timeline-item__body {
+  margin-top: var(--mk-space-1);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-normal);
+  color: var(--mk-text-muted);
+}
+.mk-timeline-item__body:empty {
+  display: none;
+}

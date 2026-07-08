@@ -1,0 +1,19 @@
+@if (icon()) {
+  <span class="mk-empty-state__icon" aria-hidden="true">
+    <mk-icon [name]="icon()" [size]="iconSize()" />
+  </span>
+}
+<ng-content select="[mkEmptyStateMedia]" />
+
+@if (title()) {
+  <p class="mk-empty-state__title">{{ title() }}</p>
+}
+@if (description()) {
+  <p class="mk-empty-state__description">{{ description() }}</p>
+}
+
+<ng-content />
+
+<div class="mk-empty-state__actions">
+  <ng-content select="[mkEmptyStateActions]" />
+</div>

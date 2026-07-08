@@ -127,6 +127,14 @@ export const routes: Routes = [
       import('./pages/charts/charts-page').then((m) => m.ChartsPage),
   },
   {
+    path: 'components/empty-timeline',
+    title: 'Empty state & timeline — mk-kit',
+    loadComponent: () =>
+      import('./pages/empty-timeline/empty-timeline-page').then(
+        (m) => m.EmptyTimelinePage,
+      ),
+  },
+  {
     path: 'components/data',
     title: 'Data display — mk-kit',
     loadComponent: () =>

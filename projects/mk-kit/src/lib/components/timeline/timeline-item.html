@@ -1,0 +1,20 @@
+<div class="mk-timeline-item__marker">
+  <span class="mk-timeline-item__dot">
+    @if (icon()) {
+      <mk-icon [name]="icon()" [size]="14" />
+    }
+  </span>
+  <span class="mk-timeline-item__connector" aria-hidden="true"></span>
+</div>
+
+<div class="mk-timeline-item__content">
+  @if (time()) {
+    <span class="mk-timeline-item__time">{{ time() }}</span>
+  }
+  @if (heading()) {
+    <p class="mk-timeline-item__heading">{{ heading() }}</p>
+  }
+  <div class="mk-timeline-item__body">
+    <ng-content />
+  </div>
+</div>
