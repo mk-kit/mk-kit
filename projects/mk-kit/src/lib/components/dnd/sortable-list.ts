@@ -35,7 +35,7 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
 @Component({
   selector: 'mk-sortable-list',
   templateUrl: './sortable-list.html',
-  styleUrl: './sortable-list.css',
+  styleUrl: './sortable-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkDropList, MkDrag, NgTemplateOutlet],
 })

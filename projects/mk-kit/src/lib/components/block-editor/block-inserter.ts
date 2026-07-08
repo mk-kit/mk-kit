@@ -29,7 +29,7 @@ interface DefGroup {
 @Component({
   selector: 'mk-block-inserter',
   templateUrl: './block-inserter.html',
-  styleUrl: './block-inserter.css',
+  styleUrl: './block-inserter.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-block-inserter',

@@ -56,7 +56,7 @@ interface MkTreeRow {
 @Component({
   selector: 'mk-tree',
   templateUrl: './tree.html',
-  styleUrl: './tree.css',
+  styleUrl: './tree.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tree',

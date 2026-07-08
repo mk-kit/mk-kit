@@ -31,7 +31,7 @@ import { MkFormField } from '../form-field/form-field';
 @Component({
   selector: 'mk-slider',
   templateUrl: './slider.html',
-  styleUrl: './slider.css',
+  styleUrl: './slider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-slider',

@@ -25,7 +25,7 @@ import { MkIcon } from '../icon/icon';
 @Component({
   selector: 'mk-empty-state',
   templateUrl: './empty-state.html',
-  styleUrl: './empty-state.css',
+  styleUrl: './empty-state.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkIcon],
   host: {

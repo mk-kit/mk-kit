@@ -31,7 +31,7 @@ export type MkAlertVariant = 'soft' | 'solid' | 'outline';
 @Component({
   selector: 'mk-alert',
   templateUrl: './alert.html',
-  styleUrl: './alert.css',
+  styleUrl: './alert.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-alert',

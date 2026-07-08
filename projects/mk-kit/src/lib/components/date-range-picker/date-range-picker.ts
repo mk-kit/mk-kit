@@ -41,7 +41,7 @@ export interface MkDateRange {
 @Component({
   selector: 'mk-date-range-picker',
   templateUrl: './date-range-picker.html',
-  styleUrl: './date-range-picker.css',
+  styleUrl: './date-range-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkCalendar],
   host: {

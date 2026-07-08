@@ -11,7 +11,7 @@ import { MkSnackbarService } from './snackbar.service';
   selector: 'mk-snackbar-container',
   imports: [MkSnackbar],
   templateUrl: './snackbar-container.html',
-  styleUrl: './snackbar-container.css',
+  styleUrl: './snackbar-container.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-snackbar-container',

@@ -26,7 +26,7 @@ const OPEN_DELAY = 400;
 @Component({
   selector: 'mk-tooltip',
   templateUrl: './tooltip.html',
-  styleUrl: './tooltip.css',
+  styleUrl: './tooltip.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tooltip',

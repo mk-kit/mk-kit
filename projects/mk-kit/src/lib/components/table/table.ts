@@ -62,7 +62,7 @@ export interface MkSortChange {
 @Component({
   selector: 'mk-table',
   templateUrl: './table.html',
-  styleUrl: './table.css',
+  styleUrl: './table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkCheckbox],
   host: {

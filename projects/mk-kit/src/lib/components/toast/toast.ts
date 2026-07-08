@@ -18,7 +18,7 @@ import { MkToastItem, MkToastService } from './toast.service';
   selector: 'mk-toast',
   imports: [MkButton],
   templateUrl: './toast.html',
-  styleUrl: './toast.css',
+  styleUrl: './toast.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-toast',

@@ -45,7 +45,7 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
   selector: '[mkDropList]',
   exportAs: 'mkDropList',
   templateUrl: './drop-list.html',
-  styleUrl: './drop-list.css',
+  styleUrl: './drop-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-drop-list',

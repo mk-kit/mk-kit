@@ -18,7 +18,7 @@ import {
 @Component({
   selector: 'mk-list',
   templateUrl: './list.html',
-  styleUrl: './list.css',
+  styleUrl: './list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-list',

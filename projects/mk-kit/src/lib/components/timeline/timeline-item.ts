@@ -15,7 +15,7 @@ import { MkIcon } from '../icon/icon';
 @Component({
   selector: 'mk-timeline-item',
   templateUrl: './timeline-item.html',
-  styleUrl: './timeline-item.css',
+  styleUrl: './timeline-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkIcon],
   host: {

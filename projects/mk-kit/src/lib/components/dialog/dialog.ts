@@ -61,7 +61,7 @@ export class MkDialogTitle {
 @Component({
   selector: 'mk-dialog',
   templateUrl: './dialog.html',
-  styleUrl: './dialog.css',
+  styleUrl: './dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Unencapsulated so `.mk-dialog-panel` (applied to the body-level overlay
   // panel outside this component's view) can be styled from here.

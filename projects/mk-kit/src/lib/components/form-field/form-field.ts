@@ -28,7 +28,7 @@ import { mkUniqueId } from '../../core/a11y/unique-id';
 @Component({
   selector: 'mk-form-field',
   templateUrl: './form-field.html',
-  styleUrl: './form-field.css',
+  styleUrl: './form-field.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-form-field',

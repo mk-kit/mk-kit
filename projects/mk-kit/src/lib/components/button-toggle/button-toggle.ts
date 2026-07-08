@@ -23,7 +23,7 @@ import { MkButtonToggleGroup } from './button-toggle-group';
 @Component({
   selector: 'mk-button-toggle',
   templateUrl: './button-toggle.html',
-  styleUrl: './button-toggle.css',
+  styleUrl: './button-toggle.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-button-toggle',

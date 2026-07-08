@@ -28,7 +28,7 @@ import { MkFormField } from '../form-field/form-field';
 @Component({
   selector: 'input[mkInput], textarea[mkInput]',
   templateUrl: './input.html',
-  styleUrl: './input.css',
+  styleUrl: './input.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-input',

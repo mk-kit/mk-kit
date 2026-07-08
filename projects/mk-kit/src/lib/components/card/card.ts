@@ -25,7 +25,7 @@ export type MkCardPadding = 'none' | 'sm' | 'md' | 'lg';
 @Component({
   selector: 'mk-card',
   templateUrl: './card.html',
-  styleUrl: './card.css',
+  styleUrl: './card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-card',

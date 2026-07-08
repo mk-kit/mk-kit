@@ -34,7 +34,7 @@ import type { MkRadio } from './radio';
 @Component({
   selector: 'mk-radio-group',
   templateUrl: './radio-group.html',
-  styleUrl: './radio-group.css',
+  styleUrl: './radio-group.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-radio-group',

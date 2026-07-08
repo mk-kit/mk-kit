@@ -36,7 +36,7 @@ const MOBILE_BREAKPOINT = 1024;
 @Component({
   selector: 'mk-app-shell',
   templateUrl: './app-shell.html',
-  styleUrl: './app-shell.css',
+  styleUrl: './app-shell.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-app-shell',

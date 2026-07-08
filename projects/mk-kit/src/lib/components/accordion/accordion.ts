@@ -21,7 +21,7 @@ import type { MkAccordionItem } from './accordion-item';
 @Component({
   selector: 'mk-accordion',
   templateUrl: './accordion.html',
-  styleUrl: './accordion.css',
+  styleUrl: './accordion.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-accordion',

@@ -26,7 +26,7 @@ export type MkAvatarStatus = 'online' | 'offline' | 'away' | 'busy';
 @Component({
   selector: 'mk-avatar',
   templateUrl: './avatar.html',
-  styleUrl: './avatar.css',
+  styleUrl: './avatar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-avatar',

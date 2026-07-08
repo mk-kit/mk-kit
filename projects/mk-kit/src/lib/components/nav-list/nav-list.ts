@@ -21,7 +21,7 @@ import {
 @Component({
   selector: 'mk-nav-list',
   templateUrl: './nav-list.html',
-  styleUrl: './nav-list.css',
+  styleUrl: './nav-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-nav-list',

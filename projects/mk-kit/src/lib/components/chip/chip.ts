@@ -24,7 +24,7 @@ export type MkChipVariant = 'solid' | 'soft' | 'outline';
 @Component({
   selector: 'mk-chip',
   templateUrl: './chip.html',
-  styleUrl: './chip.css',
+  styleUrl: './chip.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-chip',

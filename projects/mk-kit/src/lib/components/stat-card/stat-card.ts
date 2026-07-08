@@ -29,7 +29,7 @@ export type MkStatTrend = 'up' | 'down' | 'neutral';
 @Component({
   selector: 'mk-stat-card',
   templateUrl: './stat-card.html',
-  styleUrl: './stat-card.css',
+  styleUrl: './stat-card.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-stat-card',

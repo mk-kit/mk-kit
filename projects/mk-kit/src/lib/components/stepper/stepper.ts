@@ -39,7 +39,7 @@ export type MkStepperOrientation = 'horizontal' | 'vertical';
 @Component({
   selector: 'mk-stepper',
   templateUrl: './stepper.html',
-  styleUrl: './stepper.css',
+  styleUrl: './stepper.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-stepper',

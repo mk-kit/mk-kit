@@ -44,7 +44,7 @@ import {
 @Component({
   selector: 'mk-date-picker',
   templateUrl: './date-picker.html',
-  styleUrl: './date-picker.css',
+  styleUrl: './date-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [MkCalendar],
   host: {

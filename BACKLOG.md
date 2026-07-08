@@ -17,11 +17,22 @@ Future work for `@mk-kit/ui`, deferred from the main line of development.
   - Button migrated to `button.scss` using the tone/focus-ring mixins
     (reference pattern), verified pixel-identical in light + dark.
 
+  **Also done:**
+  - **All** component styles migrated from `.css` to `.scss` (73 files) with
+    their `styleUrl`s updated — a mechanical, no-visual-change pass.
+  - Adopted `mk.tone-selectors` in the components whose `[data-tone]` blocks
+    matched the shared pattern: `badge`, `tag`, `chip`, `button-toggle-group`
+    (Button was the reference). Verified pixel-identical in the browser.
+
   **Remaining:**
-  - Migrate the other tone-aware components (`button-toggle`, `progress-ring`,
-    `timeline`, `stepper` markers, chips/tags/badges…) to `@include mk.tone*`.
-  - Add size-scale and `:host([hidden])` mixins and adopt them where the
-    `sm/md/lg` height/padding/font blocks repeat.
+  - Adopt `mk.focus-ring()` where the 2-line focus-ring block repeats (~43
+    files). Mostly mechanical, but some use a `calc(-1 * …)` offset — pass it as
+    the mixin arg rather than blanket-replacing.
+  - Add a **size-scale** mixin and adopt it where the `sm/md/lg`
+    height/padding/font blocks repeat (button, select, input, badge, …).
+  - The single-`--_main`-var controls (`radio`, `switch`, `slider`, `checkbox`)
+    keep literal one-line `[data-tone]` blocks — a full 6-var `tone()` there
+    would add inert vars; leave as-is or add a focused `tone-main()` mixin.
   - Consider generating the **light** token block from a map too (currently
     literal — it only lives in one place, so lower priority).
   - The original plain-CSS notes below still describe the target end state:

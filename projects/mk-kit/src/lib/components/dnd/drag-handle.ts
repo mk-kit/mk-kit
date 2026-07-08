@@ -21,7 +21,7 @@ import {
   selector: '[mkDragHandle]',
   exportAs: 'mkDragHandle',
   template: '<ng-content />',
-  styleUrl: './drag-handle.css',
+  styleUrl: './drag-handle.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-drag-handle',

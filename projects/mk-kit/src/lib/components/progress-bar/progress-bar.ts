@@ -22,7 +22,7 @@ import { mkUniqueId } from '../../core/a11y/unique-id';
 @Component({
   selector: 'mk-progress-bar',
   templateUrl: './progress-bar.html',
-  styleUrl: './progress-bar.css',
+  styleUrl: './progress-bar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-progress-bar',

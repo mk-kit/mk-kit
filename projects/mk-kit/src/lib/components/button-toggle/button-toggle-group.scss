@@ -1,0 +1,38 @@
+@use '../../../styles/mixins' as mk;
+
+/* The group sets tone + size vars; each mk-button-toggle inherits them via the
+ * cascade (custom properties cross component encapsulation boundaries). */
+:host {
+  --_main: var(--mk-primary);
+  --_contrast: var(--mk-primary-contrast);
+  --_subtle: var(--mk-primary-subtle);
+  --_subtle-text: var(--mk-primary-subtle-text);
+
+  --_h: var(--mk-control-height-md);
+  --_fs: var(--mk-font-size-md);
+  --_pad: var(--mk-space-4);
+  --_radius: var(--mk-radius-md);
+
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+  font-family: var(--mk-font-sans);
+}
+
+@include mk.tone-selectors;
+
+:host(.mk-button-toggle-group--sm) {
+  --_h: var(--mk-control-height-sm);
+  --_fs: var(--mk-font-size-sm);
+  --_pad: var(--mk-space-3);
+  --_radius: var(--mk-radius-sm);
+}
+:host(.mk-button-toggle-group--lg) {
+  --_h: var(--mk-control-height-lg);
+  --_fs: var(--mk-font-size-lg);
+  --_pad: var(--mk-space-5);
+}
+
+:host(.mk-button-toggle-group--disabled) {
+  opacity: 0.7;
+}

@@ -17,7 +17,7 @@ export type MkDividerOrientation = 'horizontal' | 'vertical';
 @Component({
   selector: 'mk-divider',
   templateUrl: './divider.html',
-  styleUrl: './divider.css',
+  styleUrl: './divider.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-divider',

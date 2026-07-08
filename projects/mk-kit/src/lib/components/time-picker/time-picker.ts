@@ -49,7 +49,7 @@ function pad2(n: number): string {
 @Component({
   selector: 'mk-time-picker',
   templateUrl: './time-picker.html',
-  styleUrl: './time-picker.css',
+  styleUrl: './time-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-time-picker',

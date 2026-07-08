@@ -29,7 +29,7 @@ export type MkTabsVariant = 'line' | 'pill';
 @Component({
   selector: 'mk-tabs',
   templateUrl: './tabs.html',
-  styleUrl: './tabs.css',
+  styleUrl: './tabs.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tabs',

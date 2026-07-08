@@ -27,7 +27,7 @@ import { MkIconRegistry } from './icon-registry';
 @Component({
   selector: 'mk-icon',
   templateUrl: './icon.html',
-  styleUrl: './icon.css',
+  styleUrl: './icon.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Icons style their inner <svg> (from innerHTML or projection), which never
   // receives emulated-encapsulation attributes — so scope every rule under

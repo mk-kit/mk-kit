@@ -29,7 +29,7 @@ import { MkFormField } from '../form-field/form-field';
 @Component({
   selector: 'mk-switch',
   templateUrl: './switch.html',
-  styleUrl: './switch.css',
+  styleUrl: './switch.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-switch',

@@ -41,7 +41,7 @@ interface MkInlineTool {
 @Component({
   selector: 'mk-rich-text',
   templateUrl: './rich-text.html',
-  styleUrl: './rich-text.css',
+  styleUrl: './rich-text.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mk-rich-text' },
 })

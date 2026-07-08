@@ -26,7 +26,7 @@ import { mkUniqueId } from '../../core/a11y/unique-id';
 @Component({
   selector: 'mk-step',
   templateUrl: './step.html',
-  styleUrl: './step.css',
+  styleUrl: './step.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-step',

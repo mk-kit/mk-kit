@@ -14,7 +14,7 @@ import type { MkSize, MkTone } from '../../core/types';
 @Component({
   selector: 'mk-spinner',
   templateUrl: './spinner.html',
-  styleUrl: './spinner.css',
+  styleUrl: './spinner.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-spinner',

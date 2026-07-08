@@ -18,7 +18,7 @@ import {
 @Component({
   selector: 'mk-breadcrumb-item',
   templateUrl: './breadcrumb-item.html',
-  styleUrl: './breadcrumb-item.css',
+  styleUrl: './breadcrumb-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-breadcrumb-item',

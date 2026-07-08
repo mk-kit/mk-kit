@@ -21,7 +21,7 @@ import { mkUniqueId } from '../../core/a11y/unique-id';
 @Component({
   selector: 'mk-tab',
   templateUrl: './tab.html',
-  styleUrl: './tab.css',
+  styleUrl: './tab.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tab',

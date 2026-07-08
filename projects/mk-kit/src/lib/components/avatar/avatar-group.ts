@@ -27,7 +27,7 @@ import { MkAvatar } from './avatar';
 @Component({
   selector: 'mk-avatar-group',
   templateUrl: './avatar-group.html',
-  styleUrl: './avatar-group.css',
+  styleUrl: './avatar-group.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-avatar-group',

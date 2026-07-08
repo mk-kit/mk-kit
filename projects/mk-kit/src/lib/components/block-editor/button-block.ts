@@ -13,7 +13,7 @@ const TONES: MkTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', '
 @Component({
   selector: 'mk-button-block',
   templateUrl: './button-block.html',
-  styleUrl: './button-block.css',
+  styleUrl: './button-block.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MkButtonBlock {

@@ -30,7 +30,7 @@ export type MkSparklineType = 'line' | 'area' | 'bar';
 @Component({
   selector: 'mk-sparkline',
   templateUrl: './sparkline.html',
-  styleUrl: './sparkline.css',
+  styleUrl: './sparkline.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-sparkline',

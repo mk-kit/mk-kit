@@ -32,7 +32,7 @@ export interface MkConfirmDialogData {
   selector: 'mk-confirm-dialog',
   imports: [MkDialog, MkButton],
   templateUrl: './confirm-dialog.html',
-  styleUrl: './confirm-dialog.css',
+  styleUrl: './confirm-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MkConfirmDialog {

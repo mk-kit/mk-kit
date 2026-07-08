@@ -58,7 +58,7 @@ const RATIO_PRESETS: Record<number, { value: string; label: string }[]> = {
     MkBlockInserter,
   ],
   templateUrl: './block-list.html',
-  styleUrl: './block-list.css',
+  styleUrl: './block-list.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mk-block-list' },
 })

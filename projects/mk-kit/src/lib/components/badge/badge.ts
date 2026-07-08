@@ -22,7 +22,7 @@ export type MkBadgeVariant = 'solid' | 'soft' | 'outline';
 @Component({
   selector: 'mk-badge',
   templateUrl: './badge.html',
-  styleUrl: './badge.css',
+  styleUrl: './badge.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-badge',

@@ -23,7 +23,7 @@ type ImageAlign = 'left' | 'center' | 'right';
 @Component({
   selector: 'mk-image-block',
   templateUrl: './image-block.html',
-  styleUrl: './image-block.css',
+  styleUrl: './image-block.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MkImageBlock {

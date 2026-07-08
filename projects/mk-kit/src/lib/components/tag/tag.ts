@@ -16,7 +16,7 @@ export type MkTagVariant = 'solid' | 'soft' | 'outline';
 @Component({
   selector: 'mk-tag',
   templateUrl: './tag.html',
-  styleUrl: './tag.css',
+  styleUrl: './tag.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tag',

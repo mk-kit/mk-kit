@@ -32,7 +32,7 @@ import { MkNavList } from './nav-list';
 @Component({
   selector: 'mk-nav-item',
   templateUrl: './nav-item.html',
-  styleUrl: './nav-item.css',
+  styleUrl: './nav-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-nav-item',

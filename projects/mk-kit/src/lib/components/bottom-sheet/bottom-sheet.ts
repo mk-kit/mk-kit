@@ -33,7 +33,7 @@ const DISMISS_THRESHOLD = 120;
 @Component({
   selector: 'mk-bottom-sheet',
   templateUrl: './bottom-sheet.html',
-  styleUrl: './bottom-sheet.css',
+  styleUrl: './bottom-sheet.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   // Unencapsulated so `.mk-bottom-sheet-panel` (the body-level overlay panel
   // outside this component's view) can be styled from here.

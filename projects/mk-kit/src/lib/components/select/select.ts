@@ -46,7 +46,7 @@ export interface MkSelectOption {
 @Component({
   selector: 'mk-select',
   templateUrl: './select.html',
-  styleUrl: './select.css',
+  styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-select',

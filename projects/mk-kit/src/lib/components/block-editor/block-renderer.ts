@@ -22,7 +22,7 @@ import { mkIsSafeUrl, sanitizeInlineHtml } from './block-serializer';
 @Component({
   selector: 'mk-block-renderer',
   templateUrl: './block-renderer.html',
-  styleUrl: './block-renderer.css',
+  styleUrl: './block-renderer.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mk-block-renderer' },
 })

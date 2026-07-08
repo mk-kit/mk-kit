@@ -33,7 +33,7 @@ const GAP = 4;
   selector: 'mk-menu',
   exportAs: 'mkMenu',
   templateUrl: './menu.html',
-  styleUrl: './menu.css',
+  styleUrl: './menu.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-menu',

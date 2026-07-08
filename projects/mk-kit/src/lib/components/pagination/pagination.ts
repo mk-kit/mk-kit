@@ -27,7 +27,7 @@ export type MkPageItem = number | 'ellipsis';
 @Component({
   selector: 'mk-pagination',
   templateUrl: './pagination.html',
-  styleUrl: './pagination.css',
+  styleUrl: './pagination.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-pagination',

@@ -23,7 +23,7 @@ import { MkAccordion } from './accordion';
 @Component({
   selector: 'mk-accordion-item',
   templateUrl: './accordion-item.html',
-  styleUrl: './accordion-item.css',
+  styleUrl: './accordion-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-accordion-item',

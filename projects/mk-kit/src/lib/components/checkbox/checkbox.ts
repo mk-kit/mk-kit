@@ -32,7 +32,7 @@ import { MkFormField } from '../form-field/form-field';
 @Component({
   selector: 'mk-checkbox',
   templateUrl: './checkbox.html',
-  styleUrl: './checkbox.css',
+  styleUrl: './checkbox.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-checkbox',

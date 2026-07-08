@@ -42,7 +42,7 @@ const MARGIN = { top: 14, right: 14, bottom: 30, left: 44 };
 @Component({
   selector: 'mk-bar-chart',
   templateUrl: './bar-chart.html',
-  styleUrl: './charts.css',
+  styleUrl: './charts.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-chart mk-bar-chart',

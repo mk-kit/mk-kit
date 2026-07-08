@@ -34,7 +34,7 @@ const MARGIN = { top: 14, right: 16, bottom: 30, left: 44 };
 @Component({
   selector: 'mk-line-chart',
   templateUrl: './line-chart.html',
-  styleUrl: './charts.css',
+  styleUrl: './charts.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-chart mk-line-chart',

@@ -38,7 +38,7 @@ interface SliceGeom {
 @Component({
   selector: 'mk-donut-chart',
   templateUrl: './donut-chart.html',
-  styleUrl: './charts.css',
+  styleUrl: './charts.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-chart mk-donut-chart',

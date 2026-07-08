@@ -17,7 +17,7 @@ import { ChangeDetectionStrategy, Component } from '@angular/core';
 @Component({
   selector: 'mk-timeline',
   template: '<ng-content />',
-  styleUrl: './timeline.css',
+  styleUrl: './timeline.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-timeline',

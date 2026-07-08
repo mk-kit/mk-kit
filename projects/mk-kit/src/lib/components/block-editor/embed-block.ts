@@ -14,7 +14,7 @@ import { mkIsSafeUrl } from './block-serializer';
 @Component({
   selector: 'mk-embed-block',
   templateUrl: './embed-block.html',
-  styleUrl: './embed-block.css',
+  styleUrl: './embed-block.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MkEmbedBlock {

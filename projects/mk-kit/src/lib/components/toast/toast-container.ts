@@ -11,7 +11,7 @@ import { MkToastService } from './toast.service';
   selector: 'mk-toast-container',
   imports: [MkToast],
   templateUrl: './toast-container.html',
-  styleUrl: './toast-container.css',
+  styleUrl: './toast-container.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-toast-container',

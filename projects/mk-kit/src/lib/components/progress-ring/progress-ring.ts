@@ -22,7 +22,7 @@ import type { MkTone } from '../../core/types';
 @Component({
   selector: 'mk-progress-ring',
   templateUrl: './progress-ring.html',
-  styleUrl: './progress-ring.css',
+  styleUrl: './progress-ring.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-progress-ring',

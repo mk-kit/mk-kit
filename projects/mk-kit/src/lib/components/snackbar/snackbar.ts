@@ -15,7 +15,7 @@ import { MkSnackbarItem, MkSnackbarService } from './snackbar.service';
 @Component({
   selector: 'mk-snackbar',
   templateUrl: './snackbar.html',
-  styleUrl: './snackbar.css',
+  styleUrl: './snackbar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-snackbar',

@@ -24,7 +24,7 @@ import { MkBreadcrumbItem } from './breadcrumb-item';
 @Component({
   selector: 'mk-breadcrumb',
   templateUrl: './breadcrumb.html',
-  styleUrl: './breadcrumb.css',
+  styleUrl: './breadcrumb.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-breadcrumb',

@@ -22,7 +22,7 @@ import { MkSort, MkSortable } from './sort';
 @Component({
   selector: '[mkSortHeader]',
   templateUrl: './sort-header.html',
-  styleUrl: './sort-header.css',
+  styleUrl: './sort-header.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-sort-header',

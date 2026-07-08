@@ -45,7 +45,7 @@ const SETTLE_MS = 180;
   selector: '[mkDrag]',
   exportAs: 'mkDrag',
   templateUrl: './drag.html',
-  styleUrl: './drag.css',
+  styleUrl: './drag.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-drag',

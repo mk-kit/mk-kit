@@ -61,7 +61,7 @@ interface MkWeekdayHeader {
 @Component({
   selector: 'mk-calendar',
   templateUrl: './calendar.html',
-  styleUrl: './calendar.css',
+  styleUrl: './calendar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-calendar',

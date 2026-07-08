@@ -56,7 +56,7 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
 @Component({
   selector: 'mk-autocomplete',
   templateUrl: './autocomplete.html',
-  styleUrl: './autocomplete.css',
+  styleUrl: './autocomplete.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-autocomplete',

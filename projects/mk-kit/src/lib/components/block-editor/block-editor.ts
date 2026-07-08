@@ -54,7 +54,7 @@ import { MkBlockList } from './block-list';
   selector: 'mk-block-editor',
   imports: [MkBlockList],
   templateUrl: './block-editor.html',
-  styleUrl: './block-editor.css',
+  styleUrl: './block-editor.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-block-editor',

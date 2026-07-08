@@ -22,7 +22,7 @@ import {
 @Component({
   selector: 'mk-list-item',
   templateUrl: './list-item.html',
-  styleUrl: './list-item.css',
+  styleUrl: './list-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-list-item',

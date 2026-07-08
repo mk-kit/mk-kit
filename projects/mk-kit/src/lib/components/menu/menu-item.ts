@@ -26,7 +26,7 @@ import { MkMenu } from './menu';
 @Component({
   selector: 'mk-menu-item',
   templateUrl: './menu-item.html',
-  styleUrl: './menu-item.css',
+  styleUrl: './menu-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-menu-item',
