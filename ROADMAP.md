@@ -52,8 +52,9 @@ live-announcer core.
 - ✅ **Drawer** (`mk-drawer`) — declarative slide-out side panel (shipped).
 - ✅ **Toolbar** (`mk-toolbar`) — standalone action bar (shipped).
 - ✅ **Page header** (`mk-page-header`) — title/breadcrumb/meta/actions/tabs (shipped).
-- **P1 Command palette** (`mk-command-palette`, ⌘K) — fuzzy action search; a
-  hallmark of modern admin UIs.
+- ✅ **Command palette** (`mk-command-palette`, ⌘K) — filtered, grouped action
+  menu (shipped).
+- ✅ **Nav group** (`mk-nav-group`) — collapsible sidebar sections (shipped).
 - **P1 Split panes / resizable layout** (`mk-splitter`) — dashboard panel resize.
 - **P2 FAB / speed-dial**, **P2 scrollspy**, **P2 back-to-top**.
 - **P3 Scroll-area** — cross-browser custom scrollbar container.

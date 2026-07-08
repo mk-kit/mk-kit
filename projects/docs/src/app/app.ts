@@ -70,6 +70,7 @@ export class App {
         { label: 'Charts', path: '/components/charts', icon: '▚' },
         { label: 'Empty & timeline', path: '/components/empty-timeline', icon: '☰' },
         { label: 'Structure', path: '/components/structure', icon: '▤' },
+        { label: 'Command & nav', path: '/components/command-nav', icon: '⌘' },
         { label: 'Data display', path: '/components/data', icon: '▦' },
         { label: 'Date & time', path: '/components/date-time', icon: '◷' },
         { label: 'Drag & drop', path: '/components/drag-drop', icon: '⤨' },

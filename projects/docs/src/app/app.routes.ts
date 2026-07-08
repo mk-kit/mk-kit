@@ -141,6 +141,14 @@ export const routes: Routes = [
       import('./pages/structure/structure-page').then((m) => m.StructurePage),
   },
   {
+    path: 'components/command-nav',
+    title: 'Command palette & nav — mk-kit',
+    loadComponent: () =>
+      import('./pages/command-nav/command-nav-page').then(
+        (m) => m.CommandNavPage,
+      ),
+  },
+  {
     path: 'components/data',
     title: 'Data display — mk-kit',
     loadComponent: () =>
