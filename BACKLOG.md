@@ -29,9 +29,14 @@ Future work for `@mk-kit/ui`, deferred from the main line of development.
     files), passing the negative-offset variants (`calc(-1 * …)` /
     `calc(… * -1)`) as the mixin arg. Verified byte-identical compiled output.
 
-  **Remaining:**
-  - Add a **size-scale** mixin and adopt it where the `sm/md/lg`
-    height/padding/font blocks repeat (button, select, input, badge, …).
+  **Also done:**
+  - Added a `mk.control-size($size, $padding)` mixin (height + padding +
+    font-size triple) and adopted it in the control inputs whose size blocks
+    matched exactly: `button`, `select`, `input`, `autocomplete` (8 blocks).
+    Padding is a parameter (varies per component); size-scoped `border-radius`
+    stays with the caller. Verified byte-identical compiled output.
+
+  **Remaining (optional):**
   - The single-`--_main`-var controls (`radio`, `switch`, `slider`, `checkbox`)
     keep literal one-line `[data-tone]` blocks — a full 6-var `tone()` there
     would add inert vars; leave as-is or add a focused `tone-main()` mixin.

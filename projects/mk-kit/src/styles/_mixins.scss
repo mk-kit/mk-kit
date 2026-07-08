@@ -56,3 +56,13 @@ $tones: (primary, success, warning, danger, info, neutral);
   outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
   outline-offset: $offset;
 }
+
+/// The repeated control-size triple — `height` + `padding` + `font-size` — for
+/// a sized control (`sm`/`md`/`lg`). `$padding` is the full padding value (it
+/// varies per component, so it's passed in); any size-scoped `border-radius`
+/// stays with the caller.
+@mixin control-size($size, $padding) {
+  height: var(--mk-control-height-#{$size});
+  padding: $padding;
+  font-size: var(--mk-font-size-#{$size});
+}

@@ -35,15 +35,11 @@
 }
 
 :host(.mk-autocomplete--sm) .mk-autocomplete__input {
-  height: var(--mk-control-height-sm);
-  padding: 0 var(--mk-space-7) 0 var(--mk-space-2);
-  font-size: var(--mk-font-size-sm);
+  @include mk.control-size(sm, 0 var(--mk-space-7) 0 var(--mk-space-2));
   border-radius: var(--mk-radius-sm);
 }
 :host(.mk-autocomplete--lg) .mk-autocomplete__input {
-  height: var(--mk-control-height-lg);
-  padding: 0 var(--mk-space-9) 0 var(--mk-space-4);
-  font-size: var(--mk-font-size-lg);
+  @include mk.control-size(lg, 0 var(--mk-space-9) 0 var(--mk-space-4));
 }
 
 .mk-autocomplete__input:hover:not(:disabled) {

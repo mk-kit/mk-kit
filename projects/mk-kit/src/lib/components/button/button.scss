@@ -38,15 +38,11 @@
 
 /* Sizes */
 :host(.mk-button--sm) {
-  height: var(--mk-control-height-sm);
-  padding: 0 var(--mk-space-3);
-  font-size: var(--mk-font-size-sm);
+  @include mk.control-size(sm, 0 var(--mk-space-3));
   border-radius: var(--mk-radius-sm);
 }
 :host(.mk-button--lg) {
-  height: var(--mk-control-height-lg);
-  padding: 0 var(--mk-space-5);
-  font-size: var(--mk-font-size-lg);
+  @include mk.control-size(lg, 0 var(--mk-space-5));
 }
 
 :host(.mk-button--block) {
