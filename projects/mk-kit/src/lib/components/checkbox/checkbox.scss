@@ -12,12 +12,7 @@
 :host(.mk-checkbox--sm) { --_box-size: 1rem; }
 :host(.mk-checkbox--lg) { --_box-size: 1.35rem; }
 
-:host([data-tone='primary']) { --_main: var(--mk-primary); --_contrast: var(--mk-primary-contrast); }
-:host([data-tone='success']) { --_main: var(--mk-success); --_contrast: var(--mk-success-contrast); }
-:host([data-tone='warning']) { --_main: var(--mk-warning); --_contrast: var(--mk-warning-contrast); }
-:host([data-tone='danger'])  { --_main: var(--mk-danger);  --_contrast: var(--mk-danger-contrast); }
-:host([data-tone='info'])    { --_main: var(--mk-info);    --_contrast: var(--mk-info-contrast); }
-:host([data-tone='neutral']) { --_main: var(--mk-surface-inverse); --_contrast: var(--mk-text-inverse); }
+@include mk.tone-main-selectors($contrast: true);
 
 .mk-checkbox__root {
   display: inline-flex;

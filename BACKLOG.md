@@ -36,10 +36,13 @@ Future work for `@mk-kit/ui`, deferred from the main line of development.
     Padding is a parameter (varies per component); size-scoped `border-radius`
     stays with the caller. Verified byte-identical compiled output.
 
+  **Also done:**
+  - Added `mk.tone-main-selectors($contrast)` and adopted it in the
+    single-`--_main` controls — `radio`, `switch`, `slider` (main only) and
+    `checkbox` (`$contrast: true`). Verified byte-identical compiled output.
+    The SCSS refactor is now effectively complete.
+
   **Remaining (optional):**
-  - The single-`--_main`-var controls (`radio`, `switch`, `slider`, `checkbox`)
-    keep literal one-line `[data-tone]` blocks — a full 6-var `tone()` there
-    would add inert vars; leave as-is or add a focused `tone-main()` mixin.
   - Consider generating the **light** token block from a map too (currently
     literal — it only lives in one place, so lower priority).
   - The original plain-CSS notes below still describe the target end state:

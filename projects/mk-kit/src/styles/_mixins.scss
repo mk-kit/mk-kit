@@ -51,6 +51,27 @@ $tones: (primary, success, warning, danger, info, neutral);
   }
 }
 
+/// Lightweight tone selectors for controls that only need `--_main` (the
+/// accent), e.g. radio / switch / slider. Pass `$contrast: true` to also set
+/// `--_contrast` (e.g. checkbox, whose tick needs a readable colour).
+@mixin tone-main-selectors($contrast: false) {
+  @each $t in $tones {
+    :host([data-tone='#{$t}']) {
+      @if $t == neutral {
+        --_main: var(--mk-surface-inverse);
+        @if $contrast {
+          --_contrast: var(--mk-text-inverse);
+        }
+      } @else {
+        --_main: var(--mk-#{$t});
+        @if $contrast {
+          --_contrast: var(--mk-#{$t}-contrast);
+        }
+      }
+    }
+  }
+}
+
 /// The standard keyboard focus ring.
 @mixin focus-ring($offset: var(--mk-focus-ring-offset)) {
   outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);

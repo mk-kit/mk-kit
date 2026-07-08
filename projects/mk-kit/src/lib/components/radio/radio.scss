@@ -16,12 +16,7 @@
 :host(.mk-radio--sm) { --_size: 1rem; font-size: var(--mk-font-size-sm); }
 :host(.mk-radio--lg) { --_size: 1.35rem; font-size: var(--mk-font-size-lg); }
 
-:host([data-tone='primary']) { --_main: var(--mk-primary); }
-:host([data-tone='success']) { --_main: var(--mk-success); }
-:host([data-tone='warning']) { --_main: var(--mk-warning); }
-:host([data-tone='danger'])  { --_main: var(--mk-danger); }
-:host([data-tone='info'])    { --_main: var(--mk-info); }
-:host([data-tone='neutral']) { --_main: var(--mk-surface-inverse); }
+@include mk.tone-main-selectors;
 
 .mk-radio__control {
   display: inline-flex;
