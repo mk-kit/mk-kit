@@ -1,0 +1,44 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+# Cancel superseded runs on the same ref.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          # Angular 22's CLI requires Node >= 24.15.
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build:lib
+
+      - name: Test library
+        run: npm run test:lib
+
+      - name: Test docs
+        run: npm run test:docs
+
+      - name: Build docs
+        run: npm run build
+
+      - name: Verify package (publish dry-run)
+        run: npm publish --dry-run --access public
+        working-directory: dist/mk-kit

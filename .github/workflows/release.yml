@@ -1,0 +1,35 @@
+name: Release
+
+# Publishes @mk-kit/ui to npm when a version tag (e.g. v0.1.0) is pushed.
+# Requires an NPM_TOKEN repository secret with publish rights to the @mk-kit scope.
+on:
+  push:
+    tags: ['v*']
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24.18.0
+          cache: npm
+          registry-url: https://registry.npmjs.org
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build:lib
+
+      - name: Test library
+        run: npm run test:lib
+
+      - name: Publish to npm
+        run: npm publish --access public
+        working-directory: dist/mk-kit
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
