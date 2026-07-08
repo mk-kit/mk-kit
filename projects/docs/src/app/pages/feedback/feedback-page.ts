@@ -1,0 +1,693 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  inject,
+  signal,
+} from '@angular/core';
+import {
+  MkAlert,
+  MkButton,
+  MkDialog,
+  MkDialogService,
+  MkDialogTitle,
+  MkOverlayRef,
+  MkToastService,
+  MkTooltip,
+} from '@mk-kit/ui';
+import { DocsExample } from '../../shared/docs-example';
+
+/**
+ * Small custom dialog content component opened via `MkDialogService.open`. It
+ * lays out its content with `mk-dialog` (sticky header/title, scrollable body,
+ * sticky footer) and closes the surrounding overlay through the injected
+ * {@link MkOverlayRef}, optionally returning a result to `afterClosed`.
+ */
+@Component({
+  selector: 'docs-demo-dialog',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkDialog, MkDialogTitle, MkButton],
+  template: `
+    <mk-dialog>
+      <mk-dialog-title>Invite teammate</mk-dialog-title>
+      <p>
+        This is a fully custom dialog body rendered by a standalone component.
+        Anything can live here — forms, media, or rich content that scrolls
+        independently of the sticky header and footer.
+      </p>
+      <div mkDialogFooter>
+        <button mkButton variant="ghost" tone="neutral" (click)="cancel()">
+          Cancel
+        </button>
+        <button mkButton (click)="send()">Send invite</button>
+      </div>
+    </mk-dialog>
+  `,
+})
+export class DemoDialogContent {
+  private readonly ref = inject<MkOverlayRef<string>>(MkOverlayRef);
+
+  protected cancel(): void {
+    this.ref.close();
+  }
+
+  protected send(): void {
+    this.ref.close('sent');
+  }
+}
+
+/**
+ * Documentation page for the Feedback & Overlay component group: Alert,
+ * Tooltip, Toast, and Dialog.
+ */
+@Component({
+  selector: 'docs-feedback-page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DocsExample, MkAlert, MkButton, MkTooltip],
+  template: `
+    <div class="docs-page docs-container">
+      <h1>Feedback &amp; Overlay</h1>
+      <p class="docs-lead">
+        Components for communicating status and surfacing transient content:
+        inline <code class="docs-inline">Alert</code> banners, hover/focus
+        <code class="docs-inline">Tooltip</code>s, stacked
+        <code class="docs-inline">Toast</code> notifications, and modal
+        <code class="docs-inline">Dialog</code>s — all themed with
+        <code class="docs-inline">--mk-*</code> tokens and fully accessible.
+      </p>
+
+      <!-- ============================ ALERT ============================ -->
+      <h2>Alert</h2>
+      <p>
+        An inline banner that communicates a contextual status message. Set a
+        semantic <code class="docs-inline">tone</code> and a
+        <code class="docs-inline">variant</code>, an optional bold
+        <code class="docs-inline">title</code>, and mark it
+        <code class="docs-inline">dismissible</code> to render a close button
+        that emits <code class="docs-inline">dismissed</code>. Danger and
+        warning tones announce assertively (<code class="docs-inline"
+          >role="alert"</code
+        >); other tones use <code class="docs-inline">role="status"</code>.
+      </p>
+
+      <h3>Tones</h3>
+      <docs-example [code]="alertTonesCode" [column]="true">
+        <mk-alert tone="info" title="Heads up">
+          A new version of the workspace is available.
+        </mk-alert>
+        <mk-alert tone="success" title="Saved">
+          Your changes were saved successfully.
+        </mk-alert>
+        <mk-alert tone="warning" title="Storage almost full">
+          You have used 92% of your quota.
+        </mk-alert>
+        <mk-alert tone="danger" title="Payment failed">
+          We could not process your card.
+        </mk-alert>
+        <mk-alert tone="neutral">A plain, tone-neutral note.</mk-alert>
+      </docs-example>
+
+      <h3>Variants</h3>
+      <docs-example [code]="alertVariantsCode" [column]="true">
+        <mk-alert tone="success" variant="soft" title="Soft">
+          The default, low-emphasis treatment.
+        </mk-alert>
+        <mk-alert tone="success" variant="solid" title="Solid">
+          A filled, high-emphasis treatment.
+        </mk-alert>
+        <mk-alert tone="success" variant="outline" title="Outline">
+          A bordered, transparent treatment.
+        </mk-alert>
+      </docs-example>
+
+      <h3>Dismissible</h3>
+      <docs-example [code]="alertDismissibleCode" [column]="true">
+        @if (alertVisible()) {
+          <mk-alert
+            tone="info"
+            variant="outline"
+            title="Dismissible"
+            dismissible
+            (dismissed)="alertVisible.set(false)"
+          >
+            Click the close button to dismiss this alert.
+          </mk-alert>
+        } @else {
+          <button mkButton variant="ghost" (click)="alertVisible.set(true)">
+            Restore alert
+          </button>
+        }
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>Input</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">MkAlertTone</code></td>
+            <td><code class="docs-inline">'info'</code></td>
+            <td>info | success | warning | danger | neutral.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">variant</code></td>
+            <td><code class="docs-inline">MkAlertVariant</code></td>
+            <td><code class="docs-inline">'soft'</code></td>
+            <td>soft | solid | outline.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">title</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">undefined</code></td>
+            <td>Optional bold heading above the message.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">dismissible</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Renders a keyboard-accessible close button.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">(dismissed)</code></td>
+            <td><code class="docs-inline">EventEmitter&lt;void&gt;</code></td>
+            <td>—</td>
+            <td>Emitted when the close button is activated.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- =========================== TOOLTIP =========================== -->
+      <h2>Tooltip</h2>
+      <p>
+        The <code class="docs-inline">[mkTooltip]</code> directive shows a themed
+        tooltip on hover <em>and</em> keyboard focus, hides on blur, mouse-leave,
+        or <kbd>Escape</kbd>, and wires the trigger to the tooltip via
+        <code class="docs-inline">aria-describedby</code>. Set
+        <code class="docs-inline">mkTooltipPlacement</code> to position it.
+        Hover or focus the buttons below.
+      </p>
+      <docs-example [code]="tooltipCode">
+        <button mkButton variant="ghost" [mkTooltip]="'Appears on top'">
+          Top
+        </button>
+        <button
+          mkButton
+          variant="ghost"
+          [mkTooltip]="'Appears below'"
+          mkTooltipPlacement="bottom"
+        >
+          Bottom
+        </button>
+        <button
+          mkButton
+          variant="ghost"
+          [mkTooltip]="'To the left'"
+          mkTooltipPlacement="left"
+        >
+          Left
+        </button>
+        <button
+          mkButton
+          variant="ghost"
+          [mkTooltip]="'To the right'"
+          mkTooltipPlacement="right"
+        >
+          Right
+        </button>
+        <span
+          class="docs-tip-target"
+          tabindex="0"
+          [mkTooltip]="'Works on any focusable element'"
+          mkTooltipPlacement="bottom-start"
+        >
+          Any element
+        </span>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>Input</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">mkTooltip</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">''</code></td>
+            <td>Tooltip text. When empty the tooltip is suppressed.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">mkTooltipPlacement</code></td>
+            <td><code class="docs-inline">MkPlacement</code></td>
+            <td><code class="docs-inline">'top'</code></td>
+            <td>
+              top | top-start | top-end | bottom | bottom-start | bottom-end |
+              left | right.
+            </td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ============================ TOAST ============================ -->
+      <h2>Toast</h2>
+      <p>
+        <code class="docs-inline">MkToastService</code> enqueues transient
+        notifications rendered by a single, lazily-mounted container at the
+        bottom-right of the viewport. Inject the service and call
+        <code class="docs-inline">success()</code>,
+        <code class="docs-inline">danger()</code>, or the generic
+        <code class="docs-inline">show()</code>. Each toast auto-dismisses after
+        <code class="docs-inline">duration</code> ms (pass
+        <code class="docs-inline">0</code> to keep it sticky) and can carry an
+        action button.
+      </p>
+      <p>
+        <strong>No markup required.</strong> The service auto-mounts its
+        container the first time a toast is shown — you never place a container
+        component in your templates.
+      </p>
+      <docs-example [code]="toastCode">
+        <button mkButton tone="success" (click)="showSuccessToast()">
+          Success
+        </button>
+        <button mkButton tone="danger" (click)="showDangerToast()">
+          Danger
+        </button>
+        <button mkButton variant="ghost" (click)="showStickyToast()">
+          Sticky (duration 0)
+        </button>
+        <button mkButton variant="ghost" (click)="showActionToast()">
+          With action
+        </button>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>MkToastConfig</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">message</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Body message (required).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">title</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">undefined</code></td>
+            <td>Optional bold heading.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">MkToastTone</code></td>
+            <td><code class="docs-inline">'info'</code></td>
+            <td>info | success | warning | danger | neutral.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">duration</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">5000</code></td>
+            <td>Auto-dismiss delay in ms; <code class="docs-inline">0</code> keeps it until dismissed.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">dismissible</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Show a close button.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">action</code></td>
+            <td><code class="docs-inline">MkToastAction</code></td>
+            <td><code class="docs-inline">undefined</code></td>
+            <td>Optional <code class="docs-inline">{{ '{' }} label, handler? {{ '}' }}</code> button; the toast dismisses after it runs.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        Convenience methods —
+        <code class="docs-inline">info</code>,
+        <code class="docs-inline">success</code>,
+        <code class="docs-inline">warning</code>,
+        <code class="docs-inline">danger</code>,
+        <code class="docs-inline">neutral</code> — take
+        <code class="docs-inline">(message: string, config?: Partial&lt;MkToastConfig&gt;)</code>
+        and return the toast id. <code class="docs-inline">show(config)</code>,
+        <code class="docs-inline">dismiss(id)</code>, and
+        <code class="docs-inline">clear()</code> round out the API.
+      </p>
+
+      <!-- ============================ DIALOG =========================== -->
+      <h2>Dialog</h2>
+      <p>
+        <code class="docs-inline">MkDialogService</code> renders content on a
+        themed <code class="docs-inline">--mk-surface</code> panel with a
+        backdrop, focus trap, and Escape handling. Use
+        <code class="docs-inline">confirm()</code> for a yes/no prompt, or
+        <code class="docs-inline">open()</code> to mount your own standalone
+        component.
+      </p>
+
+      <h3>Confirm</h3>
+      <p>
+        <code class="docs-inline">confirm()</code> resolves
+        <code class="docs-inline">true</code> when confirmed and
+        <code class="docs-inline">false</code> on cancel, Escape, or backdrop
+        click.
+      </p>
+      <docs-example [code]="confirmCode">
+        <button mkButton tone="danger" (click)="openConfirm()">
+          Delete workspace…
+        </button>
+        <span class="docs-status">
+          @if (confirmResult() === null) {
+            No result yet.
+          } @else if (confirmResult()) {
+            Confirmed ✓
+          } @else {
+            Cancelled ✕
+          }
+        </span>
+      </docs-example>
+
+      <h3>Custom dialog</h3>
+      <p>
+        Pass a standalone component to
+        <code class="docs-inline">open()</code>. Lay it out with
+        <code class="docs-inline">mk-dialog</code> and close it through the
+        injected <code class="docs-inline">MkOverlayRef</code>, optionally
+        returning a result to <code class="docs-inline">afterClosed</code>.
+      </p>
+      <docs-example [code]="openCode">
+        <button mkButton (click)="openCustom()">Open dialog…</button>
+        <span class="docs-status">
+          @if (openResult(); as r) {
+            Closed with: {{ r }}
+          }
+        </span>
+      </docs-example>
+
+      <p>The projected <code class="docs-inline">mk-dialog</code> markup:</p>
+      <docs-example [code]="dialogMarkupCode"></docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>MkDialogConfig</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">data</code></td>
+            <td><code class="docs-inline">TData</code></td>
+            <td><code class="docs-inline">null</code></td>
+            <td>Injected into the component via <code class="docs-inline">MK_OVERLAY_DATA</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">hasBackdrop</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Render a dimmed scrim behind the panel.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">closeOnBackdropClick</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Close when the backdrop is clicked.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">closeOnEscape</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Close when Escape is pressed.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">trapFocus</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Trap focus within the panel and restore on close.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">panelClass</code></td>
+            <td><code class="docs-inline">string | string[]</code></td>
+            <td><code class="docs-inline">undefined</code></td>
+            <td>Extra class(es) on the panel host element.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">role</code></td>
+            <td><code class="docs-inline">'dialog' | 'alertdialog' | …</code></td>
+            <td><code class="docs-inline">'dialog'</code></td>
+            <td>Accessible role for the panel.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">ariaLabel</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">undefined</code></td>
+            <td>Panel label when no visible title is wired up.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>confirm() data</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">title</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Heading text (required).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">message</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Body message (required).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">confirmText</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'Confirm'</code></td>
+            <td>Confirm button label.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">cancelText</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'Cancel'</code></td>
+            <td>Cancel button label.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">'primary' | 'danger' | 'warning' | 'success'</code></td>
+            <td><code class="docs-inline">'primary'</code></td>
+            <td>Confirm button tone; <code class="docs-inline">'danger'</code> switches the panel to <code class="docs-inline">alertdialog</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+      .docs-tip-target {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--mk-space-2) var(--mk-space-3);
+        border: 1px dashed var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        color: var(--mk-text-muted);
+        cursor: help;
+      }
+      .docs-tip-target:focus-visible {
+        outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+        outline-offset: var(--mk-focus-ring-offset);
+      }
+      .docs-status {
+        display: inline-flex;
+        align-items: center;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+    `,
+  ],
+})
+export class FeedbackPage {
+  private readonly toast = inject(MkToastService);
+  private readonly dialog = inject(MkDialogService);
+
+  protected readonly alertVisible = signal(true);
+  protected readonly confirmResult = signal<boolean | null>(null);
+  protected readonly openResult = signal<string | null>(null);
+
+  // ------------------------------- Toast -------------------------------
+  protected showSuccessToast(): void {
+    this.toast.success('Your changes were saved.', { title: 'Saved' });
+  }
+
+  protected showDangerToast(): void {
+    this.toast.danger('We could not reach the server.', {
+      title: 'Connection lost',
+    });
+  }
+
+  protected showStickyToast(): void {
+    this.toast.show({
+      title: 'Sync in progress',
+      message: 'This toast stays until you dismiss it.',
+      tone: 'info',
+      duration: 0,
+    });
+  }
+
+  protected showActionToast(): void {
+    this.toast.show({
+      title: 'Item archived',
+      message: 'The record was moved to the archive.',
+      tone: 'neutral',
+      duration: 8000,
+      action: {
+        label: 'Undo',
+        handler: () => this.toast.success('Restored.'),
+      },
+    });
+  }
+
+  // ------------------------------- Dialog ------------------------------
+  protected async openConfirm(): Promise<void> {
+    const confirmed = await this.dialog.confirm({
+      title: 'Delete workspace?',
+      message: 'This permanently removes the workspace and all its data.',
+      confirmText: 'Delete',
+      cancelText: 'Keep it',
+      tone: 'danger',
+    });
+    this.confirmResult.set(confirmed);
+  }
+
+  protected async openCustom(): Promise<void> {
+    const ref = this.dialog.open<DemoDialogContent, string>(DemoDialogContent, {
+      ariaLabel: 'Invite teammate',
+    });
+    const result = await ref.afterClosed;
+    this.openResult.set(result ?? 'dismissed');
+  }
+
+  // --------------------------- Code snippets ---------------------------
+  protected readonly alertTonesCode = `<mk-alert tone="info" title="Heads up">
+  A new version of the workspace is available.
+</mk-alert>
+<mk-alert tone="success" title="Saved">…</mk-alert>
+<mk-alert tone="warning" title="Storage almost full">…</mk-alert>
+<mk-alert tone="danger" title="Payment failed">…</mk-alert>
+<mk-alert tone="neutral">A plain, tone-neutral note.</mk-alert>`;
+
+  protected readonly alertVariantsCode = `<mk-alert tone="success" variant="soft" title="Soft">…</mk-alert>
+<mk-alert tone="success" variant="solid" title="Solid">…</mk-alert>
+<mk-alert tone="success" variant="outline" title="Outline">…</mk-alert>`;
+
+  protected readonly alertDismissibleCode = `@if (visible()) {
+  <mk-alert
+    tone="info"
+    variant="outline"
+    title="Dismissible"
+    dismissible
+    (dismissed)="visible.set(false)"
+  >
+    Click the close button to dismiss this alert.
+  </mk-alert>
+}
+
+// visible = signal(true);`;
+
+  protected readonly tooltipCode = `<button mkButton [mkTooltip]="'Appears on top'">Top</button>
+
+<button mkButton [mkTooltip]="'Appears below'" mkTooltipPlacement="bottom">
+  Bottom
+</button>
+
+<!-- Works on any focusable element -->
+<span tabindex="0" [mkTooltip]="'Works anywhere'" mkTooltipPlacement="right">
+  Any element
+</span>`;
+
+  protected readonly toastCode = `// No markup needed — MkToastService auto-mounts its container.
+private readonly toast = inject(MkToastService);
+
+// Convenience methods (message, config?) -> toast id
+this.toast.success('Your changes were saved.', { title: 'Saved' });
+this.toast.danger('We could not reach the server.', { title: 'Connection lost' });
+
+// Sticky toast — duration 0 keeps it until dismissed
+this.toast.show({ message: 'This stays until dismissed.', tone: 'info', duration: 0 });
+
+// Toast with an action button (dismissed after the handler runs)
+this.toast.show({
+  title: 'Item archived',
+  message: 'The record was moved to the archive.',
+  duration: 8000,
+  action: { label: 'Undo', handler: () => this.toast.success('Restored.') },
+});`;
+
+  protected readonly confirmCode = `private readonly dialog = inject(MkDialogService);
+
+async delete(): Promise<void> {
+  const confirmed = await this.dialog.confirm({
+    title: 'Delete workspace?',
+    message: 'This permanently removes the workspace and all its data.',
+    confirmText: 'Delete',
+    cancelText: 'Keep it',
+    tone: 'danger', // switches the panel to role="alertdialog"
+  });
+  if (confirmed) remove();
+}`;
+
+  protected readonly openCode = `const ref = this.dialog.open<DemoDialogContent, string>(DemoDialogContent, {
+  ariaLabel: 'Invite teammate',
+});
+const result = await ref.afterClosed; // string | undefined`;
+
+  protected readonly dialogMarkupCode = `@Component({
+  selector: 'app-invite-dialog',
+  imports: [MkDialog, MkDialogTitle, MkButton],
+  template: \`
+    <mk-dialog>
+      <mk-dialog-title>Invite teammate</mk-dialog-title>
+      <p>Custom body content goes here.</p>
+      <div mkDialogFooter>
+        <button mkButton variant="ghost" (click)="cancel()">Cancel</button>
+        <button mkButton (click)="send()">Send invite</button>
+      </div>
+    </mk-dialog>
+  \`,
+})
+export class InviteDialog {
+  private readonly ref = inject<MkOverlayRef<string>>(MkOverlayRef);
+  protected cancel() { this.ref.close(); }
+  protected send() { this.ref.close('sent'); }
+}`;
+}

@@ -1,0 +1,75 @@
+:host {
+  --_size: 2.5rem;
+
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: var(--_size);
+  height: var(--_size);
+  background-color: var(--mk-neutral-subtle);
+  color: var(--mk-neutral-subtle-text);
+  font-family: inherit;
+  font-size: calc(var(--_size) * 0.4);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: 1;
+  text-transform: uppercase;
+  overflow: visible;
+  user-select: none;
+  vertical-align: middle;
+}
+
+/* Sizes */
+:host(.mk-avatar--sm) { --_size: 2rem; }
+:host(.mk-avatar--md) { --_size: 2.5rem; }
+:host(.mk-avatar--lg) { --_size: 3.25rem; }
+
+/* Shapes */
+:host(.mk-avatar--circle) { border-radius: var(--mk-radius-circle); }
+:host(.mk-avatar--rounded) { border-radius: var(--mk-radius-md); }
+
+.mk-avatar__img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  border-radius: inherit;
+  display: block;
+}
+
+.mk-avatar__initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.mk-avatar__icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 60%;
+  height: 60%;
+}
+.mk-avatar__icon :is(svg, img) {
+  width: 100%;
+  height: 100%;
+}
+
+/* Status dot */
+.mk-avatar__status {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  width: 28%;
+  height: 28%;
+  min-width: 0.5rem;
+  min-height: 0.5rem;
+  border-radius: var(--mk-radius-circle);
+  border: var(--mk-border-width-strong) solid var(--mk-surface);
+  box-sizing: border-box;
+  background-color: var(--mk-neutral-subtle-text);
+}
+:host([data-status='online']) .mk-avatar__status { background-color: var(--mk-success); }
+:host([data-status='offline']) .mk-avatar__status { background-color: var(--mk-text-subtle); }
+:host([data-status='away']) .mk-avatar__status { background-color: var(--mk-warning); }
+:host([data-status='busy']) .mk-avatar__status { background-color: var(--mk-danger); }

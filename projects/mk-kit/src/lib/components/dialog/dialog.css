@@ -1,0 +1,118 @@
+/* Unencapsulated (ViewEncapsulation.None): all selectors are global, so every
+ * rule is namespaced under `.mk-dialog`. `.mk-dialog-panel` targets the
+ * body-level overlay panel produced by MkOverlayService. */
+
+.mk-dialog-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 32rem);
+  max-height: min(90vh, 44rem);
+  overflow: hidden;
+  background-color: var(--mk-surface);
+  color: var(--mk-text);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-xl);
+  animation: mk-overlay-pop var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-dialog-panel {
+    animation: none;
+  }
+}
+
+.mk-dialog {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: inherit;
+  flex: 1 1 auto;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-dialog__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mk-space-3);
+  flex-shrink: 0;
+  padding: var(--mk-space-4) var(--mk-space-5);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+  background-color: var(--mk-surface);
+}
+
+.mk-dialog__heading {
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-1);
+}
+
+.mk-dialog__title {
+  margin: 0;
+  font-size: var(--mk-font-size-lg);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text);
+}
+
+.mk-dialog__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--mk-space-5);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-normal);
+  color: var(--mk-text);
+}
+
+.mk-dialog__footer {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-4) var(--mk-space-5);
+  border-top: var(--mk-border-width) solid var(--mk-border-subtle);
+  background-color: var(--mk-surface);
+}
+
+.mk-dialog__footer:empty {
+  display: none;
+}
+
+.mk-dialog__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  margin: -4px -4px 0 0;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-dialog__close:hover {
+  color: var(--mk-text);
+  background-color: var(--mk-hover-overlay);
+}
+
+.mk-dialog__close:focus-visible {
+  color: var(--mk-text);
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: var(--mk-focus-ring-offset);
+}

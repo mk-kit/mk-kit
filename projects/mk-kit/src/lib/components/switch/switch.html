@@ -1,0 +1,22 @@
+<button
+  type="button"
+  class="mk-switch__control"
+  role="switch"
+  [attr.aria-checked]="checked()"
+  [disabled]="isDisabled()"
+  [attr.aria-label]="ariaLabel() || null"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (click)="toggle()"
+  (keydown)="onKeydown($event)"
+  (blur)="onTouched()"
+>
+  <span class="mk-switch__track">
+    <span class="mk-switch__thumb"></span>
+  </span>
+</button>
+<span class="mk-switch__label" [id]="labelId" (click)="toggle()">
+  <ng-content />
+</span>

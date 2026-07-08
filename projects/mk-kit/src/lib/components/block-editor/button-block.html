@@ -1,0 +1,83 @@
+<div
+  class="mk-button-block__preview"
+  [class.mk-button-block__preview--center]="(data('align') ?? 'left') === 'center'"
+  [class.mk-button-block__preview--right]="(data('align') ?? 'left') === 'right'"
+>
+  <a
+    class="mk-cta"
+    [class.mk-cta--soft]="data('variant') === 'soft'"
+    [class.mk-cta--outline]="data('variant') === 'outline'"
+    [attr.data-tone]="data('tone') ?? 'primary'"
+    [attr.href]="readonly() ? (data('href') || null) : null"
+    [attr.target]="readonly() ? '_blank' : null"
+    rel="noopener noreferrer"
+    data-mk-focus
+  >
+    {{ data('label') || 'Button' }}
+  </a>
+</div>
+
+@if (!readonly()) {
+  <div class="mk-button-block__settings">
+    <label class="mk-button-block__field">
+      <span>Label</span>
+      <input type="text" [value]="data('label') ?? ''" (input)="onLabel($event)" />
+    </label>
+    <label class="mk-button-block__field">
+      <span>Link (href)</span>
+      <input type="url" [value]="data('href') ?? ''" placeholder="https://…" (input)="onHref($event)" />
+    </label>
+
+    <div class="mk-button-block__field">
+      <span id="mk-cta-tone">Tone</span>
+      <div class="mk-button-block__row" role="group" aria-labelledby="mk-cta-tone">
+        @for (t of tones; track t) {
+          <button
+            type="button"
+            class="mk-button-block__swatch"
+            [attr.data-tone]="t"
+            [class.mk-button-block__swatch--active]="(data('tone') ?? 'primary') === t"
+            [attr.aria-pressed]="(data('tone') ?? 'primary') === t"
+            [attr.aria-label]="t"
+            [title]="t"
+            (click)="setTone(t)"
+          ></button>
+        }
+      </div>
+    </div>
+
+    <div class="mk-button-block__field">
+      <span id="mk-cta-variant">Variant</span>
+      <div class="mk-button-block__row" role="group" aria-labelledby="mk-cta-variant">
+        @for (v of variants; track v) {
+          <button
+            type="button"
+            class="mk-button-block__pill"
+            [class.mk-button-block__pill--active]="(data('variant') ?? 'solid') === v"
+            [attr.aria-pressed]="(data('variant') ?? 'solid') === v"
+            (click)="setVariant(v)"
+          >
+            {{ v }}
+          </button>
+        }
+      </div>
+    </div>
+
+    <div class="mk-button-block__field">
+      <span id="mk-cta-align">Alignment</span>
+      <div class="mk-button-block__row" role="group" aria-labelledby="mk-cta-align">
+        @for (a of aligns; track a) {
+          <button
+            type="button"
+            class="mk-button-block__pill"
+            [class.mk-button-block__pill--active]="(data('align') ?? 'left') === a"
+            [attr.aria-pressed]="(data('align') ?? 'left') === a"
+            (click)="setAlign(a)"
+          >
+            {{ a }}
+          </button>
+        }
+      </div>
+    </div>
+  </div>
+}

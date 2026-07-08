@@ -1,0 +1,56 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+}
+
+.mk-form-field__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text);
+  width: fit-content;
+}
+
+:host(.mk-form-field--lg) .mk-form-field__label {
+  font-size: var(--mk-font-size-md);
+}
+:host(.mk-form-field--sm) .mk-form-field__label {
+  font-size: var(--mk-font-size-xs);
+}
+
+.mk-form-field__required {
+  color: var(--mk-danger);
+  font-weight: var(--mk-font-weight-bold);
+  line-height: 1;
+}
+
+.mk-form-field__control {
+  display: block;
+  min-width: 0;
+}
+
+.mk-form-field__hint,
+.mk-form-field__error {
+  margin: 0;
+  font-size: var(--mk-font-size-xs);
+  line-height: var(--mk-line-height-snug);
+}
+
+.mk-form-field__hint {
+  color: var(--mk-text-muted);
+}
+
+.mk-form-field__error {
+  color: var(--mk-danger);
+  font-weight: var(--mk-font-weight-medium);
+}
+
+:host(.mk-form-field--disabled) {
+  opacity: 0.6;
+}

@@ -1,0 +1,10 @@
+@if (showImage()) {
+  <img class="mk-avatar__img" [src]="src()" alt="" (error)="onError()" />
+} @else if (initials()) {
+  <span class="mk-avatar__initials" aria-hidden="true">{{ initials() }}</span>
+} @else {
+  <span class="mk-avatar__icon" aria-hidden="true"><ng-content /></span>
+}
+@if (status()) {
+  <span class="mk-avatar__status" aria-hidden="true"></span>
+}

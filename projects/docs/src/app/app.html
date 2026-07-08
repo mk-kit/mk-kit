@@ -1,0 +1,88 @@
+<mk-app-shell #shell>
+  <!-- Header -->
+  <div mkAppHeader class="docs-header">
+    <div class="docs-header__left">
+      @if (shell.isMobile()) {
+        <button
+          mkButton
+          variant="ghost"
+          tone="neutral"
+          iconOnly
+          aria-label="Toggle navigation"
+          (click)="shell.toggleSidebar()"
+        >
+          ☰
+        </button>
+      } @else {
+        <button
+          mkButton
+          variant="ghost"
+          tone="neutral"
+          iconOnly
+          aria-label="Collapse sidebar"
+          (click)="shell.toggleCollapsed()"
+        >
+          ⟨⟩
+        </button>
+      }
+      <a
+        class="docs-brand"
+        href="/introduction"
+        (click)="$event.preventDefault(); go(shell, '/introduction')"
+      >
+        <span class="docs-brand__mark">mk</span>
+        <span class="docs-brand__name">mk-kit</span>
+        <span class="docs-brand__ver">v0.1</span>
+      </a>
+    </div>
+
+    <div class="docs-header__right">
+      <button
+        mkButton
+        variant="outline"
+        tone="neutral"
+        size="sm"
+        (click)="cycleTheme()"
+        [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
+      >
+        <span aria-hidden="true">{{ themeIcon() }}</span>
+        {{ themeLabel() }}
+      </button>
+      <a
+        mkButton
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        href="https://github.com/mkornas/mk-kit"
+        target="_blank"
+        rel="noopener"
+      >
+        GitHub ↗
+      </a>
+    </div>
+  </div>
+
+  <!-- Sidebar -->
+  <mk-nav-list
+    mkAppSidebar
+    [collapsed]="shell.sidebarCollapsed() && !shell.isMobile()"
+  >
+    @for (section of sections; track section.title) {
+      @if (!(shell.sidebarCollapsed() && !shell.isMobile())) {
+        <div class="docs-nav-heading">{{ section.title }}</div>
+      }
+      @for (link of section.links; track link.path) {
+        <mk-nav-item
+          [label]="link.label"
+          [active]="isActive(link.path)"
+          (action)="go(shell, link.path)"
+        >
+          <span mkNavIcon aria-hidden="true">{{ link.icon }}</span>
+        </mk-nav-item>
+      }
+    }
+  </mk-nav-list>
+
+  <!-- Main content -->
+  <router-outlet />
+</mk-app-shell>

@@ -1,0 +1,33 @@
+<div class="mk-toast__body">
+  @if (item().title; as title) {
+    <p class="mk-toast__title">{{ title }}</p>
+  }
+  <p class="mk-toast__message">{{ item().message }}</p>
+
+  @if (item().action; as action) {
+    <div class="mk-toast__actions">
+      <button mkButton variant="link" size="sm" (click)="runAction()">
+        {{ action.label }}
+      </button>
+    </div>
+  }
+</div>
+
+@if (item().dismissible) {
+  <button
+    type="button"
+    class="mk-toast__close"
+    aria-label="Dismiss"
+    (click)="dismiss()"
+  >
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+}

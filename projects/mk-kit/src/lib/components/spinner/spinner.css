@@ -1,0 +1,52 @@
+:host {
+  --_color: var(--mk-primary);
+  --_size: 1.5rem;
+  --_thickness: 2px;
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+  color: var(--_color);
+}
+
+:host([data-tone='primary']) { --_color: var(--mk-primary); }
+:host([data-tone='neutral']) { --_color: var(--mk-text-muted); }
+:host([data-tone='success']) { --_color: var(--mk-success); }
+:host([data-tone='warning']) { --_color: var(--mk-warning); }
+:host([data-tone='danger']) { --_color: var(--mk-danger); }
+:host([data-tone='info']) { --_color: var(--mk-info); }
+
+:host(.mk-spinner--sm) { --_size: 1rem; --_thickness: 2px; }
+:host(.mk-spinner--md) { --_size: 1.5rem; --_thickness: 2px; }
+:host(.mk-spinner--lg) { --_size: 2.25rem; --_thickness: 3px; }
+
+.mk-spinner__circle {
+  display: block;
+  width: var(--_size);
+  height: var(--_size);
+  border: var(--_thickness) solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  opacity: 0.9;
+  animation: mk-spinner-spin 0.7s linear infinite;
+}
+@keyframes mk-spinner-spin {
+  to { transform: rotate(360deg); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-spinner__circle { animation-duration: 1.6s; }
+}
+
+.mk-spinner__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}

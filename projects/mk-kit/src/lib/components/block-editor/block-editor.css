@@ -1,0 +1,20 @@
+:host {
+  display: block;
+  padding: var(--mk-space-3);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  background: var(--mk-surface);
+  color: var(--mk-text);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-relaxed);
+}
+
+:host(.mk-block-editor--disabled) {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+:host(.mk-block-editor--readonly) {
+  border-style: dashed;
+}

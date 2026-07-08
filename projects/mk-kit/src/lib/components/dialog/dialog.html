@@ -1,0 +1,34 @@
+<header class="mk-dialog__header">
+  <div class="mk-dialog__heading">
+    <ng-content select="[mkDialogHeader], mk-dialog-title" />
+    @if (dialogTitle(); as heading) {
+      <h2 class="mk-dialog__title" [id]="titleId()">{{ heading }}</h2>
+    }
+  </div>
+  @if (!hideClose()) {
+    <button
+      type="button"
+      class="mk-dialog__close"
+      aria-label="Close dialog"
+      (click)="close()"
+    >
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+        <path
+          d="M4 4l8 8M12 4l-8 8"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.5"
+          stroke-linecap="round"
+        />
+      </svg>
+    </button>
+  }
+</header>
+
+<div class="mk-dialog__body">
+  <ng-content />
+</div>
+
+<footer class="mk-dialog__footer">
+  <ng-content select="[mkDialogFooter]" />
+</footer>

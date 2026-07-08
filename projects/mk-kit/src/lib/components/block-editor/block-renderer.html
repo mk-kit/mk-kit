@@ -1,0 +1,115 @@
+@for (block of items(); track block.id) {
+  @switch (block.type) {
+    @case ('paragraph') {
+      <p class="mk-r-paragraph" [innerHTML]="safeHtml(block.data['html'])"></p>
+    }
+    @case ('heading') {
+      @switch (headingLevel(block)) {
+        @case (1) { <h1 class="mk-r-heading" [innerHTML]="safeHtml(block.data['html'])"></h1> }
+        @case (2) { <h2 class="mk-r-heading" [innerHTML]="safeHtml(block.data['html'])"></h2> }
+        @case (3) { <h3 class="mk-r-heading" [innerHTML]="safeHtml(block.data['html'])"></h3> }
+        @case (4) { <h4 class="mk-r-heading" [innerHTML]="safeHtml(block.data['html'])"></h4> }
+      }
+    }
+    @case ('list') {
+      @if (block.data['ordered']) {
+        <ol class="mk-r-list">
+          @for (item of listItems(block); track $index) {
+            <li [innerHTML]="safeHtml(item)"></li>
+          }
+        </ol>
+      } @else {
+        <ul class="mk-r-list">
+          @for (item of listItems(block); track $index) {
+            <li [innerHTML]="safeHtml(item)"></li>
+          }
+        </ul>
+      }
+    }
+    @case ('quote') {
+      <blockquote class="mk-r-quote">
+        <p [innerHTML]="safeHtml(block.data['html'])"></p>
+        @if (block.data['citation']) {
+          <cite class="mk-r-cite">{{ block.data['citation'] }}</cite>
+        }
+      </blockquote>
+    }
+    @case ('code') {
+      <pre class="mk-r-code"><code>{{ block.data['code'] }}</code></pre>
+    }
+    @case ('image') {
+      @if (isImageSafe(block)) {
+        <figure
+          class="mk-r-figure"
+          [class.mk-r-figure--left]="block.data['align'] === 'left'"
+          [class.mk-r-figure--right]="block.data['align'] === 'right'"
+        >
+          <img
+            [src]="block.data['src']"
+            [alt]="block.data['alt'] ?? ''"
+            [style.width.%]="block.data['width'] || 100"
+            loading="lazy"
+          />
+          @if (block.data['caption']) {
+            <figcaption>{{ block.data['caption'] }}</figcaption>
+          }
+        </figure>
+      }
+    }
+    @case ('button') {
+      <div
+        class="mk-r-cta-wrap"
+        [class.mk-r-cta-wrap--center]="block.data['align'] === 'center'"
+        [class.mk-r-cta-wrap--right]="block.data['align'] === 'right'"
+      >
+        <a
+          class="mk-cta"
+          [class.mk-cta--soft]="block.data['variant'] === 'soft'"
+          [class.mk-cta--outline]="block.data['variant'] === 'outline'"
+          [attr.data-tone]="block.data['tone'] ?? 'primary'"
+          [href]="buttonHref(block)"
+          target="_blank"
+          rel="noopener noreferrer"
+        >
+          {{ block.data['label'] || 'Button' }}
+        </a>
+      </div>
+    }
+    @case ('divider') {
+      <hr class="mk-r-divider" />
+    }
+    @case ('embed') {
+      @if (embedSrc(block); as src) {
+        <div class="mk-r-embed" [style.padding-top]="paddingTop(block)">
+          <iframe
+            [src]="src"
+            title="Embedded content"
+            loading="lazy"
+            referrerpolicy="strict-origin-when-cross-origin"
+            sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+            allowfullscreen
+          ></iframe>
+        </div>
+      } @else if (fallbackUrl(block); as url) {
+        <p class="mk-r-embed-fallback">
+          <a [href]="url" target="_blank" rel="noopener noreferrer">{{ url }}</a>
+        </p>
+      }
+    }
+    @case ('columns') {
+      <div
+        class="mk-columns"
+        [style.grid-template-columns]="gridColumns(block)"
+        [style.gap]="gridGap(block)"
+        [style.align-items]="block.data['align'] ?? 'stretch'"
+        [style.justify-content]="justifyValue(block)"
+      >
+        @for (col of block.children ?? []; track col.id) {
+          <div class="mk-column">
+            <mk-block-renderer [blocks]="col.children ?? []" />
+          </div>
+        }
+      </div>
+    }
+  }
+}

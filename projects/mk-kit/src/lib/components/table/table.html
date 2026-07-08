@@ -1,0 +1,76 @@
+<div class="mk-table__scroll">
+  <table class="mk-table__table">
+    <thead class="mk-table__head">
+      <tr>
+        @if (selectable()) {
+          <th scope="col" class="mk-table__th mk-table__th--select">
+            <mk-checkbox
+              aria-label="Select all rows"
+              [checked]="allSelected()"
+              [indeterminate]="someSelected()"
+              (checkedChange)="toggleAll()"
+            />
+          </th>
+        }
+        @for (col of columns(); track col.key) {
+          <th
+            scope="col"
+            class="mk-table__th"
+            [class.mk-table__th--sortable]="col.sortable"
+            [style.width]="col.width"
+            [attr.data-align]="col.align ?? 'start'"
+            [attr.aria-sort]="ariaSort(col)"
+            [attr.tabindex]="col.sortable ? 0 : null"
+            (click)="onSort(col)"
+            (keydown)="onHeaderKeydown($event, col)"
+          >
+            <span class="mk-table__th-inner">
+              <span class="mk-table__th-label">{{ col.header }}</span>
+              @if (col.sortable) {
+                <span class="mk-table__sort" aria-hidden="true">{{ sortGlyph(col) }}</span>
+              }
+            </span>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody class="mk-table__body">
+      @for (row of sortedData(); track $index) {
+        <tr
+          class="mk-table__row"
+          [class.mk-table__row--selected]="selectable() && isSelected(row)"
+          [attr.tabindex]="clickableRows() ? 0 : null"
+          [attr.aria-selected]="selectable() ? isSelected(row) : null"
+          (click)="onRowClick(row)"
+        >
+          @if (selectable()) {
+            <td
+              class="mk-table__td mk-table__td--select"
+              (click)="$event.stopPropagation()"
+            >
+              <mk-checkbox
+                [aria-label]="'Select row'"
+                [checked]="isSelected(row)"
+                (checkedChange)="toggleRow(row)"
+              />
+            </td>
+          }
+          @for (col of columns(); track col.key) {
+            <td class="mk-table__td" [attr.data-align]="col.align ?? 'start'">
+              {{ cellText(row, col) }}
+            </td>
+          }
+        </tr>
+      } @empty {
+        <tr class="mk-table__row mk-table__row--empty">
+          <td
+            class="mk-table__empty"
+            [attr.colspan]="columns().length + (selectable() ? 1 : 0)"
+          >
+            <ng-content select="[mkTableEmpty]">{{ emptyMessage() }}</ng-content>
+          </td>
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>

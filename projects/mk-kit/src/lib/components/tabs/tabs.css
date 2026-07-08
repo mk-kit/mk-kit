@@ -1,0 +1,105 @@
+:host {
+  display: block;
+}
+
+.mk-tabs__list {
+  position: relative;
+  display: flex;
+  align-items: stretch;
+  gap: var(--mk-space-1);
+}
+
+:host(.mk-tabs--line) .mk-tabs__list {
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+}
+
+.mk-tabs__tab {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-space-2);
+  min-height: 44px;
+  padding: var(--mk-space-2) var(--mk-space-4);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  color: var(--mk-text-muted);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  transition:
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-tabs__tab:hover {
+  color: var(--mk-text);
+}
+
+.mk-tabs__tab:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  border-radius: var(--mk-radius-sm);
+}
+
+.mk-tabs__tab:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-tabs__tab--active {
+  color: var(--mk-primary);
+}
+
+/* Line variant: rounded top, sliding underline */
+:host(.mk-tabs--line) .mk-tabs__tab {
+  border-radius: var(--mk-radius-sm) var(--mk-radius-sm) 0 0;
+}
+
+.mk-tabs__indicator {
+  position: absolute;
+  bottom: calc(-1 * var(--mk-border-width));
+  left: 0;
+  height: 2px;
+  background: var(--mk-primary);
+  border-radius: var(--mk-radius-pill);
+  transition:
+    transform var(--mk-duration-normal) var(--mk-ease-emphasized),
+    width var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+/* Pill variant: filled active chip */
+:host(.mk-tabs--pill) .mk-tabs__list {
+  gap: var(--mk-space-1);
+  padding: var(--mk-space-1);
+  background: var(--mk-surface-2);
+  border-radius: var(--mk-radius-lg);
+}
+
+:host(.mk-tabs--pill) .mk-tabs__tab {
+  border-radius: var(--mk-radius-md);
+}
+
+:host(.mk-tabs--pill) .mk-tabs__tab:hover:not(:disabled):not(.mk-tabs__tab--active) {
+  background: var(--mk-hover-overlay);
+}
+
+:host(.mk-tabs--pill) .mk-tabs__tab--active {
+  color: var(--mk-primary-contrast);
+  background: var(--mk-primary);
+}
+
+.mk-tabs__panels {
+  display: block;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-tabs__indicator {
+    transition: none;
+  }
+}

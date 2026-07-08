@@ -1,0 +1,103 @@
+<input
+  #fileInput
+  type="file"
+  accept="image/*"
+  class="mk-image-block__file"
+  hidden
+  (change)="onFileSelected($event)"
+/>
+
+@if (src()) {
+  <figure
+    class="mk-image-block__figure"
+    [class.mk-image-block__figure--left]="block().data['align'] === 'left'"
+    [class.mk-image-block__figure--right]="block().data['align'] === 'right'"
+  >
+    <img
+      class="mk-image-block__img"
+      [src]="src()"
+      [alt]="block().data['alt'] ?? ''"
+      [style.width.%]="block().data['width'] || 100"
+    />
+    @if (block().data['caption'] || !readonly()) {
+      <figcaption class="mk-image-block__caption">{{ block().data['caption'] }}</figcaption>
+    }
+  </figure>
+
+  @if (!readonly()) {
+    <div class="mk-image-block__settings">
+      <label class="mk-image-block__field">
+        <span>Alt text</span>
+        <input type="text" [value]="block().data['alt'] ?? ''" (input)="onAlt($event)" />
+      </label>
+      <label class="mk-image-block__field">
+        <span>Caption</span>
+        <input type="text" [value]="block().data['caption'] ?? ''" (input)="onCaption($event)" />
+      </label>
+      <div class="mk-image-block__field">
+        <span id="mk-img-align">Alignment</span>
+        <div class="mk-image-block__aligns" role="group" aria-labelledby="mk-img-align">
+          @for (a of aligns; track a) {
+            <button
+              type="button"
+              class="mk-image-block__align"
+              [class.mk-image-block__align--active]="(block().data['align'] ?? 'center') === a"
+              [attr.aria-pressed]="(block().data['align'] ?? 'center') === a"
+              (click)="setAlign(a)"
+            >
+              {{ a }}
+            </button>
+          }
+        </div>
+      </div>
+      <label class="mk-image-block__field">
+        <span>Width: {{ block().data['width'] || 100 }}%</span>
+        <input
+          type="range"
+          min="20"
+          max="100"
+          step="5"
+          [value]="block().data['width'] || 100"
+          (input)="onWidth($event)"
+        />
+      </label>
+      <button type="button" class="mk-image-block__replace" (click)="clear()">Replace image</button>
+    </div>
+  }
+} @else {
+  <div
+    class="mk-image-block__drop"
+    [class.mk-image-block__drop--active]="dragActive()"
+    (drop)="onDrop($event)"
+    (dragover)="onDragOver($event)"
+    (dragleave)="onDragLeave()"
+  >
+    @if (uploading()) {
+      <p class="mk-image-block__hint">Uploading…</p>
+    } @else {
+      <p class="mk-image-block__icon" aria-hidden="true">🖼</p>
+      <p class="mk-image-block__hint">Drag &amp; drop an image, or</p>
+      <button
+        type="button"
+        class="mk-image-block__upload"
+        data-mk-focus
+        [disabled]="readonly()"
+        (click)="openPicker()"
+      >
+        Choose file
+      </button>
+      <label class="mk-image-block__url">
+        <span class="mk-visually-hidden">Image URL</span>
+        <input
+          type="url"
+          placeholder="…or paste an image URL"
+          [disabled]="readonly()"
+          (change)="onUrl($event)"
+        />
+      </label>
+    }
+    @if (error()) {
+      <p class="mk-image-block__error" role="alert">{{ error() }}</p>
+    }
+  </div>
+}

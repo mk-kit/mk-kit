@@ -1,0 +1,23 @@
+<div #track class="mk-slider__track" (pointerdown)="onPointerDown($event)">
+  <div class="mk-slider__fill" [style.width.%]="percent()"></div>
+  <div
+    #thumb
+    class="mk-slider__thumb"
+    role="slider"
+    [style.left.%]="percent()"
+    [attr.tabindex]="isDisabled() ? -1 : 0"
+    [attr.aria-valuemin]="min()"
+    [attr.aria-valuemax]="max()"
+    [attr.aria-valuenow]="value()"
+    [attr.aria-valuetext]="value()"
+    aria-orientation="horizontal"
+    [attr.aria-label]="ariaLabel() || null"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-disabled]="isDisabled() || null"
+    [attr.aria-required]="isRequired() || null"
+    [attr.aria-invalid]="isInvalid() || null"
+    (keydown)="onKeydown($event)"
+    (blur)="onPointerUp()"
+  ></div>
+</div>

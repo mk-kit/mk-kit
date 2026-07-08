@@ -1,0 +1,29 @@
+<span class="mk-alert__icon" aria-hidden="true">
+  <ng-content select="[mkAlertIcon]" />
+</span>
+
+<div class="mk-alert__content">
+  @if (title(); as heading) {
+    <p class="mk-alert__title">{{ heading }}</p>
+  }
+  <div class="mk-alert__message"><ng-content /></div>
+</div>
+
+@if (dismissible()) {
+  <button
+    type="button"
+    class="mk-alert__close"
+    aria-label="Dismiss"
+    (click)="onDismiss()"
+  >
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+      <path
+        d="M4 4l8 8M12 4l-8 8"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="1.5"
+        stroke-linecap="round"
+      />
+    </svg>
+  </button>
+}

@@ -1,0 +1,17 @@
+<div
+  mkDropList
+  class="mk-sortable-list__list"
+  [mkDropListData]="items()"
+  [mkDropListOrientation]="orientation()"
+  [mkDropListDisabled]="disabled()"
+  (mkDropListDropped)="onDrop($event)"
+>
+  @for (item of items(); track trackBy()($index, item)) {
+    <div mkDrag class="mk-sortable-list__item" [mkDragData]="item">
+      <ng-container
+        [ngTemplateOutlet]="itemTemplate()"
+        [ngTemplateOutletContext]="{ $implicit: item, index: $index }"
+      />
+    </div>
+  }
+</div>

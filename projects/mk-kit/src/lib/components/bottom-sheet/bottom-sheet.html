@@ -1,0 +1,46 @@
+@if (!hideHandle()) {
+  <div
+    class="mk-bottom-sheet__handle-area"
+    (pointerdown)="onHandlePointerDown($event)"
+    (pointermove)="onHandlePointerMove($event)"
+    (pointerup)="onHandlePointerUp($event)"
+    (pointercancel)="onHandlePointerUp($event)"
+  >
+    <span class="mk-bottom-sheet__handle" aria-hidden="true"></span>
+  </div>
+}
+
+@if (sheetTitle() || !hideClose()) {
+  <header class="mk-bottom-sheet__header">
+    @if (sheetTitle(); as heading) {
+      <h2 class="mk-bottom-sheet__title" [id]="titleId()">{{ heading }}</h2>
+    }
+    <ng-content select="[mkBottomSheetHeader]" />
+    @if (!hideClose()) {
+      <button
+        type="button"
+        class="mk-bottom-sheet__close"
+        aria-label="Close"
+        (click)="close()"
+      >
+        <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+          <path
+            d="M4 4l8 8M12 4l-8 8"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="1.5"
+            stroke-linecap="round"
+          />
+        </svg>
+      </button>
+    }
+  </header>
+}
+
+<div class="mk-bottom-sheet__body">
+  <ng-content />
+</div>
+
+<footer class="mk-bottom-sheet__footer">
+  <ng-content select="[mkBottomSheetFooter]" />
+</footer>

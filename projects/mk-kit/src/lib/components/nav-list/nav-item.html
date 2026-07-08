@@ -1,0 +1,67 @@
+@if (hasChildren()) {
+  <button
+    type="button"
+    class="mk-nav-item__link"
+    [attr.aria-expanded]="expanded()"
+    [attr.aria-controls]="subId"
+    [attr.title]="collapsed() ? label() : null"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="mk-nav-item__icon" aria-hidden="true">
+      <ng-content select="[mkNavIcon]" />
+    </span>
+    <span class="mk-nav-item__label">{{ label() }}</span>
+    @if (badge() !== undefined) {
+      <span class="mk-nav-item__badge">{{ badge() }}</span>
+    }
+    <span class="mk-nav-item__chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="9 6 15 12 9 18" />
+      </svg>
+    </span>
+  </button>
+
+  <ul
+    class="mk-nav-item__sub"
+    role="list"
+    [id]="subId"
+    [attr.hidden]="expanded() && !collapsed() ? null : ''"
+  >
+    <ng-content select="mk-nav-item" />
+  </ul>
+} @else if (href()) {
+  <a
+    class="mk-nav-item__link"
+    [href]="href()"
+    [attr.aria-current]="active() ? 'page' : null"
+    [attr.title]="collapsed() ? label() : null"
+    [attr.aria-disabled]="disabled() || null"
+    [attr.tabindex]="disabled() ? -1 : null"
+  >
+    <span class="mk-nav-item__icon" aria-hidden="true">
+      <ng-content select="[mkNavIcon]" />
+    </span>
+    <span class="mk-nav-item__label">{{ label() }}</span>
+    @if (badge() !== undefined) {
+      <span class="mk-nav-item__badge">{{ badge() }}</span>
+    }
+  </a>
+} @else {
+  <button
+    type="button"
+    class="mk-nav-item__link"
+    [attr.aria-current]="active() ? 'page' : null"
+    [attr.title]="collapsed() ? label() : null"
+    [disabled]="disabled()"
+    (click)="activate()"
+  >
+    <span class="mk-nav-item__icon" aria-hidden="true">
+      <ng-content select="[mkNavIcon]" />
+    </span>
+    <span class="mk-nav-item__label">{{ label() }}</span>
+    @if (badge() !== undefined) {
+      <span class="mk-nav-item__badge">{{ badge() }}</span>
+    }
+  </button>
+}

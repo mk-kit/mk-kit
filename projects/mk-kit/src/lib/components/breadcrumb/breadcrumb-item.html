@@ -1,0 +1,12 @@
+@if (href() && !last()) {
+  <a class="mk-breadcrumb-item__link" [href]="href()">
+    <ng-content />
+  </a>
+} @else {
+  <span
+    class="mk-breadcrumb-item__current"
+    [attr.aria-current]="last() ? 'page' : null"
+  >
+    <ng-content />
+  </span>
+}

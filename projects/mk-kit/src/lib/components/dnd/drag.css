@@ -1,0 +1,46 @@
+/* mk-drag — a draggable item. Colours via --mk-* tokens only.
+ * The floating pointer preview (.mk-drag-preview) is appended to <body>, so it
+ * cannot be styled from this scoped sheet — its look is set inline in drag.ts. */
+
+:host {
+  position: relative;
+  cursor: grab;
+  /* Prevent the browser turning a press-drag into a scroll/gesture. When a
+     handle is used, the handle owns this instead. */
+  touch-action: none;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* When a handle restricts the grip, the item body is not itself grabbable. */
+:host(.mk-drag--has-handle) {
+  cursor: default;
+  touch-action: auto;
+}
+
+:host(.mk-drag--dragging) {
+  cursor: grabbing;
+}
+
+/* Keyboard "picked up" state — must be visible without relying on colour alone
+   (elevation + outline + label via aria). */
+:host(.mk-drag--lifted) {
+  outline: var(--mk-border-width-strong) solid var(--mk-primary);
+  outline-offset: var(--mk-focus-ring-offset);
+  border-radius: var(--mk-radius-md);
+  background-color: var(--mk-surface-2);
+  box-shadow: var(--mk-shadow-lg);
+  z-index: var(--mk-z-sticky);
+}
+
+:host(.mk-drag--disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+  touch-action: auto;
+}
+
+/* Keyboard focus ring (matches the rest of the library). */
+:host(:focus-visible) {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: var(--mk-focus-ring-offset);
+}

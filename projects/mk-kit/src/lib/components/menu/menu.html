@@ -1,0 +1,14 @@
+@if (opened()) {
+  <div
+    #panel
+    class="mk-menu__panel"
+    role="menu"
+    [id]="panelId"
+    [attr.aria-label]="ariaLabel()"
+    [style.top.px]="top()"
+    [style.left.px]="left()"
+    (keydown)="onPanelKeydown($event)"
+  >
+    <ng-content />
+  </div>
+}

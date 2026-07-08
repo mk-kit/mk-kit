@@ -1,0 +1,37 @@
+<h3 class="mk-accordion-item__heading">
+  <button
+    type="button"
+    class="mk-accordion-item__trigger"
+    [id]="triggerId"
+    [attr.aria-controls]="panelId"
+    [attr.aria-expanded]="open()"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="mk-accordion-item__label">
+      @if (header()) {
+        {{ header() }}
+      }
+      <ng-content select="[mkAccordionHeader]" />
+    </span>
+    <span class="mk-accordion-item__chevron" aria-hidden="true">
+      <svg viewBox="0 0 24 24" width="1em" height="1em" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <polyline points="6 9 12 15 18 9" />
+      </svg>
+    </span>
+  </button>
+</h3>
+
+<div
+  class="mk-accordion-item__panel"
+  role="region"
+  [id]="panelId"
+  [attr.aria-labelledby]="triggerId"
+  [attr.inert]="open() ? null : ''"
+>
+  <div class="mk-accordion-item__panel-inner">
+    <div class="mk-accordion-item__body">
+      <ng-content />
+    </div>
+  </div>
+</div>

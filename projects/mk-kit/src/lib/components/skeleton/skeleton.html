@@ -1,0 +1,5 @@
+@if (shape() === 'text') {
+  @for (line of lineArray(); track $index) {
+    <span class="mk-skeleton__line" [style.width]="lineWidth($index)"></span>
+  }
+}

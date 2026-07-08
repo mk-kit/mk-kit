@@ -1,0 +1,15 @@
+:host {
+  /* cascades to projected list items (custom properties pierce projection) */
+  --mk-list-item-border: transparent;
+
+  display: flex;
+  flex-direction: column;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  color: var(--mk-text);
+}
+
+:host(.mk-list--bordered) {
+  --mk-list-item-border: var(--mk-border);
+}

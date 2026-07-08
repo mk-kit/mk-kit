@@ -1,0 +1,23 @@
+/* ViewEncapsulation.None — every rule is scoped under `.mk-icon` so it cannot
+ * leak, while still reaching the inner <svg> that innerHTML / projection add. */
+.mk-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  line-height: 0;
+  color: inherit;
+  vertical-align: middle;
+}
+
+.mk-icon__svg {
+  display: inline-flex;
+  width: 100%;
+  height: 100%;
+}
+
+.mk-icon svg {
+  display: block;
+  width: 100%;
+  height: 100%;
+}

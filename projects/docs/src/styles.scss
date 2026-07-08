@@ -1,0 +1,125 @@
+/* mk-kit documentation site — global styles.
+ * Pulls in the published library theme (design tokens + base) from the build
+ * output, then layers documentation-site chrome on top, using the same tokens
+ * so the docs are themed by the very system they document. */
+
+/* Import the library theme from source (stable across library rebuilds).
+   Published apps instead use: @import '@mk-kit/ui/styles.css'; */
+@import '../../mk-kit/src/styles/mk-kit.css';
+
+html,
+body {
+  height: 100%;
+}
+body {
+  margin: 0;
+}
+
+/* Docs layout primitives ------------------------------------------------- */
+.docs-container {
+  width: 100%;
+  max-width: 960px;
+  margin: 0 auto;
+  padding: var(--mk-space-8) var(--mk-space-6) var(--mk-space-16);
+}
+
+.docs-page h1 {
+  font-size: var(--mk-font-size-3xl);
+  font-weight: var(--mk-font-weight-bold);
+  letter-spacing: var(--mk-letter-spacing-tight);
+  margin: 0 0 var(--mk-space-2);
+}
+.docs-page h2 {
+  font-size: var(--mk-font-size-xl);
+  font-weight: var(--mk-font-weight-semibold);
+  margin: var(--mk-space-10) 0 var(--mk-space-4);
+  padding-bottom: var(--mk-space-2);
+  border-bottom: 1px solid var(--mk-border);
+  scroll-margin-top: calc(var(--mk-header-height) + var(--mk-space-4));
+}
+.docs-page h3 {
+  font-size: var(--mk-font-size-lg);
+  font-weight: var(--mk-font-weight-semibold);
+  margin: var(--mk-space-6) 0 var(--mk-space-3);
+}
+.docs-page p,
+.docs-page li {
+  color: var(--mk-text-muted);
+  line-height: var(--mk-line-height-relaxed);
+}
+.docs-lead {
+  font-size: var(--mk-font-size-lg);
+  color: var(--mk-text-muted);
+  max-width: 60ch;
+}
+
+.docs-page a {
+  color: var(--mk-primary);
+  text-decoration: none;
+}
+.docs-page a:hover {
+  text-decoration: underline;
+}
+
+/* Live example canvas + code block -------------------------------------- */
+.docs-example {
+  border: 1px solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  overflow: hidden;
+  margin: var(--mk-space-4) 0 var(--mk-space-6);
+  background: var(--mk-surface);
+}
+.docs-example__preview {
+  padding: var(--mk-space-6);
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-space-3);
+  align-items: center;
+  background: var(--mk-bg);
+}
+.docs-example__preview--column {
+  flex-direction: column;
+  align-items: stretch;
+}
+.docs-example__code {
+  margin: 0;
+  padding: var(--mk-space-4) var(--mk-space-5);
+  background: var(--mk-code-bg);
+  border-top: 1px solid var(--mk-border);
+  color: var(--mk-text);
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-normal);
+  overflow-x: auto;
+}
+code.docs-inline {
+  font-family: var(--mk-font-mono);
+  font-size: 0.9em;
+  background: var(--mk-code-bg);
+  padding: 0.1em 0.4em;
+  border-radius: var(--mk-radius-xs);
+  color: var(--mk-primary-subtle-text);
+}
+
+/* Props table ----------------------------------------------------------- */
+.docs-props {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mk-font-size-sm);
+  margin: var(--mk-space-4) 0;
+}
+.docs-props th,
+.docs-props td {
+  text-align: left;
+  padding: var(--mk-space-2) var(--mk-space-3);
+  border-bottom: 1px solid var(--mk-border);
+  vertical-align: top;
+}
+.docs-props th {
+  color: var(--mk-text-subtle);
+  font-weight: var(--mk-font-weight-semibold);
+}
+.docs-props td code {
+  font-family: var(--mk-font-mono);
+  color: var(--mk-primary-subtle-text);
+}

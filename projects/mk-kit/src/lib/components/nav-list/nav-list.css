@@ -1,0 +1,12 @@
+:host {
+  display: block;
+}
+
+.mk-nav-list__items {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

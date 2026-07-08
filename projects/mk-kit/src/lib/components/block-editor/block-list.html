@@ -1,0 +1,212 @@
+@let readonly = ctx.readonly() || ctx.disabled();
+
+@for (block of blocks(); track block.id; let i = $index; let last = $last) {
+  @if (!readonly) {
+    <mk-block-inserter
+      variant="slim"
+      [definitions]="ctx.definitions()"
+      [columnsOnly]="inColumn()"
+      (pick)="insertAt(i, $event)"
+    />
+  }
+
+  <div class="mk-block" [attr.data-block-id]="block.id" [class.mk-block--readonly]="readonly">
+    @if (!readonly) {
+      <div class="mk-block__gutter" aria-hidden="false">
+        <button
+          type="button"
+          class="mk-block__move"
+          [disabled]="i === 0"
+          aria-label="Move block up"
+          (click)="move(i, -1)"
+        >
+          ▲
+        </button>
+        <span class="mk-block__handle" title="Drag handle" aria-hidden="true">⠿</span>
+        <button
+          type="button"
+          class="mk-block__move"
+          [disabled]="last"
+          aria-label="Move block down"
+          (click)="move(i, 1)"
+        >
+          ▼
+        </button>
+      </div>
+
+      <div class="mk-block__bar">
+        <span class="mk-block__type">
+          <span class="mk-block__type-icon" aria-hidden="true">{{ definition(block.type)?.icon }}</span>
+          {{ definition(block.type)?.label ?? block.type }}
+        </span>
+        <div class="mk-block__actions">
+          <button
+            type="button"
+            class="mk-block__action"
+            [attr.aria-expanded]="menuOpen() === i"
+            aria-haspopup="menu"
+            aria-label="Block options"
+            (click)="toggleMenu(i)"
+          >
+            ⋯
+          </button>
+          @if (menuOpen() === i) {
+            <div class="mk-block__menu" role="menu" aria-label="Block options">
+              <button type="button" role="menuitem" (click)="duplicate(i)">Duplicate</button>
+              @for (t of transformsFor(block.type); track t) {
+                <button type="button" role="menuitem" (click)="transform(i, t)">
+                  Turn into {{ definition(t)?.label ?? t }}
+                </button>
+              }
+              <button type="button" role="menuitem" class="mk-block__menu-danger" (click)="remove(i)">
+                Delete
+              </button>
+            </div>
+          }
+        </div>
+      </div>
+    }
+
+    <div class="mk-block__body">
+      @switch (block.type) {
+        @case ('paragraph') {
+          <mk-paragraph-block
+            [block]="block"
+            [readonly]="readonly"
+            [placeholder]="ctx.placeholder()"
+            (blockChange)="update(i, $event)"
+            (splitAt)="onSplit(i, $event)"
+            (removeEmpty)="onMergeBack(i)"
+            (arrowOut)="onArrowOut(i, $event)"
+          />
+        }
+        @case ('heading') {
+          <mk-heading-block
+            [block]="block"
+            [readonly]="readonly"
+            (blockChange)="update(i, $event)"
+            (splitAt)="onSplit(i, $event)"
+            (removeEmpty)="onMergeBack(i)"
+            (arrowOut)="onArrowOut(i, $event)"
+          />
+        }
+        @case ('quote') {
+          <mk-quote-block
+            [block]="block"
+            [readonly]="readonly"
+            (blockChange)="update(i, $event)"
+            (splitAt)="onSplit(i, $event)"
+            (removeEmpty)="onMergeBack(i)"
+            (arrowOut)="onArrowOut(i, $event)"
+          />
+        }
+        @case ('list') {
+          <mk-list-block [block]="block" [readonly]="readonly" (blockChange)="update(i, $event)" />
+        }
+        @case ('code') {
+          <mk-code-block [block]="block" [readonly]="readonly" (blockChange)="update(i, $event)" />
+        }
+        @case ('image') {
+          <mk-image-block [block]="block" [readonly]="readonly" (blockChange)="update(i, $event)" />
+        }
+        @case ('embed') {
+          <mk-embed-block [block]="block" [readonly]="readonly" (blockChange)="update(i, $event)" />
+        }
+        @case ('button') {
+          <mk-button-block [block]="block" [readonly]="readonly" (blockChange)="update(i, $event)" />
+        }
+        @case ('divider') {
+          <hr class="mk-block__divider" data-mk-focus tabindex="-1" />
+        }
+        @case ('columns') {
+          @if (!readonly) {
+            <div class="mk-columns-settings" role="group" aria-label="Column settings">
+              <label>
+                <span>Columns</span>
+                <span class="mk-columns-settings__counts">
+                  @for (n of [2, 3, 4]; track n) {
+                    <button
+                      type="button"
+                      [class.mk-columns-settings__count--active]="(block.data['count'] || 2) === n"
+                      [attr.aria-pressed]="(block.data['count'] || 2) === n"
+                      (click)="setColumnCount(i, n)"
+                    >
+                      {{ n }}
+                    </button>
+                  }
+                </span>
+              </label>
+              <label>
+                <span>Ratio</span>
+                <select [value]="block.data['ratio']" (change)="onRatioChange(i, $event)">
+                  @for (preset of ratioPresets[block.data['count'] || 2]; track preset.value) {
+                    <option [value]="preset.value">{{ preset.label }}</option>
+                  }
+                </select>
+              </label>
+              <label>
+                <span>Gap</span>
+                <input
+                  type="range"
+                  min="0"
+                  max="8"
+                  [value]="block.data['gap'] ?? 4"
+                  (input)="onGapChange(i, $event)"
+                />
+              </label>
+              <label>
+                <span>Align</span>
+                <select [value]="block.data['align'] ?? 'stretch'" (change)="onAlignChange(i, $event)">
+                  <option value="stretch">Stretch</option>
+                  <option value="start">Top</option>
+                  <option value="center">Middle</option>
+                  <option value="end">Bottom</option>
+                </select>
+              </label>
+              <label>
+                <span>Justify</span>
+                <select [value]="block.data['justify'] ?? 'start'" (change)="onJustifyChange(i, $event)">
+                  <option value="start">Start</option>
+                  <option value="center">Center</option>
+                  <option value="end">End</option>
+                  <option value="between">Space between</option>
+                </select>
+              </label>
+            </div>
+          }
+          <div
+            class="mk-columns"
+            [style.grid-template-columns]="gridColumns(block)"
+            [style.gap]="gridGap(block)"
+            [style.align-items]="block.data['align'] ?? 'stretch'"
+            [style.justify-content]="justifyValue(block)"
+          >
+            @for (col of block.children ?? []; track col.id; let c = $index) {
+              <div class="mk-column">
+                <mk-block-list
+                  [blocks]="col.children ?? []"
+                  [depth]="depth() + 1"
+                  [inColumn]="true"
+                  (blocksChange)="onColumnChange(i, c, $event)"
+                />
+              </div>
+            }
+          </div>
+        }
+        @default {
+          <p class="mk-block__unknown">Unknown block: {{ block.type }}</p>
+        }
+      }
+    </div>
+  </div>
+}
+
+@if (!readonly) {
+  <mk-block-inserter
+    class="mk-block-list__add"
+    [definitions]="ctx.definitions()"
+    [columnsOnly]="inColumn()"
+    [label]="blocks().length ? 'Add block' : 'Add your first block'"
+    (pick)="insertAt(blocks().length, $event)"
+  />
+}

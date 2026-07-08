@@ -1,0 +1,62 @@
+<button
+  #trigger
+  type="button"
+  class="mk-select__trigger"
+  [id]="triggerId"
+  role="combobox"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="listId"
+  [attr.aria-activedescendant]="
+    open() && activeIndex() >= 0 ? optionId(activeIndex()) : null
+  "
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  [disabled]="isDisabled()"
+  (click)="toggle()"
+  (keydown)="onKeydown($event)"
+  (blur)="onBlur()"
+>
+  @if (displayLabel()) {
+    <span class="mk-select__value">{{ displayLabel() }}</span>
+  } @else {
+    <span class="mk-select__value mk-select__value--placeholder">{{
+      placeholder()
+    }}</span>
+  }
+  <span class="mk-select__arrow" aria-hidden="true"></span>
+</button>
+
+@if (open()) {
+  <ul
+    class="mk-select__list"
+    [id]="listId"
+    role="listbox"
+    [attr.aria-labelledby]="labelledBy()"
+  >
+    @for (opt of options(); track $index; let i = $index) {
+      <li
+        class="mk-select__option"
+        [id]="optionId(i)"
+        role="option"
+        [attr.aria-selected]="i === selectedIndex()"
+        [attr.aria-disabled]="opt.disabled || null"
+        [class.mk-select__option--active]="i === activeIndex()"
+        [class.mk-select__option--selected]="i === selectedIndex()"
+        [class.mk-select__option--disabled]="opt.disabled"
+        (mousedown)="$event.preventDefault()"
+        (mousemove)="!opt.disabled && activeIndex.set(i)"
+        (click)="selectOption(i)"
+      >
+        <span class="mk-select__option-label">{{ opt.label }}</span>
+        @if (i === selectedIndex()) {
+          <span class="mk-select__check" aria-hidden="true"></span>
+        }
+      </li>
+    } @empty {
+      <li class="mk-select__empty" role="presentation">No options</li>
+    }
+  </ul>
+}

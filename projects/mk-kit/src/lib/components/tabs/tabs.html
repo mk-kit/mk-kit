@@ -1,0 +1,33 @@
+<div class="mk-tabs__list" role="tablist">
+  @for (tab of tabs(); track tab.tabId; let i = $index) {
+    <button
+      #tabBtn
+      type="button"
+      role="tab"
+      class="mk-tabs__tab"
+      [class.mk-tabs__tab--active]="i === selectedIndex()"
+      [id]="tab.tabId"
+      [attr.aria-controls]="tab.panelId"
+      [attr.aria-selected]="i === selectedIndex()"
+      [attr.tabindex]="i === selectedIndex() ? 0 : -1"
+      [disabled]="tab.disabled()"
+      (click)="select(i)"
+      (keydown)="onKeydown($event, i)"
+    >
+      {{ tab.label() }}
+    </button>
+  }
+
+  @if (variant() === 'line') {
+    <span
+      class="mk-tabs__indicator"
+      aria-hidden="true"
+      [style.transform]="'translateX(' + indicatorLeft() + 'px)'"
+      [style.width.px]="indicatorWidth()"
+    ></span>
+  }
+</div>
+
+<div class="mk-tabs__panels">
+  <ng-content />
+</div>

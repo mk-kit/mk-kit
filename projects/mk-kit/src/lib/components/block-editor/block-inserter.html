@@ -1,0 +1,75 @@
+@if (variant() === 'slim') {
+  <button
+    type="button"
+    class="mk-block-inserter__slim-trigger"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [disabled]="disabled()"
+    aria-label="Insert a block here"
+    (click)="toggle()"
+  >
+    <span class="mk-block-inserter__plus" aria-hidden="true">＋</span>
+  </button>
+} @else {
+  <button
+    type="button"
+    class="mk-block-inserter__trigger"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [disabled]="disabled()"
+    (click)="toggle()"
+  >
+    <span class="mk-block-inserter__plus" aria-hidden="true">＋</span>
+    {{ label() }}
+  </button>
+}
+
+@if (open()) {
+  <div class="mk-block-inserter__panel" [id]="panelId" role="dialog" aria-label="Block inserter">
+    <input
+      #search
+      type="text"
+      class="mk-block-inserter__search"
+      role="combobox"
+      aria-autocomplete="list"
+      [attr.aria-expanded]="true"
+      [attr.aria-controls]="listId"
+      [attr.aria-activedescendant]="filtered().length ? optionId(activeIndex()) : null"
+      placeholder="Search blocks…"
+      [value]="query()"
+      (input)="onQuery($event)"
+      (keydown)="onKeydown($event)"
+    />
+
+    <div class="mk-block-inserter__list" [id]="listId" role="listbox" aria-label="Blocks">
+      @for (group of groups(); track group.name) {
+        <div class="mk-block-inserter__group" role="group" [attr.aria-label]="group.name">
+          <div class="mk-block-inserter__group-label">{{ group.name }}</div>
+          @for (def of group.items; track def.type) {
+            <button
+              type="button"
+              class="mk-block-inserter__option"
+              [class.mk-block-inserter__option--active]="indexOf(def) === activeIndex()"
+              [id]="optionId(indexOf(def))"
+              role="option"
+              [attr.aria-selected]="indexOf(def) === activeIndex()"
+              (mouseenter)="activeIndex.set(indexOf(def))"
+              (click)="choose(def)"
+            >
+              <span class="mk-block-inserter__icon" aria-hidden="true">{{ def.icon ?? '▢' }}</span>
+              <span class="mk-block-inserter__text">
+                <span class="mk-block-inserter__name">{{ def.label }}</span>
+                @if (def.description) {
+                  <span class="mk-block-inserter__desc">{{ def.description }}</span>
+                }
+              </span>
+            </button>
+          }
+        </div>
+      }
+      @if (!filtered().length) {
+        <p class="mk-block-inserter__empty">No blocks match “{{ query() }}”.</p>
+      }
+    </div>
+  </div>
+}

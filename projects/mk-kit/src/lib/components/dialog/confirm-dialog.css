@@ -1,0 +1,9 @@
+/* The host element is the overlay panel itself (styled via `.mk-dialog-panel`
+ * from dialog.css), so no `:host` box rules are declared here. */
+
+.mk-confirm-dialog__message {
+  margin: 0;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-relaxed);
+}

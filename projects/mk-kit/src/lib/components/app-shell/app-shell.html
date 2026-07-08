@@ -1,0 +1,38 @@
+<a class="mk-app-shell__skip" href="#mk-app-main">Skip to content</a>
+
+<header class="mk-app-shell__header" role="banner">
+  <ng-content select="[mkAppHeader]" />
+</header>
+
+<div class="mk-app-shell__body">
+  <aside
+    #sidebar
+    class="mk-app-shell__sidebar"
+    [attr.role]="isMobile() ? 'dialog' : null"
+    [attr.aria-modal]="isMobile() && sidebarOpen() ? 'true' : null"
+    [attr.aria-label]="isMobile() ? 'Sidebar navigation' : null"
+    [attr.inert]="isMobile() && !sidebarOpen() ? '' : null"
+    (keydown)="onSidebarKeydown($event)"
+  >
+    <nav class="mk-app-shell__nav" aria-label="Primary">
+      <ng-content select="[mkAppSidebar]" />
+    </nav>
+  </aside>
+
+  @if (isMobile() && sidebarOpen()) {
+    <div
+      class="mk-app-shell__scrim"
+      aria-hidden="true"
+      (click)="closeSidebar()"
+    ></div>
+  }
+
+  <main
+    id="mk-app-main"
+    class="mk-app-shell__main"
+    role="main"
+    tabindex="-1"
+  >
+    <ng-content />
+  </main>
+</div>

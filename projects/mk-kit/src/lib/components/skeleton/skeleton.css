@@ -1,0 +1,55 @@
+:host {
+  display: block;
+}
+
+/* Text variant: host is a column of line bars. */
+:host(.mk-skeleton--text) {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+}
+
+/* Elements that receive the shimmer: block shapes and text lines. */
+:host(.mk-skeleton--rect),
+:host(.mk-skeleton--circle),
+.mk-skeleton__line {
+  background-color: var(--mk-skeleton-base);
+  background-image: linear-gradient(
+    90deg,
+    var(--mk-skeleton-base) 0%,
+    var(--mk-skeleton-shine) 50%,
+    var(--mk-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: mk-skeleton-shimmer 1.4s ease-in-out infinite;
+}
+
+:host(.mk-skeleton--rect) {
+  border-radius: var(--mk-radius-md);
+}
+:host(.mk-skeleton--circle) {
+  border-radius: var(--mk-radius-circle);
+  flex: 0 0 auto;
+}
+
+.mk-skeleton__line {
+  display: block;
+  height: 0.8em;
+  border-radius: var(--mk-radius-xs);
+}
+
+@keyframes mk-skeleton-shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.mk-skeleton--rect),
+  :host(.mk-skeleton--circle),
+  .mk-skeleton__line {
+    animation: none;
+    background-image: none;
+    background-color: var(--mk-skeleton-base);
+  }
+}

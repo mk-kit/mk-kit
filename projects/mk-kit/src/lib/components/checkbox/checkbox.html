@@ -1,0 +1,24 @@
+<label class="mk-checkbox__root">
+  <span class="mk-checkbox__control">
+    <input
+      class="mk-checkbox__native"
+      type="checkbox"
+      [id]="inputId"
+      [checked]="checked()"
+      [indeterminate]="indeterminate()"
+      [disabled]="isDisabled()"
+      [required]="isRequired()"
+      [attr.aria-label]="ariaLabel() || null"
+      [attr.aria-required]="isRequired() || null"
+      [attr.aria-invalid]="isInvalid() || null"
+      [attr.aria-describedby]="describedBy()"
+      (change)="onNativeChange($event)"
+      (blur)="onTouched()"
+    />
+    <span class="mk-checkbox__box" aria-hidden="true">
+      <span class="mk-checkbox__check"></span>
+      <span class="mk-checkbox__dash"></span>
+    </span>
+  </span>
+  <span class="mk-checkbox__text"><ng-content /></span>
+</label>

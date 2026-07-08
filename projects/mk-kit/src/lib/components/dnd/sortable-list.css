@@ -1,0 +1,19 @@
+/* mk-sortable-list — layout-only wrapper; item look comes from the template. */
+:host {
+  display: block;
+}
+
+.mk-sortable-list__list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+}
+
+:host([data-orientation='horizontal']) .mk-sortable-list__list,
+.mk-sortable-list__list.mk-drop-list--horizontal {
+  flex-direction: row;
+}
+
+.mk-sortable-list__item {
+  display: block;
+}

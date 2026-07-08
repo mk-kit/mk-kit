@@ -1,0 +1,16 @@
+@if (label() || (showValue() && !indeterminate())) {
+  <div class="mk-progress-bar__header">
+    @if (label()) {
+      <span class="mk-progress-bar__label" [id]="labelId">{{ label() }}</span>
+    }
+    @if (showValue() && !indeterminate()) {
+      <span class="mk-progress-bar__value">{{ clamped() }}%</span>
+    }
+  </div>
+}
+<div class="mk-progress-bar__track">
+  <div
+    class="mk-progress-bar__fill"
+    [style.width.%]="indeterminate() ? null : clamped()"
+  ></div>
+</div>

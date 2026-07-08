@@ -1,0 +1,53 @@
+<div
+  class="mk-stepper__header"
+  role="tablist"
+  [attr.aria-orientation]="orientation()"
+>
+  @for (step of steps(); track step.headerId; let i = $index; let last = $last) {
+    <button
+      #stepBtn
+      type="button"
+      role="tab"
+      class="mk-stepper__step"
+      [class.mk-stepper__step--active]="step.active()"
+      [class.mk-stepper__step--completed]="step.completed()"
+      [class.mk-stepper__step--error]="step.hasError()"
+      [id]="step.headerId"
+      [attr.aria-controls]="step.panelId"
+      [attr.aria-selected]="step.active()"
+      [attr.aria-disabled]="!isReachable(i) || null"
+      [attr.tabindex]="step.active() ? 0 : -1"
+      [disabled]="!isReachable(i)"
+      (click)="select(i)"
+      (keydown)="onKeydown($event, i)"
+    >
+      <span class="mk-stepper__marker" aria-hidden="true">
+        @if (step.hasError()) {
+          <span class="mk-stepper__bang">!</span>
+        } @else if (step.completed()) {
+          <span class="mk-stepper__check"></span>
+        } @else {
+          {{ stepNumber(i) }}
+        }
+      </span>
+      <span class="mk-stepper__labels">
+        <span class="mk-stepper__label">
+          {{ step.label() }}
+          @if (step.optional()) {
+            <span class="mk-stepper__optional">Optional</span>
+          }
+        </span>
+        @if (step.description()) {
+          <span class="mk-stepper__description">{{ step.description() }}</span>
+        }
+      </span>
+    </button>
+    @if (!last) {
+      <span class="mk-stepper__connector" aria-hidden="true"></span>
+    }
+  }
+</div>
+
+<div class="mk-stepper__panels">
+  <ng-content />
+</div>

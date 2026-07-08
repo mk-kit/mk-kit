@@ -1,0 +1,37 @@
+@if (safeSrc()) {
+  <div class="mk-embed-block__frame" [style.padding-top]="paddingTop()">
+    <iframe
+      class="mk-embed-block__iframe"
+      [src]="safeSrc()"
+      [title]="providerName() + ' embed'"
+      loading="lazy"
+      referrerpolicy="strict-origin-when-cross-origin"
+      sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
+      allowfullscreen
+    ></iframe>
+  </div>
+} @else if (hasFallback()) {
+  <a class="mk-embed-block__card" [href]="url()" target="_blank" rel="noopener noreferrer">
+    <span class="mk-embed-block__card-icon" aria-hidden="true">🔗</span>
+    <span class="mk-embed-block__card-body">
+      <span class="mk-embed-block__card-title">External content</span>
+      <span class="mk-embed-block__card-url">{{ url() }}</span>
+    </span>
+  </a>
+}
+
+@if (!readonly()) {
+  <label class="mk-embed-block__input">
+    <span class="mk-visually-hidden">Embed URL</span>
+    <input
+      type="url"
+      data-mk-focus
+      [value]="url()"
+      placeholder="Paste a YouTube, Vimeo or other URL…"
+      (change)="onUrl($event)"
+    />
+  </label>
+  @if (url() && !safeSrc() && !hasFallback()) {
+    <p class="mk-embed-block__note">That URL can’t be embedded, but it will render as a link.</p>
+  }
+}

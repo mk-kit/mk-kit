@@ -1,0 +1,80 @@
+:host {
+  display: inline-flex;
+}
+
+.mk-button-toggle__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-space-2);
+  height: var(--_h, var(--mk-control-height-md));
+  padding: 0 var(--_pad, var(--mk-space-4));
+  font-family: inherit;
+  font-size: var(--_fs, var(--mk-font-size-md));
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  cursor: pointer;
+  user-select: none;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+/* Collapse the shared border between adjacent segments. */
+:host(:not(:first-child)) .mk-button-toggle__btn {
+  margin-left: calc(-1 * var(--mk-border-width));
+}
+
+/* Round only the outer ends of the group. */
+:host(:first-child) .mk-button-toggle__btn {
+  border-top-left-radius: var(--_radius, var(--mk-radius-md));
+  border-bottom-left-radius: var(--_radius, var(--mk-radius-md));
+}
+:host(:last-child) .mk-button-toggle__btn {
+  border-top-right-radius: var(--_radius, var(--mk-radius-md));
+  border-bottom-right-radius: var(--_radius, var(--mk-radius-md));
+}
+
+.mk-button-toggle__btn:hover:not(:disabled) {
+  background-image: linear-gradient(
+    var(--mk-hover-overlay),
+    var(--mk-hover-overlay)
+  );
+  z-index: 1;
+}
+
+.mk-button-toggle__btn:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  z-index: 2;
+}
+
+/* Selected fill */
+:host(.mk-button-toggle--selected) .mk-button-toggle__btn {
+  color: var(--_contrast);
+  background-color: var(--_main);
+  border-color: var(--_main);
+  z-index: 1;
+}
+:host(.mk-button-toggle--selected) .mk-button-toggle__btn:hover:not(:disabled) {
+  background-image: linear-gradient(
+    var(--mk-active-overlay),
+    var(--mk-active-overlay)
+  );
+}
+
+:host(.mk-button-toggle--disabled) .mk-button-toggle__btn {
+  cursor: not-allowed;
+  opacity: 0.55;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-button-toggle__btn {
+    transition: none;
+  }
+}

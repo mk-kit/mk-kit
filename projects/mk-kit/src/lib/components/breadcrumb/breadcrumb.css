@@ -1,0 +1,15 @@
+:host {
+  display: block;
+}
+
+.mk-breadcrumb__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-normal);
+}

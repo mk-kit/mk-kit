@@ -1,0 +1,38 @@
+<div
+  class="mk-tree__root"
+  role="tree"
+  [attr.aria-label]="ariaLabel() || null"
+>
+  @for (row of rows(); track $index; let i = $index) {
+    <div
+      #row
+      class="mk-tree__item"
+      role="treeitem"
+      [class.mk-tree__item--selected]="isSelected(row.node)"
+      [class.mk-tree__item--disabled]="row.node.disabled"
+      [attr.aria-level]="row.level"
+      [attr.aria-posinset]="row.posinset"
+      [attr.aria-setsize]="row.setsize"
+      [attr.aria-expanded]="row.expandable ? row.expanded : null"
+      [attr.aria-selected]="selectable() ? isSelected(row.node) : null"
+      [attr.aria-disabled]="row.node.disabled || null"
+      [attr.tabindex]="tabIndexFor(i)"
+      [style.padding-left]="indent(row.level)"
+      (click)="onRowClick(i)"
+      (keydown)="onKeydown($event, i)"
+    >
+      <span class="mk-tree__toggle" aria-hidden="true">
+        @if (row.expandable) {
+          <span
+            class="mk-tree__caret"
+            [class.mk-tree__caret--open]="row.expanded"
+          ></span>
+        }
+      </span>
+      @if (row.node.icon) {
+        <span class="mk-tree__icon" aria-hidden="true">{{ row.node.icon }}</span>
+      }
+      <span class="mk-tree__label">{{ row.node.label }}</span>
+    </div>
+  }
+</div>

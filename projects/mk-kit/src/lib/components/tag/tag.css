@@ -1,0 +1,83 @@
+:host {
+  --_main: var(--mk-surface-inverse);
+  --_contrast: var(--mk-text-inverse);
+  --_subtle: var(--mk-neutral-subtle);
+  --_subtle-text: var(--mk-neutral-subtle-text);
+
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  height: 1.5rem;
+  padding: 0 var(--mk-space-2);
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-sm);
+  font-family: inherit;
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+:host([data-tone='primary']) {
+  --_main: var(--mk-primary);
+  --_contrast: var(--mk-primary-contrast);
+  --_subtle: var(--mk-primary-subtle);
+  --_subtle-text: var(--mk-primary-subtle-text);
+}
+:host([data-tone='neutral']) {
+  --_main: var(--mk-surface-inverse);
+  --_contrast: var(--mk-text-inverse);
+  --_subtle: var(--mk-neutral-subtle);
+  --_subtle-text: var(--mk-neutral-subtle-text);
+}
+:host([data-tone='success']) {
+  --_main: var(--mk-success);
+  --_contrast: var(--mk-success-contrast);
+  --_subtle: var(--mk-success-subtle);
+  --_subtle-text: var(--mk-success-subtle-text);
+}
+:host([data-tone='warning']) {
+  --_main: var(--mk-warning);
+  --_contrast: var(--mk-warning-contrast);
+  --_subtle: var(--mk-warning-subtle);
+  --_subtle-text: var(--mk-warning-subtle-text);
+}
+:host([data-tone='danger']) {
+  --_main: var(--mk-danger);
+  --_contrast: var(--mk-danger-contrast);
+  --_subtle: var(--mk-danger-subtle);
+  --_subtle-text: var(--mk-danger-subtle-text);
+}
+:host([data-tone='info']) {
+  --_main: var(--mk-info);
+  --_contrast: var(--mk-info-contrast);
+  --_subtle: var(--mk-info-subtle);
+  --_subtle-text: var(--mk-info-subtle-text);
+}
+
+/* Sizes */
+:host(.mk-tag--sm) {
+  height: 1.25rem;
+  padding: 0 var(--mk-space-1);
+}
+:host(.mk-tag--lg) {
+  height: 1.75rem;
+  padding: 0 var(--mk-space-3);
+  font-size: var(--mk-font-size-sm);
+}
+
+/* Variants */
+:host(.mk-tag--solid) {
+  background-color: var(--_main);
+  color: var(--_contrast);
+}
+:host(.mk-tag--soft) {
+  background-color: var(--_subtle);
+  color: var(--_subtle-text);
+}
+:host(.mk-tag--outline) {
+  background-color: transparent;
+  color: var(--_subtle-text);
+  border-color: color-mix(in srgb, var(--_main) 42%, var(--mk-border-strong));
+}

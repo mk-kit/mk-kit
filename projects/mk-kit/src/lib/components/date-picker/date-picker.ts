@@ -1,0 +1,247 @@
+import {
+  ChangeDetectionStrategy,
+  Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
+  booleanAttribute,
+  computed,
+  effect,
+  forwardRef,
+  inject,
+  input,
+  model,
+  numberAttribute,
+  signal,
+  viewChild,
+} from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import type { MkSize } from '../../core/types';
+import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkFormField } from '../form-field/form-field';
+import { MkCalendar } from '../calendar/calendar';
+import {
+  clampDate,
+  formatDate,
+  parseISODate,
+  startOfDay,
+} from '../datetime/date-utils';
+
+/**
+ * DatePicker — a text field paired with a calendar popover. Type a date (parsed
+ * on blur/Enter) or pick one from the `mk-calendar`. Implements
+ * `ControlValueAccessor` and a two-way `value` model, so it works with
+ * `[(ngModel)]`, reactive forms and `[(value)]`.
+ *
+ * The calendar opens below the field, closes on Escape / outside click / after
+ * a selection, and wires `aria-expanded` / `aria-haspopup` / `aria-invalid`.
+ * When nested in an `mk-form-field` it adopts the field's id and aria wiring.
+ *
+ * ```html
+ * <mk-date-picker [(value)]="date" [min]="minDate" clearable />
+ * ```
+ */
+@Component({
+  selector: 'mk-date-picker',
+  templateUrl: './date-picker.html',
+  styleUrl: './date-picker.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkCalendar],
+  host: {
+    class: 'mk-date-picker',
+    '[class.mk-date-picker--sm]': "effectiveSize() === 'sm'",
+    '[class.mk-date-picker--md]': "effectiveSize() === 'md'",
+    '[class.mk-date-picker--lg]': "effectiveSize() === 'lg'",
+    '[class.mk-date-picker--open]': 'open()',
+    '[class.mk-date-picker--invalid]': 'isInvalid()',
+    '[class.mk-date-picker--disabled]': 'isDisabled()',
+    '(document:pointerdown)': 'onDocumentPointerdown($event)',
+    '(focusout)': 'onFocusOut($event)',
+  },
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => MkDatePicker),
+      multi: true,
+    },
+  ],
+})
+export class MkDatePicker implements ControlValueAccessor {
+  private readonly field = inject(MkFormField, { optional: true });
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
+  private readonly inputRef =
+    viewChild<ElementRef<HTMLInputElement>>('textInput');
+
+  /** Two-way selected date. */
+  readonly value = model<Date | null>(null);
+  /** Earliest selectable date (inclusive). */
+  readonly min = input<Date | null>(null);
+  /** Latest selectable date (inclusive). */
+  readonly max = input<Date | null>(null);
+  /** Placeholder shown when empty. */
+  readonly placeholder = input<string>('Select date…');
+  /** Pattern used to render the selected date in the field. */
+  readonly displayFormat = input<string>('MMM d, yyyy');
+  /** Disable the control. */
+  readonly disabled = input(false, { transform: booleanAttribute });
+  /** Show a clear button when a date is selected. */
+  readonly clearable = input(false, { transform: booleanAttribute });
+  /** Force invalid styling + `aria-invalid`. */
+  readonly invalid = input(false, { transform: booleanAttribute });
+  /** First column of the calendar week (0 = Sunday). */
+  readonly firstDayOfWeek = input(0, { transform: numberAttribute });
+  /** Control size. Ignored when nested in an `mk-form-field`. */
+  readonly size = input<MkSize>('md');
+
+  protected readonly open = signal(false);
+  /** Editable text mirror of the field. */
+  protected readonly inputText = signal('');
+  private readonly cvaDisabled = signal(false);
+  private onChange: (value: Date | null) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  readonly inputId = this.field?.controlId ?? mkUniqueId('mk-date-picker');
+  readonly panelId = mkUniqueId('mk-date-picker-panel');
+
+  protected readonly effectiveSize = computed<MkSize>(() =>
+    this.field ? this.field.size() : this.size(),
+  );
+  protected readonly isDisabled = computed(
+    () => this.disabled() || this.cvaDisabled(),
+  );
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
+  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly describedBy = computed(
+    () => this.field?.describedBy() ?? null,
+  );
+  protected readonly showClear = computed(
+    () => this.clearable() && !!this.value() && !this.isDisabled(),
+  );
+
+  constructor() {
+    // Keep the text field in sync with the model (typing does not touch value).
+    effect(() => {
+      const v = this.value();
+      this.inputText.set(v ? formatDate(v, this.displayFormat()) : '');
+    });
+  }
+
+  protected toggle(): void {
+    if (this.isDisabled()) return;
+    this.open() ? this.close() : this.openPanel();
+  }
+
+  protected openPanel(): void {
+    if (this.isDisabled() || this.open()) return;
+    this.open.set(true);
+    afterNextRender(
+      {
+        write: () => {
+          const el = this.host.nativeElement.querySelector<HTMLElement>(
+            '.mk-calendar__day[tabindex="0"]',
+          );
+          el?.focus();
+        },
+      },
+      { injector: this.injector },
+    );
+  }
+
+  protected close(): void {
+    if (this.open()) this.open.set(false);
+  }
+
+  protected onCalendarPick(date: Date | null): void {
+    this.setValue(date);
+    this.close();
+    this.inputRef()?.nativeElement.focus();
+  }
+
+  protected onInput(event: Event): void {
+    this.inputText.set((event.target as HTMLInputElement).value);
+  }
+
+  protected onInputKeydown(event: Event): void {
+    const e = event as KeyboardEvent;
+    if (this.isDisabled()) return;
+    switch (e.key) {
+      case 'Enter':
+        e.preventDefault();
+        this.commitInput();
+        break;
+      case 'ArrowDown':
+        e.preventDefault();
+        this.openPanel();
+        break;
+      case 'Escape':
+        if (this.open()) {
+          e.preventDefault();
+          this.close();
+        }
+        break;
+    }
+  }
+
+  protected clear(): void {
+    this.setValue(null);
+    this.inputRef()?.nativeElement.focus();
+  }
+
+  private commitInput(): void {
+    const text = this.inputText().trim();
+    if (!text) {
+      this.setValue(null);
+      return;
+    }
+    const parsed = this.parse(text);
+    if (parsed) {
+      this.setValue(clampDate(parsed, this.min(), this.max()));
+    } else {
+      // Invalid entry — revert to the current model's display.
+      const v = this.value();
+      this.inputText.set(v ? formatDate(v, this.displayFormat()) : '');
+    }
+  }
+
+  private parse(text: string): Date | null {
+    const iso = parseISODate(text);
+    if (iso) return iso;
+    const ms = Date.parse(text);
+    return Number.isNaN(ms) ? null : startOfDay(new Date(ms));
+  }
+
+  private setValue(date: Date | null): void {
+    this.value.set(date);
+    this.onChange(date);
+  }
+
+  protected onDocumentPointerdown(event: Event): void {
+    if (!this.open()) return;
+    if (!this.host.nativeElement.contains(event.target as Node)) this.close();
+  }
+
+  protected onFocusOut(event: Event): void {
+    const related = (event as FocusEvent).relatedTarget as Node | null;
+    if (related && this.host.nativeElement.contains(related)) return;
+    this.commitInput();
+    this.close();
+    this.onTouched();
+  }
+
+  // --- ControlValueAccessor -------------------------------------------------
+  writeValue(value: Date | null): void {
+    this.value.set(value ?? null);
+  }
+  registerOnChange(fn: (value: Date | null) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+}

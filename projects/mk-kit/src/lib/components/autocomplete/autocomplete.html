@@ -1,0 +1,78 @@
+<div class="mk-autocomplete__field">
+  <input
+    #input
+    type="text"
+    class="mk-autocomplete__input"
+    [id]="inputId"
+    role="combobox"
+    autocomplete="off"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listId"
+    aria-autocomplete="list"
+    [attr.aria-activedescendant]="
+      open() && activeIndex() >= 0 ? optionId(activeIndex()) : null
+    "
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [placeholder]="placeholder()"
+    [value]="query()"
+    [disabled]="isDisabled()"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+  />
+
+  @if (query() && !isDisabled()) {
+    <button
+      type="button"
+      class="mk-autocomplete__clear"
+      aria-label="Clear"
+      tabindex="-1"
+      (mousedown)="$event.preventDefault()"
+      (click)="clear()"
+    ></button>
+  }
+
+  <span class="mk-autocomplete__arrow" aria-hidden="true"></span>
+</div>
+
+@if (open()) {
+  <ul
+    class="mk-autocomplete__list"
+    [id]="listId"
+    role="listbox"
+    [attr.aria-labelledby]="labelledBy()"
+  >
+    @if (loading()) {
+      <li class="mk-autocomplete__status" role="presentation">
+        <span class="mk-autocomplete__spinner" aria-hidden="true"></span>
+        Loading…
+      </li>
+    } @else {
+      @for (opt of filtered(); track $index; let i = $index) {
+        <li
+          class="mk-autocomplete__option"
+          [id]="optionId(i)"
+          role="option"
+          [attr.aria-selected]="i === activeIndex()"
+          [attr.aria-disabled]="opt.disabled || null"
+          [class.mk-autocomplete__option--active]="i === activeIndex()"
+          [class.mk-autocomplete__option--disabled]="opt.disabled"
+          (mousedown)="$event.preventDefault()"
+          (mousemove)="!opt.disabled && activeIndex.set(i)"
+          (click)="selectOption(i)"
+        >
+          <span class="mk-autocomplete__option-label">{{ opt.label }}</span>
+        </li>
+      } @empty {
+        <li class="mk-autocomplete__status" role="presentation">
+          {{ emptyMessage() }}
+        </li>
+      }
+    }
+  </ul>
+}

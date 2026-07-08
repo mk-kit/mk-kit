@@ -1,0 +1,41 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  width: 100%;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+}
+
+/* Rule segments flanking the (optional) label. */
+:host::before,
+:host::after {
+  content: '';
+  flex: 1 1 auto;
+  height: var(--mk-border-width);
+  background-color: var(--mk-border);
+}
+
+/* Unlabelled: the empty label collapses so the two rules meet as one line. */
+.mk-divider__label:empty {
+  display: none;
+}
+.mk-divider__label {
+  flex: 0 0 auto;
+  line-height: var(--mk-line-height-tight);
+}
+
+/* Vertical rule */
+:host(.mk-divider--vertical) {
+  display: inline-flex;
+  flex-direction: column;
+  width: auto;
+  height: 100%;
+  min-height: 1em;
+  align-self: stretch;
+}
+:host(.mk-divider--vertical)::before,
+:host(.mk-divider--vertical)::after {
+  width: var(--mk-border-width);
+  height: auto;
+}

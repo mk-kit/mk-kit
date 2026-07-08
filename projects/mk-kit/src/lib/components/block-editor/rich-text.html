@@ -1,0 +1,42 @@
+@if (toolbar().visible && !disabled()) {
+  <div
+    class="mk-rich-text__toolbar"
+    role="toolbar"
+    aria-label="Text formatting"
+    [style.top.px]="toolbar().top"
+    [style.left.px]="toolbar().left"
+  >
+    @for (tool of tools; track tool.id) {
+      <button
+        type="button"
+        class="mk-rich-text__tool"
+        [class.mk-rich-text__tool--active]="isActive(tool.id)"
+        [class.mk-rich-text__tool--code]="tool.id === 'code'"
+        [attr.aria-pressed]="isActive(tool.id)"
+        [attr.aria-label]="tool.label + (tool.shortcut ? ' (' + tool.shortcut + ')' : '')"
+        [title]="tool.label"
+        (mousedown)="runTool(tool.id, $event)"
+      >
+        {{ tool.icon }}
+      </button>
+    }
+  </div>
+}
+
+<div
+  #editable
+  class="mk-rich-text__editable"
+  data-mk-editable
+  role="textbox"
+  aria-multiline="true"
+  [attr.aria-label]="ariaLabel()"
+  [attr.contenteditable]="disabled() ? null : 'true'"
+  [attr.data-placeholder]="placeholder()"
+  [class.mk-rich-text__editable--empty]="showPlaceholder()"
+  (input)="onInput()"
+  (focus)="onFocus()"
+  (blur)="onBlur()"
+  (keydown)="onKeydown($event)"
+  (keyup)="onSelectionChange()"
+  (mouseup)="onSelectionChange()"
+></div>

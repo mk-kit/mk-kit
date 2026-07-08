@@ -1,0 +1,16 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  font-family: var(--mk-font-sans);
+}
+
+:host(.mk-radio-group--horizontal) {
+  flex-direction: row;
+  flex-wrap: wrap;
+  gap: var(--mk-space-4);
+}
+
+:host(.mk-radio-group--disabled) {
+  opacity: 0.7;
+}

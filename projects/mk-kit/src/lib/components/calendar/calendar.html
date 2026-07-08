@@ -1,0 +1,91 @@
+<div class="mk-calendar__header">
+  <button
+    type="button"
+    class="mk-calendar__nav"
+    aria-label="Previous month"
+    (click)="prevMonth()"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M15 5l-7 7 7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+
+  <span class="mk-calendar__label" [id]="labelId" aria-live="polite">{{
+    monthLabel()
+  }}</span>
+
+  <button
+    type="button"
+    class="mk-calendar__nav"
+    aria-label="Next month"
+    (click)="nextMonth()"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M9 5l7 7-7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+</div>
+
+<table
+  class="mk-calendar__grid"
+  role="grid"
+  [attr.aria-labelledby]="labelId"
+  (keydown)="onGridKeydown($event)"
+>
+  <thead>
+    <tr>
+      @for (wd of weekdays(); track $index) {
+        <th class="mk-calendar__weekday" scope="col">
+          <abbr [title]="wd.full">{{ wd.short }}</abbr>
+        </th>
+      }
+    </tr>
+  </thead>
+  <tbody (mouseleave)="clearHover()">
+    @for (week of weeks(); track $index) {
+      <tr>
+        @for (day of week; track day.getTime()) {
+          <td
+            class="mk-calendar__cell"
+            role="gridcell"
+            [attr.aria-selected]="isSelected(day) || null"
+          >
+            <button
+              type="button"
+              class="mk-calendar__day"
+              [class.mk-calendar__day--outside]="isOutside(day)"
+              [class.mk-calendar__day--today]="isToday(day)"
+              [class.mk-calendar__day--selected]="isSelected(day)"
+              [class.mk-calendar__day--range-start]="isRangeStart(day)"
+              [class.mk-calendar__day--range-end]="isRangeEnd(day)"
+              [class.mk-calendar__day--in-range]="isInRange(day)"
+              [class.mk-calendar__day--disabled]="isDisabled(day)"
+              [attr.tabindex]="isFocused(day) ? 0 : -1"
+              [attr.aria-label]="dayLabel(day)"
+              [attr.aria-current]="isToday(day) ? 'date' : null"
+              [attr.aria-disabled]="isDisabled(day) || null"
+              (click)="select(day)"
+              (mouseenter)="onHover(day)"
+            >
+              <span class="mk-calendar__day-num">{{ day.getDate() }}</span>
+            </button>
+          </td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>

@@ -1,0 +1,16 @@
+<span class="mk-snackbar__message">{{ item().message }}</span>
+
+@if (item().actionLabel) {
+  <button type="button" class="mk-snackbar__action" (click)="runAction()">
+    {{ item().actionLabel }}
+  </button>
+}
+
+@if (item().dismissible) {
+  <button
+    type="button"
+    class="mk-snackbar__close"
+    aria-label="Dismiss"
+    (click)="dismiss()"
+  ></button>
+}

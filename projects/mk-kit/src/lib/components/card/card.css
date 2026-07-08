@@ -1,0 +1,38 @@
+:host {
+  /* padding token shared with header/footer parts (custom props cascade) */
+  --mk-card-pad: var(--mk-space-5);
+
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-lg);
+  color: var(--mk-text);
+  overflow: hidden;
+}
+
+:host([data-padding='none']) { --mk-card-pad: 0; }
+:host([data-padding='sm']) { --mk-card-pad: var(--mk-space-3); }
+:host([data-padding='md']) { --mk-card-pad: var(--mk-space-5); }
+:host([data-padding='lg']) { --mk-card-pad: var(--mk-space-6); }
+
+/* Variants */
+:host(.mk-card--elevated) {
+  box-shadow: var(--mk-shadow-sm);
+}
+:host(.mk-card--outlined) {
+  border-color: var(--mk-border);
+}
+:host(.mk-card--filled) {
+  background-color: var(--mk-surface-2);
+}
+
+.mk-card__body {
+  padding: var(--mk-card-pad);
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* Collapse body padding when it holds no meaningful content is left to the
+   consumer; an empty body simply renders an empty padded box. */

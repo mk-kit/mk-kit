@@ -1,0 +1,12 @@
+<span class="mk-chip__content"><ng-content /></span>
+@if (removable()) {
+  <button
+    type="button"
+    class="mk-chip__remove"
+    [attr.aria-label]="removeLabel()"
+    [disabled]="disabled()"
+    (click)="onRemoveClick($event)"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+}

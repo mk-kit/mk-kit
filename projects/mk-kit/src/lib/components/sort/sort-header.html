@@ -1,0 +1,9 @@
+<span class="mk-sort-header__label"><ng-content /></span>
+@if (!isDisabled()) {
+  <span
+    class="mk-sort-header__arrow"
+    [class.mk-sort-header__arrow--active]="isActive()"
+    [class.mk-sort-header__arrow--desc]="direction() === 'desc'"
+    aria-hidden="true"
+  ></span>
+}

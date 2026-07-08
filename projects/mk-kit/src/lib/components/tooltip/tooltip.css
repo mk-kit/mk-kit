@@ -1,0 +1,36 @@
+:host {
+  position: fixed;
+  z-index: var(--mk-z-tooltip);
+  max-width: 16rem;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  background-color: var(--mk-surface-inverse);
+  color: var(--mk-text-inverse);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: var(--mk-line-height-snug);
+  text-align: center;
+  border-radius: var(--mk-radius-sm);
+  box-shadow: var(--mk-shadow-md);
+  pointer-events: none;
+  white-space: normal;
+  overflow-wrap: break-word;
+
+  opacity: 0;
+  transform: scale(0.96);
+  transition:
+    opacity var(--mk-duration-fast) var(--mk-ease-out),
+    transform var(--mk-duration-fast) var(--mk-ease-out);
+}
+
+:host(.mk-tooltip--visible) {
+  opacity: 1;
+  transform: scale(1);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    transition: none;
+    transform: none;
+  }
+}

@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>mk-kit — Angular admin component library</title>
+    <base href="/" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta
+      name="description"
+      content="mk-kit — a themable, accessible Angular 22 component library for admin dashboards. Signals, WCAG 2.1 AA, CSS-variable theming, dark mode out of the box."
+    />
+    <link rel="icon" type="image/x-icon" href="favicon.ico" />
+    <script>
+      // Apply the persisted theme before first paint to avoid a flash.
+      (function () {
+        try {
+          var t = localStorage.getItem('mk-kit-theme');
+          if (t === 'light' || t === 'dark') {
+            document.documentElement.setAttribute('data-mk-theme', t);
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="mk-app">
+    <app-root></app-root>
+  </body>
+</html>

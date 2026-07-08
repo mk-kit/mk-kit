@@ -1,0 +1,41 @@
+/* To learn more about Typescript configuration file: https://www.typescriptlang.org/docs/handbook/tsconfig-json.html. */
+/* To learn more about Angular compiler options: https://angular.dev/reference/configs/angular-compiler-options. */
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "noImplicitOverride": true,
+    "noPropertyAccessFromIndexSignature": true,
+    "noImplicitReturns": true,
+    "paths": {
+      "@mk-kit/ui": ["./dist/mk-kit"],
+      "@mk-kit/ui/*": ["./dist/mk-kit/*"]
+    },
+    "noFallthroughCasesInSwitch": true,
+    "skipLibCheck": true,
+    "isolatedModules": true,
+    "experimentalDecorators": true,
+    "importHelpers": true,
+    "target": "ES2022",
+    "module": "preserve"
+  },
+  "angularCompilerOptions": {
+    "enableI18nLegacyMessageIdFormat": false,
+    "strictInjectionParameters": true,
+    "strictInputAccessModifiers": true
+  },
+  "files": [],
+  "references": [
+    {
+      "path": "./projects/mk-kit/tsconfig.lib.json"
+    },
+    {
+      "path": "./projects/mk-kit/tsconfig.spec.json"
+    },
+    {
+      "path": "./projects/docs/tsconfig.app.json"
+    },
+    {
+      "path": "./projects/docs/tsconfig.spec.json"
+    }
+  ]
+}

@@ -1,0 +1,134 @@
+:host {
+  --_cell-pad-y: var(--mk-space-3);
+  --_cell-pad-x: var(--mk-space-4);
+
+  display: block;
+  color: var(--mk-text);
+}
+
+:host(.mk-table--compact) {
+  --_cell-pad-y: var(--mk-space-2);
+  --_cell-pad-x: var(--mk-space-3);
+}
+
+/* Horizontal scroll container */
+.mk-table__scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+}
+
+.mk-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mk-font-size-sm);
+  background-color: var(--mk-surface);
+}
+
+/* Header */
+.mk-table__th {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  background-color: var(--mk-surface-2);
+  color: var(--mk-text-muted);
+  font-weight: var(--mk-font-weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+  vertical-align: middle;
+}
+
+/* Sticky header */
+:host(.mk-table--sticky) .mk-table__head .mk-table__th {
+  position: sticky;
+  top: 0;
+  z-index: var(--mk-z-sticky);
+}
+
+.mk-table__th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+}
+
+.mk-table__th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.mk-table__th--sortable:hover {
+  background-color: var(--mk-surface-3);
+  color: var(--mk-text);
+}
+.mk-table__th--sortable:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+}
+.mk-table__th[aria-sort='ascending'],
+.mk-table__th[aria-sort='descending'] {
+  color: var(--mk-text);
+}
+
+.mk-table__sort {
+  font-size: var(--mk-font-size-xs);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* Body cells */
+.mk-table__td {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+  vertical-align: middle;
+}
+.mk-table__row:last-child .mk-table__td {
+  border-bottom: 0;
+}
+
+/* Alignment */
+.mk-table__th[data-align='center'],
+.mk-table__td[data-align='center'] { text-align: center; }
+.mk-table__th[data-align='end'],
+.mk-table__td[data-align='end'] { text-align: right; }
+
+/* Zebra */
+:host(.mk-table--zebra) .mk-table__body .mk-table__row:nth-child(even) .mk-table__td {
+  background-color: var(--mk-surface-2);
+}
+
+/* Hover */
+:host(.mk-table--hover) .mk-table__body .mk-table__row:not(.mk-table__row--empty):hover .mk-table__td {
+  background-color: var(--mk-neutral-subtle);
+}
+
+/* Clickable rows */
+:host(.mk-table--clickable) .mk-table__row:not(.mk-table__row--empty) {
+  cursor: pointer;
+}
+:host(.mk-table--clickable) .mk-table__row:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+}
+
+/* Selection column */
+.mk-table__th--select,
+.mk-table__td--select {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Selected rows — win over zebra + hover backgrounds */
+:host .mk-table__body .mk-table__row--selected .mk-table__td,
+:host(.mk-table--zebra) .mk-table__body .mk-table__row--selected:nth-child(even) .mk-table__td,
+:host(.mk-table--hover) .mk-table__body .mk-table__row--selected:hover .mk-table__td {
+  background-color: var(--mk-selected-bg);
+  color: var(--mk-selected-text);
+}
+
+/* Empty state */
+.mk-table__empty {
+  padding: var(--mk-space-8) var(--_cell-pad-x);
+  text-align: center;
+  color: var(--mk-text-subtle);
+}

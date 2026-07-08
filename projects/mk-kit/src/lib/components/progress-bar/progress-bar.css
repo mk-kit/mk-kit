@@ -1,0 +1,75 @@
+:host {
+  --_fill: var(--mk-primary);
+  --_track-height: 0.5rem;
+
+  display: block;
+  width: 100%;
+}
+
+:host([data-tone='primary']) { --_fill: var(--mk-primary); }
+:host([data-tone='neutral']) { --_fill: var(--mk-surface-inverse); }
+:host([data-tone='success']) { --_fill: var(--mk-success); }
+:host([data-tone='warning']) { --_fill: var(--mk-warning); }
+:host([data-tone='danger']) { --_fill: var(--mk-danger); }
+:host([data-tone='info']) { --_fill: var(--mk-info); }
+
+/* Sizes */
+:host(.mk-progress-bar--sm) { --_track-height: 0.25rem; }
+:host(.mk-progress-bar--md) { --_track-height: 0.5rem; }
+:host(.mk-progress-bar--lg) { --_track-height: 0.75rem; }
+
+.mk-progress-bar__header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: var(--mk-space-2);
+  margin-bottom: var(--mk-space-2);
+  font-size: var(--mk-font-size-sm);
+}
+.mk-progress-bar__label {
+  color: var(--mk-text);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-progress-bar__value {
+  color: var(--mk-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-progress-bar__track {
+  position: relative;
+  width: 100%;
+  height: var(--_track-height);
+  background-color: var(--mk-surface-3);
+  border-radius: var(--mk-radius-pill);
+  overflow: hidden;
+}
+
+.mk-progress-bar__fill {
+  height: 100%;
+  background-color: var(--_fill);
+  border-radius: inherit;
+  transition: width var(--mk-duration-normal) var(--mk-ease-out);
+}
+
+/* Indeterminate */
+:host(.mk-progress-bar--indeterminate) .mk-progress-bar__fill {
+  width: 40%;
+  animation: mk-progress-indeterminate 1.4s var(--mk-ease-standard) infinite;
+}
+@keyframes mk-progress-indeterminate {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(350%); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-progress-bar__fill { transition: none; }
+  :host(.mk-progress-bar--indeterminate) .mk-progress-bar__fill {
+    /* Slow, gentle pulse instead of a fast sliding motion. */
+    width: 100%;
+    animation: mk-progress-pulse 2s ease-in-out infinite;
+  }
+}
+@keyframes mk-progress-pulse {
+  0%, 100% { opacity: 0.5; }
+  50% { opacity: 1; }
+}

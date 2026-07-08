@@ -1,0 +1,7 @@
+:host {
+  display: block;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  background: var(--mk-surface);
+  overflow: hidden;
+}

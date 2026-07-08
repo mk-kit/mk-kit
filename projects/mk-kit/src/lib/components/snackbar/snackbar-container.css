@@ -1,0 +1,10 @@
+:host {
+  position: fixed;
+  bottom: var(--mk-space-5);
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: var(--mk-z-toast);
+  display: flex;
+  justify-content: center;
+  pointer-events: none;
+}

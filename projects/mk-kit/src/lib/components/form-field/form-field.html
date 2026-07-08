@@ -1,0 +1,20 @@
+@if (label()) {
+  <label class="mk-form-field__label" [id]="labelId" [attr.for]="controlId">
+    <span class="mk-form-field__label-text">{{ label() }}</span>
+    @if (required()) {
+      <span class="mk-form-field__required" aria-hidden="true">*</span>
+    }
+  </label>
+}
+
+<div class="mk-form-field__control">
+  <ng-content />
+</div>
+
+@if (hintVisible()) {
+  <p class="mk-form-field__hint" [id]="hintId">{{ hint() }}</p>
+}
+
+@if (hasError()) {
+  <p class="mk-form-field__error" [id]="errorId" role="alert">{{ error() }}</p>
+}

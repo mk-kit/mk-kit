@@ -1,0 +1,22 @@
+/* mk-drop-list — the container of draggable items.
+ * Kept layout-neutral so it can be applied to any element (ul, div, …).
+ * The floating preview and the drop-gap placeholder are created imperatively
+ * and live outside this directive's style scope, so they are styled inline
+ * with --mk-* tokens in drag.ts. */
+
+:host {
+  display: block;
+  position: relative;
+}
+
+/* Highlight the list an item is currently hovering over (buckets/kanban). */
+:host(.mk-drop-list--receiving) {
+  outline: var(--mk-border-width-strong) solid var(--mk-primary-subtle-text);
+  outline-offset: calc(-1 * var(--mk-border-width-strong));
+  border-radius: var(--mk-radius-md);
+  background-color: color-mix(in srgb, var(--mk-primary) 6%, transparent);
+}
+
+:host(.mk-drop-list--disabled) {
+  cursor: not-allowed;
+}

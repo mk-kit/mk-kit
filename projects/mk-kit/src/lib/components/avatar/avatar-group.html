@@ -1,0 +1,6 @@
+<ng-content />
+@if (overflowCount() > 0) {
+  <span class="mk-avatar-group__overflow" aria-label="{{ overflowCount() }} more">
+    +{{ overflowCount() }}
+  </span>
+}

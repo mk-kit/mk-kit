@@ -1,0 +1,20 @@
+<div class="mk-stat-card__header">
+  <span class="mk-stat-card__label" [id]="labelId">{{ label() }}</span>
+  <span class="mk-stat-card__icon" aria-hidden="true">
+    <ng-content select="[mkStatIcon]" />
+  </span>
+</div>
+
+<div class="mk-stat-card__value">{{ value() }}</div>
+
+@if (hasDelta()) {
+  <div class="mk-stat-card__delta" [attr.data-trend]="deltaTrend()">
+    <span class="mk-stat-card__arrow" aria-hidden="true">{{ arrow() }}</span>
+    <span class="mk-stat-card__delta-value">{{ delta() }}</span>
+    <span class="mk-stat-card__sr">{{ trendLabel() }}</span>
+  </div>
+}
+
+@if (hint()) {
+  <div class="mk-stat-card__hint">{{ hint() }}</div>
+}

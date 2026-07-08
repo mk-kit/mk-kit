@@ -1,0 +1,15 @@
+<button
+  #btn
+  type="button"
+  class="mk-button-toggle__btn"
+  [attr.role]="role()"
+  [attr.aria-checked]="ariaChecked()"
+  [attr.aria-pressed]="ariaPressed()"
+  [attr.aria-disabled]="isDisabled() || null"
+  [disabled]="isDisabled()"
+  [attr.tabindex]="tabIndex()"
+  (click)="onClick()"
+  (keydown)="onKeydown($event)"
+>
+  <ng-content />
+</button>
