@@ -1,0 +1,35 @@
+:host {
+  display: inline-block;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+.mk-sparkline__svg {
+  display: block;
+  max-width: 100%;
+  overflow: visible;
+}
+
+.mk-sparkline__line {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  /* Stroke width is set per-instance; keep it visually constant despite the
+     non-uniform viewBox scaling. */
+  vector-effect: non-scaling-stroke;
+}
+
+.mk-sparkline__area {
+  opacity: 0.16;
+  stroke: none;
+}
+
+.mk-sparkline__dot {
+  stroke: var(--mk-surface);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+.mk-sparkline__bar {
+  stroke: none;
+}

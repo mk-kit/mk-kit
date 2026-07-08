@@ -1,0 +1,106 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Gridlines + value-axis labels -->
+    @for (row of gridRows(); track row.value) {
+      @if (showGrid()) {
+        <line
+          class="mk-chart__grid"
+          [attr.x1]="plot().x"
+          [attr.x2]="plot().x + plot().w"
+          [attr.y1]="row.y"
+          [attr.y2]="row.y"
+        />
+      }
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--y"
+        [attr.x]="plot().x - 8"
+        [attr.y]="row.y"
+      >
+        {{ row.label }}
+      </text>
+    }
+
+    <!-- Bars -->
+    @for (b of bars(); track b.categoryIndex + '-' + b.seriesIndex) {
+      <rect
+        class="mk-chart__bar"
+        [class.mk-chart__bar--dim]="hovered() && hovered() !== b"
+        [attr.x]="b.x"
+        [attr.y]="b.y"
+        [attr.width]="b.w"
+        [attr.height]="b.h"
+        [style.fill]="b.color"
+        rx="3"
+        (pointerenter)="setHover(b)"
+        (pointerleave)="setHover(null)"
+      />
+    }
+
+    <!-- Category labels -->
+    @for (band of bands(); track band.label) {
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--x"
+        [attr.x]="band.cx"
+        [attr.y]="height() - 10"
+      >
+        {{ band.label }}
+      </text>
+    }
+  </svg>
+
+  @if (tooltip(); as t) {
+    <div
+      class="mk-chart__tooltip"
+      [style.left.%]="t.left"
+      [style.top.%]="t.top"
+    >
+      <span class="mk-chart__tooltip-title">{{ t.category }}</span>
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__swatch" [style.background]="t.color"></span>
+        @if (t.multi) {
+          <span class="mk-chart__tooltip-name">{{ t.series }}</span>
+        }
+        <span class="mk-chart__tooltip-value">{{ t.value }}</span>
+      </span>
+    </div>
+  }
+</div>
+
+@if (legendVisible()) {
+  <ul class="mk-chart__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        {{ item.name }}
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Category</th>
+      @for (s of series(); track s.name) {
+        <th scope="col">{{ s.name }}</th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (cat of categories(); track cat; let c = $index) {
+      <tr>
+        <th scope="row">{{ cat }}</th>
+        @for (s of series(); track s.name) {
+          <td>{{ s.data[c] }}</td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>

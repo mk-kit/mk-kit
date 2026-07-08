@@ -1,0 +1,42 @@
+<svg
+  class="mk-sparkline__svg"
+  [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+  [attr.width]="width()"
+  [attr.height]="height()"
+  preserveAspectRatio="none"
+  aria-hidden="true"
+  focusable="false"
+>
+  @if (type() === 'bar') {
+    @for (b of bars(); track $index) {
+      <rect
+        class="mk-sparkline__bar"
+        [attr.x]="b.x"
+        [attr.y]="b.y"
+        [attr.width]="b.w"
+        [attr.height]="b.h"
+        [style.fill]="color()"
+        rx="1"
+      />
+    }
+  } @else {
+    @if (type() === 'area') {
+      <path class="mk-sparkline__area" [attr.d]="areaPath()" [style.fill]="color()" />
+    }
+    <path
+      class="mk-sparkline__line"
+      [attr.d]="linePath()"
+      [style.stroke]="color()"
+      [style.stroke-width]="strokeWidth()"
+    />
+    @if (showDot() && lastPoint(); as p) {
+      <circle
+        class="mk-sparkline__dot"
+        [attr.cx]="p.x"
+        [attr.cy]="p.y"
+        [attr.r]="strokeWidth() + 1"
+        [style.fill]="color()"
+      />
+    }
+  }
+</svg>

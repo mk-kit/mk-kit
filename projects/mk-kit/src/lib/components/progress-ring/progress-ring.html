@@ -1,0 +1,33 @@
+<svg
+  class="mk-progress-ring__svg"
+  [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
+  [attr.width]="size()"
+  [attr.height]="size()"
+  aria-hidden="true"
+  focusable="false"
+>
+  <circle
+    class="mk-progress-ring__track"
+    [attr.cx]="center()"
+    [attr.cy]="center()"
+    [attr.r]="radius()"
+    [attr.stroke-width]="thickness()"
+    fill="none"
+  />
+  <circle
+    class="mk-progress-ring__arc"
+    [attr.cx]="center()"
+    [attr.cy]="center()"
+    [attr.r]="radius()"
+    [attr.stroke-width]="thickness()"
+    [attr.stroke-dasharray]="circumference()"
+    [attr.stroke-dashoffset]="indeterminate() ? circumference() * 0.7 : dashOffset()"
+    fill="none"
+    stroke-linecap="round"
+  />
+</svg>
+
+@if (showLabel() && !indeterminate()) {
+  <span class="mk-progress-ring__label">{{ percent() }}%</span>
+}
+<span class="mk-progress-ring__center"><ng-content /></span>

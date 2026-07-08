@@ -195,6 +195,20 @@
   --mk-scrollbar-thumb: #cbd1d9;
   --mk-scrollbar-thumb-hover: #adb5c0;
   --mk-code-bg: #f1f3f5;
+
+  /* Categorical chart palette — validated colorblind-safe, fixed order.
+     Assign by series index, never cycle a 9th hue (fold into "Other"). */
+  --mk-chart-1: #4f46e5;
+  --mk-chart-2: #0e9f6e;
+  --mk-chart-3: #c2740f;
+  --mk-chart-4: #e0338a;
+  --mk-chart-5: #2f8bd6;
+  --mk-chart-6: #0d9488;
+  --mk-chart-7: #8b5cf6;
+  --mk-chart-8: #e5484d;
+  /* Recessive chart chrome (alias existing tokens; re-resolves per theme). */
+  --mk-chart-grid: var(--mk-border-subtle);
+  --mk-chart-axis: var(--mk-text-subtle);
 }
 
 /* -------------------------------------------------------------------------
@@ -275,6 +289,16 @@
     --mk-scrollbar-thumb: #3a444f;
     --mk-scrollbar-thumb-hover: #4b545f;
     --mk-code-bg: #1e252e;
+
+    /* Chart palette — dark variant (validated on #161b22 surface). */
+    --mk-chart-1: #6366f1;
+    --mk-chart-2: #16a34a;
+    --mk-chart-3: #d97706;
+    --mk-chart-4: #db2777;
+    --mk-chart-5: #3b82f6;
+    --mk-chart-6: #0d9488;
+    --mk-chart-7: #8b5cf6;
+    --mk-chart-8: #ef4444;
   }
 }
 
@@ -352,6 +376,16 @@
   --mk-scrollbar-thumb: #3a444f;
   --mk-scrollbar-thumb-hover: #4b545f;
   --mk-code-bg: #1e252e;
+
+  /* Chart palette — dark variant (validated on #161b22 surface). */
+  --mk-chart-1: #6366f1;
+  --mk-chart-2: #16a34a;
+  --mk-chart-3: #d97706;
+  --mk-chart-4: #db2777;
+  --mk-chart-5: #3b82f6;
+  --mk-chart-6: #0d9488;
+  --mk-chart-7: #8b5cf6;
+  --mk-chart-8: #ef4444;
 }
 
 /* -------------------------------------------------------------------------

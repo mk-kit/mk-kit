@@ -1,0 +1,140 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Gridlines + value-axis labels -->
+    @for (row of gridRows(); track row.value) {
+      @if (showGrid()) {
+        <line
+          class="mk-chart__grid"
+          [attr.x1]="plot().x"
+          [attr.x2]="plot().x + plot().w"
+          [attr.y1]="row.y"
+          [attr.y2]="row.y"
+        />
+      }
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--y"
+        [attr.x]="plot().x - 8"
+        [attr.y]="row.y"
+      >
+        {{ row.label }}
+      </text>
+    }
+
+    <!-- Areas + lines -->
+    @for (r of rendered(); track r.name) {
+      @if (area()) {
+        <path class="mk-chart__area" [attr.d]="r.area" [style.fill]="r.color" />
+      }
+      <path class="mk-chart__line" [attr.d]="r.line" [style.stroke]="r.color" />
+      @if (showDots()) {
+        @for (p of r.points; track $index) {
+          <circle
+            class="mk-chart__dot"
+            [attr.cx]="p.x"
+            [attr.cy]="p.y"
+            r="3"
+            [style.fill]="r.color"
+          />
+        }
+      }
+    }
+
+    <!-- Category labels -->
+    @for (cat of categories(); track $index; let i = $index) {
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--x"
+        [attr.x]="plot().x + (categories().length > 1 ? (i * plot().w) / (categories().length - 1) : plot().w / 2)"
+        [attr.y]="height() - 10"
+      >
+        {{ cat }}
+      </text>
+    }
+
+    <!-- Hover crosshair + active point markers -->
+    @if (crosshairX(); as cx) {
+      <line
+        class="mk-chart__crosshair"
+        [attr.x1]="cx"
+        [attr.x2]="cx"
+        [attr.y1]="plot().y"
+        [attr.y2]="plot().y + plot().h"
+      />
+      @for (p of activePoints(); track p.name) {
+        <circle
+          class="mk-chart__dot"
+          [attr.cx]="p.x"
+          [attr.cy]="p.y"
+          r="4"
+          [style.fill]="p.color"
+        />
+      }
+    }
+
+    <!-- Transparent hit bands -->
+    @for (band of hitBands(); track band.index) {
+      <rect
+        [attr.x]="band.x"
+        [attr.y]="band.y"
+        [attr.width]="band.w"
+        [attr.height]="band.h"
+        fill="transparent"
+        (pointerenter)="setHover(band.index)"
+        (pointerleave)="setHover(null)"
+      />
+    }
+  </svg>
+
+  @if (tooltip(); as t) {
+    <div class="mk-chart__tooltip" [style.left.%]="t.left" [style.top.%]="t.top">
+      <span class="mk-chart__tooltip-title">{{ t.category }}</span>
+      @for (row of t.rows; track row.name) {
+        <span class="mk-chart__tooltip-row">
+          <span class="mk-chart__swatch" [style.background]="row.color"></span>
+          @if (t.multi) {
+            <span class="mk-chart__tooltip-name">{{ row.name }}</span>
+          }
+          <span class="mk-chart__tooltip-value">{{ row.value }}</span>
+        </span>
+      }
+    </div>
+  }
+</div>
+
+@if (legendVisible()) {
+  <ul class="mk-chart__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        {{ item.name }}
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Category</th>
+      @for (s of series(); track s.name) {
+        <th scope="col">{{ s.name }}</th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (cat of categories(); track cat; let c = $index) {
+      <tr>
+        <th scope="row">{{ cat }}</th>
+        @for (s of series(); track s.name) {
+          <td>{{ s.data[c] }}</td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>

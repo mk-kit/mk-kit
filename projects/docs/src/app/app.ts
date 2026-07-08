@@ -67,6 +67,7 @@ export class App {
         { label: 'Snackbar', path: '/components/snackbar', icon: '▭' },
         { label: 'Bottom sheet', path: '/components/bottom-sheet', icon: '▟' },
         { label: 'Sort', path: '/components/sort', icon: '⇅' },
+        { label: 'Charts', path: '/components/charts', icon: '▚' },
         { label: 'Data display', path: '/components/data', icon: '▦' },
         { label: 'Date & time', path: '/components/date-time', icon: '◷' },
         { label: 'Drag & drop', path: '/components/drag-drop', icon: '⤨' },

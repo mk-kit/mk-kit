@@ -121,6 +121,12 @@ export const routes: Routes = [
       import('./pages/sort/sort-page').then((m) => m.SortPage),
   },
   {
+    path: 'components/charts',
+    title: 'Charts — mk-kit',
+    loadComponent: () =>
+      import('./pages/charts/charts-page').then((m) => m.ChartsPage),
+  },
+  {
     path: 'components/data',
     title: 'Data display — mk-kit',
     loadComponent: () =>

@@ -1,0 +1,76 @@
+:host {
+  --_ring: var(--mk-primary);
+
+  display: inline-grid;
+  place-items: center;
+  position: relative;
+  line-height: 0;
+  vertical-align: middle;
+}
+
+:host([data-tone='primary']) { --_ring: var(--mk-primary); }
+:host([data-tone='success']) { --_ring: var(--mk-success); }
+:host([data-tone='warning']) { --_ring: var(--mk-warning); }
+:host([data-tone='danger']) { --_ring: var(--mk-danger); }
+:host([data-tone='info']) { --_ring: var(--mk-info); }
+:host([data-tone='neutral']) { --_ring: var(--mk-text-muted); }
+
+.mk-progress-ring__svg {
+  grid-area: 1 / 1;
+  /* Start the arc at 12 o'clock and sweep clockwise. */
+  transform: rotate(-90deg);
+}
+
+.mk-progress-ring__track {
+  stroke: var(--mk-border);
+}
+
+.mk-progress-ring__arc {
+  stroke: var(--_ring);
+  transition: stroke-dashoffset var(--mk-duration-normal) var(--mk-ease-standard);
+}
+
+/* Indeterminate: a fixed 30%-length arc spinning around the track. */
+:host(.mk-progress-ring--indeterminate) .mk-progress-ring__svg {
+  animation: mk-progress-ring-spin 0.9s linear infinite;
+  transform-origin: center;
+}
+:host(.mk-progress-ring--indeterminate) .mk-progress-ring__arc {
+  transition: none;
+}
+
+.mk-progress-ring__label {
+  grid-area: 1 / 1;
+  line-height: 1;
+  font-family: var(--mk-font-sans);
+  font-size: 0.7em;
+  font-weight: var(--mk-font-weight-semibold);
+  color: var(--mk-text);
+  font-variant-numeric: tabular-nums;
+}
+
+/* Projected centre content (icon/number) sits on top of the ring. */
+.mk-progress-ring__center {
+  grid-area: 1 / 1;
+  display: grid;
+  place-items: center;
+  line-height: 1;
+}
+.mk-progress-ring__center:empty {
+  display: none;
+}
+
+@keyframes mk-progress-ring-spin {
+  to {
+    transform: rotate(270deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host(.mk-progress-ring--indeterminate) .mk-progress-ring__svg {
+    animation-duration: 1.8s;
+  }
+  .mk-progress-ring__arc {
+    transition: none;
+  }
+}

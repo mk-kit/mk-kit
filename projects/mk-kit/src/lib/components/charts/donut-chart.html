@@ -1,0 +1,65 @@
+<div class="mk-chart__frame mk-donut__frame" [style.max-width.px]="size()">
+  <svg
+    class="mk-chart__svg mk-donut__svg"
+    [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    @for (g of geom(); track g.index) {
+      <path
+        class="mk-chart__slice"
+        [class.mk-chart__slice--dim]="hovered() !== null && hovered() !== g.index"
+        [attr.d]="g.path"
+        [style.fill]="g.color"
+        (pointerenter)="setHover(g.index)"
+        (pointerleave)="setHover(null)"
+      />
+    }
+  </svg>
+
+  @if (innerRadius() > 0 && (centerLabel() || centerSublabel())) {
+    <div class="mk-donut__center">
+      @if (centerLabel()) {
+        <span class="mk-donut__center-label">{{ centerLabel() }}</span>
+      }
+      @if (centerSublabel()) {
+        <span class="mk-donut__center-sublabel">{{ centerSublabel() }}</span>
+      }
+    </div>
+  }
+
+  @if (tooltip(); as t) {
+    <div class="mk-chart__tooltip" [style.left.%]="t.left" [style.top.%]="t.top">
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__swatch" [style.background]="t.color"></span>
+        <span class="mk-chart__tooltip-name">{{ t.name }}</span>
+        <span class="mk-chart__tooltip-value">{{ t.value }} ({{ t.percent }}%)</span>
+      </span>
+    </div>
+  }
+</div>
+
+@if (showLegend()) {
+  <ul class="mk-chart__legend mk-donut__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        <span class="mk-donut__legend-name">{{ item.name }}</span>
+        <span class="mk-donut__legend-value">{{ item.value }} · {{ item.percent }}%</span>
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr><th scope="col">Slice</th><th scope="col">Value</th></tr>
+  </thead>
+  <tbody>
+    @for (s of slices(); track s.name) {
+      <tr><th scope="row">{{ s.name }}</th><td>{{ s.value }}</td></tr>
+    }
+  </tbody>
+</table>
