@@ -1,3 +1,7 @@
+// mk-kit theme — SCSS SOURCE.
+// The shipped `mk-kit.css` is GENERATED from this file: run `npm run build:theme`
+// (also run by `build:lib` and `start`). Do not edit the generated .css by hand.
+
 /* =========================================================================
  * mk-kit — Global theme & design tokens
  * -------------------------------------------------------------------------
@@ -8,6 +12,7 @@
  *
  *   import '@mk-kit/ui/styles.css';
  * ========================================================================= */
+
 /* -------------------------------------------------------------------------
  * 1. Theme-independent tokens (geometry, type, motion, layering)
  * ---------------------------------------------------------------------- */
@@ -17,38 +22,44 @@
     sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
   --mk-font-mono: ui-monospace, 'SF Mono', 'Cascadia Code', 'JetBrains Mono',
     'Fira Code', Consolas, monospace;
+
   /* Type scale (rem, 1rem = 16px base) */
-  --mk-font-size-xs: 0.75rem; /* 12 */
+  --mk-font-size-xs: 0.75rem;   /* 12 */
   --mk-font-size-sm: 0.8125rem; /* 13 */
-  --mk-font-size-md: 0.875rem; /* 14 — default UI text */
-  --mk-font-size-lg: 1rem; /* 16 */
-  --mk-font-size-xl: 1.25rem; /* 20 */
-  --mk-font-size-2xl: 1.5rem; /* 24 */
+  --mk-font-size-md: 0.875rem;  /* 14 — default UI text */
+  --mk-font-size-lg: 1rem;      /* 16 */
+  --mk-font-size-xl: 1.25rem;   /* 20 */
+  --mk-font-size-2xl: 1.5rem;   /* 24 */
   --mk-font-size-3xl: 1.875rem; /* 30 */
-  --mk-font-size-4xl: 2.25rem; /* 36 */
+  --mk-font-size-4xl: 2.25rem;  /* 36 */
+
   --mk-font-weight-normal: 400;
   --mk-font-weight-medium: 500;
   --mk-font-weight-semibold: 600;
   --mk-font-weight-bold: 700;
+
   --mk-line-height-tight: 1.2;
   --mk-line-height-snug: 1.35;
   --mk-line-height-normal: 1.5;
   --mk-line-height-relaxed: 1.7;
+
   --mk-letter-spacing-tight: -0.01em;
   --mk-letter-spacing-normal: 0;
   --mk-letter-spacing-wide: 0.02em;
+
   /* Spacing scale (4px base) */
   --mk-space-0: 0;
-  --mk-space-1: 0.25rem; /* 4  */
-  --mk-space-2: 0.5rem; /* 8  */
-  --mk-space-3: 0.75rem; /* 12 */
-  --mk-space-4: 1rem; /* 16 */
-  --mk-space-5: 1.25rem; /* 20 */
-  --mk-space-6: 1.5rem; /* 24 */
-  --mk-space-8: 2rem; /* 32 */
-  --mk-space-10: 2.5rem; /* 40 */
-  --mk-space-12: 3rem; /* 48 */
-  --mk-space-16: 4rem; /* 64 */
+  --mk-space-1: 0.25rem;  /* 4  */
+  --mk-space-2: 0.5rem;   /* 8  */
+  --mk-space-3: 0.75rem;  /* 12 */
+  --mk-space-4: 1rem;     /* 16 */
+  --mk-space-5: 1.25rem;  /* 20 */
+  --mk-space-6: 1.5rem;   /* 24 */
+  --mk-space-8: 2rem;     /* 32 */
+  --mk-space-10: 2.5rem;  /* 40 */
+  --mk-space-12: 3rem;    /* 48 */
+  --mk-space-16: 4rem;    /* 64 */
+
   /* Radii */
   --mk-radius-none: 0;
   --mk-radius-xs: 3px;
@@ -59,13 +70,16 @@
   --mk-radius-2xl: 24px;
   --mk-radius-pill: 999px;
   --mk-radius-circle: 50%;
+
   /* Control sizing (heights for inputs/buttons) */
   --mk-control-height-sm: 30px;
   --mk-control-height-md: 38px;
   --mk-control-height-lg: 46px;
+
   /* Borders */
   --mk-border-width: 1px;
   --mk-border-width-strong: 2px;
+
   /* Motion */
   --mk-duration-instant: 80ms;
   --mk-duration-fast: 140ms;
@@ -74,6 +88,7 @@
   --mk-ease-standard: cubic-bezier(0.2, 0, 0, 1);
   --mk-ease-emphasized: cubic-bezier(0.3, 0, 0, 1);
   --mk-ease-out: cubic-bezier(0, 0, 0.2, 1);
+
   /* Z-index layering */
   --mk-z-base: 0;
   --mk-z-sticky: 100;
@@ -83,9 +98,11 @@
   --mk-z-menu: 1200;
   --mk-z-tooltip: 1300;
   --mk-z-toast: 1400;
+
   /* Focus ring geometry */
   --mk-focus-ring-width: 2px;
   --mk-focus-ring-offset: 2px;
+
   /* Layout defaults (admin shell) */
   --mk-sidebar-width: 260px;
   --mk-sidebar-width-collapsed: 68px;
@@ -97,6 +114,7 @@
  * ---------------------------------------------------------------------- */
 :root {
   color-scheme: light;
+
   /* Surfaces */
   --mk-bg: #f5f6f8;
   --mk-surface: #ffffff;
@@ -104,21 +122,25 @@
   --mk-surface-3: #e8ebee;
   --mk-surface-inverse: #1a1d23;
   --mk-overlay-scrim: rgba(17, 20, 26, 0.45);
+
   /* Text */
   --mk-text: #1a1d23;
   --mk-text-muted: #56606e;
   --mk-text-subtle: #8b95a3;
   --mk-text-inverse: #ffffff;
   --mk-text-disabled: #adb5c0;
+
   /* Borders / dividers */
   --mk-border: #e3e6eb;
   --mk-border-strong: #cbd1d9;
   --mk-border-subtle: #eef0f3;
+
   /* Interaction overlays (layered over any surface) */
   --mk-hover-overlay: rgba(17, 20, 26, 0.04);
   --mk-active-overlay: rgba(17, 20, 26, 0.08);
   --mk-selected-bg: #eef2ff;
   --mk-selected-text: #3730a3;
+
   /* Primary / brand */
   --mk-primary: #4f46e5;
   --mk-primary-hover: #4338ca;
@@ -127,48 +149,57 @@
   --mk-primary-subtle: #eef2ff;
   --mk-primary-subtle-hover: #e0e7ff;
   --mk-primary-subtle-text: #3730a3;
+
   /* Semantic — success */
   --mk-success: #15803d;
   --mk-success-hover: #166534;
   --mk-success-contrast: #ffffff;
   --mk-success-subtle: #e7f6ec;
   --mk-success-subtle-text: #14622f;
+
   /* Semantic — warning */
   --mk-warning: #b45309;
   --mk-warning-hover: #92400e;
   --mk-warning-contrast: #ffffff;
   --mk-warning-subtle: #fdf1e3;
   --mk-warning-subtle-text: #92400e;
+
   /* Semantic — danger */
   --mk-danger: #dc2626;
   --mk-danger-hover: #b91c1c;
   --mk-danger-contrast: #ffffff;
   --mk-danger-subtle: #fdeaea;
   --mk-danger-subtle-text: #b3201a;
+
   /* Semantic — info */
   --mk-info: #0369a1;
   --mk-info-hover: #075985;
   --mk-info-contrast: #ffffff;
   --mk-info-subtle: #e5f3fb;
   --mk-info-subtle-text: #075985;
+
   /* Neutral tone (secondary buttons, tags) */
   --mk-neutral-subtle: #eff1f4;
   --mk-neutral-subtle-hover: #e5e8ec;
   --mk-neutral-subtle-text: #3a424e;
+
   /* Focus ring color */
   --mk-focus-ring: rgba(79, 70, 229, 0.5);
+
   /* Elevation shadows */
   --mk-shadow-xs: 0 1px 2px rgba(17, 20, 26, 0.06);
   --mk-shadow-sm: 0 1px 3px rgba(17, 20, 26, 0.08), 0 1px 2px rgba(17, 20, 26, 0.04);
   --mk-shadow-md: 0 4px 12px rgba(17, 20, 26, 0.1), 0 2px 4px rgba(17, 20, 26, 0.05);
   --mk-shadow-lg: 0 12px 28px rgba(17, 20, 26, 0.14), 0 4px 8px rgba(17, 20, 26, 0.06);
   --mk-shadow-xl: 0 24px 48px rgba(17, 20, 26, 0.2), 0 8px 16px rgba(17, 20, 26, 0.08);
+
   /* Backdrops / misc */
   --mk-skeleton-base: #e8ebee;
   --mk-skeleton-shine: #f4f6f8;
   --mk-scrollbar-thumb: #cbd1d9;
   --mk-scrollbar-thumb-hover: #adb5c0;
   --mk-code-bg: #f1f3f5;
+
   /* Categorical chart palette — validated colorblind-safe, fixed order.
      Assign by series index, never cycle a 9th hue (fold into "Other"). */
   --mk-chart-1: #4f46e5;
@@ -188,149 +219,106 @@
  * 3. Dark theme values — declared ONCE here, emitted into both dark
  *    selectors below. (Previously duplicated verbatim in two places.)
  * ---------------------------------------------------------------------- */
-/* Auto (OS) dark, unless explicitly overridden to light. */
-@media (prefers-color-scheme: dark) {
-  :root:not([data-mk-theme=light]) {
-    color-scheme: dark;
-    --mk-bg: #0d1117;
-    --mk-surface: #161b22;
-    --mk-surface-2: #1e252e;
-    --mk-surface-3: #2a323c;
-    --mk-surface-inverse: #e6edf3;
-    --mk-overlay-scrim: rgba(1, 4, 9, 0.6);
-    --mk-text: #e6edf3;
-    --mk-text-muted: #9aa5b1;
-    --mk-text-subtle: #6e7a8a;
-    --mk-text-inverse: #0d1117;
-    --mk-text-disabled: #4b545f;
-    --mk-border: #2a323c;
-    --mk-border-strong: #3a444f;
-    --mk-border-subtle: #21272f;
-    --mk-hover-overlay: rgba(255, 255, 255, 0.05);
-    --mk-active-overlay: rgba(255, 255, 255, 0.09);
-    --mk-selected-bg: #1e2540;
-    --mk-selected-text: #c7d2fe;
-    --mk-primary: #6366f1;
-    --mk-primary-hover: #7c7ff4;
-    --mk-primary-active: #9599f7;
-    --mk-primary-contrast: #ffffff;
-    --mk-primary-subtle: #1e2540;
-    --mk-primary-subtle-hover: #262f4f;
-    --mk-primary-subtle-text: #c7d2fe;
-    --mk-success: #22c55e;
-    --mk-success-hover: #4ade80;
-    --mk-success-contrast: #052e13;
-    --mk-success-subtle: #10261a;
-    --mk-success-subtle-text: #6ee7a0;
-    --mk-warning: #f59e0b;
-    --mk-warning-hover: #fbbf24;
-    --mk-warning-contrast: #2a1a02;
-    --mk-warning-subtle: #2a2010;
-    --mk-warning-subtle-text: #fcd34d;
-    --mk-danger: #f04747;
-    --mk-danger-hover: #f56b6b;
-    --mk-danger-contrast: #ffffff;
-    --mk-danger-subtle: #2c1416;
-    --mk-danger-subtle-text: #fca5a5;
-    --mk-info: #38bdf8;
-    --mk-info-hover: #5cccf9;
-    --mk-info-contrast: #04222e;
-    --mk-info-subtle: #0c2733;
-    --mk-info-subtle-text: #a5e4fb;
-    --mk-neutral-subtle: #232b34;
-    --mk-neutral-subtle-hover: #2c3540;
-    --mk-neutral-subtle-text: #c4ccd6;
-    --mk-focus-ring: rgba(129, 140, 248, 0.6);
-    --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-    --mk-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
-    --mk-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35);
-    --mk-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
-    --mk-shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.45);
-    --mk-skeleton-base: #232b34;
-    --mk-skeleton-shine: #2f3945;
-    --mk-scrollbar-thumb: #3a444f;
-    --mk-scrollbar-thumb-hover: #4b545f;
-    --mk-code-bg: #1e252e;
-    --mk-chart-1: #6366f1;
-    --mk-chart-2: #16a34a;
-    --mk-chart-3: #d97706;
-    --mk-chart-4: #db2777;
-    --mk-chart-5: #3b82f6;
-    --mk-chart-6: #0d9488;
-    --mk-chart-7: #8b5cf6;
-    --mk-chart-8: #ef4444;
+$mk-dark: (
+  'bg': '#0d1117',
+  'surface': '#161b22',
+  'surface-2': '#1e252e',
+  'surface-3': '#2a323c',
+  'surface-inverse': '#e6edf3',
+  'overlay-scrim': 'rgba(1, 4, 9, 0.6)',
+
+  'text': '#e6edf3',
+  'text-muted': '#9aa5b1',
+  'text-subtle': '#6e7a8a',
+  'text-inverse': '#0d1117',
+  'text-disabled': '#4b545f',
+
+  'border': '#2a323c',
+  'border-strong': '#3a444f',
+  'border-subtle': '#21272f',
+
+  'hover-overlay': 'rgba(255, 255, 255, 0.05)',
+  'active-overlay': 'rgba(255, 255, 255, 0.09)',
+  'selected-bg': '#1e2540',
+  'selected-text': '#c7d2fe',
+
+  'primary': '#6366f1',
+  'primary-hover': '#7c7ff4',
+  'primary-active': '#9599f7',
+  'primary-contrast': '#ffffff',
+  'primary-subtle': '#1e2540',
+  'primary-subtle-hover': '#262f4f',
+  'primary-subtle-text': '#c7d2fe',
+
+  'success': '#22c55e',
+  'success-hover': '#4ade80',
+  'success-contrast': '#052e13',
+  'success-subtle': '#10261a',
+  'success-subtle-text': '#6ee7a0',
+
+  'warning': '#f59e0b',
+  'warning-hover': '#fbbf24',
+  'warning-contrast': '#2a1a02',
+  'warning-subtle': '#2a2010',
+  'warning-subtle-text': '#fcd34d',
+
+  'danger': '#f04747',
+  'danger-hover': '#f56b6b',
+  'danger-contrast': '#ffffff',
+  'danger-subtle': '#2c1416',
+  'danger-subtle-text': '#fca5a5',
+
+  'info': '#38bdf8',
+  'info-hover': '#5cccf9',
+  'info-contrast': '#04222e',
+  'info-subtle': '#0c2733',
+  'info-subtle-text': '#a5e4fb',
+
+  'neutral-subtle': '#232b34',
+  'neutral-subtle-hover': '#2c3540',
+  'neutral-subtle-text': '#c4ccd6',
+
+  'focus-ring': 'rgba(129, 140, 248, 0.6)',
+
+  'shadow-xs': '0 1px 2px rgba(0, 0, 0, 0.4)',
+  'shadow-sm': '0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3)',
+  'shadow-md': '0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35)',
+  'shadow-lg': '0 12px 28px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4)',
+  'shadow-xl': '0 24px 48px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.45)',
+
+  'skeleton-base': '#232b34',
+  'skeleton-shine': '#2f3945',
+  'scrollbar-thumb': '#3a444f',
+  'scrollbar-thumb-hover': '#4b545f',
+  'code-bg': '#1e252e',
+
+  'chart-1': '#6366f1',
+  'chart-2': '#16a34a',
+  'chart-3': '#d97706',
+  'chart-4': '#db2777',
+  'chart-5': '#3b82f6',
+  'chart-6': '#0d9488',
+  'chart-7': '#8b5cf6',
+  'chart-8': '#ef4444',
+);
+
+@mixin mk-emit-dark($tokens) {
+  color-scheme: dark;
+  @each $name, $value in $tokens {
+    --mk-#{$name}: #{$value};
   }
 }
+
+/* Auto (OS) dark, unless explicitly overridden to light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mk-theme='light']) {
+    @include mk-emit-dark($mk-dark);
+  }
+}
+
 /* Explicit dark. */
-[data-mk-theme=dark] {
-  color-scheme: dark;
-  --mk-bg: #0d1117;
-  --mk-surface: #161b22;
-  --mk-surface-2: #1e252e;
-  --mk-surface-3: #2a323c;
-  --mk-surface-inverse: #e6edf3;
-  --mk-overlay-scrim: rgba(1, 4, 9, 0.6);
-  --mk-text: #e6edf3;
-  --mk-text-muted: #9aa5b1;
-  --mk-text-subtle: #6e7a8a;
-  --mk-text-inverse: #0d1117;
-  --mk-text-disabled: #4b545f;
-  --mk-border: #2a323c;
-  --mk-border-strong: #3a444f;
-  --mk-border-subtle: #21272f;
-  --mk-hover-overlay: rgba(255, 255, 255, 0.05);
-  --mk-active-overlay: rgba(255, 255, 255, 0.09);
-  --mk-selected-bg: #1e2540;
-  --mk-selected-text: #c7d2fe;
-  --mk-primary: #6366f1;
-  --mk-primary-hover: #7c7ff4;
-  --mk-primary-active: #9599f7;
-  --mk-primary-contrast: #ffffff;
-  --mk-primary-subtle: #1e2540;
-  --mk-primary-subtle-hover: #262f4f;
-  --mk-primary-subtle-text: #c7d2fe;
-  --mk-success: #22c55e;
-  --mk-success-hover: #4ade80;
-  --mk-success-contrast: #052e13;
-  --mk-success-subtle: #10261a;
-  --mk-success-subtle-text: #6ee7a0;
-  --mk-warning: #f59e0b;
-  --mk-warning-hover: #fbbf24;
-  --mk-warning-contrast: #2a1a02;
-  --mk-warning-subtle: #2a2010;
-  --mk-warning-subtle-text: #fcd34d;
-  --mk-danger: #f04747;
-  --mk-danger-hover: #f56b6b;
-  --mk-danger-contrast: #ffffff;
-  --mk-danger-subtle: #2c1416;
-  --mk-danger-subtle-text: #fca5a5;
-  --mk-info: #38bdf8;
-  --mk-info-hover: #5cccf9;
-  --mk-info-contrast: #04222e;
-  --mk-info-subtle: #0c2733;
-  --mk-info-subtle-text: #a5e4fb;
-  --mk-neutral-subtle: #232b34;
-  --mk-neutral-subtle-hover: #2c3540;
-  --mk-neutral-subtle-text: #c4ccd6;
-  --mk-focus-ring: rgba(129, 140, 248, 0.6);
-  --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
-  --mk-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
-  --mk-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35);
-  --mk-shadow-lg: 0 12px 28px rgba(0, 0, 0, 0.6), 0 4px 8px rgba(0, 0, 0, 0.4);
-  --mk-shadow-xl: 0 24px 48px rgba(0, 0, 0, 0.7), 0 8px 16px rgba(0, 0, 0, 0.45);
-  --mk-skeleton-base: #232b34;
-  --mk-skeleton-shine: #2f3945;
-  --mk-scrollbar-thumb: #3a444f;
-  --mk-scrollbar-thumb-hover: #4b545f;
-  --mk-code-bg: #1e252e;
-  --mk-chart-1: #6366f1;
-  --mk-chart-2: #16a34a;
-  --mk-chart-3: #d97706;
-  --mk-chart-4: #db2777;
-  --mk-chart-5: #3b82f6;
-  --mk-chart-6: #0d9488;
-  --mk-chart-7: #8b5cf6;
-  --mk-chart-8: #ef4444;
+[data-mk-theme='dark'] {
+  @include mk-emit-dark($mk-dark);
 }
 
 /* -------------------------------------------------------------------------
@@ -351,8 +339,8 @@ body.mk-app {
 }
 
 /* Shared box-sizing for all mk components */
-[class^=mk-],
-[class*=" mk-"] {
+[class^='mk-'],
+[class*=' mk-'] {
   box-sizing: border-box;
 }
 
@@ -381,19 +369,16 @@ body.mk-app {
   scrollbar-color: var(--mk-scrollbar-thumb) transparent;
   scrollbar-width: thin;
 }
-
 .mk-app *::-webkit-scrollbar {
   width: 10px;
   height: 10px;
 }
-
 .mk-app *::-webkit-scrollbar-thumb {
   background: var(--mk-scrollbar-thumb);
   border-radius: var(--mk-radius-pill);
   border: 2px solid transparent;
   background-clip: content-box;
 }
-
 .mk-app *::-webkit-scrollbar-thumb:hover {
   background: var(--mk-scrollbar-thumb-hover);
   background-clip: content-box;
@@ -401,33 +386,18 @@ body.mk-app {
 
 /* Body-level overlay animations (dialog / menu / toast live outside components) */
 @keyframes mk-overlay-fade {
-  from {
-    opacity: 0;
-  }
-  to {
-    opacity: 1;
-  }
+  from { opacity: 0; }
+  to { opacity: 1; }
 }
 @keyframes mk-overlay-pop {
-  from {
-    opacity: 0;
-    transform: translateY(8px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+  from { opacity: 0; transform: translateY(8px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 @keyframes mk-toast-in {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { opacity: 0; transform: translateY(12px); }
+  to { opacity: 1; transform: translateY(0); }
 }
+
 /* Respect reduced-motion globally for library animations */
 @media (prefers-reduced-motion: reduce) {
   :root {

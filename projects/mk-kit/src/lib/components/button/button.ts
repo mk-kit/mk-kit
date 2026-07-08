@@ -22,7 +22,7 @@ import type { MkSize, MkTone, MkVariant } from '../../core/types';
 @Component({
   selector: 'button[mkButton], a[mkButton]',
   templateUrl: './button.html',
-  styleUrl: './button.css',
+  styleUrl: './button.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-button',

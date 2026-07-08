@@ -2,15 +2,11 @@
  * Tone selectors set local --_* vars; variant selectors consume them.
  * All interactive states composite --mk-hover/active-overlay so every tone
  * works without per-tone hover tokens. */
+@use '../../../styles/mixins' as mk;
 
 :host {
   /* tone defaults (primary) — overridden by [data-tone] blocks below */
-  --_main: var(--mk-primary);
-  --_hover: var(--mk-primary-hover);
-  --_active: var(--mk-primary-active);
-  --_contrast: var(--mk-primary-contrast);
-  --_subtle: var(--mk-primary-subtle);
-  --_subtle-text: var(--mk-primary-subtle-text);
+  @include mk.tone(primary);
 
   display: inline-flex;
   align-items: center;
@@ -37,54 +33,8 @@
     box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
 }
 
-:host([data-tone='primary']) {
-  --_main: var(--mk-primary);
-  --_hover: var(--mk-primary-hover);
-  --_active: var(--mk-primary-active);
-  --_contrast: var(--mk-primary-contrast);
-  --_subtle: var(--mk-primary-subtle);
-  --_subtle-text: var(--mk-primary-subtle-text);
-}
-:host([data-tone='success']) {
-  --_main: var(--mk-success);
-  --_hover: var(--mk-success-hover);
-  --_active: var(--mk-success-hover);
-  --_contrast: var(--mk-success-contrast);
-  --_subtle: var(--mk-success-subtle);
-  --_subtle-text: var(--mk-success-subtle-text);
-}
-:host([data-tone='warning']) {
-  --_main: var(--mk-warning);
-  --_hover: var(--mk-warning-hover);
-  --_active: var(--mk-warning-hover);
-  --_contrast: var(--mk-warning-contrast);
-  --_subtle: var(--mk-warning-subtle);
-  --_subtle-text: var(--mk-warning-subtle-text);
-}
-:host([data-tone='danger']) {
-  --_main: var(--mk-danger);
-  --_hover: var(--mk-danger-hover);
-  --_active: var(--mk-danger-hover);
-  --_contrast: var(--mk-danger-contrast);
-  --_subtle: var(--mk-danger-subtle);
-  --_subtle-text: var(--mk-danger-subtle-text);
-}
-:host([data-tone='info']) {
-  --_main: var(--mk-info);
-  --_hover: var(--mk-info-hover);
-  --_active: var(--mk-info-hover);
-  --_contrast: var(--mk-info-contrast);
-  --_subtle: var(--mk-info-subtle);
-  --_subtle-text: var(--mk-info-subtle-text);
-}
-:host([data-tone='neutral']) {
-  --_main: var(--mk-surface-inverse);
-  --_hover: var(--mk-surface-inverse);
-  --_active: var(--mk-surface-inverse);
-  --_contrast: var(--mk-text-inverse);
-  --_subtle: var(--mk-neutral-subtle);
-  --_subtle-text: var(--mk-neutral-subtle-text);
-}
+/* Per-tone local vars (primary, success, warning, danger, info, neutral). */
+@include mk.tone-selectors;
 
 /* Sizes */
 :host(.mk-button--sm) {
@@ -165,8 +115,7 @@
 
 /* Focus ring (keyboard only) */
 :host(:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Disabled */

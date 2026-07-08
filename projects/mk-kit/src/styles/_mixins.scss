@@ -1,0 +1,58 @@
+// mk-kit — shared SCSS mixins for component styles.
+//
+// Build-time only. These emit plain CSS that still references the runtime
+// `--mk-*` custom properties, so the theming contract is unchanged — a mixin
+// never bakes a literal colour, only wires the tokens.
+//
+//   @use '../../../styles/mixins' as mk;
+//   :host { @include mk.tone(primary); }
+//   @include mk.tone-selectors;
+
+/// All semantic tones, in canonical order.
+$tones: (primary, success, warning, danger, info, neutral);
+
+/// Map a tone onto the local `--_*` vars that variant rules consume.
+/// Mirrors the reference pattern in the Button: a `--_main/-hover/-active/
+/// -contrast/-subtle/-subtle-text` set, composited with overlay tokens by the
+/// variant selectors. `neutral` and `primary` are special-cased; the rest
+/// follow the regular `--mk-<tone>*` family (with `active` folding to `hover`).
+@mixin tone($name) {
+  @if $name == neutral {
+    --_main: var(--mk-surface-inverse);
+    --_hover: var(--mk-surface-inverse);
+    --_active: var(--mk-surface-inverse);
+    --_contrast: var(--mk-text-inverse);
+    --_subtle: var(--mk-neutral-subtle);
+    --_subtle-text: var(--mk-neutral-subtle-text);
+  } @else if $name == primary {
+    --_main: var(--mk-primary);
+    --_hover: var(--mk-primary-hover);
+    --_active: var(--mk-primary-active);
+    --_contrast: var(--mk-primary-contrast);
+    --_subtle: var(--mk-primary-subtle);
+    --_subtle-text: var(--mk-primary-subtle-text);
+  } @else {
+    --_main: var(--mk-#{$name});
+    --_hover: var(--mk-#{$name}-hover);
+    --_active: var(--mk-#{$name}-hover);
+    --_contrast: var(--mk-#{$name}-contrast);
+    --_subtle: var(--mk-#{$name}-subtle);
+    --_subtle-text: var(--mk-#{$name}-subtle-text);
+  }
+}
+
+/// Emit `:host([data-tone='<t>'])` blocks for every tone, each setting its
+/// `--_*` vars. Call once at the top level of a tone-aware component.
+@mixin tone-selectors {
+  @each $t in $tones {
+    :host([data-tone='#{$t}']) {
+      @include tone($t);
+    }
+  }
+}
+
+/// The standard keyboard focus ring.
+@mixin focus-ring($offset: var(--mk-focus-ring-offset)) {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: $offset;
+}
