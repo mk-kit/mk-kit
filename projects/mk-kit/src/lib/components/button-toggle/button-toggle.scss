@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: inline-flex;
 }
@@ -49,8 +51,7 @@
 }
 
 .mk-button-toggle__btn:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
   z-index: 2;
 }
 

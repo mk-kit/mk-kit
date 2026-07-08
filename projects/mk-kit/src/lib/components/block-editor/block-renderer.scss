@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   color: var(--mk-text);
@@ -131,8 +133,7 @@ h4.mk-r-heading { font-size: var(--mk-font-size-lg); font-weight: var(--mk-font-
 .mk-cta--soft { background: var(--_subtle); color: var(--_subtle-text); }
 .mk-cta--outline { background: transparent; color: var(--_subtle-text); border-color: color-mix(in srgb, var(--_main) 42%, var(--mk-border-strong)); }
 .mk-cta:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Embed */

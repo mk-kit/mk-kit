@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   --_main: var(--mk-primary);
   --_track-w: 2.4rem;
@@ -63,8 +65,7 @@
 }
 
 .mk-switch__control:focus-visible .mk-switch__track {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-switch__label {

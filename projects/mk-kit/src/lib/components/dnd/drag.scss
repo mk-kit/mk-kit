@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 /* mk-drag — a draggable item. Colours via --mk-* tokens only.
  * The floating pointer preview (.mk-drag-preview) is appended to <body>, so it
  * cannot be styled from this scoped sheet — its look is set inline in drag.ts. */
@@ -41,6 +43,5 @@
 
 /* Keyboard focus ring (matches the rest of the library). */
 :host(:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }

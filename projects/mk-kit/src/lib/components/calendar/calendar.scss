@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   --_cell-size: 2.5rem;
 
@@ -65,8 +67,7 @@
   background-color: var(--mk-active-overlay);
 }
 .mk-calendar__nav:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 .mk-calendar__nav svg {
   display: block;
@@ -120,8 +121,7 @@
   background-color: var(--mk-hover-overlay);
 }
 .mk-calendar__day:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(var(--mk-focus-ring-offset) * -1);
+  @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
 }
 
 .mk-calendar__day--outside {

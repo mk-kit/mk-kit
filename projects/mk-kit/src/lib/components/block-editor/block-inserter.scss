@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   position: relative;
   display: block;
@@ -73,8 +75,7 @@
 
 .mk-block-inserter__trigger:focus-visible,
 .mk-block-inserter__slim-trigger:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Panel */
@@ -105,8 +106,7 @@
   font: inherit;
 }
 .mk-block-inserter__search:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-block-inserter__list {

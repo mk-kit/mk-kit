@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
 }
@@ -153,8 +155,7 @@
 
 button:focus-visible,
 input:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-visually-hidden {

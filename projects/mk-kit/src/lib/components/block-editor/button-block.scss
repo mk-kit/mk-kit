@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
 }
@@ -89,8 +91,7 @@
   background: var(--_subtle);
 }
 .mk-cta:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Settings */
@@ -161,6 +162,5 @@
 .mk-button-block__swatch:focus-visible,
 .mk-button-block__pill:focus-visible,
 .mk-button-block__field input:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }

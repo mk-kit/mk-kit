@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
 }
@@ -30,8 +32,7 @@
 }
 
 .mk-nav-item__link:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 .mk-nav-item__link:disabled,

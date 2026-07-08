@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: inline-flex;
   align-items: center;
@@ -25,8 +27,7 @@
 }
 
 .mk-breadcrumb-item__link:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-breadcrumb-item__current {

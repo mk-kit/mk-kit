@@ -69,8 +69,7 @@
 
 /* Focus ring (keyboard only) */
 :host(:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Disabled */
@@ -109,8 +108,7 @@
   background-image: linear-gradient(var(--mk-hover-overlay), var(--mk-hover-overlay));
 }
 .mk-chip__remove:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
   opacity: 1;
 }
 .mk-chip__remove:disabled {

@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 /* mk-alert — tone selectors set local --_* vars; variant selectors consume them. */
 
 :host {
@@ -138,6 +140,5 @@
 }
 .mk-alert__close:focus-visible {
   opacity: 1;
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }

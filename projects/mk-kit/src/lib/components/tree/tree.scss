@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   font-family: var(--mk-font-sans);
@@ -26,8 +28,7 @@
   background-color: var(--mk-hover-overlay);
 }
 .mk-tree__item:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 .mk-tree__item--selected {

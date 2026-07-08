@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: flex;
   align-items: center;
@@ -55,8 +57,7 @@
   background-color: color-mix(in srgb, transparent 88%, white);
 }
 .mk-snackbar__action:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-snackbar__close {
@@ -80,8 +81,7 @@
   background-color: color-mix(in srgb, transparent 85%, white);
 }
 .mk-snackbar__close:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 .mk-snackbar__close::before,
 .mk-snackbar__close::after {

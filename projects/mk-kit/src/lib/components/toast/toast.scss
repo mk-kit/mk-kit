@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 /* mk-toast — tone selectors set the accent via local --_* vars. */
 
 :host {
@@ -95,6 +97,5 @@
 
 .mk-toast__close:focus-visible {
   color: var(--mk-text);
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }

@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   min-height: 100vh;
@@ -53,8 +55,7 @@
 }
 
 .mk-app-shell__main:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 .mk-app-shell__scrim {

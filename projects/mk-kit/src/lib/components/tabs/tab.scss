@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   padding: var(--mk-space-4) var(--mk-space-1);
@@ -12,8 +14,7 @@
 }
 
 :host(:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
   border-radius: var(--mk-radius-sm);
 }
 

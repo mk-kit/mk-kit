@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   font-family: var(--mk-font-sans);
@@ -37,8 +39,7 @@
   background-color: var(--mk-hover-overlay);
 }
 .mk-stepper__step:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 .mk-stepper__step:disabled {
   color: var(--mk-text-disabled);

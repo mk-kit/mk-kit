@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   --_main: var(--mk-primary);
   --_size: 1.15rem;
@@ -60,8 +62,7 @@
   outline: none;
 }
 :host(:focus-visible) .mk-radio__control {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 :host(.mk-radio--disabled) {

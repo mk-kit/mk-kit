@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   position: relative;
@@ -30,8 +32,7 @@
   border-color: var(--mk-border-strong);
 }
 .mk-time-picker__field:focus-within {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
   border-color: var(--mk-primary);
 }
 
@@ -98,8 +99,7 @@
 }
 .mk-time-picker__toggle:focus-visible,
 .mk-time-picker__clear:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(var(--mk-focus-ring-offset) * -1);
+  @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
   border-radius: var(--mk-radius-sm);
 }
 .mk-time-picker__toggle:disabled {

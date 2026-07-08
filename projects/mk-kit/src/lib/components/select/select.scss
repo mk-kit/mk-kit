@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   position: relative;
@@ -41,8 +43,7 @@
   border-color: var(--mk-border-strong);
 }
 .mk-select__trigger:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
   border-color: var(--mk-primary);
 }
 

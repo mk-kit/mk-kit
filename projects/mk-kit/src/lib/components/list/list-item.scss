@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: flex;
   align-items: center;
@@ -45,8 +47,7 @@
   background-color: var(--mk-neutral-subtle);
 }
 :host(.mk-list-item--interactive:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 /* Selected */

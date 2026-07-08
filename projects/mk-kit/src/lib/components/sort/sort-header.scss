@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   cursor: pointer;
   user-select: none;
@@ -13,8 +15,7 @@
 }
 
 :host(:focus-visible) {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 .mk-sort-header__label {

@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 /* Unencapsulated (ViewEncapsulation.None): every rule is namespaced under
  * `.mk-bottom-sheet`. `.mk-bottom-sheet-panel` targets the body-level overlay
  * panel produced by MkOverlayService, re-anchoring it to the bottom edge. */
@@ -110,8 +112,7 @@
 }
 .mk-bottom-sheet__close:focus-visible {
   color: var(--mk-text);
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Body */

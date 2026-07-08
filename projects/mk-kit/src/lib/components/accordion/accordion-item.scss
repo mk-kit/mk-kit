@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
   border-bottom: var(--mk-border-width) solid var(--mk-border);
@@ -36,8 +38,7 @@
 }
 
 .mk-accordion-item__trigger:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
   border-radius: var(--mk-radius-sm);
 }
 

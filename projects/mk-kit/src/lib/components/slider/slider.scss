@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   --_main: var(--mk-primary);
   --_track-h: 0.4rem;
@@ -55,8 +57,7 @@
 }
 
 .mk-slider__thumb:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 :host(.mk-slider--disabled) {

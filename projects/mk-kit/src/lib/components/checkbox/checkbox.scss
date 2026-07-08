@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   /* tone defaults (primary) — overridden by [data-tone] blocks */
   --_main: var(--mk-primary);
@@ -103,8 +105,7 @@
 
 /* Focus ring on the box, driven by the hidden native input */
 .mk-checkbox__native:focus-visible + .mk-checkbox__box {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 /* Invalid */

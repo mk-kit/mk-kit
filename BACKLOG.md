@@ -24,10 +24,12 @@ Future work for `@mk-kit/ui`, deferred from the main line of development.
     matched the shared pattern: `badge`, `tag`, `chip`, `button-toggle-group`
     (Button was the reference). Verified pixel-identical in the browser.
 
+  **Also done:**
+  - Adopted `mk.focus-ring()` across every component (48 focus blocks in 39
+    files), passing the negative-offset variants (`calc(-1 * …)` /
+    `calc(… * -1)`) as the mixin arg. Verified byte-identical compiled output.
+
   **Remaining:**
-  - Adopt `mk.focus-ring()` where the 2-line focus-ring block repeats (~43
-    files). Mostly mechanical, but some use a `calc(-1 * …)` offset — pass it as
-    the mixin arg rather than blanket-replacing.
   - Add a **size-scale** mixin and adopt it where the `sm/md/lg`
     height/padding/font blocks repeat (button, select, input, badge, …).
   - The single-`--_main`-var controls (`radio`, `switch`, `slider`, `checkbox`)

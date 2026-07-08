@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   display: block;
 }
@@ -69,8 +71,7 @@
 }
 .mk-embed-block__input input:focus-visible,
 .mk-embed-block__card:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: var(--mk-focus-ring-offset);
+  @include mk.focus-ring;
 }
 
 .mk-embed-block__note {

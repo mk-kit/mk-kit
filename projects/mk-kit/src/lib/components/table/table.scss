@@ -1,3 +1,5 @@
+@use '../../../styles/mixins' as mk;
+
 :host {
   --_cell-pad-y: var(--mk-space-3);
   --_cell-pad-x: var(--mk-space-4);
@@ -60,8 +62,7 @@
   color: var(--mk-text);
 }
 .mk-table__th--sortable:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 .mk-table__th[aria-sort='ascending'],
 .mk-table__th[aria-sort='descending'] {
@@ -105,8 +106,7 @@
   cursor: pointer;
 }
 :host(.mk-table--clickable) .mk-table__row:focus-visible {
-  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
-  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 /* Selection column */
