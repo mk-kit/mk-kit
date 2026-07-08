@@ -1,0 +1,27 @@
+<div class="mk-page-header__breadcrumb">
+  <ng-content select="[mkPageHeaderBreadcrumb]" />
+</div>
+
+<div class="mk-page-header__main">
+  <div class="mk-page-header__heading">
+    <div class="mk-page-header__title-row">
+      @if (heading(); as h) {
+        <h1 class="mk-page-header__title">{{ h }}</h1>
+      }
+      <div class="mk-page-header__meta">
+        <ng-content select="[mkPageHeaderMeta]" />
+      </div>
+    </div>
+    @if (description(); as d) {
+      <p class="mk-page-header__description">{{ d }}</p>
+    }
+  </div>
+
+  <div class="mk-page-header__actions">
+    <ng-content select="[mkPageHeaderActions]" />
+  </div>
+</div>
+
+<div class="mk-page-header__tabs">
+  <ng-content select="[mkPageHeaderTabs]" />
+</div>

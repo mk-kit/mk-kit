@@ -14,3 +14,6 @@ export * from './app-shell';
 export * from './nav-list';
 export * from './stepper';
 export * from './tree';
+export * from './drawer';
+export * from './toolbar';
+export * from './page-header';

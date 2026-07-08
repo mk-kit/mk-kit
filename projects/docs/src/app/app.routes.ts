@@ -135,6 +135,12 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'components/structure',
+    title: 'Structure — mk-kit',
+    loadComponent: () =>
+      import('./pages/structure/structure-page').then((m) => m.StructurePage),
+  },
+  {
     path: 'components/data',
     title: 'Data display — mk-kit',
     loadComponent: () =>

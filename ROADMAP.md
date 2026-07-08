@@ -49,11 +49,13 @@ live-announcer core.
 - **P3 Heatmap**, **P3 scatter**, **P3 funnel**, **P3 radar**, **P3 treemap**.
 
 ### Navigation & layout
+- ✅ **Drawer** (`mk-drawer`) — declarative slide-out side panel (shipped).
+- ✅ **Toolbar** (`mk-toolbar`) — standalone action bar (shipped).
+- ✅ **Page header** (`mk-page-header`) — title/breadcrumb/meta/actions/tabs (shipped).
 - **P1 Command palette** (`mk-command-palette`, ⌘K) — fuzzy action search; a
   hallmark of modern admin UIs.
 - **P1 Split panes / resizable layout** (`mk-splitter`) — dashboard panel resize.
 - **P2 FAB / speed-dial**, **P2 scrollspy**, **P2 back-to-top**.
-- **P2 Toolbar** — standalone action bar (distinct from app-shell header).
 - **P3 Scroll-area** — cross-browser custom scrollbar container.
 
 ### Feedback & overlay

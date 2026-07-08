@@ -1,0 +1,33 @@
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+}
+
+:host(.mk-toolbar--bordered) {
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-md);
+}
+
+.mk-toolbar__start {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  flex: 1 1 auto;
+  min-width: 0;
+  flex-wrap: wrap;
+}
+
+.mk-toolbar__end {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  flex: none;
+}
+.mk-toolbar__end:empty {
+  display: none;
+}

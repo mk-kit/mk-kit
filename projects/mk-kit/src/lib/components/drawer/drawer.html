@@ -1,0 +1,49 @@
+@if (hasBackdrop()) {
+  <div class="mk-drawer__backdrop" (click)="onBackdrop()"></div>
+}
+
+<aside
+  #panel
+  class="mk-drawer__panel"
+  role="dialog"
+  [attr.aria-modal]="hasBackdrop() ? 'true' : null"
+  [attr.aria-label]="!heading() ? ariaLabel() || null : null"
+  [attr.aria-labelledby]="heading() ? titleId : null"
+  [style.--_size]="size()"
+  tabindex="-1"
+>
+  @if (heading() || !hideClose()) {
+    <header class="mk-drawer__header">
+      @if (heading(); as h) {
+        <h2 class="mk-drawer__title" [id]="titleId">{{ h }}</h2>
+      }
+      <ng-content select="[mkDrawerHeader]" />
+      @if (!hideClose()) {
+        <button
+          type="button"
+          class="mk-drawer__close"
+          aria-label="Close"
+          (click)="close()"
+        >
+          <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+            <path
+              d="M4 4l8 8M12 4l-8 8"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="1.5"
+              stroke-linecap="round"
+            />
+          </svg>
+        </button>
+      }
+    </header>
+  }
+
+  <div class="mk-drawer__body">
+    <ng-content />
+  </div>
+
+  <footer class="mk-drawer__footer">
+    <ng-content select="[mkDrawerFooter]" />
+  </footer>
+</aside>

@@ -69,6 +69,7 @@ export class App {
         { label: 'Sort', path: '/components/sort', icon: '⇅' },
         { label: 'Charts', path: '/components/charts', icon: '▚' },
         { label: 'Empty & timeline', path: '/components/empty-timeline', icon: '☰' },
+        { label: 'Structure', path: '/components/structure', icon: '▤' },
         { label: 'Data display', path: '/components/data', icon: '▦' },
         { label: 'Date & time', path: '/components/date-time', icon: '◷' },
         { label: 'Drag & drop', path: '/components/drag-drop', icon: '⤨' },
