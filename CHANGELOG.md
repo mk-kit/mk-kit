@@ -8,6 +8,11 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mkMask`** — an input-mask directive. Formats an input as the user types
+  against a token pattern (`0` digit, `A` letter, `*` alphanumeric; other chars
+  are literals), skipping ill-fitting characters. Exposes the raw value via
+  `(unmaskedChange)` and the formatted value via `(maskedChange)`; the pure
+  `mkApplyMask(value, pattern)` helper is exported too.
 - **`MkDialogService.alert()` and `.prompt()`** — imperative single-button
   acknowledgement and single-field prompt dialogs, alongside the existing
   `confirm()`. `alert()` resolves on dismiss; `prompt()` resolves with the

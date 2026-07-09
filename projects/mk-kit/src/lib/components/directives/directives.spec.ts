@@ -6,6 +6,7 @@ import { MkScrollspy } from './scrollspy';
 import { MkIntersect } from './intersect';
 import { MkInfiniteScroll } from './infinite-scroll';
 import { MkRipple } from './ripple';
+import { MkMask, mkApplyMask } from './mask';
 
 @Component({
   imports: [MkClickOutside],
@@ -389,5 +390,81 @@ describe('MkRipple', () => {
     vi.advanceTimersByTime(700);
     expect(btn.querySelectorAll('.mk-ripple__wave')).toHaveLength(0);
     vi.useRealTimers();
+  });
+});
+
+// --- MkMask -----------------------------------------------------------------
+@Component({
+  imports: [MkMask],
+  template: `<input
+    #input
+    [mkMask]="pattern()"
+    (unmaskedChange)="raw.set($event)"
+    (maskedChange)="masked.set($event)"
+  />`,
+})
+class MaskHost {
+  readonly pattern = signal('(000) 000-0000');
+  readonly raw = signal('');
+  readonly masked = signal('');
+}
+
+describe('mkApplyMask', () => {
+  it('inserts literals and keeps only token characters as unmasked', () => {
+    expect(mkApplyMask('5551234567', '(000) 000-0000')).toEqual({
+      masked: '(555) 123-4567',
+      unmasked: '5551234567',
+    });
+  });
+
+  it('skips characters that do not fit the current token', () => {
+    // Letters rejected in a digit mask.
+    expect(mkApplyMask('12ab34', '00-00').unmasked).toBe('1234');
+    // Digits rejected in a letter mask.
+    expect(mkApplyMask('a1b2', 'AAAA').unmasked).toBe('ab');
+  });
+
+  it('stops at the first unfilled token (no dangling literal)', () => {
+    expect(mkApplyMask('12', '00/00/0000').masked).toBe('12');
+    expect(mkApplyMask('123', '00/00/0000').masked).toBe('12/3');
+  });
+
+  it('supports alphanumeric tokens', () => {
+    expect(mkApplyMask('ab12cd', '**-**-**').masked).toBe('ab-12-cd');
+  });
+});
+
+describe('MkMask', () => {
+  let fixture: ComponentFixture<MaskHost>;
+  let input: HTMLInputElement;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(MaskHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+  });
+
+  afterEach(() => {
+    fixture.nativeElement.remove();
+    fixture.destroy();
+  });
+
+  it('formats the input and emits masked + unmasked values', () => {
+    input.value = '5551234567';
+    input.dispatchEvent(new Event('input'));
+    expect(input.value).toBe('(555) 123-4567');
+    expect(fixture.componentInstance.masked()).toBe('(555) 123-4567');
+    expect(fixture.componentInstance.raw()).toBe('5551234567');
+  });
+
+  it('reformats correctly after a partial edit', () => {
+    input.value = '555';
+    input.dispatchEvent(new Event('input'));
+    expect(input.value).toBe('(555');
+    expect(fixture.componentInstance.raw()).toBe('555');
   });
 });

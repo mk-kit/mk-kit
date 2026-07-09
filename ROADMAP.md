@@ -174,8 +174,8 @@ existing primitive it would reuse. Priorities as before.
 - ✅ **Imperative dialogs** — `MkDialogService` already had `confirm()`; added
   `alert()` (single-button) and `prompt()` (text input) — Promise-based, over the
   existing overlay/dialog (shipped).
-- **P1 `mkMask`** — input-mask directive (phone, card, date, custom pattern) with
-  a clean unmasked model value. A very common gap.
+- ✅ **`mkMask`** — input-mask directive (`0`/`A`/`*` tokens + literals) with
+  `(unmaskedChange)` raw value; skips ill-fitting chars, caret-aware (shipped).
 - **P1 `mk-tag-input`** — freeform token/chip input (create-on-Enter, paste-split,
   Backspace-removes). Distinct from `mk-multi-select` (option-bound); reuses
   `MkChip`. Keywords/tags for the CMS.

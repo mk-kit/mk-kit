@@ -6,6 +6,8 @@ import {
   MkCopyToClipboard,
   MkInfiniteScroll,
   MkIntersect,
+  MkInput,
+  MkMask,
   MkRipple,
   MkScrollspy,
 } from '@mkornas/ui';
@@ -28,6 +30,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkIntersect,
     MkInfiniteScroll,
     MkRipple,
+    MkInput,
+    MkMask,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -225,6 +229,26 @@ import { DocsExample } from '../../shared/docs-example';
           </ul>
         </div>
       </docs-example>
+
+      <!-- mask -->
+      <h2>Input mask</h2>
+      <p>
+        <code class="docs-inline">mkMask</code> formats an input as you type
+        against a token pattern — <code class="docs-inline">0</code> = digit,
+        <code class="docs-inline">A</code> = letter,
+        <code class="docs-inline">*</code> = alphanumeric; any other character is
+        an inserted literal. Read the raw value with
+        <code class="docs-inline">(unmaskedChange)</code>.
+      </p>
+      <docs-example [code]="maskCode" [column]="true">
+        <div class="mask-demo">
+          <input mkInput mkMask="(000) 000-0000" placeholder="(___) ___-____"
+            (unmaskedChange)="phone.set($event)" />
+          <input mkInput mkMask="0000 0000 0000 0000" placeholder="Card number" />
+          <input mkInput mkMask="00/00/0000" placeholder="DD/MM/YYYY" />
+          <p class="echo">Raw phone: {{ phone() || '—' }}</p>
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -367,6 +391,12 @@ import { DocsExample } from '../../shared/docs-example';
       .ripple-list li:last-child {
         border-bottom: 0;
       }
+      .mask-demo {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-3);
+        max-width: 20rem;
+      }
     `,
   ],
 })
@@ -420,6 +450,13 @@ export class UtilitiesPage {
 <div class="tile" mkRipple mkRippleColor="var(--mk-primary)">Card</div>
 
 <li mkRipple>Inbox</li>`;
+
+  protected readonly phone = signal('');
+  protected readonly maskCode = `<input mkInput mkMask="(000) 000-0000"
+  (unmaskedChange)="phone.set($event)" />
+
+<input mkInput mkMask="0000 0000 0000 0000" />   <!-- card -->
+<input mkInput mkMask="00/00/0000" />            <!-- date -->`;
 
   protected readonly scrollspyCode = `<nav mkScrollspy="section[id]" [root]="body" #spy="mkScrollspy">
   @for (s of sections; track s.id) {
