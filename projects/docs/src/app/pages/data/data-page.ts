@@ -814,6 +814,31 @@ interface DemoUser {
         </div>
       </docs-example>
 
+      <h2>Data-grid pro</h2>
+      <p>
+        Opt-in power features on the same <code class="docs-inline">mk-table</code>:
+        <strong>resize</strong> columns from the header edge, <strong>reorder</strong>
+        them by dragging headers, <strong>pin</strong> a column so it stays put
+        while the rest scroll horizontally, and <strong>edit</strong> cells
+        inline (double-click). Set <code class="docs-inline">resizableColumns</code>
+        / <code class="docs-inline">reorderableColumns</code> and mark columns
+        <code class="docs-inline">resizable</code> /
+        <code class="docs-inline">editable</code> /
+        <code class="docs-inline">pinned</code>.
+        Last edit: <strong>{{ gridStatus() }}</strong>.
+      </p>
+      <docs-example [code]="gridProCode" column>
+        <mk-table
+          [columns]="gridColumns"
+          [data]="gridRows()"
+          resizableColumns
+          reorderableColumns
+          zebra
+          (cellEdit)="onCellEdit($event)"
+          style="width: 100%"
+        />
+      </docs-example>
+
       <h2>Description list</h2>
       <p>
         <code class="docs-inline">&lt;mk-description-list&gt;</code> renders a
@@ -1117,6 +1142,26 @@ published: true`;
     this.expandedRows.set(rows);
   }
 
+  // ----- Data-grid pro -------------------------------------------------
+  protected readonly gridColumns: MkTableColumn<DemoUser>[] = [
+    { key: 'name', header: 'Name', pinned: 'left', width: '160px', resizable: true, sortable: true },
+    { key: 'email', header: 'Email', resizable: true, editable: true, width: '220px' },
+    { key: 'role', header: 'Role', resizable: true, editable: true, width: '140px' },
+    { key: 'orders', header: 'Orders', align: 'end', resizable: true, width: '110px' },
+    { key: 'status', header: 'Status', align: 'center', editable: true, width: '130px' },
+  ];
+  protected readonly gridRows = signal<DemoUser[]>(this.users.slice(0, 5));
+  protected readonly gridStatus = signal('—');
+
+  protected onCellEdit(e: { row: DemoUser; key: string; value: string }): void {
+    this.gridRows.update((rows) =>
+      rows.map((r) =>
+        r === e.row ? { ...r, [e.key]: e.value } : r,
+      ),
+    );
+    this.gridStatus.set(`${e.key} → "${e.value}"`);
+  }
+
   // ----- Code snippets -------------------------------------------------
   protected readonly cardCode = `<mk-card variant="elevated">
   <mk-card-header>
@@ -1223,6 +1268,19 @@ published: true`;
   clickableRows
   (sortChange)="onSort($event)"
   (rowClick)="onRowClick($event)" />`;
+
+  protected readonly gridProCode = `columns: MkTableColumn<User>[] = [
+  { key: 'name',  header: 'Name',  pinned: 'left', resizable: true, sortable: true },
+  { key: 'email', header: 'Email', resizable: true, editable: true },
+  { key: 'role',  header: 'Role',  resizable: true, editable: true },
+  // …
+];
+
+<mk-table
+  [columns]="columns" [data]="rows()"
+  resizableColumns reorderableColumns
+  (cellEdit)="onCellEdit($event)" />
+// Drag header edges to resize · drag headers to reorder · double-click a cell to edit`;
 
   protected readonly expandableCode = `<mk-table
   [columns]="columns"

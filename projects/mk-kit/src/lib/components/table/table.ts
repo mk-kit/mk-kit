@@ -10,7 +10,7 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { NgTemplateOutlet } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
 import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
 import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { mkUniqueId } from '../../core/a11y/unique-id';
@@ -38,6 +38,14 @@ export interface MkTableColumn<T = Record<string, unknown>> {
   width?: string;
   /** Optional formatter turning the raw value into display text. */
   format?: (value: unknown, row: T) => string;
+  /** Allow the user to drag-resize this column (needs `resizableColumns`). */
+  resizable?: boolean;
+  /** Make this column's cells inline-editable (double-click / Enter). */
+  editable?: boolean;
+  /** Pin (freeze) this column to a side while the body scrolls horizontally. */
+  pinned?: 'left' | 'right';
+  /** Minimum width in px when resizing (default 60). */
+  minWidth?: number;
 }
 
 /** Payload emitted by {@link MkTable.sortChange}. */
@@ -46,6 +54,16 @@ export interface MkSortChange {
   key: string;
   /** Resulting direction (`none` when sorting was cleared). */
   direction: MkSortDirection;
+}
+
+/** Payload emitted by {@link MkTable.cellEdit} when an editable cell is saved. */
+export interface MkCellEdit<T = Record<string, unknown>> {
+  /** The edited row. */
+  row: T;
+  /** The column key that was edited. */
+  key: string;
+  /** The new (string) value the user entered. */
+  value: string;
 }
 
 /**
@@ -84,6 +102,7 @@ export interface MkSortChange {
 export class MkTable<T = Record<string, unknown>> {
   private readonly announcer = inject(MkLiveAnnouncer);
   private readonly i18n = inject(MK_I18N);
+  private readonly document = inject(DOCUMENT);
 
   /** Column definitions (order = display order). */
   readonly columns = input.required<MkTableColumn<T>[]>();
@@ -121,6 +140,10 @@ export class MkTable<T = Record<string, unknown>> {
   readonly expandable = input(false, { transform: booleanAttribute });
   /** Allow only one row expanded at a time (accordion). */
   readonly singleExpand = input(false, { transform: booleanAttribute });
+  /** Enable drag-to-resize on columns marked `resizable` (data-grid pro). */
+  readonly resizableColumns = input(false, { transform: booleanAttribute });
+  /** Enable drag-to-reorder of column headers (data-grid pro). */
+  readonly reorderableColumns = input(false, { transform: booleanAttribute });
 
   /** Emitted when the sort column/direction changes. */
   readonly sortChange = output<MkSortChange>();
@@ -130,6 +153,170 @@ export class MkTable<T = Record<string, unknown>> {
   readonly selectionChange = output<T[]>();
   /** Emitted with the currently expanded rows whenever they change. */
   readonly expandedChange = output<T[]>();
+  /** Emitted when a column is resized: `{ key, width }` (px). */
+  readonly columnResize = output<{ key: string; width: number }>();
+  /** Emitted with the new column key order after a reorder. */
+  readonly columnReorder = output<string[]>();
+  /** Emitted when an inline-editable cell is saved. */
+  readonly cellEdit = output<MkCellEdit<T>>();
+
+  /** User-set column widths (px), keyed by column key. */
+  private readonly colWidths = signal<Record<string, number>>({});
+  /** User-set column order (keys); `null` = the input order. */
+  private readonly colOrder = signal<string[] | null>(null);
+  /** The cell currently being inline-edited. */
+  protected readonly editing = signal<{ index: number; key: string } | null>(
+    null,
+  );
+
+  /** Columns in display order, honouring any user reordering. */
+  protected readonly orderedColumns = computed<MkTableColumn<T>[]>(() => {
+    const cols = this.columns();
+    const order = this.colOrder();
+    if (!order) return cols;
+    const byKey = new Map(cols.map((c) => [c.key, c]));
+    const ordered = order.map((k) => byKey.get(k)).filter((c): c is MkTableColumn<T> => !!c);
+    // Append any columns not present in the saved order (e.g. newly added).
+    for (const c of cols) if (!order.includes(c.key)) ordered.push(c);
+    return ordered;
+  });
+
+  /** The rendered width for a column, if the user resized it. */
+  protected colStyleWidth(col: MkTableColumn<T>): string | null {
+    const w = this.colWidths()[col.key];
+    if (w != null) return `${w}px`;
+    return col.width ?? null;
+  }
+
+  /** Sticky offset (px) for a pinned column, summing the pinned ones before it. */
+  protected pinnedOffset(col: MkTableColumn<T>): number {
+    const side = col.pinned;
+    if (!side) return 0;
+    const cols = this.orderedColumns().filter((c) => c.pinned === side);
+    const idx = cols.indexOf(col);
+    const before = side === 'left' ? cols.slice(0, idx) : cols.slice(idx + 1);
+    let offset = 0;
+    for (const c of before) offset += this.colWidths()[c.key] ?? this.numericWidth(c);
+    // Account for the leading select / expander columns on the left.
+    if (side === 'left') {
+      offset += (this.selectable() ? 44 : 0) + (this.expandable() ? 44 : 0);
+    }
+    return offset;
+  }
+
+  private numericWidth(col: MkTableColumn<T>): number {
+    const w = col.width ? parseInt(col.width, 10) : NaN;
+    return Number.isFinite(w) ? w : 150;
+  }
+
+  // --- Column resize --------------------------------------------------------
+  private resizeKey: string | null = null;
+  private resizeStartX = 0;
+  private resizeStartW = 0;
+  private resizeMin = 60;
+
+  /** Begin a drag-resize from a header handle. */
+  protected startResize(event: PointerEvent, col: MkTableColumn<T>): void {
+    if (!this.resizableColumns() || !col.resizable) return;
+    event.preventDefault();
+    event.stopPropagation();
+    const th = (event.target as HTMLElement).closest('th') as HTMLElement | null;
+    this.resizeKey = col.key;
+    this.resizeStartX = event.clientX;
+    this.resizeStartW =
+      this.colWidths()[col.key] ?? th?.getBoundingClientRect().width ?? this.numericWidth(col);
+    this.resizeMin = col.minWidth ?? 60;
+    this.document.addEventListener('pointermove', this.onResizeMove);
+    this.document.addEventListener('pointerup', this.onResizeEnd);
+  }
+
+  private readonly onResizeMove = (event: PointerEvent): void => {
+    if (!this.resizeKey) return;
+    const width = Math.max(
+      this.resizeMin,
+      Math.round(this.resizeStartW + (event.clientX - this.resizeStartX)),
+    );
+    this.colWidths.update((w) => ({ ...w, [this.resizeKey as string]: width }));
+  };
+
+  private readonly onResizeEnd = (): void => {
+    if (this.resizeKey) {
+      this.columnResize.emit({
+        key: this.resizeKey,
+        width: this.colWidths()[this.resizeKey],
+      });
+    }
+    this.resizeKey = null;
+    this.document.removeEventListener('pointermove', this.onResizeMove);
+    this.document.removeEventListener('pointerup', this.onResizeEnd);
+  };
+
+  // --- Column reorder (native drag) -----------------------------------------
+  protected readonly dragKey = signal<string | null>(null);
+
+  protected onColDragStart(event: DragEvent, col: MkTableColumn<T>): void {
+    if (!this.reorderableColumns()) return;
+    this.dragKey.set(col.key);
+    event.dataTransfer?.setData('text/plain', col.key);
+    if (event.dataTransfer) event.dataTransfer.effectAllowed = 'move';
+  }
+
+  protected onColDragOver(event: DragEvent): void {
+    if (this.reorderableColumns() && this.dragKey()) event.preventDefault();
+  }
+
+  protected onColDrop(event: DragEvent, target: MkTableColumn<T>): void {
+    const from = this.dragKey();
+    this.dragKey.set(null);
+    if (!from || from === target.key) return;
+    event.preventDefault();
+    const order = this.orderedColumns().map((c) => c.key);
+    const fromIdx = order.indexOf(from);
+    const toIdx = order.indexOf(target.key);
+    if (fromIdx < 0 || toIdx < 0) return;
+    order.splice(toIdx, 0, order.splice(fromIdx, 1)[0]);
+    this.colOrder.set(order);
+    this.columnReorder.emit(order);
+  }
+
+  protected onColDragEnd(): void {
+    this.dragKey.set(null);
+  }
+
+  // --- Inline cell edit -----------------------------------------------------
+  protected isEditing(index: number, col: MkTableColumn<T>): boolean {
+    const e = this.editing();
+    return !!e && e.index === index && e.key === col.key;
+  }
+
+  protected startEdit(index: number, col: MkTableColumn<T>, event?: Event): void {
+    if (!col.editable) return;
+    event?.stopPropagation();
+    this.editing.set({ index, key: col.key });
+  }
+
+  protected commitEdit(row: T, col: MkTableColumn<T>, value: string): void {
+    this.editing.set(null);
+    this.cellEdit.emit({ row, key: col.key, value });
+  }
+
+  protected cancelEdit(): void {
+    this.editing.set(null);
+  }
+
+  protected onEditKeydown(
+    event: KeyboardEvent,
+    row: T,
+    col: MkTableColumn<T>,
+  ): void {
+    if (event.key === 'Enter') {
+      event.preventDefault();
+      this.commitEdit(row, col, (event.target as HTMLInputElement).value);
+    } else if (event.key === 'Escape') {
+      event.preventDefault();
+      this.cancelEdit();
+    }
+  }
 
   /** The projected row-detail template (enable via `expandable`). */
   protected readonly rowDetail = contentChild(MkTableRowDetail);

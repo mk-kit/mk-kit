@@ -176,6 +176,92 @@
   padding: var(--_cell-pad-y) var(--_cell-pad-x);
 }
 
+/* --- Data-grid pro ------------------------------------------------------- */
+
+/* Header needs relative positioning for the resize handle. */
+.mk-table__th {
+  position: relative;
+}
+
+/* Column resize handle */
+.mk-table__resize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.mk-table__resize::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 3px;
+  width: 2px;
+  height: 50%;
+  background-color: var(--mk-border);
+}
+.mk-table__resize:hover::after {
+  background-color: var(--mk-primary);
+}
+
+/* Reorder drag state */
+.mk-table__th[draggable='true'] {
+  cursor: grab;
+}
+.mk-table__th--dragging {
+  opacity: 0.5;
+}
+
+/* Pinned / sticky columns */
+.mk-table__th--pinned,
+.mk-table__td--pinned {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--mk-surface);
+}
+.mk-table__th--pinned {
+  z-index: 2;
+  background-color: var(--mk-surface-2);
+}
+/* A shadow on the inner edge to separate frozen columns from scrolling ones. */
+.mk-table__th--pinned:not(.mk-table__th--pinned-right),
+.mk-table__td--pinned:not(.mk-table__td--pinned-right) {
+  box-shadow: 2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+.mk-table__th--pinned-right,
+.mk-table__td--pinned-right {
+  box-shadow: -2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+/* Keep zebra/selected backgrounds on pinned body cells opaque. */
+:host(.mk-table--zebra)
+  .mk-table__body
+  .mk-table__row:nth-child(even)
+  .mk-table__td--pinned {
+  background-color: var(--mk-surface-2);
+}
+
+/* Inline-editable cells */
+.mk-table__td--editable {
+  cursor: text;
+}
+.mk-table__td--editable:hover {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-table__cell-input {
+  width: 100%;
+  margin: calc(-1 * var(--mk-space-1)) 0;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  font: inherit;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-primary);
+  border-radius: var(--mk-radius-sm);
+  outline: none;
+}
+
 /* Empty state */
 .mk-table__empty {
   padding: var(--mk-space-8) var(--_cell-pad-x);

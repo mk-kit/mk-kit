@@ -132,3 +132,105 @@ describe('MkTable — expandable rows', () => {
     expect(fixture.componentInstance.expanded().map((r) => r.id)).toEqual([2]);
   });
 });
+
+describe('MkTable — data-grid pro', () => {
+  let fixture: ComponentFixture<MkTable<Row>>;
+  let table: MkTable<Row>;
+
+  const GRID_COLUMNS: MkTableColumn<Row>[] = [
+    { key: 'id', header: 'ID', pinned: 'left', width: '80px', resizable: true },
+    { key: 'name', header: 'Name', resizable: true, editable: true },
+    { key: 'notes', header: 'Notes', editable: true },
+  ];
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent<MkTable<Row>>(MkTable);
+    table = fixture.componentInstance;
+    fixture.componentRef.setInput('columns', GRID_COLUMNS);
+    fixture.componentRef.setInput('data', [
+      { id: 1, name: 'Ada', notes: 'x' },
+    ]);
+    fixture.componentRef.setInput('resizableColumns', true);
+    fixture.componentRef.setInput('reorderableColumns', true);
+    fixture.detectChanges();
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('resizing a column updates its rendered width and emits', () => {
+    const resized = vi.fn();
+    table.columnResize.subscribe(resized);
+    const col = GRID_COLUMNS[1]; // name, no fixed width
+    (table as any).startResize(
+      { clientX: 100, preventDefault() {}, stopPropagation() {}, target: { closest: () => null } },
+      col,
+    );
+    (table as any).onResizeMove({ clientX: 160 }); // +60
+    (table as any).onResizeEnd();
+    expect((table as any).colStyleWidth(col)).toBe('210px'); // 150 default + 60
+    expect(resized).toHaveBeenCalledWith({ key: 'name', width: 210 });
+  });
+
+  it('never resizes below the minimum width', () => {
+    const col = GRID_COLUMNS[1];
+    (table as any).startResize(
+      { clientX: 100, preventDefault() {}, stopPropagation() {}, target: { closest: () => null } },
+      col,
+    );
+    (table as any).onResizeMove({ clientX: -500 }); // way negative
+    expect((table as any).colStyleWidth(col)).toBe('60px'); // clamped to min
+  });
+
+  it('reordering moves a column and emits the new key order', () => {
+    const reordered = vi.fn();
+    table.columnReorder.subscribe(reordered);
+    // drag "notes" onto "name"
+    (table as any).onColDragStart({ dataTransfer: null }, GRID_COLUMNS[2]);
+    (table as any).onColDrop({ preventDefault() {} }, GRID_COLUMNS[1]);
+    expect((table as any).orderedColumns().map((c: MkTableColumn<Row>) => c.key)).toEqual([
+      'id',
+      'notes',
+      'name',
+    ]);
+    expect(reordered).toHaveBeenCalledWith(['id', 'notes', 'name']);
+  });
+
+  it('computes a sticky offset for pinned columns', () => {
+    // id is the only left-pinned column, first in order → offset 0.
+    expect((table as any).pinnedOffset(GRID_COLUMNS[0])).toBe(0);
+    // A second left-pinned column sits after id's 80px width.
+    fixture.componentRef.setInput('columns', [
+      { key: 'id', header: 'ID', pinned: 'left', width: '80px' },
+      { key: 'name', header: 'Name', pinned: 'left', width: '120px' },
+      { key: 'notes', header: 'Notes' },
+    ]);
+    fixture.detectChanges();
+    const cols = (table as any).orderedColumns() as MkTableColumn<Row>[];
+    expect((table as any).pinnedOffset(cols[1])).toBe(80);
+  });
+
+  it('inline edit toggles and commits, emitting cellEdit', () => {
+    const edited = vi.fn();
+    table.cellEdit.subscribe(edited);
+    const col = GRID_COLUMNS[1];
+    const row = { id: 1, name: 'Ada', notes: 'x' };
+    expect((table as any).isEditing(0, col)).toBe(false);
+    (table as any).startEdit(0, col);
+    expect((table as any).isEditing(0, col)).toBe(true);
+    (table as any).commitEdit(row, col, 'Grace');
+    expect((table as any).isEditing(0, col)).toBe(false);
+    expect(edited).toHaveBeenCalledWith({ row, key: 'name', value: 'Grace' });
+  });
+
+  it('cancelEdit exits without emitting', () => {
+    const edited = vi.fn();
+    table.cellEdit.subscribe(edited);
+    (table as any).startEdit(0, GRID_COLUMNS[2]);
+    (table as any).cancelEdit();
+    expect((table as any).isEditing(0, GRID_COLUMNS[2])).toBe(false);
+    expect(edited).not.toHaveBeenCalled();
+  });
+});

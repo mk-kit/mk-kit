@@ -17,17 +17,27 @@
             />
           </th>
         }
-        @for (col of columns(); track col.key) {
+        @for (col of orderedColumns(); track col.key) {
           <th
             scope="col"
             class="mk-table__th"
             [class.mk-table__th--sortable]="col.sortable"
-            [style.width]="col.width"
+            [class.mk-table__th--pinned]="col.pinned"
+            [class.mk-table__th--pinned-right]="col.pinned === 'right'"
+            [class.mk-table__th--dragging]="dragKey() === col.key"
+            [style.width]="colStyleWidth(col)"
+            [style.left.px]="col.pinned === 'left' ? pinnedOffset(col) : null"
+            [style.right.px]="col.pinned === 'right' ? pinnedOffset(col) : null"
             [attr.data-align]="col.align ?? 'start'"
             [attr.aria-sort]="ariaSort(col)"
             [attr.tabindex]="col.sortable ? 0 : null"
+            [attr.draggable]="reorderableColumns() && !col.pinned ? true : null"
             (click)="onSort(col)"
             (keydown)="onHeaderKeydown($event, col)"
+            (dragstart)="onColDragStart($event, col)"
+            (dragover)="onColDragOver($event)"
+            (drop)="onColDrop($event, col)"
+            (dragend)="onColDragEnd()"
           >
             <span class="mk-table__th-inner">
               <span class="mk-table__th-label">{{ col.header }}</span>
@@ -35,6 +45,16 @@
                 <span class="mk-table__sort" aria-hidden="true">{{ sortGlyph(col) }}</span>
               }
             </span>
+            @if (resizableColumns() && col.resizable) {
+              <span
+                class="mk-table__resize"
+                role="separator"
+                aria-orientation="vertical"
+                aria-label="Resize column"
+                (pointerdown)="startResize($event, col)"
+                (click)="$event.stopPropagation()"
+              ></span>
+            }
           </th>
         }
       </tr>
@@ -79,9 +99,30 @@
               />
             </td>
           }
-          @for (col of columns(); track col.key) {
-            <td class="mk-table__td" [attr.data-align]="col.align ?? 'start'">
-              {{ cellText(row, col) }}
+          @for (col of orderedColumns(); track col.key) {
+            <td
+              class="mk-table__td"
+              [class.mk-table__td--pinned]="col.pinned"
+              [class.mk-table__td--pinned-right]="col.pinned === 'right'"
+              [class.mk-table__td--editable]="col.editable"
+              [style.width]="colStyleWidth(col)"
+              [style.left.px]="col.pinned === 'left' ? pinnedOffset(col) : null"
+              [style.right.px]="col.pinned === 'right' ? pinnedOffset(col) : null"
+              [attr.data-align]="col.align ?? 'start'"
+              (dblclick)="startEdit(i, col, $event)"
+            >
+              @if (isEditing(i, col)) {
+                <input
+                  class="mk-table__cell-input"
+                  [value]="cellText(row, col)"
+                  (click)="$event.stopPropagation()"
+                  (keydown)="onEditKeydown($event, row, col)"
+                  (blur)="commitEdit(row, col, $any($event.target).value)"
+                  autofocus
+                />
+              } @else {
+                {{ cellText(row, col) }}
+              }
             </td>
           }
         </tr>

@@ -196,8 +196,10 @@ existing primitive it would reuse. Priorities as before.
 - ⏳ **`mk-tour`** — product-onboarding coach marks (in progress).
 
 ### Tier 3 — larger / specialized
-- **P2 Data-grid pro** — extend `mk-table`: column resize / reorder / pin, sticky
-  columns, inline cell edit. The biggest single value-add for admin.
+- ✅ **Data-grid pro** — extended `mk-table` with column resize, drag reorder,
+  pin/sticky columns, and inline cell edit (double-click); gated by
+  `resizableColumns`/`reorderableColumns` + per-column `resizable`/`editable`/
+  `pinned`, with `(columnResize)`/`(columnReorder)`/`(cellEdit)` (shipped).
 - ✅ **`mk-event-calendar`** — month scheduler with event pills + "+N more",
   month nav, day/event click (shipped).
 - ✅ **`mk-kanban`** — draggable board columns/cards on the dnd module,

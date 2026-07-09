@@ -6,6 +6,15 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **Data-grid pro (`mk-table`)** — opt-in power features on the existing table:
+  drag-to-**resize** columns (`resizableColumns` + per-column `resizable`),
+  drag-to-**reorder** headers (`reorderableColumns`), **pin/sticky** columns
+  (`pinned: 'left' | 'right'`), and **inline cell edit** (`editable`,
+  double-click). New outputs `(columnResize)` / `(columnReorder)` / `(cellEdit)`.
+  Fully additive — existing tables are unchanged.
+
 ## [0.1.7] — 2026-07-09
 
 ### Added
