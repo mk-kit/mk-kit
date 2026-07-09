@@ -1,0 +1,18 @@
+@for (star of stars(); track star) {
+  <button
+    type="button"
+    class="mk-rating__star"
+    [class.mk-rating__star--filled]="star <= displayValue()"
+    [disabled]="readonly() || isDisabled()"
+    tabindex="-1"
+    [attr.aria-hidden]="true"
+    (click)="setValue(star)"
+    (mouseenter)="onStarEnter(star)"
+  >
+    <svg viewBox="0 0 24 24" width="1em" height="1em" aria-hidden="true">
+      <path
+        d="M12 2.5l2.9 6 6.6.9-4.8 4.6 1.2 6.5L12 18.9 6.1 21l1.2-6.5L2.5 9.9l6.6-.9z"
+      />
+    </svg>
+  </button>
+}

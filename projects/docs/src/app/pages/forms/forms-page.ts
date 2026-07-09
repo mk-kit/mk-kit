@@ -10,8 +10,12 @@ import {
   type MkUploadFn,
   MkFormField,
   MkInput,
+  MkAutosize,
+  MkNumberInput,
+  MkOtp,
   MkRadio,
   MkRadioGroup,
+  MkRating,
   MkSelect,
   type MkSelectOption,
   MkSlider,
@@ -40,6 +44,10 @@ import { DocsExample } from '../../shared/docs-example';
     MkFileUpload,
     MkCodeEditor,
     MkButton,
+    MkRating,
+    MkNumberInput,
+    MkOtp,
+    MkAutosize,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -392,6 +400,62 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>(validate)</td><td>MkCodeValidity</td><td>—</td><td>Emits {{ '{ valid, error }' }} on change.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- RATING / NUMBER / OTP / AUTOSIZE -->
+      <!-- ============================================================ -->
+      <h2>Rating</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-rating&gt;</code> is a star rating input
+        (and read-only display) following the ARIA slider pattern — click/hover a
+        star, or focus and use Arrow keys.
+      </p>
+      <docs-example [code]="ratingCode" [column]="true">
+        <mk-rating [(value)]="score" />
+        <p class="echo">Score: {{ score() }} / 5 · <mk-rating [value]="4" readonly size="sm" /> (read-only)</p>
+      </docs-example>
+
+      <h2>Number input</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-number-input&gt;</code> is a numeric field
+        with −/+ steppers, clamping and Arrow-key stepping
+        (<code class="docs-inline">spinbutton</code>).
+      </p>
+      <docs-example [code]="numberCode" [column]="true">
+        <mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />
+        <p class="echo">Quantity: {{ qty() ?? '—' }}</p>
+      </docs-example>
+
+      <h2>OTP / PIN input</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-otp&gt;</code> is a segmented one-time-code
+        field: auto-advance, Backspace-to-previous, Arrow navigation and full-code
+        paste.
+      </p>
+      <docs-example [code]="otpCode" [column]="true">
+        <mk-otp [(value)]="otp" [length]="6" />
+        <p class="echo">Code: {{ otp() || '—' }}</p>
+      </docs-example>
+
+      <h2>Textarea autosize</h2>
+      <p>
+        <code class="docs-inline">mkAutosize</code> grows a
+        <code class="docs-inline">&lt;textarea&gt;</code> to fit its content,
+        between <code class="docs-inline">mkAutosizeMinRows</code> and
+        <code class="docs-inline">mkAutosizeMaxRows</code>. Type to watch it grow.
+      </p>
+      <docs-example [code]="autosizeCode" [column]="true">
+        <textarea
+          mkInput
+          mkAutosize
+          [mkAutosizeMinRows]="2"
+          [mkAutosizeMaxRows]="8"
+          [mkAutosizeValue]="note()"
+          placeholder="Type a few lines…"
+          [(ngModel)]="note"
+          style="width: 100%; max-width: 30rem;"
+        ></textarea>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -449,6 +513,18 @@ export class FormsPage {
     const done = files.filter((f) => f.status === 'success').length;
     return `${done} uploaded`;
   });
+
+  // --- Rating / number / otp / autosize -------------------------------------
+  protected readonly score = signal(3);
+  protected readonly qty = signal<number | null>(1);
+  protected readonly otp = signal('');
+  protected readonly note = signal('');
+
+  protected readonly ratingCode = `<mk-rating [(value)]="score" />`;
+  protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
+  protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
+  protected readonly autosizeCode = `<textarea mkInput mkAutosize [mkAutosizeMaxRows]="8"
+  [mkAutosizeValue]="note()" [(ngModel)]="note"></textarea>`;
 
   // --- Code editor ----------------------------------------------------------
   protected readonly config = signal(

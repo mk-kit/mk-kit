@@ -62,22 +62,22 @@ live-announcer core.
 - ✅ **Multi-select** (`mk-multi-select`) — multiple selection with removable
   chips over a sync/async option source (shipped). A token/tag input could still
   reuse its chip + query internals.
-- **P2 Rating** (`mk-rating`) — star input + read-only display.
-- **P2 Number stepper input** — numeric field with +/- and clamp/step.
-- **P2 OTP / PIN input** — segmented one-time-code field.
+- ✅ **Rating** (`mk-rating`) — star input + read-only display (shipped).
+- ✅ **Number input** (`mk-number-input`) — numeric field with −/+ and clamp/step (shipped).
+- ✅ **OTP / PIN input** (`mk-otp`) — segmented one-time-code field (shipped).
 - **P2 Color picker** — swatch grid + hex/HSL, token-friendly.
-- **P2 Textarea autosize** — grow-with-content directive for `mkInput`.
+- ✅ **Textarea autosize** (`mkAutosize`) — grow-with-content directive (shipped).
 - **P3 Range slider** — two-thumb variant of `mk-slider`.
 - **P3 Form error summary** — aggregated, linkable validation list.
 
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value
   pairs for entity-detail panels; grid/stacked, rich values (shipped).
-- **P1 Virtual scroll** — windowed rendering for long lists/tables (perf).
+- ✅ **Virtual scroll** (`mk-virtual-scroll`) — windowed rendering for long lists (shipped).
 - **P2 Expandable / nested table rows** — detail rows + row grouping.
-- **P2 Avatar group** — overlapped avatars with "+N" overflow.
-- **P2 Code block** — the docs have one; promote a themed `mk-code` with copy.
-- **P2 Carousel** — accessible slides/gallery.
+- ✅ **Avatar group** (`mk-avatar-group`) — overlapped avatars with "+N" overflow (shipped).
+- ✅ **Code block** (`mk-code`) — themed read-only block, highlight + copy (shipped).
+- ✅ **Carousel** (`mk-carousel`) — accessible slides/gallery (shipped).
 - **P3 Comparison / diff view**, **P3 QR/barcode**.
 
 ### Charts (extend the module)

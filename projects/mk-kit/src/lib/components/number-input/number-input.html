@@ -1,0 +1,43 @@
+<button
+  type="button"
+  class="mk-number-input__btn mk-number-input__btn--dec"
+  aria-label="Decrease"
+  tabindex="-1"
+  [disabled]="!canDecrement()"
+  (click)="step_(-1)"
+>
+  <span aria-hidden="true">−</span>
+</button>
+
+<input
+  #input
+  type="text"
+  inputmode="decimal"
+  class="mk-number-input__field"
+  [id]="inputId"
+  role="spinbutton"
+  [value]="display()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [attr.aria-valuenow]="value()"
+  [attr.aria-valuemin]="min()"
+  [attr.aria-valuemax]="max()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (input)="onInput($event)"
+  (keydown)="onKeydown($event)"
+  (blur)="onBlur()"
+/>
+
+<button
+  type="button"
+  class="mk-number-input__btn mk-number-input__btn--inc"
+  aria-label="Increase"
+  tabindex="-1"
+  [disabled]="!canIncrement()"
+  (click)="step_(1)"
+>
+  <span aria-hidden="true">+</span>
+</button>

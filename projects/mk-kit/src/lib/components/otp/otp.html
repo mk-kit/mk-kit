@@ -1,0 +1,19 @@
+@for (i of indexes(); track i) {
+  <input
+    #cell
+    class="mk-otp__cell"
+    [id]="cellId + '-' + i"
+    [type]="mask() ? 'password' : 'text'"
+    [attr.inputmode]="inputMode()"
+    autocomplete="one-time-code"
+    maxlength="1"
+    [value]="charAt(i)"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="'Digit ' + (i + 1)"
+    [attr.aria-invalid]="isInvalid() || null"
+    (input)="onCellInput(i, $event)"
+    (keydown)="onCellKeydown(i, $event)"
+    (paste)="onPaste(i, $event)"
+    (blur)="onBlur()"
+  />
+}
