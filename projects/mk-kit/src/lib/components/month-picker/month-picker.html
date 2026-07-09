@@ -1,0 +1,87 @@
+<div #field class="mk-month-picker__field">
+  <button
+    #trigger
+    type="button"
+    class="mk-month-picker__trigger"
+    [id]="triggerId"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+  >
+    @if (displayLabel()) {
+      <span class="mk-month-picker__value">{{ displayLabel() }}</span>
+    } @else {
+      <span class="mk-month-picker__value mk-month-picker__value--placeholder">{{
+        resolvedPlaceholder()
+      }}</span>
+    }
+    <span class="mk-month-picker__icon" aria-hidden="true"></span>
+  </button>
+
+  @if (clearable() && value() && !isDisabled()) {
+    <button
+      type="button"
+      class="mk-month-picker__clear"
+      aria-label="Clear"
+      (click)="clear($event)"
+    >
+      <span class="mk-month-picker__clear-icon" aria-hidden="true"></span>
+    </button>
+  }
+</div>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-month-picker__panel"
+    role="dialog"
+    [id]="panelId"
+    [attr.aria-label]="mode() === 'year' ? 'Choose year' : 'Choose month'"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    (dismiss)="close()"
+  >
+    <div class="mk-month-picker__header">
+      <button
+        type="button"
+        class="mk-month-picker__nav"
+        [attr.aria-label]="mode() === 'year' ? 'Previous years' : 'Previous year'"
+        (click)="shiftView(-1)"
+      >
+        ‹
+      </button>
+      <span class="mk-month-picker__header-label" aria-live="polite">{{ headerLabel() }}</span>
+      <button
+        type="button"
+        class="mk-month-picker__nav"
+        [attr.aria-label]="mode() === 'year' ? 'Next years' : 'Next year'"
+        (click)="shiftView(1)"
+      >
+        ›
+      </button>
+    </div>
+
+    <div class="mk-month-picker__grid" role="grid" (keydown)="onGridKeydown($event)">
+      @for (cell of cells(); track cell.label; let i = $index) {
+        <button
+          #cell
+          type="button"
+          class="mk-month-picker__cell"
+          [class.mk-month-picker__cell--selected]="cell.selected"
+          [attr.tabindex]="i === activeIndex() ? 0 : -1"
+          [attr.aria-selected]="cell.selected"
+          [disabled]="cell.disabled"
+          (click)="selectCell(cell)"
+        >
+          {{ cell.label }}
+        </button>
+      }
+    </div>
+  </div>
+}

@@ -3,6 +3,7 @@ import {
   MkCalendar,
   MkDatePicker,
   MkDateRangePicker,
+  MkMonthPicker,
   MkTimePicker,
   type MkDateRange,
   formatDate,
@@ -18,7 +19,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-date-time-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker],
+  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker],
   template: `
     <div class="docs-page docs-container">
       <h1>Date &amp; time</h1>
@@ -198,6 +199,48 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- MONTH / YEAR PICKER -->
+      <!-- ============================================================ -->
+      <h2>Month &amp; year picker</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-month-picker&gt;</code> is a compact field
+        for picking a <strong>month</strong> (<code class="docs-inline">MMM yyyy</code>)
+        or, with <code class="docs-inline">mode="year"</code>, a whole
+        <strong>year</strong>. The popover shows a 12-month grid (year nav) or a
+        12-year decade grid, with arrow-key roving focus. Its model is a
+        <code class="docs-inline">Date</code> at the first day of the selection.
+      </p>
+
+      <docs-example [code]="monthPickerCode" [column]="true">
+        <div class="row">
+          <mk-month-picker [(value)]="month" clearable placeholder="Pick a month…" />
+          <mk-month-picker mode="year" [(value)]="year" clearable placeholder="Pick a year…" />
+        </div>
+        <p class="echo">
+          Month: {{ month() ? formatDate(month()!, 'MMMM yyyy') : '—' }} ·
+          Year: {{ year() ? year()!.getFullYear() : '—' }}
+        </p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;Date | null&gt;</td><td>null</td><td>Two-way selected date (first of the month / year).</td></tr>
+          <tr><td>mode</td><td>'month' | 'year'</td><td>'month'</td><td>Pick a month or a whole year.</td></tr>
+          <tr><td>min</td><td>Date | null</td><td>null</td><td>Earliest selectable date (inclusive).</td></tr>
+          <tr><td>max</td><td>Date | null</td><td>null</td><td>Latest selectable date (inclusive).</td></tr>
+          <tr><td>displayFormat</td><td>string</td><td>'MMM yyyy' / 'yyyy'</td><td>Pattern used to render the trigger label.</td></tr>
+          <tr><td>placeholder</td><td>string</td><td>'Select month…'</td><td>Shown when empty.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
+          <tr><td>clearable</td><td>boolean</td><td>false</td><td>Show a clear button when a value is selected.</td></tr>
+          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling + aria-invalid.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -209,6 +252,14 @@ import { DocsExample } from '../../shared/docs-example';
         margin: 0;
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
+      }
+      .row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mk-space-4);
+      }
+      .row > * {
+        flex: 1 1 12rem;
       }
     `,
   ],
@@ -233,6 +284,10 @@ export class DateTimePage {
   // --- Time picker ----------------------------------------------------------
   protected readonly time = signal<string | null>('09:15');
   protected readonly time12 = signal<string | null>('14:30');
+
+  // --- Month / year picker --------------------------------------------------
+  protected readonly month = signal<Date | null>(null);
+  protected readonly year = signal<Date | null>(null);
 
   // --- Date range picker ----------------------------------------------------
   protected readonly range = signal<MkDateRange>({ start: null, end: null });
@@ -280,6 +335,12 @@ inThirtyDays = new Date(this.today.getTime() + 30 * 864e5);
   protected readonly rangePickerCode = `range = signal<MkDateRange>({ start: null, end: null });
 
 <mk-date-range-picker [(value)]="range" [firstDayOfWeek]="1" clearable />`;
+
+  protected readonly monthPickerCode = `month = signal<Date | null>(null);
+year = signal<Date | null>(null);
+
+<mk-month-picker [(value)]="month" clearable placeholder="Pick a month…" />
+<mk-month-picker mode="year" [(value)]="year" clearable placeholder="Pick a year…" />`;
 }
 
 /** Local midnight for today. */
