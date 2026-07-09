@@ -1,0 +1,168 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  --_fs: var(--mk-font-size-sm);
+  --_lh: 1.6;
+  --_pad-y: var(--mk-space-2);
+  --_pad-x: var(--mk-space-3);
+  display: block;
+  width: 100%;
+  font-family: var(--mk-font-mono);
+}
+
+.mk-code-editor__frame {
+  display: flex;
+  align-items: stretch;
+  overflow: hidden;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-code-editor__frame:hover {
+  border-color: var(--mk-border-strong);
+}
+.mk-code-editor__frame:focus-within {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+:host(.mk-code-editor--invalid) .mk-code-editor__frame {
+  border-color: var(--mk-danger);
+}
+:host(.mk-code-editor--invalid) .mk-code-editor__frame:focus-within {
+  outline-color: var(--mk-danger);
+}
+:host(.mk-code-editor--disabled) .mk-code-editor__frame {
+  background-color: var(--mk-surface-2);
+  opacity: 0.7;
+}
+
+:host(.mk-code-editor--sm) {
+  --_fs: var(--mk-font-size-xs);
+}
+:host(.mk-code-editor--lg) {
+  --_fs: var(--mk-font-size-md);
+}
+
+/* Line-number gutter */
+.mk-code-editor__gutter {
+  flex: none;
+  padding: var(--_pad-y) var(--mk-space-2);
+  overflow: hidden;
+  text-align: right;
+  font-size: var(--_fs);
+  line-height: var(--_lh);
+  color: var(--mk-text-subtle);
+  background-color: var(--mk-surface-2);
+  border-right: var(--mk-border-width) solid var(--mk-border-subtle);
+  user-select: none;
+  white-space: nowrap;
+}
+.mk-code-editor__lineno {
+  display: block;
+  min-width: 1.5ch;
+}
+
+.mk-code-editor__scroll {
+  position: relative;
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+/* Shared text metrics — the highlight layer and textarea MUST match exactly. */
+.mk-code-editor__highlight,
+.mk-code-editor__highlight code,
+.mk-code-editor__textarea {
+  margin: 0;
+  padding: var(--_pad-y) var(--_pad-x);
+  font-family: var(--mk-font-mono);
+  font-size: var(--_fs);
+  line-height: var(--_lh);
+  tab-size: 2;
+  letter-spacing: normal;
+  white-space: pre;
+  overflow-wrap: normal;
+  box-sizing: border-box;
+  border: 0;
+}
+.mk-code-editor__highlight code {
+  padding: 0;
+  font: inherit;
+  color: var(--mk-text);
+  background: none;
+}
+
+.mk-code-editor__highlight {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+  color: var(--mk-text);
+}
+
+.mk-code-editor__textarea {
+  position: relative;
+  z-index: 1;
+  display: block;
+  width: 100%;
+  overflow: auto;
+  color: transparent;
+  -webkit-text-fill-color: transparent;
+  caret-color: var(--mk-text);
+  background: transparent;
+  outline: none;
+  resize: vertical;
+}
+.mk-code-editor__textarea::placeholder {
+  color: var(--mk-text-subtle);
+  -webkit-text-fill-color: var(--mk-text-subtle);
+}
+.mk-code-editor__textarea::selection {
+  background-color: var(--mk-selected-bg);
+}
+.mk-code-editor__textarea:disabled {
+  cursor: not-allowed;
+}
+
+/* Soft-wrap mode */
+:host(.mk-code-editor--wrap) .mk-code-editor__highlight,
+:host(.mk-code-editor--wrap) .mk-code-editor__highlight code,
+:host(.mk-code-editor--wrap) .mk-code-editor__textarea {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+:host(.mk-code-editor--wrap) .mk-code-editor__textarea {
+  overflow-x: hidden;
+}
+
+/* Syntax tokens (theme-aware via semantic tokens) */
+.mk-tok-key {
+  color: var(--mk-info);
+}
+.mk-tok-str {
+  color: var(--mk-success);
+}
+.mk-tok-num {
+  color: var(--mk-warning);
+}
+.mk-tok-kw {
+  color: var(--mk-primary);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-tok-punc {
+  color: var(--mk-text-muted);
+}
+
+.mk-code-editor__error {
+  margin: var(--mk-space-1) 0 0;
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-code-editor__frame {
+    transition: none;
+  }
+}

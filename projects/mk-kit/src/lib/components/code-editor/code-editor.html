@@ -1,0 +1,42 @@
+<div class="mk-code-editor__frame">
+  @if (lineNumbers()) {
+    <div #gutter class="mk-code-editor__gutter" aria-hidden="true">
+      @for (n of lines(); track n) {
+        <span class="mk-code-editor__lineno">{{ n }}</span>
+      }
+    </div>
+  }
+
+  <div class="mk-code-editor__scroll">
+    <pre #highlight class="mk-code-editor__highlight" aria-hidden="true"><code [innerHTML]="highlightedHtml()"></code></pre>
+
+    <textarea
+      #textarea
+      class="mk-code-editor__textarea"
+      [id]="editorId"
+      [value]="value()"
+      [placeholder]="placeholder()"
+      [readOnly]="readOnly()"
+      [disabled]="isDisabled()"
+      [rows]="rows()"
+      [attr.wrap]="wrap() ? 'soft' : 'off'"
+      spellcheck="false"
+      autocapitalize="off"
+      autocomplete="off"
+      autocorrect="off"
+      [attr.aria-label]="labelledBy() ? null : ariaLabel() || 'Code editor'"
+      [attr.aria-labelledby]="labelledBy()"
+      [attr.aria-describedby]="ariaDescribedBy()"
+      [attr.aria-invalid]="isInvalid() || null"
+      [attr.aria-required]="isRequired() || null"
+      (input)="onInput($event)"
+      (scroll)="onScroll($event)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    ></textarea>
+  </div>
+</div>
+
+@if (jsonError(); as error) {
+  <p class="mk-code-editor__error" [id]="errorId" role="alert">{{ error }}</p>
+}

@@ -19,10 +19,11 @@ engine). These gate specific admin screens — see the readiness analysis in
   selection with removable chips over an async option source (`filterMode="none"`
   + `(search)`); chips keep their labels after options leave the list, `max`
   caps the count. Covers the `relation` field type + taxonomy/term assignment.
-- **[P1] JSON / code editor** (`mk-code-editor` / `mk-json-field`) — the `json`
-  field type and plugin/settings JSONB editing. Syntax highlight + validation;
-  `block-editor` is for rich content, not JSON. A textarea is the stopgap. (New —
-  not previously tracked.)
+- ✅ **JSON / code editor** (`mk-code-editor`) — **shipped.** Dependency-free
+  textarea-over-highlight editor with a JSON tokenizer, live validation (inline
+  error + `(validate)`), `format()` pretty-print, line numbers and Tab-indent
+  (Escape releases the trap). `language="json"` covers the `json` field type +
+  plugin/settings JSONB editing.
 - **[P2] Description list** (`mk-description-list`) — entity-detail / revision-meta
   panels. Also listed under Data display below.
 - **[P2] Popover / popconfirm** — inline row-level "Delete?" confirm. `mk-dialog`
@@ -39,7 +40,8 @@ editor, charts) is already covered by shipping components.
 ## What already ships (for reference)
 
 Buttons, button-toggle, inputs, form-field, select, autocomplete,
-**multi-select** (chips + async), **file-upload** (dropzone), checkbox,
+**multi-select** (chips + async), **file-upload** (dropzone),
+**code-editor** (JSON highlight + validation), checkbox,
 radio, switch, slider, calendar + date/time/range pickers · card, divider,
 badge, tag, chip, avatar, list, stat-card, progress-bar, **progress-ring**,
 spinner, skeleton, table (+ standalone `mkSort`), **charts** (sparkline, bar,

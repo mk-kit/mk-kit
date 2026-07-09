@@ -1,7 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  MkButton,
   MkCheckbox,
+  MkCodeEditor,
+  type MkCodeValidity,
   MkFileUpload,
   type MkUploadFile,
   type MkUploadFn,
@@ -35,6 +38,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkSwitch,
     MkSlider,
     MkFileUpload,
+    MkCodeEditor,
+    MkButton,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -335,6 +340,58 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>(rejected)</td><td>MkUploadRejection[]</td><td>—</td><td>Rejected files with a reason.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- CODE EDITOR -->
+      <!-- ============================================================ -->
+      <h2>Code editor</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-code-editor&gt;</code> is a lightweight,
+        dependency-free code field with syntax highlighting. With
+        <code class="docs-inline">language="json"</code> it validates on every
+        change (inline error + <code class="docs-inline">(validate)</code>) and
+        offers <code class="docs-inline">format()</code> to pretty-print — ideal
+        for a CMS <code class="docs-inline">json</code> field. Tab inserts spaces;
+        press Escape then Tab to move focus out (never a keyboard trap).
+      </p>
+
+      <docs-example [code]="codeEditorCode" [column]="true">
+        <div style="width: 100%;">
+          <mk-code-editor
+            #jsonEditor
+            language="json"
+            [rows]="9"
+            ariaLabel="Configuration JSON"
+            [(value)]="config"
+            (validate)="jsonValid.set($event)"
+          />
+          <div style="display: flex; align-items: center; gap: var(--mk-space-2); margin-top: var(--mk-space-2);">
+            <button mkButton variant="outline" size="sm" (click)="jsonEditor.format()">
+              Format
+            </button>
+            <span class="echo">
+              {{ jsonValid().valid ? '✓ valid JSON' : '✗ ' + jsonValid().error }}
+            </span>
+          </div>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>language</td><td>'json' | 'plaintext'</td><td>'plaintext'</td><td>Highlighting + validation mode.</td></tr>
+          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way editor content.</td></tr>
+          <tr><td>rows</td><td>number</td><td>8</td><td>Visible rows (minimum height).</td></tr>
+          <tr><td>lineNumbers</td><td>boolean</td><td>true</td><td>Show a line-number gutter.</td></tr>
+          <tr><td>tabSize</td><td>number</td><td>2</td><td>Spaces inserted by Tab / used by format().</td></tr>
+          <tr><td>wrap</td><td>boolean</td><td>false</td><td>Soft-wrap instead of horizontal scroll.</td></tr>
+          <tr><td>readOnly / disabled</td><td>boolean</td><td>false</td><td>Read-only / disabled states.</td></tr>
+          <tr><td>format()</td><td>method</td><td>—</td><td>Pretty-print valid JSON (via exportAs template ref).</td></tr>
+          <tr><td>(validate)</td><td>MkCodeValidity</td><td>—</td><td>Emits {{ '{ valid, error }' }} on change.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -391,6 +448,15 @@ export class FormsPage {
     if (!files.length) return 'none yet';
     const done = files.filter((f) => f.status === 'success').length;
     return `${done} uploaded`;
+  });
+
+  // --- Code editor ----------------------------------------------------------
+  protected readonly config = signal(
+    '{"theme":"dark","features":{"search":true,"beta":false},"limits":[10,20,30]}',
+  );
+  protected readonly jsonValid = signal<MkCodeValidity>({
+    valid: true,
+    error: null,
   });
 
   /** Demo uploader: streams fake progress, then resolves. */
@@ -455,4 +521,8 @@ export class FormsPage {
   hint="PNG, JPG or GIF up to 5 MB — max 4 files"
   [uploadFn]="upload"
   [(files)]="uploads" />`;
+
+  protected readonly codeEditorCode = `<mk-code-editor #editor language="json" [rows]="9" [(value)]="config"
+  (validate)="jsonValid.set($event)" />
+<button mkButton variant="outline" size="sm" (click)="editor.format()">Format</button>`;
 }

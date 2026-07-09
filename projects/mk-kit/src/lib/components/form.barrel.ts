@@ -8,6 +8,7 @@ export * from './select';
 export * from './autocomplete';
 export * from './multi-select';
 export * from './file-upload';
+export * from './code-editor';
 export * from './button-toggle';
 export * from './checkbox';
 export * from './radio';
