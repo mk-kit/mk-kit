@@ -1,0 +1,79 @@
+@if (editing()) {
+  @if (multiline()) {
+    <textarea
+      #input
+      class="mk-inline-edit__input mk-inline-edit__input--multiline"
+      [id]="fieldId"
+      [value]="draft()"
+      [attr.aria-label]="ariaLabel()"
+      rows="3"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    ></textarea>
+  } @else {
+    <input
+      #input
+      type="text"
+      class="mk-inline-edit__input"
+      [id]="fieldId"
+      [value]="draft()"
+      [attr.aria-label]="ariaLabel()"
+      (input)="onInput($event)"
+      (keydown)="onKeydown($event)"
+      (blur)="onBlur()"
+    />
+  }
+  @if (multiline()) {
+    <div class="mk-inline-edit__actions">
+      <button
+        type="button"
+        class="mk-inline-edit__action"
+        aria-label="Save"
+        (mousedown)="$event.preventDefault()"
+        (click)="save()"
+      >
+        ✓
+      </button>
+      <button
+        type="button"
+        class="mk-inline-edit__action"
+        aria-label="Cancel"
+        (mousedown)="$event.preventDefault()"
+        (click)="cancel()"
+      >
+        ✕
+      </button>
+    </div>
+  }
+} @else {
+  <button
+    #display
+    type="button"
+    class="mk-inline-edit__display"
+    [class.mk-inline-edit__display--empty]="!displayText()"
+    [attr.aria-label]="ariaLabel()"
+    [disabled]="isDisabled()"
+    (click)="startEdit()"
+  >
+    <span class="mk-inline-edit__text">{{ displayText() || placeholder() }}</span>
+    @if (!isDisabled()) {
+      <svg
+        class="mk-inline-edit__pencil"
+        viewBox="0 0 16 16"
+        width="14"
+        height="14"
+        aria-hidden="true"
+        focusable="false"
+      >
+        <path
+          d="M11.5 1.5l3 3L5 14l-3.5.5L2 11l9.5-9.5z"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="1.3"
+          stroke-linejoin="round"
+        />
+      </svg>
+    }
+  </button>
+}

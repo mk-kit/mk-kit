@@ -23,6 +23,7 @@ import {
   MkSkeleton,
   MkSpinner,
   MkStatCard,
+  MkInlineEdit,
   MkTable,
   MkTableRowDetail,
   MkTag,
@@ -71,6 +72,7 @@ interface DemoUser {
     MkSkeleton,
     MkSpinner,
     MkStatCard,
+    MkInlineEdit,
     MkTable,
     MkTableRowDetail,
     MkTag,
@@ -792,6 +794,21 @@ interface DemoUser {
         </mk-table>
       </docs-example>
 
+      <h2>Inline edit</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-inline-edit&gt;</code> turns text into a
+        click-to-edit field: click (or focus + Enter) to edit, Enter or blur
+        saves, Escape reverts. Add <code class="docs-inline">multiline</code> for
+        a textarea. Its model is a <code class="docs-inline">string</code>.
+      </p>
+      <docs-example [code]="inlineEditCode" [column]="true">
+        <div style="display: grid; gap: var(--mk-space-3); max-width: 22rem;">
+          <mk-inline-edit [(value)]="editTitle" ariaLabel="Edit title" />
+          <mk-inline-edit multiline [(value)]="editNotes" ariaLabel="Edit notes" />
+          <p class="echo">Title: {{ editTitle() || '—' }}</p>
+        </div>
+      </docs-example>
+
       <h2>Description list</h2>
       <p>
         <code class="docs-inline">&lt;mk-description-list&gt;</code> renders a
@@ -1013,6 +1030,12 @@ published: true`;
   protected onRowClick(row: DemoUser): void {
     this.tableStatus.set(`clicked ${row.name}`);
   }
+
+  // ----- Inline edit ---------------------------------------------------
+  protected readonly editTitle = signal('Q3 marketing plan');
+  protected readonly editNotes = signal('Draft — review before sending.');
+  protected readonly inlineEditCode = `<mk-inline-edit [(value)]="title" />
+<mk-inline-edit multiline [(value)]="notes" />`;
 
   // ----- Expandable rows ----------------------------------------------
   protected readonly expandedRows = signal<DemoUser[]>([]);

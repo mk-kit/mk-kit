@@ -8,6 +8,9 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-inline-edit`** — click-to-edit text: the display swaps to an input on
+  click (or Enter/Space), Enter or blur saves, Escape reverts. `multiline`
+  textarea variant, `saveOnBlur`, `(saved)` / `(cancelled)`; CVA over `string`.
 - **`mk-tag-input`** — a freeform token/chip input: type and press Enter (or a
   separator) to add a removable chip, Backspace on an empty field removes the
   last, and pasting a delimited string adds several. CVA over `string[]`;

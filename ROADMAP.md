@@ -179,8 +179,8 @@ existing primitive it would reuse. Priorities as before.
 - ✅ **`mk-tag-input`** — freeform token/chip input (create-on-Enter/separator,
   paste-split, Backspace-removes), CVA over `string[]`, reuses `MkChip`; `max` /
   `allowDuplicates` / `addOnBlur` (shipped).
-- **P1 `mkEditable` / `mk-inline-edit`** — click text to edit in place, with
-  save/cancel/Escape and a pending state. Ubiquitous in admin tables & detail views.
+- ✅ **`mk-inline-edit`** — click text to edit in place; Enter/blur saves,
+  Escape reverts, `multiline` textarea, CVA over string (shipped).
 - **P2 `mk-password-input`** — reveal toggle + strength meter + optional rules
   checklist. Auth/settings forms.
 

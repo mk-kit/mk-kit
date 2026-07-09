@@ -19,6 +19,7 @@ export * from './spinner';
 export * from './charts';
 export * from './skeleton';
 export * from './table';
+export * from './inline-edit';
 export * from './sort';
 export * from './description-list';
 export * from './code';
