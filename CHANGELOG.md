@@ -6,6 +6,8 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+## [0.1.6] — 2026-07-09
+
 ### Added
 
 - **`mkRipple`** — a Material-style press ripple for any surface (button, list
@@ -139,7 +141,8 @@ Initial private release as `@mkornas/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.1.5...HEAD
+[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.1.6...HEAD
+[0.1.6]: https://github.com/mkornas/mk-kit/compare/v0.1.5...v0.1.6
 [0.1.5]: https://github.com/mkornas/mk-kit/compare/v0.1.4...v0.1.5
 [0.1.4]: https://github.com/mkornas/mk-kit/compare/v0.1.3...v0.1.4
 [0.1.3]: https://github.com/mkornas/mk-kit/compare/v0.1.2...v0.1.3
