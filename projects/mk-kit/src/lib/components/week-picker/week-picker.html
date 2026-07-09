@@ -1,0 +1,75 @@
+<div #field class="mk-week-picker__field">
+  <button
+    #trigger
+    type="button"
+    class="mk-week-picker__trigger"
+    [id]="triggerId"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+  >
+    @if (displayLabel()) {
+      <span class="mk-week-picker__value">{{ displayLabel() }}</span>
+    } @else {
+      <span class="mk-week-picker__value mk-week-picker__value--placeholder">{{
+        placeholder()
+      }}</span>
+    }
+    <svg
+      class="mk-week-picker__icon"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      aria-hidden="true"
+    >
+      <rect x="3" y="4" width="18" height="17" rx="2" />
+      <path d="M3 9h18M8 2v4M16 2v4" />
+    </svg>
+  </button>
+
+  @if (showClear()) {
+    <button
+      type="button"
+      class="mk-week-picker__clear"
+      aria-label="Clear week"
+      (click)="clear()"
+    >
+      <span class="mk-week-picker__clear-icon" aria-hidden="true"></span>
+    </button>
+  }
+</div>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-week-picker__panel"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    (dismiss)="close()"
+    [id]="panelId"
+    role="dialog"
+    aria-label="Choose week"
+  >
+    <mk-calendar
+      [value]="calendarValue()"
+      [rangeMode]="true"
+      [rangeStart]="highlightStart()"
+      [rangeEnd]="highlightEnd()"
+      (dateSelected)="onPick($event)"
+      (dateHovered)="onHover($event)"
+      [min]="min()"
+      [max]="max()"
+      [firstDayOfWeek]="firstDayOfWeek()"
+      [size]="effectiveSize()"
+    />
+  </div>
+}

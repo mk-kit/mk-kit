@@ -8,6 +8,11 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-week-picker`** — pick a whole calendar week from the popover calendar;
+  hovering a day previews its entire week, clicking selects it. Value is an
+  `MkWeek` (`{ start, end }`, aligned to `firstDayOfWeek`); `showWeekNumber`
+  prefixes the ISO week. `mk-calendar` gained a `(dateHovered)` output and
+  date-utils gained `startOfWeek` / `endOfWeek` / `getISOWeek`.
 - **`mkScrollspy`** — a directive that tracks which section is in view and
   exposes its `id` (via `activeId()` / `(activeChange)`), so a table of contents
   can highlight the current link. `root` and `offset` inputs; activates the last

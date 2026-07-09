@@ -103,7 +103,9 @@ live-announcer core.
 ### Pickers
 - ✅ **Month / year picker** (`mk-month-picker`, `mode="month" | "year"`) — compact
   field + top-layer popover; 12-month / 12-year grid, roving keyboard nav (shipped).
-- **P3 Week picker** (reuse `calendar`), **P3 mini inline date**.
+- ✅ **Week picker** (`mk-week-picker`) — pick a whole week from the calendar
+  popover; hover previews the week, `MkWeek` `{start, end}` value, ISO week
+  number option (shipped). **P3 mini inline date** remaining.
 
 ---
 
@@ -142,7 +144,7 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
-1. **Week picker** + mini inline date — remaining picker P3s.
-2. **Intersection / lazy-load / infinite-scroll** directives — remaining P2 utilities.
+1. **Intersection / lazy-load / infinite-scroll** directives — remaining P2 utilities.
+2. **Mini inline date** — remaining picker P3.
 3. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
    high-contrast theme, heatmap/scatter charts).

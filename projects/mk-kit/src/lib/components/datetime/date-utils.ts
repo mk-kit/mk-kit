@@ -126,6 +126,38 @@ export function startOfDay(date: Date): Date {
   return new Date(date.getFullYear(), date.getMonth(), date.getDate());
 }
 
+/**
+ * The first day of the week containing `date`, at midnight. `firstDayOfWeek`
+ * is the week's starting weekday (0 = Sunday … 6 = Saturday).
+ */
+export function startOfWeek(date: Date, firstDayOfWeek = 0): Date {
+  const start = startOfDay(date);
+  const diff = (start.getDay() - firstDayOfWeek + 7) % 7;
+  return addDays(start, -diff);
+}
+
+/** The last day of the week containing `date`, at midnight. */
+export function endOfWeek(date: Date, firstDayOfWeek = 0): Date {
+  return addDays(startOfWeek(date, firstDayOfWeek), 6);
+}
+
+/**
+ * ISO-8601 week number (1–53) of `date`. Weeks start on Monday and week 1 is
+ * the week containing the first Thursday of the year.
+ */
+export function getISOWeek(date: Date): number {
+  // Shift to the Thursday of this ISO week, then count weeks from Jan 1.
+  const d = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+  const day = (d.getDay() + 6) % 7; // Monday = 0 … Sunday = 6
+  d.setDate(d.getDate() - day + 3);
+  const firstThursday = new Date(d.getFullYear(), 0, 4);
+  const firstDay = (firstThursday.getDay() + 6) % 7;
+  firstThursday.setDate(firstThursday.getDate() - firstDay + 3);
+  return (
+    1 + Math.round((d.getTime() - firstThursday.getTime()) / (7 * 86400000))
+  );
+}
+
 /** True when `a` is strictly before `b` (full timestamp comparison). */
 export function isBefore(a: Date, b: Date): boolean {
   return a.getTime() < b.getTime();

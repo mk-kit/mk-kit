@@ -101,6 +101,12 @@ export class MkCalendar {
 
   /** Emitted whenever a (non-disabled) day is activated. */
   readonly dateSelected = output<Date>();
+  /**
+   * Emitted (in range mode) as the pointer hovers days — the hovered day, or
+   * `null` on leave. Lets hosts preview a selection (e.g. a whole-week
+   * highlight in `mk-week-picker`).
+   */
+  readonly dateHovered = output<Date | null>();
 
   /** id of the visible month/year label — wire as the grid's label. */
   readonly labelId = mkUniqueId('mk-calendar-label');
@@ -225,11 +231,16 @@ export class MkCalendar {
   }
 
   protected onHover(d: Date): void {
-    if (this.rangeMode()) this.hoveredDate.set(startOfDay(d));
+    if (!this.rangeMode()) return;
+    const day = startOfDay(d);
+    this.hoveredDate.set(day);
+    this.dateHovered.emit(day);
   }
 
   protected clearHover(): void {
-    if (this.rangeMode()) this.hoveredDate.set(null);
+    if (!this.rangeMode()) return;
+    this.hoveredDate.set(null);
+    this.dateHovered.emit(null);
   }
 
   protected prevMonth(): void {

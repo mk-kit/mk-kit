@@ -5,7 +5,9 @@ import {
   MkDateRangePicker,
   MkMonthPicker,
   MkTimePicker,
+  MkWeekPicker,
   type MkDateRange,
+  type MkWeek,
   formatDate,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
@@ -19,7 +21,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-date-time-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker],
+  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker],
   template: `
     <div class="docs-page docs-container">
       <h1>Date &amp; time</h1>
@@ -241,6 +243,48 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- WEEK PICKER -->
+      <!-- ============================================================ -->
+      <h2>Week picker</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-week-picker&gt;</code> selects a whole
+        calendar week from the popover calendar — hover a day to preview its week,
+        click to select. Its model is an
+        <code class="docs-inline">MkWeek</code> —
+        <code class="docs-inline">&#123; start: Date; end: Date &#125;</code>,
+        aligned to <code class="docs-inline">firstDayOfWeek</code>. Set
+        <code class="docs-inline">showWeekNumber</code> to prefix the ISO week.
+      </p>
+
+      <docs-example [code]="weekPickerCode" [column]="true">
+        <mk-week-picker
+          [(value)]="week"
+          [firstDayOfWeek]="1"
+          showWeekNumber
+          clearable
+        />
+        <p class="echo">Week: {{ weekLabel() }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;MkWeek | null&gt;</td><td>null</td><td>Two-way selected week (start/end, aligned to firstDayOfWeek).</td></tr>
+          <tr><td>min</td><td>Date | null</td><td>null</td><td>Earliest selectable date (inclusive).</td></tr>
+          <tr><td>max</td><td>Date | null</td><td>null</td><td>Latest selectable date (inclusive).</td></tr>
+          <tr><td>firstDayOfWeek</td><td>number (0–6)</td><td>0</td><td>First column of the week; also anchors the selected week.</td></tr>
+          <tr><td>displayFormat</td><td>string</td><td>'MMM d'</td><td>Pattern used to render each endpoint.</td></tr>
+          <tr><td>showWeekNumber</td><td>boolean</td><td>false</td><td>Prefix the label with the ISO week number.</td></tr>
+          <tr><td>placeholder</td><td>string</td><td>'Select week…'</td><td>Shown when empty.</td></tr>
+          <tr><td>clearable</td><td>boolean</td><td>false</td><td>Show a clear button when a week is selected.</td></tr>
+          <tr><td>disabled / invalid</td><td>boolean</td><td>false</td><td>Disable / force invalid styling.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -288,6 +332,14 @@ export class DateTimePage {
   // --- Month / year picker --------------------------------------------------
   protected readonly month = signal<Date | null>(null);
   protected readonly year = signal<Date | null>(null);
+
+  // --- Week picker ----------------------------------------------------------
+  protected readonly week = signal<MkWeek | null>(null);
+  protected readonly weekLabel = computed(() => {
+    const w = this.week();
+    if (!w) return '—';
+    return `${formatDate(w.start, 'MMM d')} → ${formatDate(w.end, 'MMM d, yyyy')}`;
+  });
 
   // --- Date range picker ----------------------------------------------------
   protected readonly range = signal<MkDateRange>({ start: null, end: null });
@@ -341,6 +393,10 @@ year = signal<Date | null>(null);
 
 <mk-month-picker [(value)]="month" clearable placeholder="Pick a month…" />
 <mk-month-picker mode="year" [(value)]="year" clearable placeholder="Pick a year…" />`;
+
+  protected readonly weekPickerCode = `week = signal<MkWeek | null>(null);
+
+<mk-week-picker [(value)]="week" [firstDayOfWeek]="1" showWeekNumber clearable />`;
 }
 
 /** Local midnight for today. */
