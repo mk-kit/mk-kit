@@ -9,10 +9,8 @@ common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 Driven by the **mk-cms** admin panel (schema-driven CRUD). The original blockers
 — **file-upload**, **multi-select + chips**, **JSON/code editor**,
 **popover/popconfirm** and **description-list** — plus the **block-editor ↔ HTML bridge** — are all ✅ **shipped** (details in the
-component sections below). One item remains:
-
-- **[P3] Revision diff / comparison view** — the CMS snapshots each save; a diff
-  view makes the revisions screen shine. Also listed under Data display below.
+component sections below), including the **revision diff / comparison view**
+(`mk-diff`) and the **block-editor ↔ HTML bridge**. **No blockers remain.**
 
 The **block-editor ↔ HTML bridge** shipped as `valueFormat="html"` on
 `mk-block-editor` (reads/writes an HTML string so it backs a string-typed
@@ -65,7 +63,7 @@ live-announcer core.
 - ✅ **Avatar group** (`mk-avatar-group`) — overlapped avatars with "+N" overflow (shipped).
 - ✅ **Code block** (`mk-code`) — themed read-only block, highlight + copy (shipped).
 - ✅ **Carousel** (`mk-carousel`) — accessible slides/gallery (shipped).
-- **P3 Comparison / diff view**, **P3 QR/barcode**.
+- ✅ **Comparison / diff view** (`mk-diff`) — LCS line diff + word highlighting, unified/split (shipped). **P3 QR/barcode** remaining.
 
 ### Charts (extend the module)
 - **P2 Horizontal bar** + **stacked area** variants.

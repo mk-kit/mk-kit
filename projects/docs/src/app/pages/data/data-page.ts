@@ -6,6 +6,7 @@ import {
   MkCarousel,
   MkCarouselSlide,
   MkCode,
+  MkDiff,
   MkVirtualScroll,
   MkCard,
   MkCardFooter,
@@ -54,6 +55,7 @@ interface DemoUser {
     MkVirtualScroll,
     MkCarousel,
     MkCarouselSlide,
+    MkDiff,
     MkCard,
     MkCardFooter,
     MkCardHeader,
@@ -832,6 +834,21 @@ interface DemoUser {
           </mk-carousel>
         </div>
       </docs-example>
+
+      <h2>Diff</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-diff&gt;</code> compares two versions of
+        text (a revision "before → after") with an LCS line diff and intra-line
+        word highlighting. Render <code class="docs-inline">unified</code>
+        (single column, +/−) or <code class="docs-inline">split</code>
+        (side-by-side).
+      </p>
+      <docs-example [code]="diffCode" [column]="true">
+        <div style="display: flex; flex-direction: column; gap: var(--mk-space-4); width: 100%;">
+          <mk-diff [before]="diffBefore" [after]="diffAfter" />
+          <mk-diff [before]="diffBefore" [after]="diffAfter" mode="split" beforeLabel="v3" afterLabel="v4" />
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -867,6 +884,18 @@ export class DataPage {
   <div mkCarouselSlide>…</div>
   <div mkCarouselSlide>…</div>
 </mk-carousel>`;
+
+  protected readonly diffBefore = `title: Getting started
+theme: light
+retries: 3
+Draft the quick brown fox.`;
+  protected readonly diffAfter = `title: Getting started
+theme: dark
+retries: 5
+Draft the slow brown fox.
+published: true`;
+  protected readonly diffCode = `<mk-diff [before]="v1" [after]="v2" />
+<mk-diff [before]="v1" [after]="v2" mode="split" />`;
 
   protected readonly descListCode = `<mk-description-list divided>
   <mk-desc-item term="Status"><mk-badge tone="success">Active</mk-badge></mk-desc-item>
