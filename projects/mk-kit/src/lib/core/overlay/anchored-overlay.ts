@@ -165,8 +165,6 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   readonly dismiss = output<void>();
 
   private popover = false;
-  private placeholder?: Comment;
-  private originalParent: Node | null = null;
 
   private readonly onReposition = () => this.position();
   private readonly onDocPointerdown = (e: Event) => {
@@ -181,14 +179,6 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   ngAfterViewInit(): void {
     if (!this.isBrowser) return;
     const el = this.host.nativeElement;
-
-    // Leave a placeholder so Angular can remove the node from its original
-    // parent on destroy (we move it back there in ngOnDestroy).
-    this.originalParent = el.parentNode;
-    if (this.originalParent) {
-      this.placeholder = this.document.createComment('mk-anchored-panel');
-      this.originalParent.insertBefore(this.placeholder, el);
-    }
 
     el.style.position = 'fixed';
     el.style.margin = '0';
@@ -301,11 +291,11 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
       el.removeAttribute('popover');
     }
 
-    // Move the node back beside its placeholder so Angular's own DOM removal
-    // (which targets the original parent) finds it where it expects.
-    if (this.placeholder?.parentNode) {
-      this.placeholder.parentNode.insertBefore(el, this.placeholder);
-      this.placeholder.remove();
-    }
+    // Remove the teleported node ourselves. It was moved out of the component's
+    // view into `document.body`, so Angular's view teardown removes it by
+    // reference (`node.remove()`); re-inserting it anywhere would orphan a
+    // detached copy, leaking one panel per open/close cycle. A plain remove is
+    // idempotent whichever teardown step runs first.
+    el.remove();
   }
 }

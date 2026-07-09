@@ -1,4 +1,11 @@
-import { mkComputeAnchoredPosition } from './anchored-overlay';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  provideZonelessChangeDetection,
+  signal,
+} from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { MkAnchoredPanel, mkComputeAnchoredPosition } from './anchored-overlay';
 
 /** Build a rect-like object from top/left/width/height. */
 function rect(top: number, left: number, width: number, height: number) {
@@ -62,5 +69,69 @@ describe('mkComputeAnchoredPosition', () => {
     // Preferred top = 10 - 40 - 8 = -38 → clamped to gap (8). Stays 'top'.
     expect(pos.top).toBe(8);
     expect(pos.placement).toBe('top');
+  });
+});
+
+@Component({
+  selector: 'mk-anchored-host',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkAnchoredPanel],
+  template: `
+    <button #trigger>trigger</button>
+    @if (open()) {
+      <div class="panel" mkAnchoredPanel [mkAnchoredPanelFor]="trigger">panel</div>
+    }
+  `,
+})
+class AnchoredHost {
+  readonly open = signal(false);
+}
+
+describe('MkAnchoredPanel (directive lifecycle)', () => {
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+  });
+
+  function panelCount(): number {
+    return document.querySelectorAll('.panel').length;
+  }
+
+  it('teleports the panel into a document.body top-layer portal when open', async () => {
+    const fixture = TestBed.createComponent(AnchoredHost);
+    fixture.detectChanges();
+    expect(panelCount()).toBe(0);
+
+    fixture.componentInstance.open.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const panel = document.querySelector('.panel') as HTMLElement;
+    expect(panel).toBeTruthy();
+    expect(panel.parentElement).toBe(document.body);
+    expect(panel.style.position).toBe('fixed');
+
+    fixture.destroy();
+    expect(panelCount()).toBe(0);
+  });
+
+  it('leaves no orphaned panel behind across repeated open/close cycles', async () => {
+    const fixture = TestBed.createComponent(AnchoredHost);
+    fixture.detectChanges();
+
+    for (let i = 0; i < 4; i++) {
+      fixture.componentInstance.open.set(true);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      fixture.componentInstance.open.set(false);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      // The teleported node must be fully removed — not moved back into the
+      // component view — so nothing accumulates in the DOM.
+      expect(panelCount()).toBe(0);
+    }
+
+    fixture.destroy();
   });
 });
