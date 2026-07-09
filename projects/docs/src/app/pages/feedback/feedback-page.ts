@@ -11,6 +11,8 @@ import {
   MkDialog,
   MkDialogService,
   MkDialogTitle,
+  MkLoadingBar,
+  MkLoadingBarService,
   MkOverlayRef,
   MkPopconfirm,
   MkPopconfirmTrigger,
@@ -77,6 +79,7 @@ export class DemoDialogContent {
     MkPopoverTrigger,
     MkPopconfirm,
     MkPopconfirmTrigger,
+    MkLoadingBar,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -271,6 +274,23 @@ export class DemoDialogContent {
           </tr>
         </tbody>
       </table>
+
+      <!-- ============================ LOADING BAR ============================ -->
+      <mk-loading-bar />
+      <h2>Top loading bar</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-loading-bar&gt;</code> is a thin progress
+        bar fixed to the top of the viewport, driven by
+        <code class="docs-inline">MkLoadingBarService</code> — hook it to router
+        events for route progress. Watch the very top of the page:
+      </p>
+      <docs-example [code]="loadingBarCode" [column]="true">
+        <div style="display: flex; gap: var(--mk-space-2); flex-wrap: wrap;">
+          <button mkButton variant="outline" size="sm" (click)="loadingBar.start()">start()</button>
+          <button mkButton variant="outline" size="sm" (click)="loadingBar.set(60)">set(60)</button>
+          <button mkButton variant="outline" size="sm" (click)="loadingBar.complete()">complete()</button>
+        </div>
+      </docs-example>
 
       <!-- ============================ BANNER ============================ -->
       <h2>Banner</h2>
@@ -620,6 +640,14 @@ export class DemoDialogContent {
 export class FeedbackPage {
   private readonly toast = inject(MkToastService);
   private readonly dialog = inject(MkDialogService);
+  protected readonly loadingBar = inject(MkLoadingBarService);
+  protected readonly loadingBarCode = `// Place once (e.g. in the app shell):
+// <mk-loading-bar />
+const bar = inject(MkLoadingBarService);
+router.events.subscribe(e => {
+  if (e instanceof NavigationStart) bar.start();
+  if (e instanceof NavigationEnd) bar.complete();
+});`;
 
   protected readonly alertVisible = signal(true);
   protected readonly confirmResult = signal<boolean | null>(null);

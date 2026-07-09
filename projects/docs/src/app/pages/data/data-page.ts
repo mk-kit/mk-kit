@@ -7,6 +7,7 @@ import {
   MkCarouselSlide,
   MkCode,
   MkDiff,
+  MkSkeletonPreset,
   MkVirtualScroll,
   MkCard,
   MkCardFooter,
@@ -56,6 +57,7 @@ interface DemoUser {
     MkCarousel,
     MkCarouselSlide,
     MkDiff,
+    MkSkeletonPreset,
     MkCard,
     MkCardFooter,
     MkCardHeader,
@@ -849,6 +851,21 @@ interface DemoUser {
           <mk-diff [before]="diffBefore" [after]="diffAfter" mode="split" beforeLabel="v3" afterLabel="v4" />
         </div>
       </docs-example>
+
+      <h2>Skeleton presets</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-skeleton-preset&gt;</code> assembles
+        ready-made loading layouts — <code class="docs-inline">paragraph</code>,
+        <code class="docs-inline">card</code>, <code class="docs-inline">list</code>
+        or <code class="docs-inline">table</code> — from the skeleton primitive.
+      </p>
+      <docs-example [code]="skeletonPresetCode" [column]="true">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--mk-space-6); width: 100%;">
+          <mk-skeleton-preset preset="card" />
+          <mk-skeleton-preset preset="list" [rows]="3" />
+          <mk-skeleton-preset preset="table" [rows]="3" [columns]="4" />
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -896,6 +913,9 @@ Draft the slow brown fox.
 published: true`;
   protected readonly diffCode = `<mk-diff [before]="v1" [after]="v2" />
 <mk-diff [before]="v1" [after]="v2" mode="split" />`;
+  protected readonly skeletonPresetCode = `<mk-skeleton-preset preset="card" />
+<mk-skeleton-preset preset="list" [rows]="3" />
+<mk-skeleton-preset preset="table" [rows]="3" [columns]="4" />`;
 
   protected readonly descListCode = `<mk-description-list divided>
   <mk-desc-item term="Status"><mk-badge tone="success">Active</mk-badge></mk-desc-item>

@@ -52,7 +52,7 @@ live-announcer core.
 - ✅ **OTP / PIN input** (`mk-otp`) — segmented one-time-code field (shipped).
 - ✅ **Color picker** (`mk-color-picker`) — swatch + hex + native OS picker (shipped).
 - ✅ **Textarea autosize** (`mkAutosize`) — grow-with-content directive (shipped).
-- **P3 Range slider** — two-thumb variant of `mk-slider`.
+- ✅ **Range slider** (`mk-range-slider`) — two-thumb `[low,high]` variant (shipped).
 - **P3 Form error summary** — aggregated, linkable validation list.
 
 ### Data display
@@ -88,8 +88,8 @@ live-announcer core.
 - ✅ **Popover** (`mk-popover`) + **popconfirm** (`mk-popconfirm`) — rich non-text
   floating panel + inline confirm, top-layer via `MkAnchoredPanel` (shipped).
 - ✅ **Banner** (`mk-banner`) — persistent page/section notice, tone + actions + dismiss (shipped).
-- **P2 Top loading bar** — route-level progress (YouTube/GitHub style).
-- **P2 Skeleton presets** — text/paragraph/card/table skeleton shapes.
+- ✅ **Top loading bar** (`mk-loading-bar` + `MkLoadingBarService`) — route-level progress (shipped).
+- ✅ **Skeleton presets** (`mk-skeleton-preset`) — paragraph/card/list/table layouts (shipped).
 
 ### Directives / utilities
 - ✅ **clickOutside** (`mkClickOutside`) + **copy-to-clipboard**
@@ -137,7 +137,6 @@ Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
 1. **Month/year/week pickers** (reuse `calendar`) — highest-value remaining P2.
-2. **Expandable table rows**, **skeleton presets**, **top loading bar**,
-   **scrollspy**.
-3. RTL audit + density mode; then P3 polish (range slider, QR, ripple,
-   theme-builder, high-contrast theme).
+2. **Expandable table rows** and **scrollspy** — remaining structural P2s.
+3. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
+   high-contrast theme, heatmap/scatter charts).

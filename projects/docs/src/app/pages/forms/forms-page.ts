@@ -15,6 +15,8 @@ import {
   MkNumberInput,
   MkOtp,
   MkRadio,
+  MkRangeSlider,
+  type MkRange,
   MkRadioGroup,
   MkRating,
   MkSelect,
@@ -50,6 +52,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkOtp,
     MkAutosize,
     MkColorPicker,
+    MkRangeSlider,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -469,6 +472,19 @@ import { DocsExample } from '../../shared/docs-example';
         <mk-color-picker [(value)]="brand" [swatches]="palette" />
         <p class="echo">Value: <code class="docs-inline">{{ brand() }}</code></p>
       </docs-example>
+
+      <h2>Range slider</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-range-slider&gt;</code> selects a
+        <code class="docs-inline">[low, high]</code> range with two thumbs (each a
+        <code class="docs-inline">role="slider"</code>); the thumbs can't cross.
+      </p>
+      <docs-example [code]="rangeCode" [column]="true">
+        <div style="max-width: 26rem; width: 100%;">
+          <mk-range-slider [min]="0" [max]="1000" [step]="10" [(value)]="priceRange" />
+          <p class="echo">Range: {{ priceRange()[0] }} – {{ priceRange()[1] }}</p>
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -539,6 +555,8 @@ export class FormsPage {
 
   protected readonly ratingCode = `<mk-rating [(value)]="score" />`;
   protected readonly colorCode = `<mk-color-picker [(value)]="brand" [swatches]="palette" />`;
+  protected readonly priceRange = signal<MkRange>([200, 750]);
+  protected readonly rangeCode = `<mk-range-slider [min]="0" [max]="1000" [step]="10" [(value)]="priceRange" />`;
   protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
   protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
   protected readonly autosizeCode = `<textarea mkInput mkAutosize [mkAutosizeMaxRows]="8"

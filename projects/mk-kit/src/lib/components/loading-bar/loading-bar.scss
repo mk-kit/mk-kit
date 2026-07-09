@@ -1,0 +1,28 @@
+:host {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: var(--mk-z-toast, 1400);
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-loading-bar--active) {
+  opacity: 1;
+}
+
+.mk-loading-bar__fill {
+  height: 100%;
+  width: 0;
+  background-color: var(--mk-primary);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--mk-primary) 60%, transparent);
+  transition: width var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .mk-loading-bar__fill {
+    transition: none;
+  }
+}

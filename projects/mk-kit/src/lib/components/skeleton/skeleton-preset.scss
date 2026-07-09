@@ -1,0 +1,30 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-3);
+  width: 100%;
+}
+
+.mk-skeleton-preset__row {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+}
+.mk-skeleton-preset__lines {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+}
+
+.mk-skeleton-preset__thead,
+.mk-skeleton-preset__trow {
+  display: grid;
+  gap: var(--mk-space-3);
+  align-items: center;
+}
+.mk-skeleton-preset__thead {
+  padding-bottom: var(--mk-space-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}

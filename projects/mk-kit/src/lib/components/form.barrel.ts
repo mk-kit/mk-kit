@@ -18,3 +18,4 @@ export * from './radio';
 export * from './switch';
 export * from './slider';
 export * from './color-picker';
+export * from './range-slider';
