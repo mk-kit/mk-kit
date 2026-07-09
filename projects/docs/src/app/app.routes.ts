@@ -168,5 +168,11 @@ export const routes: Routes = [
         (m) => m.NavigationPage,
       ),
   },
+  {
+    path: 'components/utilities',
+    title: 'Utilities — mk-kit',
+    loadComponent: () =>
+      import('./pages/utilities/utilities-page').then((m) => m.UtilitiesPage),
+  },
   { path: '**', redirectTo: 'introduction' },
 ];

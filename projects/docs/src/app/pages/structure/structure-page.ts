@@ -6,6 +6,7 @@ import {
   MkFormField,
   MkInput,
   MkPageHeader,
+  MkSplitter,
   MkToolbar,
 } from '@mkornas/ui';
 import { FormsModule } from '@angular/forms';
@@ -24,6 +25,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkPageHeader,
     MkToolbar,
     MkDrawer,
+    MkSplitter,
     MkButton,
     MkBadge,
     MkFormField,
@@ -116,6 +118,38 @@ import { DocsExample } from '../../shared/docs-example';
         <p>Put an <code class="docs-inline">mk-nav-list</code> here for a mobile menu.</p>
         <p style="color: var(--mk-text-muted);">Keyword bound from the other drawer: {{ keyword() || '—' }}</p>
       </mk-drawer>
+
+      <h2>Splitter</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-splitter&gt;</code> gives two resizable
+        panes with a draggable, keyboard-operable separator (ARIA
+        <code class="docs-inline">separator</code>). Drag the handle, or focus it
+        and use Arrow keys (Home/End jump to the bounds). Project the panes with
+        <code class="docs-inline">mkSplitterStart</code> /
+        <code class="docs-inline">mkSplitterEnd</code>.
+      </p>
+      <docs-example [code]="splitterCode" [column]="true">
+        <mk-splitter
+          [(size)]="splitPos"
+          [min]="20"
+          [max]="80"
+          style="height: 12rem; border: var(--mk-border-width) solid var(--mk-border);
+                 border-radius: var(--mk-radius-md); overflow: hidden;"
+        >
+          <div mkSplitterStart style="padding: var(--mk-space-3); background: var(--mk-surface-2);">
+            <strong>Sidebar</strong>
+            <p style="color: var(--mk-text-muted); font-size: var(--mk-font-size-sm);">
+              {{ splitPos() }}% wide
+            </p>
+          </div>
+          <div mkSplitterEnd style="padding: var(--mk-space-3);">
+            <strong>Content</strong>
+            <p style="color: var(--mk-text-muted); font-size: var(--mk-font-size-sm);">
+              Drag the divider, or Tab to it and use Arrow / Home / End.
+            </p>
+          </div>
+        </mk-splitter>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -138,6 +172,12 @@ export class StructurePage {
   protected readonly endOpen = signal(false);
   protected readonly startOpen = signal(false);
   protected readonly keyword = signal('');
+  protected readonly splitPos = signal(35);
+
+  protected readonly splitterCode = `<mk-splitter [(size)]="splitPos" [min]="20" [max]="80">
+  <div mkSplitterStart>Sidebar</div>
+  <div mkSplitterEnd>Content</div>
+</mk-splitter>`;
 
   protected readonly pageHeaderCode = `<mk-page-header heading="Articles"
   description="Create, edit and publish your posts.">

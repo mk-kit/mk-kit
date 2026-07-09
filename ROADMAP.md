@@ -71,8 +71,8 @@ live-announcer core.
 - **P3 Form error summary** — aggregated, linkable validation list.
 
 ### Data display
-- **P1 Description list** (`mk-description-list`) — key/value pairs (entity detail
-  panels); trivial but ubiquitous in dashboards.
+- ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value
+  pairs for entity-detail panels; grid/stacked, rich values (shipped).
 - **P1 Virtual scroll** — windowed rendering for long lists/tables (perf).
 - **P2 Expandable / nested table rows** — detail rows + row grouping.
 - **P2 Avatar group** — overlapped avatars with "+N" overflow.
@@ -92,7 +92,8 @@ live-announcer core.
 - ✅ **Command palette** (`mk-command-palette`, ⌘K) — filtered, grouped action
   menu (shipped).
 - ✅ **Nav group** (`mk-nav-group`) — collapsible sidebar sections (shipped).
-- **P1 Split panes / resizable layout** (`mk-splitter`) — dashboard panel resize.
+- ✅ **Split panes / resizable layout** (`mk-splitter`) — two panes, draggable +
+  keyboard ARIA separator, horizontal/vertical (shipped).
 - **P2 FAB / speed-dial**, **P2 scrollspy**, **P2 back-to-top**.
 - **P3 Scroll-area** — cross-browser custom scrollbar container.
 
@@ -104,8 +105,10 @@ live-announcer core.
 - **P2 Skeleton presets** — text/paragraph/card/table skeleton shapes.
 
 ### Directives / utilities
-- **P1 clickOutside**, **P1 copy-to-clipboard**, **P2 intersection/lazy-load**,
-  **P2 autofocus**, **P2 infinite-scroll**, **P3 ripple**.
+- ✅ **clickOutside** (`mkClickOutside`) + **copy-to-clipboard**
+  (`mkCopyToClipboard`) — shipped; docs at `/components/utilities`.
+- **P2 intersection/lazy-load**, **P2 autofocus**, **P2 infinite-scroll**,
+  **P3 ripple**.
 
 ### Pickers
 - **P2 Month / year / week pickers** (reuse `calendar`), **P3 mini inline date**.

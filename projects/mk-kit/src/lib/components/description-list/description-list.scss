@@ -1,0 +1,54 @@
+:host {
+  display: block;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-description-list__dl {
+  margin: 0;
+}
+
+/* Grid: term column + value column, aligned across all rows. */
+.mk-description-list__dl[data-layout='grid'] {
+  display: grid;
+  grid-template-columns: minmax(6rem, max-content) 1fr;
+  gap: var(--mk-space-2) var(--mk-space-4);
+  align-items: baseline;
+}
+
+/* Stacked: term above value, one block per pair. */
+.mk-description-list__dl[data-layout='stacked'] {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-3);
+}
+.mk-description-list__dl[data-layout='stacked'] .mk-description-list__details {
+  margin-top: var(--mk-space-1);
+}
+
+.mk-description-list__term {
+  margin: 0;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-medium);
+  color: var(--mk-text-muted);
+}
+
+.mk-description-list__details {
+  margin: 0;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  min-width: 0;
+  overflow-wrap: break-word;
+}
+
+/* Row dividers */
+.mk-description-list__dl--divided[data-layout='grid'] .mk-description-list__term,
+.mk-description-list__dl--divided[data-layout='grid']
+  .mk-description-list__details {
+  padding-bottom: var(--mk-space-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+.mk-description-list__dl--divided[data-layout='stacked']
+  .mk-description-list__details {
+  padding-bottom: var(--mk-space-3);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}

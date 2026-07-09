@@ -20,3 +20,4 @@ export * from './charts';
 export * from './skeleton';
 export * from './table';
 export * from './sort';
+export * from './description-list';

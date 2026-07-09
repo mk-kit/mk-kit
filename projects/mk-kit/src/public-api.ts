@@ -15,3 +15,4 @@ export * from './lib/components/context-menu.barrel';
 export * from './lib/components/datetime.barrel';
 export * from './lib/components/dnd.barrel';
 export * from './lib/components/block-editor.barrel';
+export * from './lib/components/directives.barrel';

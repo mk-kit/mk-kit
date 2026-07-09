@@ -8,6 +8,8 @@ import {
   MkCardHeader,
   MkCardTitle,
   MkChip,
+  MkDescItem,
+  MkDescriptionList,
   MkDivider,
   MkList,
   MkListItem,
@@ -42,6 +44,8 @@ interface DemoUser {
     MkAvatar,
     MkAvatarGroup,
     MkBadge,
+    MkDescriptionList,
+    MkDescItem,
     MkCard,
     MkCardFooter,
     MkCardHeader,
@@ -744,6 +748,25 @@ interface DemoUser {
         <code class="docs-inline">width</code> and a
         <code class="docs-inline">format</code> callback.
       </p>
+
+      <h2>Description list</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-description-list&gt;</code> renders a
+        semantic <code class="docs-inline">&lt;dl&gt;</code> of term/detail pairs
+        for entity-detail and metadata panels. Values may be rich content;
+        <code class="docs-inline">grid</code> aligns terms in a column,
+        <code class="docs-inline">stacked</code> puts each term above its value.
+      </p>
+      <docs-example [code]="descListCode" [column]="true">
+        <mk-description-list [divided]="true" style="max-width: 30rem;">
+          <mk-desc-item term="Status">
+            <mk-badge tone="success">Active</mk-badge>
+          </mk-desc-item>
+          <mk-desc-item term="Owner">Ada Lovelace</mk-desc-item>
+          <mk-desc-item term="Plan">Enterprise · 24 seats</mk-desc-item>
+          <mk-desc-item term="Created">Jul 1, 2026</mk-desc-item>
+        </mk-description-list>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -758,6 +781,12 @@ interface DemoUser {
   ],
 })
 export class DataPage {
+  protected readonly descListCode = `<mk-description-list divided>
+  <mk-desc-item term="Status"><mk-badge tone="success">Active</mk-badge></mk-desc-item>
+  <mk-desc-item term="Owner">Ada Lovelace</mk-desc-item>
+  <mk-desc-item term="Plan">Enterprise · 24 seats</mk-desc-item>
+</mk-description-list>`;
+
   // ----- Chip filters --------------------------------------------------
   protected readonly filters = ['Open', 'In progress', 'Closed'];
   protected readonly selectedFilters = signal<string[]>(['Open']);

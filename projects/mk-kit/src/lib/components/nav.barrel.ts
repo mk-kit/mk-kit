@@ -18,3 +18,4 @@ export * from './drawer';
 export * from './toolbar';
 export * from './page-header';
 export * from './command-palette';
+export * from './splitter';

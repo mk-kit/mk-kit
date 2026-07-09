@@ -1,0 +1,25 @@
+<div class="mk-splitter__pane mk-splitter__pane--start" [style.flex-basis.%]="clampedSize()">
+  <ng-content select="[mkSplitterStart]" />
+</div>
+
+<div
+  class="mk-splitter__separator"
+  role="separator"
+  tabindex="0"
+  [attr.aria-orientation]="orientation() === 'vertical' ? 'horizontal' : 'vertical'"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-valuenow]="clampedSize()"
+  [attr.aria-valuemin]="min()"
+  [attr.aria-valuemax]="max()"
+  [attr.aria-disabled]="disabled() || null"
+  (pointerdown)="onPointerdown($event)"
+  (pointermove)="onPointermove($event)"
+  (pointerup)="onPointerup($event)"
+  (keydown)="onKeydown($event)"
+>
+  <span class="mk-splitter__grip" aria-hidden="true"></span>
+</div>
+
+<div class="mk-splitter__pane mk-splitter__pane--end">
+  <ng-content select="[mkSplitterEnd]" />
+</div>
