@@ -11,16 +11,18 @@
       @if (showGrid()) {
         <line
           class="mk-chart__grid"
-          [attr.x1]="plot().x"
-          [attr.x2]="plot().x + plot().w"
-          [attr.y1]="row.y"
-          [attr.y2]="row.y"
+          [attr.x1]="row.x1"
+          [attr.x2]="row.x2"
+          [attr.y1]="row.y1"
+          [attr.y2]="row.y2"
         />
       }
       <text
-        class="mk-chart__axis-label mk-chart__axis-label--y"
-        [attr.x]="plot().x - 8"
-        [attr.y]="row.y"
+        class="mk-chart__axis-label"
+        [class.mk-chart__axis-label--y]="!horizontal()"
+        [class.mk-chart__axis-label--x]="horizontal()"
+        [attr.x]="row.labelX"
+        [attr.y]="row.labelY"
       >
         {{ row.label }}
       </text>
@@ -45,9 +47,11 @@
     <!-- Category labels -->
     @for (band of bands(); track band.label) {
       <text
-        class="mk-chart__axis-label mk-chart__axis-label--x"
-        [attr.x]="band.cx"
-        [attr.y]="height() - 10"
+        class="mk-chart__axis-label"
+        [class.mk-chart__axis-label--x]="!horizontal()"
+        [class.mk-chart__axis-label--y]="horizontal()"
+        [attr.x]="band.labelX"
+        [attr.y]="band.labelY"
       >
         {{ band.label }}
       </text>

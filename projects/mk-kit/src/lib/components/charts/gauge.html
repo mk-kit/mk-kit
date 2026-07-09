@@ -1,0 +1,35 @@
+<svg
+  class="mk-gauge__svg"
+  [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
+  preserveAspectRatio="xMidYMid meet"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path
+    class="mk-gauge__track"
+    [attr.d]="trackPath()"
+    [style.fill]="trackColor()"
+  />
+  @if (valuePath()) {
+    <path class="mk-gauge__value" [attr.d]="valuePath()" [style.fill]="color()" />
+  }
+  <text
+    class="mk-gauge__number"
+    [attr.x]="cx()"
+    [attr.y]="cy()"
+    text-anchor="middle"
+    dominant-baseline="central"
+  >
+    {{ centerText() }}
+  </text>
+  @if (label()) {
+    <text
+      class="mk-gauge__label"
+      [attr.x]="cx()"
+      [attr.y]="cy() + size() * 0.14"
+      text-anchor="middle"
+    >
+      {{ label() }}
+    </text>
+  }
+</svg>

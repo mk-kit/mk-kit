@@ -66,8 +66,10 @@ live-announcer core.
 - ✅ **Comparison / diff view** (`mk-diff`) — LCS line diff + word highlighting, unified/split (shipped). **P3 QR/barcode** remaining.
 
 ### Charts (extend the module)
-- **P2 Horizontal bar** + **stacked area** variants.
-- **P2 Gauge / radial** — single-metric dial (KPIs).
+- ✅ **Horizontal bar** (`mk-bar-chart orientation="horizontal"`) + **stacked
+  area** (`mk-line-chart stacked`) shipped.
+- ✅ **Gauge / radial** (`mk-gauge`) — single-metric KPI dial, configurable sweep
+  (shipped).
 - **P3 Heatmap**, **P3 scatter**, **P3 funnel**, **P3 radar**, **P3 treemap**.
 
 ### Navigation & layout
@@ -134,8 +136,7 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
-1. **Chart variants** (gauge/radial, horizontal bar, stacked area) and
-   **month/year/week pickers** — highest-value remaining P2 components.
+1. **Month/year/week pickers** (reuse `calendar`) — highest-value remaining P2.
 2. **Expandable table rows**, **skeleton presets**, **top loading bar**,
    **scrollspy**.
 3. RTL audit + density mode; then P3 polish (range slider, QR, ripple,

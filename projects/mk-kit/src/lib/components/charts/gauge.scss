@@ -1,0 +1,38 @@
+:host {
+  display: inline-block;
+  max-width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-gauge__svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  overflow: visible;
+}
+
+.mk-gauge__track {
+  opacity: 0.9;
+}
+
+.mk-gauge__value {
+  transition: d var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+}
+
+.mk-gauge__number {
+  fill: var(--mk-text);
+  font-size: var(--mk-font-size-xl, 1.5rem);
+  font-weight: var(--mk-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-gauge__label {
+  fill: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-gauge__value {
+    transition: none;
+  }
+}

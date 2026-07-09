@@ -28,7 +28,7 @@
 
     <!-- Areas + lines -->
     @for (r of rendered(); track r.name) {
-      @if (area()) {
+      @if (fillAreas()) {
         <path class="mk-chart__area" [attr.d]="r.area" [style.fill]="r.color" />
       }
       <path class="mk-chart__line" [attr.d]="r.line" [style.stroke]="r.color" />

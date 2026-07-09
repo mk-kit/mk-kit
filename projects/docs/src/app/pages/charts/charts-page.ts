@@ -4,6 +4,7 @@ import {
   type MkChartSlice,
   MkBarChart,
   MkDonutChart,
+  MkGauge,
   MkLineChart,
   MkProgressRing,
   MkSparkline,
@@ -24,6 +25,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkBarChart,
     MkLineChart,
     MkDonutChart,
+    MkGauge,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -89,6 +91,14 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <h3>Horizontal</h3>
+      <p>Set <code class="docs-inline">orientation="horizontal"</code> — ideal when category names are long.</p>
+      <docs-example [code]="horizontalCode" column>
+        <div style="width: 100%; max-width: 40rem;">
+          <mk-bar-chart orientation="horizontal" [categories]="channels" [series]="channelSeries" [height]="220" />
+        </div>
+      </docs-example>
+
       <!-- ============================================================ -->
       <h2>Line chart</h2>
       <p>Change over ordered categories; single or multi-series, optional area.</p>
@@ -96,6 +106,25 @@ import { DocsExample } from '../../shared/docs-example';
         <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--mk-space-5); width: 100%;">
           <mk-line-chart [categories]="months" [series]="sessions" area [height]="220" />
           <mk-line-chart [categories]="months" [series]="twoLines" showDots [height]="220" />
+        </div>
+      </docs-example>
+
+      <h3>Stacked area</h3>
+      <p>Add <code class="docs-inline">stacked</code> to fill cumulative bands (composition over time).</p>
+      <docs-example [code]="stackedAreaCode" column>
+        <div style="width: 100%; max-width: 40rem;">
+          <mk-line-chart [categories]="months" [series]="twoLines" stacked [height]="220" />
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Gauge</h2>
+      <p>A single-metric radial dial (KPI). Configurable sweep, unit and label.</p>
+      <docs-example [code]="gaugeCode" column>
+        <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: center;">
+          <mk-gauge [value]="68" unit="%" label="of quota" [size]="160" />
+          <mk-gauge [value]="4.2" [max]="5" valueText="4.2" label="rating" color="var(--mk-warning)" [size]="160" />
+          <mk-gauge [value]="82" [arc]="180" unit="%" label="uptime" color="var(--mk-success)" [size]="160" />
         </div>
       </docs-example>
 
@@ -136,6 +165,10 @@ export class ChartsPage {
     { name: 'Social', value: 210 },
     { name: 'Referral', value: 110 },
   ];
+  protected readonly channels = ['Organic search', 'Paid ads', 'Email', 'Social'];
+  protected readonly channelSeries: MkChartSeries[] = [
+    { name: 'Conversions', data: [540, 320, 260, 180] },
+  ];
 
   protected readonly sparklineCode = `<mk-sparkline [data]="trend" type="line" showDot />
 <mk-sparkline [data]="trend" type="area" color="var(--mk-success)" />
@@ -151,6 +184,15 @@ export class ChartsPage {
 
   protected readonly stackedCode = `<mk-bar-chart [categories]="quarters" [series]="twoSeries" />
 <mk-bar-chart [categories]="quarters" [series]="twoSeries" stacked />`;
+
+  protected readonly horizontalCode = `<mk-bar-chart orientation="horizontal"
+  [categories]="channels" [series]="channelSeries" />`;
+
+  protected readonly stackedAreaCode = `<mk-line-chart [categories]="months" [series]="twoLines" stacked />`;
+
+  protected readonly gaugeCode = `<mk-gauge [value]="68" unit="%" label="of quota" />
+<mk-gauge [value]="4.2" [max]="5" valueText="4.2" label="rating" color="var(--mk-warning)" />
+<mk-gauge [value]="82" [arc]="180" unit="%" label="uptime" color="var(--mk-success)" />`;
 
   protected readonly lineCode = `<mk-line-chart [categories]="months" [series]="sessions" area />
 <mk-line-chart [categories]="months" [series]="twoLines" showDots />`;

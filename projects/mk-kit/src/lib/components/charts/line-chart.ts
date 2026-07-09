@@ -19,6 +19,22 @@ import {
 
 const MARGIN = { top: 14, right: 16, bottom: 30, left: 44 };
 
+/** Closed path filling between an upper (`top`) and lower (`bottom`) line. */
+function stackedAreaPath(
+  top: readonly MkPoint[],
+  bottom: readonly MkPoint[],
+): string {
+  if (!top.length) return '';
+  const topLine = top
+    .map((p, i) => `${i === 0 ? 'M' : 'L'}${p.x} ${p.y}`)
+    .join(' ');
+  const botLine = [...bottom]
+    .reverse()
+    .map((p) => `L${p.x} ${p.y}`)
+    .join(' ');
+  return `${topLine} ${botLine} Z`;
+}
+
 /**
  * LineChart — a line (or `area`) chart for change over time / ordered
  * categories, with one or more series. Dependency-free SVG on the validated
@@ -53,6 +69,8 @@ export class MkLineChart {
   readonly height = input(260, { transform: numberAttribute });
   /** Fill the area under each line. */
   readonly area = input(false, { transform: booleanAttribute });
+  /** Stack the series (cumulative bands) — implies filled areas. */
+  readonly stacked = input(false, { transform: booleanAttribute });
   /** Draw a dot at every data point. */
   readonly showDots = input(false, { transform: booleanAttribute });
   /** Show gridlines. */
@@ -79,7 +97,19 @@ export class MkLineChart {
   );
 
   private readonly extent = computed<[number, number]>(() => {
-    const values = this.series().flatMap((s) => s.data);
+    const series = this.series();
+    if (!series.length) return [0, 1];
+    if (this.stacked()) {
+      const n = Math.max(0, ...series.map((s) => s.data.length));
+      let max = 0;
+      for (let i = 0; i < n; i++) {
+        let sum = 0;
+        for (const s of series) sum += Math.max(s.data[i] ?? 0, 0);
+        max = Math.max(max, sum);
+      }
+      return [0, max || 1];
+    }
+    const values = series.flatMap((s) => s.data);
     if (!values.length) return [0, 1];
     return [Math.min(...values, 0), Math.max(...values)];
   });
@@ -121,8 +151,27 @@ export class MkLineChart {
   protected readonly rendered = computed(() => {
     const toY = this.toY();
     const xAt = this.xAt();
-    const baseline = this.toY()(this.domain()[0]);
-    return this.series().map((s, si) => {
+    const series = this.series();
+
+    if (this.stacked()) {
+      const n = Math.max(0, ...series.map((s) => s.data.length));
+      const running = new Array<number>(n).fill(0);
+      return series.map((s, si) => {
+        const bottom: MkPoint[] = running.map((v, i) => ({ x: xAt(i), y: toY(v) }));
+        for (let i = 0; i < n; i++) running[i] += Math.max(s.data[i] ?? 0, 0);
+        const top: MkPoint[] = running.map((v, i) => ({ x: xAt(i), y: toY(v) }));
+        return {
+          name: s.name,
+          color: this.colors()[si],
+          points: top,
+          line: mkLinePath(top),
+          area: stackedAreaPath(top, bottom),
+        };
+      });
+    }
+
+    const baseline = toY(this.domain()[0]);
+    return series.map((s, si) => {
       const points: MkPoint[] = s.data.map((v, i) => ({ x: xAt(i), y: toY(v) }));
       return {
         name: s.name,
@@ -133,6 +182,9 @@ export class MkLineChart {
       };
     });
   });
+
+  /** Whether to paint the filled areas. */
+  protected readonly fillAreas = computed(() => this.area() || this.stacked());
 
   /** Transparent hit bands (one per category) driving the shared tooltip. */
   protected readonly hitBands = computed(() => {
