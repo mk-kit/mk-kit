@@ -101,11 +101,12 @@ live-announcer core.
 
 ## Features & infrastructure (not components)
 
-- **P1 Unit tests.** The library has **0 spec files**. For a published package,
-  add Vitest specs (a11y roles, keyboard, CVA, signals) — start with Button,
-  Select, Table, overlay/focus-trap core.
-- **P1 CI pipeline.** GitHub Actions: build lib + docs, typecheck, lint, run
-  tests, publish-dry-run on PRs; release on tag.
+- ✅ **Unit tests** — Vitest specs (`@angular/build:unit-test`), 144 tests across
+  components (CVA, keyboard, ARIA, signals) + the diff/HTML-parser/overlay-math
+  utilities. (shipped; grow coverage as components land.)
+- ✅ **CI pipeline** — `.github/workflows/ci.yml` (build lib → test lib → test
+  docs → build docs → publish dry-run, on push/PR) + `release.yml` (publish to
+  GitHub Packages on `v*` tags). (shipped.)
 - **P1 i18n of built-in strings.** Hardcoded English exists in aria labels and
   UI text ("No results", "No options", "Close", announcer messages). Provide an
   injectable string/`InjectionToken` map so consumers can localize.
@@ -114,8 +115,9 @@ live-announcer core.
 - **P2 Automated a11y checks** (axe) in CI over the docs pages.
 - **P2 SSR / hydration verification** — components are `isPlatformBrowser`-guarded;
   add an SSR smoke test.
-- **P2 SCSS preprocessor migration** — see `BACKLOG.md` (dedupe tone/size/theme
-  blocks via mixins + a token map).
+- ✅ **SCSS preprocessor migration** — all component styles are `.scss`; theme
+  source is `styles/mk-kit.scss` (dark tokens deduped) with shared
+  `_mixins.scss` (`tone`/`focus-ring`/`control-size`). (shipped.)
 - **P2 Density mode** — global compact/comfortable switch (table has density;
   generalize to a token/attribute).
 - **P2 RTL audit** — verify logical properties; add `dir="rtl"` coverage.
@@ -127,7 +129,12 @@ live-announcer core.
 
 ## Suggested near-term order
 
-1. Tests + CI (unblocks confident publishing).
-2. File upload, multi-select, description list, popover (highest daily-use gaps).
-3. Command palette + split panes (dashboard differentiators).
-4. i18n token, then the SCSS migration.
+Tests, CI, the SCSS migration and all mk-cms blockers are done. What's left:
+
+1. **i18n token map** — the last P1: localise the built-in strings.
+2. **Chart variants** (gauge/radial, horizontal bar, stacked area) and
+   **month/year/week pickers** — highest-value remaining P2 components.
+3. **Expandable table rows**, **skeleton presets**, **top loading bar**,
+   **scrollspy**.
+4. RTL audit + density mode; then P3 polish (range slider, QR, ripple,
+   theme-builder, high-contrast theme).
