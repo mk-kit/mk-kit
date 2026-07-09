@@ -1,0 +1,39 @@
+:host {
+  display: contents;
+}
+
+.mk-popover__panel {
+  // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
+  min-width: 12rem;
+  max-width: min(22rem, calc(100vw - var(--mk-space-4)));
+  padding: var(--mk-space-3) var(--mk-space-4);
+  color: var(--mk-text);
+  background: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-lg);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+  animation: mk-popover-in var(--mk-duration-fast) var(--mk-ease-out);
+}
+
+.mk-popover__panel:focus-visible {
+  outline: none;
+}
+
+@keyframes mk-popover-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--mk-space-1))) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-popover__panel {
+    animation: none;
+  }
+}

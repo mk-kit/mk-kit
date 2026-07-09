@@ -1,0 +1,20 @@
+<mk-popover
+  [placement]="placement()"
+  [ariaLabel]="title() || message()"
+  (closed)="onPopoverClosed()"
+>
+  <div class="mk-popconfirm__body">
+    @if (title()) {
+      <p class="mk-popconfirm__title">{{ title() }}</p>
+    }
+    <p class="mk-popconfirm__message">{{ message() }}</p>
+    <div class="mk-popconfirm__actions">
+      <button mkButton variant="ghost" tone="neutral" size="sm" (click)="onCancel()">
+        {{ cancelText() }}
+      </button>
+      <button mkButton [tone]="tone()" size="sm" (click)="onConfirm()">
+        {{ confirmText() }}
+      </button>
+    </div>
+  </div>
+</mk-popover>

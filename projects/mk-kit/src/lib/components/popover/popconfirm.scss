@@ -1,0 +1,32 @@
+:host {
+  display: contents;
+}
+
+.mk-popconfirm__body {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  min-width: 12rem;
+  max-width: 18rem;
+}
+
+.mk-popconfirm__title {
+  margin: 0;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-semibold);
+  color: var(--mk-text);
+}
+
+.mk-popconfirm__message {
+  margin: 0;
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text-muted);
+  line-height: var(--mk-line-height-normal);
+}
+
+.mk-popconfirm__actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: var(--mk-space-2);
+  margin-top: var(--mk-space-1);
+}

@@ -1,0 +1,19 @@
+@if (opened()) {
+  <div
+    #panel
+    class="mk-popover__panel"
+    role="dialog"
+    tabindex="-1"
+    [id]="panelId"
+    [attr.aria-label]="ariaLabel()"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="anchorEl()"
+    [placement]="placement()"
+    [gap]="8"
+    (dismiss)="close(false)"
+    (keydown.escape)="onEscape($event)"
+    (focusout)="onPanelFocusout($event)"
+  >
+    <ng-content />
+  </div>
+}

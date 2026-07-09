@@ -11,6 +11,10 @@ import {
   MkDialogService,
   MkDialogTitle,
   MkOverlayRef,
+  MkPopconfirm,
+  MkPopconfirmTrigger,
+  MkPopover,
+  MkPopoverTrigger,
   MkToastService,
   MkTooltip,
 } from '@mkornas/ui';
@@ -62,7 +66,16 @@ export class DemoDialogContent {
 @Component({
   selector: 'docs-feedback-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkAlert, MkButton, MkTooltip],
+  imports: [
+    DocsExample,
+    MkAlert,
+    MkButton,
+    MkTooltip,
+    MkPopover,
+    MkPopoverTrigger,
+    MkPopconfirm,
+    MkPopconfirmTrigger,
+  ],
   template: `
     <div class="docs-page docs-container">
       <h1>Feedback &amp; Overlay</h1>
@@ -256,6 +269,48 @@ export class DemoDialogContent {
           </tr>
         </tbody>
       </table>
+
+      <!-- ============================ POPOVER ============================ -->
+      <h2>Popover</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-popover&gt;</code> is a non-modal floating
+        panel for rich content, opened by click via
+        <code class="docs-inline">mkPopoverTriggerFor</code>. It renders in the top
+        layer (never clipped), moves focus inside on open, and closes on Escape,
+        outside click or Tabbing out.
+      </p>
+      <docs-example [code]="popoverCode">
+        <button mkButton variant="outline" [mkPopoverTriggerFor]="info">
+          Shipping details
+        </button>
+        <mk-popover #info ariaLabel="Shipping details">
+          <h4 style="margin: 0 0 var(--mk-space-1);">Free shipping</h4>
+          <p style="margin: 0; color: var(--mk-text-muted); font-size: var(--mk-font-size-sm);">
+            Orders over $50 ship free and arrive in 2–3 business days.
+          </p>
+        </mk-popover>
+      </docs-example>
+
+      <!-- ============================ POPCONFIRM ============================ -->
+      <h2>Popconfirm</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-popconfirm&gt;</code> is an inline
+        confirmation popover for row-level destructive actions — lighter than a
+        modal dialog. It emits <code class="docs-inline">(confirm)</code> and
+        <code class="docs-inline">(cancel)</code> (the latter also on Escape or
+        outside click).
+      </p>
+      <docs-example [code]="popconfirmCode">
+        <button mkButton tone="danger" [mkPopconfirmFor]="del">Delete item</button>
+        <mk-popconfirm
+          #del
+          title="Delete item?"
+          message="This can’t be undone."
+          confirmText="Delete"
+          (confirm)="onDeleted()"
+        />
+        <p class="echo">{{ deleteStatus() }}</p>
+      </docs-example>
 
       <!-- ============================ TOAST ============================ -->
       <h2>Toast</h2>
@@ -543,6 +598,11 @@ export class FeedbackPage {
   protected readonly alertVisible = signal(true);
   protected readonly confirmResult = signal<boolean | null>(null);
   protected readonly openResult = signal<string | null>(null);
+  protected readonly deleteStatus = signal('Nothing deleted yet.');
+
+  protected onDeleted(): void {
+    this.deleteStatus.set('Item deleted ✓');
+  }
 
   // ------------------------------- Toast -------------------------------
   protected showSuccessToast(): void {
@@ -598,6 +658,16 @@ export class FeedbackPage {
   }
 
   // --------------------------- Code snippets ---------------------------
+  protected readonly popoverCode = `<button mkButton [mkPopoverTriggerFor]="info">Shipping details</button>
+<mk-popover #info ariaLabel="Shipping details">
+  <h4>Free shipping</h4>
+  <p>Orders over $50 ship free and arrive in 2–3 business days.</p>
+</mk-popover>`;
+
+  protected readonly popconfirmCode = `<button mkButton tone="danger" [mkPopconfirmFor]="del">Delete item</button>
+<mk-popconfirm #del title="Delete item?" message="This can’t be undone."
+  confirmText="Delete" (confirm)="onDeleted()" />`;
+
   protected readonly alertTonesCode = `<mk-alert tone="info" title="Heads up">
   A new version of the workspace is available.
 </mk-alert>

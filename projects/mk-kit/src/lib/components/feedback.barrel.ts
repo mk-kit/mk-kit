@@ -4,6 +4,7 @@
  */
 export * from './alert';
 export * from './tooltip';
+export * from './popover';
 export * from './dialog';
 export * from './toast';
 export * from './snackbar';

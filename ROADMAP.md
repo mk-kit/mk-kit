@@ -26,8 +26,9 @@ engine). These gate specific admin screens — see the readiness analysis in
   plugin/settings JSONB editing.
 - **[P2] Description list** (`mk-description-list`) — entity-detail / revision-meta
   panels. Also listed under Data display below.
-- **[P2] Popover / popconfirm** — inline row-level "Delete?" confirm. `mk-dialog`
-  covers it today. Also listed under Feedback below.
+- ✅ **Popover / popconfirm** (`mk-popover` / `mk-popconfirm`) — **shipped.**
+  Top-layer non-modal popover + inline row-level "Delete?" confirm (built on
+  `MkAnchoredPanel`). Also listed under Feedback below.
 - **[P3] Revision diff / comparison view** — the CMS stores a snapshot per save;
   a diff view makes the revisions screen shine. Also listed under Data display.
 
@@ -96,8 +97,8 @@ live-announcer core.
 - **P3 Scroll-area** — cross-browser custom scrollbar container.
 
 ### Feedback & overlay
-- **P1 Popover** (`mk-popover`) — rich (non-text) floating panel; today only
-  text `tooltip` + `menu` exist. Also enables **popconfirm** (inline confirm).
+- ✅ **Popover** (`mk-popover`) + **popconfirm** (`mk-popconfirm`) — rich non-text
+  floating panel + inline confirm, top-layer via `MkAnchoredPanel` (shipped).
 - **P2 Banner** — page/section-level persistent alert with actions.
 - **P2 Top loading bar** — route-level progress (YouTube/GitHub style).
 - **P2 Skeleton presets** — text/paragraph/card/table skeleton shapes.
