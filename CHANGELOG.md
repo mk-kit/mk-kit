@@ -8,6 +8,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-tag-input`** — a freeform token/chip input: type and press Enter (or a
+  separator) to add a removable chip, Backspace on an empty field removes the
+  last, and pasting a delimited string adds several. CVA over `string[]`;
+  `max` / `allowDuplicates` / `addOnBlur` options, `(added)` / `(removed)`.
 - **`mkMask`** — an input-mask directive. Formats an input as the user types
   against a token pattern (`0` digit, `A` letter, `*` alphanumeric; other chars
   are literals), skipping ill-fitting characters. Exposes the raw value via

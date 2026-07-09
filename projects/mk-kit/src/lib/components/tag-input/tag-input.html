@@ -1,0 +1,37 @@
+<div class="mk-tag-input__field">
+  <ul class="mk-tag-input__tags">
+    @for (tag of value(); track $index; let i = $index) {
+      <li class="mk-tag-input__tag">
+        <mk-chip
+          [size]="effectiveSize()"
+          [removable]="!isDisabled()"
+          [disabled]="isDisabled()"
+          [removeLabel]="'Remove ' + tag"
+          (removed)="removeAt(i)"
+        >
+          {{ tag }}
+        </mk-chip>
+      </li>
+    }
+    <li class="mk-tag-input__entry">
+      <input
+        #input
+        class="mk-tag-input__input"
+        type="text"
+        autocomplete="off"
+        [id]="inputId"
+        [value]="query()"
+        [placeholder]="value().length ? '' : placeholder()"
+        [disabled]="isDisabled() || atMax()"
+        [attr.aria-labelledby]="labelledBy()"
+        [attr.aria-describedby]="describedBy()"
+        [attr.aria-invalid]="isInvalid() || null"
+        [attr.aria-required]="isRequired() || null"
+        (input)="onQueryInput($event)"
+        (keydown)="onKeydown($event)"
+        (paste)="onPaste($event)"
+        (blur)="onBlur()"
+      />
+    </li>
+  </ul>
+</div>

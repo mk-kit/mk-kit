@@ -176,9 +176,9 @@ existing primitive it would reuse. Priorities as before.
   existing overlay/dialog (shipped).
 - ✅ **`mkMask`** — input-mask directive (`0`/`A`/`*` tokens + literals) with
   `(unmaskedChange)` raw value; skips ill-fitting chars, caret-aware (shipped).
-- **P1 `mk-tag-input`** — freeform token/chip input (create-on-Enter, paste-split,
-  Backspace-removes). Distinct from `mk-multi-select` (option-bound); reuses
-  `MkChip`. Keywords/tags for the CMS.
+- ✅ **`mk-tag-input`** — freeform token/chip input (create-on-Enter/separator,
+  paste-split, Backspace-removes), CVA over `string[]`, reuses `MkChip`; `max` /
+  `allowDuplicates` / `addOnBlur` (shipped).
 - **P1 `mkEditable` / `mk-inline-edit`** — click text to edit in place, with
   save/cancel/Escape and a pending state. Ubiquitous in admin tables & detail views.
 - **P2 `mk-password-input`** — reveal toggle + strength meter + optional rules

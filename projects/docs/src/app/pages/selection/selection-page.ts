@@ -7,6 +7,7 @@ import {
   MkButtonToggleGroup,
   MkFormField,
   MkMultiSelect,
+  MkTagInput,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -30,6 +31,7 @@ interface Framework {
     MkButtonToggleGroup,
     MkFormField,
     MkMultiSelect,
+    MkTagInput,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -164,6 +166,26 @@ interface Framework {
       </docs-example>
 
       <!-- ============================================================ -->
+      <!-- TAG INPUT -->
+      <!-- ============================================================ -->
+      <h2>Tag input</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-tag-input&gt;</code> collects
+        <strong>freeform</strong> tags (not from an option list). Type and press
+        Enter or comma to add a chip, Backspace on an empty field removes the
+        last, and pasting a delimited string adds several at once. Its model is a
+        <code class="docs-inline">string[]</code>.
+      </p>
+      <docs-example [code]="tagInputCode" column>
+        <div style="max-width: 26rem; width: 100%;">
+          <mk-tag-input placeholder="Add tags…" [(value)]="keywords" />
+          <p class="echo">
+            Tags: <code class="docs-inline">{{ keywords().join(', ') || '—' }}</code>
+          </p>
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
       <!-- ============================================================ -->
       <h2>Button toggle</h2>
@@ -242,6 +264,7 @@ export class SelectionPage {
   protected readonly picked = signal<unknown>(null);
   protected readonly picked2 = signal<unknown>(null);
   protected readonly tags = signal<unknown[]>(['angular']);
+  protected readonly keywords = signal<string[]>(['design', 'ux']);
   protected readonly reviewers = signal<unknown[]>([]);
 
   // --- async demo ---
@@ -292,6 +315,10 @@ export class SelectionPage {
   placeholder="Add frameworks…"
   [options]="frameworks"
   [(value)]="tags" />`;
+
+  protected readonly tagInputCode = `keywords = signal<string[]>(['design', 'ux']);
+
+<mk-tag-input placeholder="Add tags…" [(value)]="keywords" />`;
 
   protected readonly multiAsyncCode = `<mk-form-field label="Reviewers" hint="Pick up to 3" required>
   <mk-multi-select

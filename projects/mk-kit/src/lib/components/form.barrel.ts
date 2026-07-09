@@ -8,6 +8,7 @@ export * from './input';
 export * from './select';
 export * from './autocomplete';
 export * from './multi-select';
+export * from './tag-input';
 export * from './file-upload';
 export * from './code-editor';
 export * from './rating';
