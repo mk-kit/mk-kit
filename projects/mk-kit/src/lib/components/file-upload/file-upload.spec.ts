@@ -24,6 +24,8 @@ describe('MkFileUpload', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => fixture.destroy());
+
   const add = (files: File[]) => (fu as any).addFiles(files as unknown as FileList);
 
   it('accepts a valid file and emits filesSelected', () => {

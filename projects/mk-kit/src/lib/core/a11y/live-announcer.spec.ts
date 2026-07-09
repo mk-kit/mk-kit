@@ -5,18 +5,20 @@ import { MkLiveAnnouncer } from './live-announcer.service';
 describe('MkLiveAnnouncer', () => {
   let announcer: MkLiveAnnouncer;
 
+  const clearRegions = () =>
+    document.querySelectorAll('.mk-visually-hidden').forEach((el) => el.remove());
+
   beforeEach(() => {
+    // Clear any regions leaked by other specs sharing this jsdom, so the
+    // assertions below are deterministic regardless of file execution order.
+    clearRegions();
     TestBed.configureTestingModule({
       providers: [provideZonelessChangeDetection()],
     });
     announcer = TestBed.inject(MkLiveAnnouncer);
   });
 
-  afterEach(() => {
-    document
-      .querySelectorAll('.mk-visually-hidden')
-      .forEach((el) => el.remove());
-  });
+  afterEach(clearRegions);
 
   it('creates a single live region on first announce', () => {
     announcer.announce('hello');

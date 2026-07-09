@@ -19,7 +19,10 @@ describe('MkPopover', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => trigger.remove());
+  afterEach(() => {
+    fixture.destroy();
+    trigger.remove();
+  });
 
   it('open / close / toggle drive the opened state', () => {
     expect(pop.opened()).toBe(false);
@@ -64,7 +67,10 @@ describe('MkPopconfirm', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => trigger.remove());
+  afterEach(() => {
+    fixture.destroy();
+    trigger.remove();
+  });
 
   it('confirm emits confirm (not cancel) and closes', () => {
     const confirm = vi.fn();

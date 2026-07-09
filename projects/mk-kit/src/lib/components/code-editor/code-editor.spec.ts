@@ -38,6 +38,8 @@ describe('MkCodeEditor', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => fixture.destroy());
+
   it('reports a JSON parse error for invalid content', () => {
     ed.writeValue('{ bad json ');
     expect((ed as any).jsonError()).toBeTruthy();

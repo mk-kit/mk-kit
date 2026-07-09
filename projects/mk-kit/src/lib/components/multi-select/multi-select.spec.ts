@@ -22,6 +22,8 @@ describe('MkMultiSelect', () => {
     fixture.detectChanges();
   });
 
+  afterEach(() => fixture.destroy());
+
   it('adds an option to the value and emits the change', () => {
     const onChange = vi.fn();
     ms.registerOnChange(onChange);

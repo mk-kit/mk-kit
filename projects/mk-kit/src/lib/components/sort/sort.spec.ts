@@ -34,6 +34,13 @@ describe('MkSort / MkSortHeader', () => {
     headers = Array.from(fixture.nativeElement.querySelectorAll('th'));
   });
 
+  afterEach(() => {
+    fixture.destroy();
+    // MkSort announces via MkLiveAnnouncer, which appends a body-level region;
+    // remove it so it can't pollute other specs sharing this jsdom.
+    document.querySelectorAll('.mk-visually-hidden').forEach((el) => el.remove());
+  });
+
   it('starts unsorted with aria-sort="none"', () => {
     expect(headers[0].getAttribute('aria-sort')).toBe('none');
   });
