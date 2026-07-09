@@ -3,6 +3,10 @@ import {
   MkAvatar,
   MkAvatarGroup,
   MkBadge,
+  MkCarousel,
+  MkCarouselSlide,
+  MkCode,
+  MkVirtualScroll,
   MkCard,
   MkCardFooter,
   MkCardHeader,
@@ -46,6 +50,10 @@ interface DemoUser {
     MkBadge,
     MkDescriptionList,
     MkDescItem,
+    MkCode,
+    MkVirtualScroll,
+    MkCarousel,
+    MkCarouselSlide,
     MkCard,
     MkCardFooter,
     MkCardHeader,
@@ -767,6 +775,63 @@ interface DemoUser {
           <mk-desc-item term="Created">Jul 1, 2026</mk-desc-item>
         </mk-description-list>
       </docs-example>
+
+      <h2>Code block</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-code&gt;</code> is a read-only, themed code
+        block with syntax highlighting, an optional filename header, line numbers
+        and a copy button (it reuses the tokenizer + copy directive).
+      </p>
+      <docs-example [code]="codeBlockCode" [column]="true">
+        <mk-code
+          language="json"
+          filename="config.json"
+          [lineNumbers]="true"
+          [code]="sampleJson"
+        />
+      </docs-example>
+
+      <h2>Virtual scroll</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-virtual-scroll&gt;</code> renders only the
+        rows visible in the viewport (plus a small overscan), so a list of
+        thousands of fixed-height items stays smooth. Give the host a height and a
+        row template. This list has <strong>10,000 rows</strong>.
+      </p>
+      <docs-example [code]="virtualScrollCode" [column]="true">
+        <mk-virtual-scroll
+          [items]="bigList"
+          [itemHeight]="36"
+          style="height: 16rem; width: 100%; border: var(--mk-border-width) solid var(--mk-border); border-radius: var(--mk-radius-md);"
+        >
+          <ng-template let-row let-i="index">
+            <div style="display: flex; gap: var(--mk-space-3); align-items: center; height: 100%; padding: 0 var(--mk-space-3); border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);">
+              <span style="color: var(--mk-text-subtle); width: 4rem; font-variant-numeric: tabular-nums;">#{{ i }}</span>
+              <span>{{ row.name }}</span>
+            </div>
+          </ng-template>
+        </mk-virtual-scroll>
+      </docs-example>
+
+      <h2>Carousel</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-carousel&gt;</code> is an accessible
+        slides/gallery — prev/next arrows, dot indicators, Arrow-key navigation
+        and optional autoplay (pauses on hover/focus). Mark each slide with
+        <code class="docs-inline">mkCarouselSlide</code>.
+      </p>
+      <docs-example [code]="carouselCode" [column]="true">
+        <div style="max-width: 30rem; width: 100%;">
+          <mk-carousel ariaLabel="Highlights">
+            @for (c of slides; track c.title) {
+              <div mkCarouselSlide [style.background]="c.bg" style="padding: var(--mk-space-8) var(--mk-space-4); text-align: center; color: #fff;">
+                <h3 style="margin: 0 0 var(--mk-space-1);">{{ c.title }}</h3>
+                <p style="margin: 0; opacity: 0.85;">{{ c.body }}</p>
+              </div>
+            }
+          </mk-carousel>
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -781,6 +846,28 @@ interface DemoUser {
   ],
 })
 export class DataPage {
+  protected readonly sampleJson =
+    '{\n  "theme": "dark",\n  "retries": 3,\n  "features": ["search", "export"]\n}';
+  protected readonly bigList = Array.from({ length: 10000 }, (_, i) => ({
+    name: `Item number ${i + 1}`,
+  }));
+  protected readonly slides = [
+    { title: 'Fast', body: 'Signals + OnPush everywhere.', bg: 'var(--mk-primary)' },
+    { title: 'Accessible', body: 'WCAG 2.1 AA out of the box.', bg: 'var(--mk-success)' },
+    { title: 'Themeable', body: 'Every colour is a CSS variable.', bg: 'var(--mk-info)' },
+  ];
+
+  protected readonly codeBlockCode = `<mk-code language="json" filename="config.json"
+  lineNumbers [code]="json" />`;
+  protected readonly virtualScrollCode = `<mk-virtual-scroll [items]="rows" [itemHeight]="36"
+  style="height: 16rem;">
+  <ng-template let-row let-i="index">#{{ '{{ i }}' }} — {{ '{{ row.name }}' }}</ng-template>
+</mk-virtual-scroll>`;
+  protected readonly carouselCode = `<mk-carousel ariaLabel="Highlights">
+  <div mkCarouselSlide>…</div>
+  <div mkCarouselSlide>…</div>
+</mk-carousel>`;
+
   protected readonly descListCode = `<mk-description-list divided>
   <mk-desc-item term="Status"><mk-badge tone="success">Active</mk-badge></mk-desc-item>
   <mk-desc-item term="Owner">Ada Lovelace</mk-desc-item>

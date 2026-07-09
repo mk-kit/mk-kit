@@ -1,0 +1,93 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  display: block;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-carousel__viewport {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--mk-radius-md);
+}
+.mk-carousel__viewport:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-carousel__track {
+  display: flex;
+  transition: transform var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+}
+
+.mk-carousel__slide {
+  flex: 0 0 100%;
+  min-width: 0;
+}
+
+.mk-carousel__arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  display: grid;
+  place-items: center;
+  width: 2rem;
+  height: 2rem;
+  font-size: var(--mk-font-size-lg);
+  line-height: 1;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-circle);
+  box-shadow: var(--mk-shadow-sm);
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-carousel__arrow:hover {
+  background-color: var(--mk-surface-2);
+}
+.mk-carousel__arrow:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-carousel__arrow--prev {
+  left: var(--mk-space-2);
+}
+.mk-carousel__arrow--next {
+  right: var(--mk-space-2);
+}
+
+.mk-carousel__dots {
+  display: flex;
+  justify-content: center;
+  gap: var(--mk-space-2);
+  margin-top: var(--mk-space-2);
+}
+.mk-carousel__dot {
+  width: 0.5rem;
+  height: 0.5rem;
+  padding: 0;
+  background-color: var(--mk-border-strong);
+  border: none;
+  border-radius: var(--mk-radius-circle);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-carousel__dot:hover {
+  background-color: var(--mk-text-muted);
+}
+.mk-carousel__dot:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-carousel__dot--active {
+  background-color: var(--mk-primary);
+  transform: scale(1.25);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-carousel__track,
+  .mk-carousel__arrow,
+  .mk-carousel__dot {
+    transition: none;
+  }
+}

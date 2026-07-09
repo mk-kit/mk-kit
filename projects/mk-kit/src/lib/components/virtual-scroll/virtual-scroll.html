@@ -1,0 +1,17 @@
+<div #viewport class="mk-virtual-scroll__viewport" (scroll)="onScroll($event)">
+  <div class="mk-virtual-scroll__spacer" [style.height.px]="totalHeight()">
+    <div
+      class="mk-virtual-scroll__content"
+      [style.transform]="'translateY(' + offset() + 'px)'"
+    >
+      @for (row of visibleItems(); track row.index) {
+        <div class="mk-virtual-scroll__item" [style.height.px]="itemHeight()">
+          <ng-container
+            [ngTemplateOutlet]="template() ?? null"
+            [ngTemplateOutletContext]="{ $implicit: row.item, index: row.index }"
+          />
+        </div>
+      }
+    </div>
+  </div>
+</div>

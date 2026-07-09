@@ -1,0 +1,55 @@
+<div
+  class="mk-carousel__viewport"
+  role="region"
+  aria-roledescription="carousel"
+  [attr.aria-label]="ariaLabel()"
+  tabindex="0"
+  (keydown)="onKeydown($event)"
+  (mouseenter)="pause()"
+  (mouseleave)="resume()"
+  (focusin)="pause()"
+  (focusout)="resume()"
+>
+  <div
+    class="mk-carousel__track"
+    [style.transform]="'translateX(' + -index() * 100 + '%)'"
+  >
+    <ng-content />
+  </div>
+
+  @if (showArrows() && count() > 1) {
+    <button
+      type="button"
+      class="mk-carousel__arrow mk-carousel__arrow--prev"
+      aria-label="Previous slide"
+      (click)="prev()"
+    >
+      <span aria-hidden="true">‹</span>
+    </button>
+    <button
+      type="button"
+      class="mk-carousel__arrow mk-carousel__arrow--next"
+      aria-label="Next slide"
+      (click)="next()"
+    >
+      <span aria-hidden="true">›</span>
+    </button>
+  }
+</div>
+
+@if (showDots() && count() > 1) {
+  <div class="mk-carousel__dots">
+    @for (dot of dots(); track dot) {
+      <button
+        type="button"
+        class="mk-carousel__dot"
+        [class.mk-carousel__dot--active]="dot === index()"
+        [attr.aria-current]="dot === index() || null"
+        [attr.aria-label]="'Go to slide ' + (dot + 1)"
+        (click)="goTo(dot)"
+      ></button>
+    }
+  </div>
+}
+
+<div class="mk-visually-hidden" aria-live="polite">{{ liveText() }}</div>

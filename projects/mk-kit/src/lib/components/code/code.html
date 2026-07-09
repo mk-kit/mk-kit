@@ -1,0 +1,27 @@
+@if (hasHeader()) {
+  <div class="mk-code__header">
+    <span class="mk-code__filename">{{ filename() }}</span>
+    @if (copyable()) {
+      <button
+        type="button"
+        class="mk-code__copy"
+        [mkCopyToClipboard]="code()"
+        #copier="mkCopyToClipboard"
+        [attr.aria-label]="copier.justCopied() ? 'Copied' : 'Copy code'"
+      >
+        {{ copier.justCopied() ? '✓ Copied' : 'Copy' }}
+      </button>
+    }
+  </div>
+}
+
+<div class="mk-code__scroll">
+  @if (lineNumbers()) {
+    <div class="mk-code__gutter" aria-hidden="true">
+      @for (n of lines(); track n) {
+        <span class="mk-code__lineno">{{ n }}</span>
+      }
+    </div>
+  }
+  <pre class="mk-code__pre"><code [innerHTML]="highlighted()"></code></pre>
+</div>
