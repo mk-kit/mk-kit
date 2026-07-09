@@ -5,6 +5,7 @@ import { filter, map } from 'rxjs/operators';
 import {
   MkAppShell,
   MkButton,
+  MkNavGroup,
   MkNavItem,
   MkNavList,
   MkThemeService,
@@ -18,11 +19,13 @@ interface NavLink {
 interface NavSection {
   title: string;
   links: NavLink[];
+  /** Render as a collapsible group (component categories) vs a plain heading. */
+  collapsible?: boolean;
 }
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MkAppShell, MkNavList, MkNavItem, MkButton],
+  imports: [RouterOutlet, MkAppShell, MkNavList, MkNavGroup, MkNavItem, MkButton],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,28 +59,54 @@ export class App {
       ],
     },
     {
-      title: 'Components',
+      title: 'Forms & inputs',
+      collapsible: true,
       links: [
         { label: 'Buttons', path: '/components/buttons', icon: '⬡' },
         { label: 'Forms', path: '/components/forms', icon: '☑' },
         { label: 'Selection', path: '/components/selection', icon: '⊟' },
-        { label: 'Stepper', path: '/components/stepper', icon: '☷' },
+        { label: 'Date & time', path: '/components/date-time', icon: '◷' },
+      ],
+    },
+    {
+      title: 'Data display',
+      collapsible: true,
+      links: [
+        { label: 'Data display', path: '/components/data', icon: '▦' },
+        { label: 'Charts', path: '/components/charts', icon: '▚' },
+        { label: 'Sort', path: '/components/sort', icon: '⇅' },
         { label: 'Tree', path: '/components/tree', icon: '⑃' },
         { label: 'Icon', path: '/components/icon', icon: '❖' },
-        { label: 'Snackbar', path: '/components/snackbar', icon: '▭' },
-        { label: 'Bottom sheet', path: '/components/bottom-sheet', icon: '▟' },
-        { label: 'Sort', path: '/components/sort', icon: '⇅' },
-        { label: 'Charts', path: '/components/charts', icon: '▚' },
         { label: 'Empty & timeline', path: '/components/empty-timeline', icon: '☰' },
+      ],
+    },
+    {
+      title: 'Navigation & layout',
+      collapsible: true,
+      links: [
+        { label: 'Navigation', path: '/components/navigation', icon: '⛶' },
         { label: 'Structure', path: '/components/structure', icon: '▤' },
         { label: 'Command & nav', path: '/components/command-nav', icon: '⌘' },
-        { label: 'Data display', path: '/components/data', icon: '▦' },
-        { label: 'Date & time', path: '/components/date-time', icon: '◷' },
-        { label: 'Drag & drop', path: '/components/drag-drop', icon: '⤨' },
+        { label: 'Stepper', path: '/components/stepper', icon: '☷' },
         { label: 'Context menu', path: '/components/context-menu', icon: '☰' },
-        { label: 'Content editor', path: '/components/content-editor', icon: '✎' },
+      ],
+    },
+    {
+      title: 'Feedback & overlays',
+      collapsible: true,
+      links: [
         { label: 'Feedback', path: '/components/feedback', icon: '✦' },
-        { label: 'Navigation', path: '/components/navigation', icon: '⛶' },
+        { label: 'Snackbar', path: '/components/snackbar', icon: '▭' },
+        { label: 'Bottom sheet', path: '/components/bottom-sheet', icon: '▟' },
+      ],
+    },
+    {
+      title: 'Editors & interactions',
+      collapsible: true,
+      links: [
+        { label: 'Content editor', path: '/components/content-editor', icon: '✎' },
+        { label: 'Drag & drop', path: '/components/drag-drop', icon: '⤨' },
+        { label: 'Utilities', path: '/components/utilities', icon: '⚙' },
       ],
     },
   ];

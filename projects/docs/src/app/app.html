@@ -68,18 +68,17 @@
     [collapsed]="shell.sidebarCollapsed() && !shell.isMobile()"
   >
     @for (section of sections; track section.title) {
-      @if (!(shell.sidebarCollapsed() && !shell.isMobile())) {
-        <div class="docs-nav-heading">{{ section.title }}</div>
-      }
-      @for (link of section.links; track link.path) {
-        <mk-nav-item
-          [label]="link.label"
-          [active]="isActive(link.path)"
-          (action)="go(shell, link.path)"
-        >
-          <span mkNavIcon aria-hidden="true">{{ link.icon }}</span>
-        </mk-nav-item>
-      }
+      <mk-nav-group [label]="section.title" [collapsible]="!!section.collapsible">
+        @for (link of section.links; track link.path) {
+          <mk-nav-item
+            [label]="link.label"
+            [active]="isActive(link.path)"
+            (action)="go(shell, link.path)"
+          >
+            <span mkNavIcon aria-hidden="true">{{ link.icon }}</span>
+          </mk-nav-item>
+        }
+      </mk-nav-group>
     }
   </mk-nav-list>
 

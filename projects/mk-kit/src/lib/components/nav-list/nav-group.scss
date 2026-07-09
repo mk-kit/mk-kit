@@ -62,6 +62,11 @@
   flex-direction: column;
   gap: 2px;
 }
+/* `display:flex` above beats the UA `[hidden]{display:none}`, so the collapsed
+   region would stay visible — re-hide it with matching specificity. */
+.mk-nav-group__items[hidden] {
+  display: none;
+}
 
 /* In a collapsed icon rail: no label, just a subtle separator above groups. */
 :host(.mk-nav-group--collapsed-rail) + :host(.mk-nav-group--collapsed-rail) {
