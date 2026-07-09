@@ -32,6 +32,11 @@ import {
 } from './block-registry';
 import { MkBlockEditorContext } from './block-context';
 import { MkBlockList } from './block-list';
+import { mkBlocksToHtml } from './block-serializer';
+import { mkHtmlToBlocks } from './block-parser';
+
+/** How the form/CVA value is exchanged: a document object or an HTML string. */
+export type MkBlockValueFormat = 'document' | 'html';
 
 /**
  * Block editor — a configurable, Gutenberg-style block content editor. Renders
@@ -79,8 +84,15 @@ export class MkBlockEditor implements ControlValueAccessor {
   private readonly tokenUpload = inject(MK_BLOCK_UPLOAD_HANDLER, { optional: true });
   private readonly tokenEmbeds = inject(MK_BLOCK_EMBED_PROVIDERS, { optional: true });
 
-  /** Two-way document value. */
+  /** Two-way document value (always an `MkBlockDocument`, regardless of format). */
   readonly value = model<MkBlockDocument>(mkEmptyDocument());
+  /**
+   * Form/CVA exchange format. `document` (default) reads/writes an
+   * `MkBlockDocument`; `html` reads/writes an **HTML string** — so the editor
+   * can back a string-typed richtext field (`[(ngModel)]="htmlString"`). The
+   * two-way `value` model stays an `MkBlockDocument` either way.
+   */
+  readonly valueFormat = input<MkBlockValueFormat>('document');
   /** Custom / extended block definitions (merged over the defaults + token). */
   readonly blocks = input<MkBlockDefinition[] | null>(null);
   /** Placeholder for empty text blocks. */
@@ -98,10 +110,12 @@ export class MkBlockEditor implements ControlValueAccessor {
 
   /** Fires on any document change (in addition to the `value` model). */
   readonly change = output<MkBlockDocument>();
+  /** Fires the serialised HTML on any change — convenient in `html` mode. */
+  readonly htmlChange = output<string>();
 
   protected readonly cvaDisabled = signal(false);
 
-  private onChange: (value: MkBlockDocument) => void = () => {};
+  private onChange: (value: MkBlockDocument | string) => void = () => {};
   private onTouched: () => void = () => {};
 
   /** Effective, merged block definitions. */
@@ -141,16 +155,26 @@ export class MkBlockEditor implements ControlValueAccessor {
       blocks,
     };
     this.value.set(next);
-    this.onChange(next);
+    const html = mkBlocksToHtml(next);
+    this.onChange(this.valueFormat() === 'html' ? html : next);
     this.onTouched();
     this.change.emit(next);
+    this.htmlChange.emit(html);
   }
 
   // --- ControlValueAccessor -------------------------------------------------
-  writeValue(value: MkBlockDocument | null): void {
-    this.value.set(value ?? mkEmptyDocument());
+  writeValue(value: MkBlockDocument | string | null): void {
+    if (this.valueFormat() === 'html') {
+      this.value.set(
+        typeof value === 'string'
+          ? mkHtmlToBlocks(value)
+          : ((value as MkBlockDocument | null) ?? mkEmptyDocument()),
+      );
+    } else {
+      this.value.set((value as MkBlockDocument | null) ?? mkEmptyDocument());
+    }
   }
-  registerOnChange(fn: (value: MkBlockDocument) => void): void {
+  registerOnChange(fn: (value: MkBlockDocument | string) => void): void {
     this.onChange = fn;
   }
   registerOnTouched(fn: () => void): void {

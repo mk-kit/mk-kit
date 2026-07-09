@@ -4,6 +4,7 @@ import {
   computed,
   signal,
 } from '@angular/core';
+import { FormsModule } from '@angular/forms';
 import {
   MkBlockEditor,
   MkBlockRenderer,
@@ -15,7 +16,7 @@ import {
 
 @Component({
   selector: 'docs-block-editor-page',
-  imports: [MkBlockEditor, MkBlockRenderer, MkTabs, MkTab],
+  imports: [FormsModule, MkBlockEditor, MkBlockRenderer, MkTabs, MkTab],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container be-wide">
@@ -112,6 +113,28 @@ import {
       </p>
       <pre class="be-code"><code>{{ renderCode }}</code></pre>
 
+      <h2>HTML value mode (richtext fields)</h2>
+      <p>
+        Set <code class="docs-inline">valueFormat="html"</code> and the editor
+        reads/writes an <strong>HTML string</strong> instead of an
+        <code class="docs-inline">MkBlockDocument</code> — so it can back a
+        string-typed <code class="docs-inline">richtext</code> field
+        (<code class="docs-inline">[(ngModel)]="html"</code>). It seeds from stored
+        HTML via <code class="docs-inline">mkHtmlToBlocks</code> and serialises
+        back with <code class="docs-inline">mkBlocksToHtml</code> on every change.
+      </p>
+      <div class="be-editor be-wide">
+        <mk-block-editor
+          valueFormat="html"
+          [ngModel]="richHtml()"
+          (ngModelChange)="richHtml.set($event)"
+          ariaLabel="Richtext content"
+          placeholder="Edit — the value below is an HTML string…"
+        />
+      </div>
+      <p>Bound HTML string (what the CMS stores):</p>
+      <pre class="be-output"><code>{{ richHtml() || '(empty)' }}</code></pre>
+
       <h2>API</h2>
       <table class="docs-props">
         <thead>
@@ -123,8 +146,9 @@ import {
           <tr><td><code>uploadHandler</code></td><td><code>(f: File) =&gt; Promise&lt;string&gt;</code></td><td>Image upload; falls back to a data URL.</td></tr>
           <tr><td><code>embedProviders</code></td><td><code>MkEmbedProvider[] | null</code></td><td>Extra allow-listed embed providers.</td></tr>
           <tr><td><code>placeholder</code> / <code>readonly</code> / <code>disabled</code> / <code>ariaLabel</code></td><td>—</td><td>Prompt text, read-only view, form disable, a11y label.</td></tr>
-          <tr><td><code>change</code></td><td><code>output&lt;MkBlockDocument&gt;</code></td><td>Fires on every edit.</td></tr>
-          <tr><td><code>mkBlocksToHtml(doc)</code> / <code>mkBlocksToText(doc)</code></td><td><code>string</code></td><td>Serialize the document to HTML / plain text.</td></tr>
+          <tr><td><code>valueFormat</code></td><td><code>'document' | 'html'</code></td><td><code>'document'</code> — set <code>'html'</code> to read/write an HTML string (richtext fields).</td></tr>
+          <tr><td><code>change</code> / <code>htmlChange</code></td><td><code>output&lt;MkBlockDocument&gt;</code> / <code>output&lt;string&gt;</code></td><td>Fire the document / serialized HTML on every edit.</td></tr>
+          <tr><td><code>mkBlocksToHtml(doc)</code> / <code>mkHtmlToBlocks(html)</code></td><td><code>string</code> / <code>MkBlockDocument</code></td><td>Serialize to HTML / parse HTML back into a document (round-trip).</td></tr>
           <tr><td><code>&lt;mk-block-renderer [value]&gt;</code></td><td>—</td><td>Read-only, themed display of a saved document.</td></tr>
         </tbody>
       </table>
@@ -167,6 +191,11 @@ import {
   ],
 })
 export class BlockEditorPage {
+  /** Seeded from stored HTML; stays an HTML string as the CMS would persist. */
+  protected readonly richHtml = signal(
+    '<h3>Release notes</h3><p>The <strong>HTML value mode</strong> lets the editor back a <code>richtext</code> field.</p><ul><li>Seeds from HTML</li><li>Emits HTML</li></ul>',
+  );
+
   protected readonly doc = signal<MkBlockDocument>({
     version: 1,
     blocks: [

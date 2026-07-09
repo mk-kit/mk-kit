@@ -8,17 +8,16 @@ common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 
 Driven by the **mk-cms** admin panel (schema-driven CRUD). The original blockers
 — **file-upload**, **multi-select + chips**, **JSON/code editor**,
-**popover/popconfirm** and **description-list** — are all ✅ **shipped** (details
-in the component sections below). Two items remain:
+**popover/popconfirm** and **description-list** — plus the **block-editor ↔ HTML bridge** — are all ✅ **shipped** (details in the
+component sections below). One item remains:
 
-- **[P1] Block-editor ↔ HTML bridge** (`mk-block-editor`) — the editor's value is
-  a structured `MkBlockDocument`, but the CMS `richtext` field type stores an
-  **HTML string**. There's no way to seed the editor from HTML or serialize its
-  document back to HTML, so the admin falls back to a plain `textarea` for
-  richtext. Add an HTML (de)serializer — `MkBlockDocument` ⇄ HTML — or a
-  plain-HTML value mode. (Found wiring the entry editor, 2026-07-09.)
 - **[P3] Revision diff / comparison view** — the CMS snapshots each save; a diff
   view makes the revisions screen shine. Also listed under Data display below.
+
+The **block-editor ↔ HTML bridge** shipped as `valueFormat="html"` on
+`mk-block-editor` (reads/writes an HTML string so it backs a string-typed
+`richtext` field) + `mkHtmlToBlocks(html)` — the inverse of `mkBlocksToHtml` —
+for the `MkBlockDocument` ⇄ HTML round-trip.
 
 The rest of the admin (tables + bulk actions, app-shell, nav-group, command
 palette, tree + dnd menu builder, dialogs, toasts, date pickers, charts) is

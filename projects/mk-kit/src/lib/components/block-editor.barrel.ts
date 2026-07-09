@@ -7,7 +7,10 @@
  */
 
 // Editor + renderer components
-export { MkBlockEditor } from './block-editor/block-editor';
+export {
+  MkBlockEditor,
+  type MkBlockValueFormat,
+} from './block-editor/block-editor';
 export { MkBlockRenderer } from './block-editor/block-renderer';
 
 // Document model
@@ -33,7 +36,7 @@ export {
   mkMergeBlockDefinitions,
 } from './block-editor/block-registry';
 
-// Serializers
+// Serializers + HTML parser (round-trip: MkBlockDocument ⇄ HTML)
 export {
   mkBlocksToHtml,
   mkBlocksToText,
@@ -42,3 +45,4 @@ export {
   mkIsSafeUrl,
   sanitizeInlineHtml,
 } from './block-editor/block-serializer';
+export { mkHtmlToBlocks } from './block-editor/block-parser';
