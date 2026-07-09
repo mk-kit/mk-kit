@@ -16,6 +16,7 @@ import {
   MkColorPicker,
   MkNumberInput,
   MkOtp,
+  MkPasswordInput,
   MkRadio,
   MkRangeSlider,
   type MkRange,
@@ -53,6 +54,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkRating,
     MkNumberInput,
     MkOtp,
+    MkPasswordInput,
     MkAutosize,
     MkColorPicker,
     MkRangeSlider,
@@ -184,6 +186,53 @@ import { DocsExample } from '../../shared/docs-example';
         <tbody>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored (inherited) inside an mk-form-field.</td></tr>
           <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid visual + aria-invalid when used standalone.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <!-- PASSWORD INPUT -->
+      <!-- ============================================================ -->
+      <h2>Password input</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-password-input&gt;</code> is a password
+        field with a reveal toggle (show/hide the characters), an optional 0–4
+        strength meter and an optional rules checklist that ticks off as the
+        password grows. It implements
+        <code class="docs-inline">ControlValueAccessor</code> over a string with a
+        two-way <code class="docs-inline">[(value)]</code> model and, inside an
+        <code class="docs-inline">&lt;mk-form-field&gt;</code>, wires its label,
+        description and validity automatically.
+      </p>
+
+      <docs-example [code]="passwordCode" [column]="true">
+        <div style="max-width: 26rem; width: 100%;">
+          <mk-password-input
+            [(value)]="password"
+            showStrength
+            showRules
+            [minLength]="10"
+            placeholder="Create a password"
+          />
+        </div>
+        <mk-form-field label="Password" style="max-width: 26rem; width: 100%;">
+          <mk-password-input [(value)]="password" [minLength]="10" placeholder="Create a password" />
+        </mk-form-field>
+        <p class="echo">{{ password().length }} characters</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way password value ([(value)] / [(ngModel)]).</td></tr>
+          <tr><td>placeholder</td><td>string</td><td>''</td><td>Placeholder shown when empty.</td></tr>
+          <tr><td>showStrength</td><td>boolean</td><td>false</td><td>Show the 0–4 strength meter below the field.</td></tr>
+          <tr><td>showRules</td><td>boolean</td><td>false</td><td>Show the rules checklist below the field.</td></tr>
+          <tr><td>minLength</td><td>number</td><td>8</td><td>Minimum length used by the strength score and rules.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
+          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling when standalone.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
         </tbody>
       </table>
 
@@ -624,6 +673,9 @@ export class FormsPage {
     return `${done} uploaded`;
   });
 
+  // --- Password input -------------------------------------------------------
+  protected readonly password = signal('');
+
   // --- Rating / number / otp / autosize -------------------------------------
   protected readonly score = signal(3);
   protected readonly qty = signal<number | null>(1);
@@ -633,6 +685,17 @@ export class FormsPage {
   protected readonly palette = [
     '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#111827',
   ];
+
+  protected readonly passwordCode = `<mk-password-input
+  [(value)]="password"
+  showStrength
+  showRules
+  [minLength]="10"
+  placeholder="Create a password" />
+
+<mk-form-field label="Password">
+  <mk-password-input [(value)]="password" [minLength]="10" placeholder="Create a password" />
+</mk-form-field>`;
 
   protected readonly ratingCode = `<mk-rating [(value)]="score" />`;
   protected readonly colorCode = `<mk-color-picker [(value)]="brand" [swatches]="palette" />`;

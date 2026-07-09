@@ -11,15 +11,21 @@ import {
   MkDialog,
   MkDialogService,
   MkDialogTitle,
+  MkHovercard,
+  MkHovercardTrigger,
   MkLoadingBar,
   MkLoadingBarService,
+  type MkNotification,
+  MkNotificationCenter,
   MkOverlayRef,
   MkPopconfirm,
   MkPopconfirmTrigger,
   MkPopover,
   MkPopoverTrigger,
+  MkResult,
   MkToastService,
   MkTooltip,
+  MkTourService,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -80,6 +86,10 @@ export class DemoDialogContent {
     MkPopconfirm,
     MkPopconfirmTrigger,
     MkLoadingBar,
+    MkHovercard,
+    MkHovercardTrigger,
+    MkNotificationCenter,
+    MkResult,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -625,6 +635,100 @@ export class DemoDialogContent {
           </tr>
         </tbody>
       </table>
+
+      <!-- ============================ HOVERCARD ============================ -->
+      <h2>Hovercard</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-hovercard&gt;</code> is a rich hover
+        preview (in the spirit of GitHub user cards), opened on hover/focus of a
+        trigger via <code class="docs-inline">[mkHovercardFor]</code>. Unlike a
+        tooltip it projects arbitrary content; unlike a popover it opens on hover
+        after a short delay and stays open while you move onto the card. Hover the
+        mention below.
+      </p>
+      <docs-example [code]="hovercardCode">
+        <p style="margin: 0;">
+          Reviewed by
+          <a href="#" class="docs-mention" [mkHovercardFor]="ada">@ada</a>
+          two hours ago.
+        </p>
+        <mk-hovercard #ada ariaLabel="Ada Lovelace">
+          <div class="docs-hovercard">
+            <span class="docs-hovercard-avatar" aria-hidden="true">AL</span>
+            <div>
+              <strong class="docs-hovercard-name">Ada Lovelace</strong>
+              <span class="docs-hovercard-role">Principal Engineer · Core</span>
+              <p class="docs-hovercard-bio">
+                Works on the compiler and analytical engine. Occasionally writes
+                the first program.
+              </p>
+            </div>
+          </div>
+        </mk-hovercard>
+      </docs-example>
+
+      <!-- ======================= NOTIFICATION CENTER ======================= -->
+      <h2>Notification center</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-notification-center&gt;</code> is a bell
+        trigger with an unread-count badge that opens a dropdown listing
+        notifications. Bind the list with two-way
+        <code class="docs-inline">[(notifications)]</code>; clicking a row marks it
+        read (updating the model immutably) and
+        <strong>Mark all read</strong> clears every unread item. Click the bell:
+      </p>
+      <docs-example [code]="notificationCode">
+        <mk-notification-center
+          [(notifications)]="notifications"
+          (itemClick)="onNotificationClick($event)"
+        />
+        <span class="docs-status">{{ notificationStatus() }}</span>
+      </docs-example>
+
+      <!-- ============================ RESULT ============================ -->
+      <h2>Result</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-result&gt;</code> is a centred, full-page
+        status state — a success confirmation or an empty 404/403/500 page. Set a
+        <code class="docs-inline">status</code> preset (which picks the icon and
+        its tone), a <code class="docs-inline">resultTitle</code> and
+        <code class="docs-inline">subtitle</code>, and project action buttons into
+        the <code class="docs-inline">[mkResultActions]</code> slot.
+      </p>
+      <docs-example [code]="resultCode" [column]="true">
+        <mk-result
+          status="success"
+          resultTitle="Payment complete"
+          subtitle="Your order #A-1042 is confirmed and on its way."
+        >
+          <button mkButton mkResultActions>View order</button>
+          <button mkButton variant="ghost" mkResultActions>Back home</button>
+        </mk-result>
+        <mk-result
+          status="404"
+          resultTitle="Page not found"
+          subtitle="We couldn't find the page you were looking for."
+        >
+          <button mkButton variant="outline" mkResultActions>Go home</button>
+        </mk-result>
+      </docs-example>
+
+      <!-- ============================ TOUR ============================ -->
+      <h2>Tour</h2>
+      <p>
+        <code class="docs-inline">MkTourService</code> walks the user through a
+        sequence of <code class="docs-inline">MkTourStep</code>s: for each it dims
+        the page, highlights the target with a bright ring, and anchors a coach-mark
+        popover to it. Inject the service and call
+        <code class="docs-inline">start(steps)</code> — it resolves when the tour
+        finishes, is skipped, or Escaped. Start the tour to highlight the two marked
+        elements below:
+      </p>
+      <docs-example [code]="tourCode">
+        <button mkButton (click)="startTour()">Take a tour</button>
+        <span id="tour-step-1" class="docs-tour-target">Create</span>
+        <span id="tour-step-2" class="docs-tour-target">Inbox</span>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -651,12 +755,61 @@ export class DemoDialogContent {
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
       }
+      .docs-mention {
+        color: var(--mk-primary);
+        font-weight: var(--mk-font-weight-medium);
+        text-decoration: none;
+      }
+      .docs-mention:hover {
+        text-decoration: underline;
+      }
+      .docs-hovercard {
+        display: flex;
+        gap: var(--mk-space-3);
+        max-width: 20rem;
+      }
+      .docs-hovercard-avatar {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        flex: none;
+        width: 2.5rem;
+        height: 2.5rem;
+        border-radius: var(--mk-radius-full);
+        background: var(--mk-primary);
+        color: var(--mk-primary-contrast);
+        font-size: var(--mk-font-size-sm);
+        font-weight: var(--mk-font-weight-bold);
+      }
+      .docs-hovercard-name {
+        display: block;
+      }
+      .docs-hovercard-role {
+        display: block;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+      .docs-hovercard-bio {
+        margin: var(--mk-space-2) 0 0;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+      .docs-tour-target {
+        display: inline-flex;
+        align-items: center;
+        padding: var(--mk-space-2) var(--mk-space-3);
+        border: 1px solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
     `,
   ],
 })
 export class FeedbackPage {
   private readonly toast = inject(MkToastService);
   private readonly dialog = inject(MkDialogService);
+  private readonly tour = inject(MkTourService);
   protected readonly loadingBar = inject(MkLoadingBarService);
   protected readonly loadingBarCode = `// Place once (e.g. in the app shell):
 // <mk-loading-bar />
@@ -679,6 +832,58 @@ router.events.subscribe(e => {
 
   protected onDeleted(): void {
     this.deleteStatus.set('Item deleted ✓');
+  }
+
+  // --------------------------- Notification center ---------------------------
+  protected readonly notifications = signal<MkNotification[]>([
+    {
+      id: 1,
+      title: 'Ada mentioned you',
+      body: 'Re: “Ship the analytical engine milestone”.',
+      time: '2m ago',
+    },
+    {
+      id: 2,
+      title: 'Build #482 passed',
+      body: 'All 1,204 checks green on main.',
+      time: '18m ago',
+    },
+    {
+      id: 3,
+      title: 'New teammate joined',
+      body: 'Grace Hopper accepted your invite.',
+      time: '1h ago',
+      read: true,
+    },
+    {
+      id: 4,
+      title: 'Weekly digest',
+      body: '6 pull requests merged this week.',
+      time: 'Yesterday',
+      read: true,
+    },
+  ]);
+  protected readonly notificationStatus = signal('No notification opened yet.');
+
+  protected onNotificationClick(item: MkNotification): void {
+    this.notificationStatus.set(`Opened: ${item.title}`);
+  }
+
+  // ------------------------------- Tour -------------------------------
+  protected startTour(): void {
+    this.tour.start([
+      {
+        target: '#tour-step-1',
+        title: 'Create',
+        body: 'Start a new project from here whenever you need one.',
+      },
+      {
+        target: '#tour-step-2',
+        title: 'Inbox',
+        body: 'Your mentions and updates land here.',
+        placement: 'bottom',
+      },
+    ]);
   }
 
   // ------------------------------- Toast -------------------------------
@@ -753,6 +958,47 @@ router.events.subscribe(e => {
   }
 
   // --------------------------- Code snippets ---------------------------
+  protected readonly hovercardCode = `<a href="/u/ada" [mkHovercardFor]="ada">@ada</a>
+<mk-hovercard #ada ariaLabel="Ada Lovelace">
+  <div class="card">
+    <span class="avatar">AL</span>
+    <div>
+      <strong>Ada Lovelace</strong>
+      <span>Principal Engineer · Core</span>
+      <p>Works on the compiler and analytical engine.</p>
+    </div>
+  </div>
+</mk-hovercard>`;
+
+  protected readonly notificationCode = `<mk-notification-center
+  [(notifications)]="notifications"
+  (itemClick)="onNotificationClick($event)" />
+
+// notifications = signal<MkNotification[]>([
+//   { id: 1, title: 'Ada mentioned you', body: '…', time: '2m ago' },
+//   { id: 3, title: 'New teammate joined', body: '…', time: '1h ago', read: true },
+// ]);`;
+
+  protected readonly resultCode = `<mk-result status="success" resultTitle="Payment complete"
+  subtitle="Your order #A-1042 is confirmed and on its way.">
+  <button mkButton mkResultActions>View order</button>
+  <button mkButton variant="ghost" mkResultActions>Back home</button>
+</mk-result>
+
+<mk-result status="404" resultTitle="Page not found"
+  subtitle="We couldn't find the page you were looking for.">
+  <button mkButton variant="outline" mkResultActions>Go home</button>
+</mk-result>`;
+
+  protected readonly tourCode = `private readonly tour = inject(MkTourService);
+
+startTour(): void {
+  this.tour.start([
+    { target: '#tour-step-1', title: 'Create', body: 'Start a new project here.' },
+    { target: '#tour-step-2', title: 'Inbox', body: 'Your mentions land here.', placement: 'bottom' },
+  ]);
+}`;
+
   protected readonly popoverCode = `<button mkButton [mkPopoverTriggerFor]="info">Shipping details</button>
 <mk-popover #info ariaLabel="Shipping details">
   <h4>Free shipping</h4>

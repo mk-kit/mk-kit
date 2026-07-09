@@ -3,9 +3,11 @@ import {
   MkCalendar,
   MkDatePicker,
   MkDateRangePicker,
+  MkEventCalendar,
   MkMonthPicker,
   MkTimePicker,
   MkWeekPicker,
+  type MkCalendarEvent,
   type MkDateRange,
   type MkWeek,
   formatDate,
@@ -21,7 +23,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-date-time-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker],
+  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker, MkEventCalendar],
   template: `
     <div class="docs-page docs-container">
       <h1>Date &amp; time</h1>
@@ -285,6 +287,49 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- EVENT CALENDAR -->
+      <!-- ============================================================ -->
+      <h2>Event calendar</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-event-calendar&gt;</code> is a display-only
+        month-grid scheduler: it plots
+        <code class="docs-inline">MkCalendarEvent</code>s —
+        <code class="docs-inline">&#123; date, title, color?, id? &#125;</code> — as
+        coloured pills on the day they fall on, capped at
+        <code class="docs-inline">maxPerDay</code> with a "+N more" line for the rest.
+        It exposes the viewed month as a two-way
+        <code class="docs-inline">[(viewDate)]</code> and emits
+        <code class="docs-inline">dayClick</code> /
+        <code class="docs-inline">eventClick</code>.
+      </p>
+
+      <docs-example [code]="eventCalendarCode" [column]="true">
+        <mk-event-calendar
+          [events]="events()"
+          [(viewDate)]="calMonth"
+          [firstDayOfWeek]="1"
+          (dayClick)="onDayClick($event)"
+          (eventClick)="onEventClick($event)"
+        />
+        <p class="echo">Last activity: {{ lastActivity() }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>events</td><td>readonly MkCalendarEvent[]</td><td>[]</td><td>Events to plot onto the grid.</td></tr>
+          <tr><td>viewDate</td><td>model&lt;Date&gt;</td><td>new Date()</td><td>Two-way month being viewed (any day within it).</td></tr>
+          <tr><td>firstDayOfWeek</td><td>number (0–6)</td><td>0</td><td>First column of the week; 0 = Sunday … 6 = Saturday.</td></tr>
+          <tr><td>maxPerDay</td><td>number</td><td>3</td><td>Max event pills per day before collapsing into "+N more".</td></tr>
+          <tr><td>dayClick</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted when a day cell is activated.</td></tr>
+          <tr><td>eventClick</td><td>output&lt;MkCalendarEvent&gt;</td><td>—</td><td>Emitted when an event pill is activated (does not also fire dayClick).</td></tr>
+          <tr><td>monthChange</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted when the viewed month changes via prev/next.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -351,6 +396,19 @@ export class DateTimePage {
     return `${s} → ${e}`;
   });
 
+  // --- Event calendar -------------------------------------------------------
+  protected readonly calMonth = signal<Date>(new Date());
+  protected readonly events = signal<readonly MkCalendarEvent[]>(eventsThisMonth());
+  protected readonly lastActivity = signal<string>('—');
+
+  protected onDayClick(d: Date): void {
+    this.lastActivity.set(`Day clicked: ${formatDate(d, 'MMM d, yyyy')}`);
+  }
+
+  protected onEventClick(event: MkCalendarEvent): void {
+    this.lastActivity.set(`Event clicked: ${event.title} (${formatDate(event.date, 'MMM d')})`);
+  }
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
   protected readonly calendarCode = `calDate = signal<Date | null>(new Date());
 
@@ -397,6 +455,38 @@ year = signal<Date | null>(null);
   protected readonly weekPickerCode = `week = signal<MkWeek | null>(null);
 
 <mk-week-picker [(value)]="week" [firstDayOfWeek]="1" showWeekNumber clearable />`;
+
+  protected readonly eventCalendarCode = `const now = new Date();
+events = signal<MkCalendarEvent[]>([
+  { date: new Date(now.getFullYear(), now.getMonth(), 5), title: 'Kickoff' },
+  { date: new Date(now.getFullYear(), now.getMonth(), 12), title: 'Design review', color: 'var(--mk-success)' },
+  { date: new Date(now.getFullYear(), now.getMonth(), 18), title: 'Sprint demo' },
+  { date: new Date(now.getFullYear(), now.getMonth(), 18), title: 'Retro' },
+  { date: new Date(now.getFullYear(), now.getMonth(), 24), title: 'Release', color: 'var(--mk-warning)' },
+]);
+calMonth = signal<Date>(new Date());
+
+<mk-event-calendar
+  [events]="events()"
+  [(viewDate)]="calMonth"
+  [firstDayOfWeek]="1"
+  (dayClick)="onDayClick($event)"
+  (eventClick)="onEventClick($event)"
+/>`;
+}
+
+/** ~5 events scattered across the current month for the event-calendar demo. */
+function eventsThisMonth(): MkCalendarEvent[] {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = now.getMonth();
+  return [
+    { date: new Date(y, m, 5), title: 'Kickoff' },
+    { date: new Date(y, m, 12), title: 'Design review', color: 'var(--mk-success)' },
+    { date: new Date(y, m, 18), title: 'Sprint demo' },
+    { date: new Date(y, m, 18), title: 'Retro' },
+    { date: new Date(y, m, 24), title: 'Release', color: 'var(--mk-warning)' },
+  ];
 }
 
 /** Local midnight for today. */

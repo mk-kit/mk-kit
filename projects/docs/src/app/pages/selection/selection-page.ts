@@ -8,6 +8,10 @@ import {
   MkFormField,
   MkMultiSelect,
   MkTagInput,
+  MkTransferList,
+  type MkTransferItem,
+  MkTreeSelect,
+  type MkTreeNode,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -32,6 +36,8 @@ interface Framework {
     MkFormField,
     MkMultiSelect,
     MkTagInput,
+    MkTransferList,
+    MkTreeSelect,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -186,6 +192,61 @@ interface Framework {
       </docs-example>
 
       <!-- ============================================================ -->
+      <!-- TRANSFER LIST -->
+      <!-- ============================================================ -->
+      <h2>Transfer list</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-transfer-list&gt;</code> is a dual list
+        box (pick list) for shuttling items between an
+        <strong>available</strong> and a <strong>selected</strong> list — ideal
+        for assigning roles or permissions. Check rows and use the middle move
+        buttons, or press Enter on a row to move it across. Its model is the
+        array of selected values, and <code class="docs-inline">filterable</code>
+        adds a search box over each list.
+      </p>
+      <docs-example [code]="transferListCode" column>
+        <mk-transfer-list
+          filterable
+          [items]="roles"
+          [(value)]="assigned"
+          availableLabel="All roles"
+          selectedLabel="Assigned"
+        />
+        <p class="echo">
+          Assigned:
+          <code class="docs-inline">{{ assigned().join(', ') || '—' }}</code>
+        </p>
+      </docs-example>
+
+      <!-- ============================================================ -->
+      <!-- TREE SELECT -->
+      <!-- ============================================================ -->
+      <h2>Tree select</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-tree-select&gt;</code> is a form field
+        whose popover holds a hierarchical
+        <code class="docs-inline">&lt;mk-tree&gt;</code>. The trigger shows the
+        chosen node's label; opening it reveals the selectable tree in the top
+        layer, so it is never clipped. Picking a node sets the value and closes
+        the panel. Add <code class="docs-inline">clearable</code> for a reset
+        button.
+      </p>
+      <docs-example [code]="treeSelectCode" column>
+        <div style="max-width: 22rem; width: 100%;">
+          <mk-tree-select
+            [nodes]="categories"
+            [(value)]="category"
+            clearable
+            placeholder="Choose a category…"
+          />
+          <p class="echo">
+            Category:
+            <code class="docs-inline">{{ category() ?? '—' }}</code>
+          </p>
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
       <!-- ============================================================ -->
       <h2>Button toggle</h2>
@@ -295,6 +356,40 @@ export class SelectionPage {
     this.searching.set(false);
   }
 
+  // --- transfer list demo ---
+  protected readonly roles: MkTransferItem[] = [
+    { value: 'admin', label: 'Administrator' },
+    { value: 'editor', label: 'Editor' },
+    { value: 'author', label: 'Author' },
+    { value: 'reviewer', label: 'Reviewer' },
+    { value: 'viewer', label: 'Viewer' },
+    { value: 'billing', label: 'Billing manager' },
+  ];
+  protected readonly assigned = signal<unknown[]>(['editor', 'reviewer']);
+
+  // --- tree select demo ---
+  protected readonly categories: MkTreeNode[] = [
+    {
+      label: 'Electronics',
+      value: 'electronics',
+      expanded: true,
+      children: [
+        { label: 'Phones', value: 'phones' },
+        { label: 'Laptops', value: 'laptops' },
+        { label: 'Cameras', value: 'cameras' },
+      ],
+    },
+    {
+      label: 'Home & Garden',
+      value: 'home',
+      children: [
+        { label: 'Furniture', value: 'furniture' },
+        { label: 'Kitchen', value: 'kitchen' },
+      ],
+    },
+  ];
+  protected readonly category = signal<unknown | null>(null);
+
   // --- toggle demos ---
   protected readonly view = signal<unknown>('grid');
   protected readonly formats = signal<unknown[]>(['bold']);
@@ -336,6 +431,37 @@ export class SelectionPage {
   [loading]="searching()"
   (search)="onUserSearch($event)"
   [(value)]="userId" />`;
+
+  protected readonly transferListCode = `roles = signal<MkTransferItem[]>([
+  { value: 'admin', label: 'Administrator' },
+  { value: 'editor', label: 'Editor' },
+  // …
+]);
+assigned = signal<unknown[]>(['editor', 'reviewer']);
+
+<mk-transfer-list
+  filterable
+  [items]="roles"
+  [(value)]="assigned"
+  availableLabel="All roles"
+  selectedLabel="Assigned" />`;
+
+  protected readonly treeSelectCode = `categories = signal<MkTreeNode[]>([
+  {
+    label: 'Electronics', value: 'electronics', expanded: true,
+    children: [
+      { label: 'Phones', value: 'phones' },
+      { label: 'Laptops', value: 'laptops' },
+    ],
+  },
+  // …
+]);
+
+<mk-tree-select
+  [nodes]="categories"
+  [(value)]="category"
+  clearable
+  placeholder="Choose a category…" />`;
 
   protected readonly toggleCode = `<mk-button-toggle-group [(value)]="view" aria-label="View mode">
   <mk-button-toggle value="grid">Grid</mk-button-toggle>

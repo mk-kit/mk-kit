@@ -4,6 +4,7 @@ import {
   MkButton,
   MkClickOutside,
   MkCopyToClipboard,
+  MkHotkey,
   MkInfiniteScroll,
   MkIntersect,
   MkInput,
@@ -25,6 +26,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkButton,
     MkClickOutside,
     MkCopyToClipboard,
+    MkHotkey,
     MkAutofocus,
     MkScrollspy,
     MkIntersect,
@@ -249,6 +251,38 @@ import { DocsExample } from '../../shared/docs-example';
           <p class="echo">Raw phone: {{ phone() || '—' }}</p>
         </div>
       </docs-example>
+
+      <!-- hotkeys -->
+      <h2>Hotkeys</h2>
+      <p>
+        <code class="docs-inline">[mkHotkey]</code> binds a keyboard shortcut to
+        an element via <code class="docs-inline">MkHotkeysService</code>: a
+        <code class="docs-inline">&lt;button&gt;</code> host is clicked when the
+        combo fires, any other host emits
+        <code class="docs-inline">(mkHotkeyPressed)</code>. Use
+        <code class="docs-inline">mod</code> for ⌘ on Mac / Ctrl elsewhere, and
+        space-separated chords like <code class="docs-inline">g h</code>. By
+        default shortcuts are ignored while you type in an input (opt in with
+        <code class="docs-inline">mkHotkeyAllowInInput</code>). Try
+        <kbd>⌘K</kbd> / <kbd>Ctrl K</kbd>, then press <kbd>g</kbd> then
+        <kbd>h</kbd>.
+      </p>
+      <docs-example [code]="hotkeysCode" [column]="true">
+        <div class="hotkey-demo">
+          <button mkButton mkHotkey="mod+k" (click)="onHotkey('mod+k')">
+            Search (⌘K)
+          </button>
+          <button
+            mkButton
+            variant="outline"
+            mkHotkey="g h"
+            (click)="onHotkey('g h')"
+          >
+            Go home (g h)
+          </button>
+        </div>
+        <p class="echo">Last shortcut: {{ lastHotkey() || '—' }}</p>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -397,6 +431,11 @@ import { DocsExample } from '../../shared/docs-example';
         gap: var(--mk-space-3);
         max-width: 20rem;
       }
+      .hotkey-demo {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mk-space-3);
+      }
     `,
   ],
 })
@@ -476,4 +515,23 @@ export class UtilitiesPage {
   #c="mkCopyToClipboard" (copiedText)="onCopied($event)">
   {{ c.justCopied() ? '✓ Copied!' : 'Copy token' }}
 </button>`;
+
+  // --- Hotkeys --------------------------------------------------------------
+  protected readonly lastHotkey = signal('');
+
+  protected onHotkey(name: string): void {
+    this.lastHotkey.set(name);
+  }
+
+  // On a <button>/<a> host, [mkHotkey] click()s the host, so wire (click);
+  // other hosts emit (mkHotkeyPressed). mod = ⌘ on Mac / Ctrl elsewhere.
+  // Note: the browser may swallow real Ctrl+K, but most combos reach the handler.
+  protected readonly hotkeysCode = `<!-- button host: the hotkey clicks it, so listen on (click) -->
+<button mkButton mkHotkey="mod+k" (click)="onHotkey('mod+k')">Search (⌘K)</button>
+
+<!-- a two-step chord: press g, then h -->
+<button mkButton mkHotkey="g h" (click)="onHotkey('g h')">Go home</button>
+
+<!-- non-button host emits (mkHotkeyPressed) instead -->
+<div mkHotkey="?" (mkHotkeyPressed)="showHelp()">…</div>`;
 }

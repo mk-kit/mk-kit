@@ -6,7 +6,10 @@ import {
   MkCarousel,
   MkCarouselSlide,
   MkCode,
+  MkCountdown,
   MkDiff,
+  MkKanban,
+  type MkKanbanColumn,
   MkSkeletonPreset,
   MkVirtualScroll,
   MkCard,
@@ -55,6 +58,8 @@ interface DemoUser {
     MkDescriptionList,
     MkDescItem,
     MkCode,
+    MkCountdown,
+    MkKanban,
     MkVirtualScroll,
     MkCarousel,
     MkCarouselSlide,
@@ -914,6 +919,33 @@ interface DemoUser {
           <mk-skeleton-preset preset="table" [rows]="3" [columns]="4" />
         </div>
       </docs-example>
+
+      <!-- =========================== KANBAN ========================== -->
+      <h2>Kanban</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-kanban&gt;</code> is a board of columns
+        whose cards are <strong>draggable between columns</strong> (and reorderable
+        within one) with both pointer and keyboard dragging. Bind
+        <code class="docs-inline">columns</code> two-way — the model is updated
+        immutably on every drop — and listen to
+        <code class="docs-inline">cardMoved</code> for move events.
+      </p>
+      <docs-example [code]="kanbanCode" [column]="true">
+        <mk-kanban [(columns)]="board" style="width: 100%" />
+      </docs-example>
+
+      <!-- ========================== COUNTDOWN ======================== -->
+      <h2>Countdown</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-countdown&gt;</code> counts down
+        <strong>live</strong>, ticking every second toward a target
+        <code class="docs-inline">to</code> date and showing the remaining days,
+        hours, minutes and seconds. It emits
+        <code class="docs-inline">finished</code> once the instant passes.
+      </p>
+      <docs-example [code]="countdownCode" [column]="true">
+        <mk-countdown [to]="launchDate" />
+      </docs-example>
     </div>
   `,
   styles: [
@@ -938,6 +970,43 @@ export class DataPage {
     { title: 'Accessible', body: 'WCAG 2.1 AA out of the box.', bg: 'var(--mk-success)' },
     { title: 'Themeable', body: 'Every colour is a CSS variable.', bg: 'var(--mk-info)' },
   ];
+
+  // ----- Kanban --------------------------------------------------------
+  protected readonly board = signal<MkKanbanColumn[]>([
+    {
+      id: 'todo',
+      title: 'To do',
+      cards: [
+        { id: 't1', title: 'Draft release notes' },
+        { id: 't2', title: 'Audit colour tokens' },
+        { id: 't3', title: 'Write kanban docs' },
+      ],
+    },
+    {
+      id: 'doing',
+      title: 'In progress',
+      cards: [
+        { id: 'd1', title: 'Ship countdown component' },
+        { id: 'd2', title: 'Review DnD a11y' },
+      ],
+    },
+    {
+      id: 'done',
+      title: 'Done',
+      cards: [
+        { id: 'x1', title: 'Set up docs site' },
+        { id: 'x2', title: 'Publish v1 to npm' },
+      ],
+    },
+  ]);
+
+  protected readonly kanbanCode = `<mk-kanban [(columns)]="board" (cardMoved)="onMoved($event)" />`;
+
+  // ----- Countdown -----------------------------------------------------
+  /** A few days out; computed at construction so SSR/build stays stable. */
+  protected readonly launchDate = new Date(Date.now() + 3 * 24 * 60 * 60 * 1000);
+
+  protected readonly countdownCode = `<mk-countdown [to]="launchDate" (finished)="onLaunch()" />`;
 
   protected readonly codeBlockCode = `<mk-code language="json" filename="config.json"
   lineNumbers [code]="json" />`;
