@@ -3,6 +3,8 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MkClickOutside } from './click-outside';
 import { MkCopyToClipboard } from './copy-to-clipboard';
 import { MkScrollspy } from './scrollspy';
+import { MkIntersect } from './intersect';
+import { MkInfiniteScroll } from './infinite-scroll';
 
 @Component({
   imports: [MkClickOutside],
@@ -190,5 +192,148 @@ describe('MkScrollspy', () => {
     body.dispatchEvent(new Event('scroll')); // no change → no second emit
     expect(dir.activeId()).toBe('s-b');
     expect(emits).toEqual(['s-b']);
+  });
+});
+
+// --- MkIntersect ------------------------------------------------------------
+type IoCb = (entries: Array<{ isIntersecting: boolean }>) => void;
+
+@Component({
+  imports: [MkIntersect],
+  template: `<div
+    mkIntersect
+    [once]="once()"
+    (mkIntersect)="events.set([...events(), $event])"
+  ></div>`,
+})
+class IntersectHost {
+  readonly once = signal(false);
+  readonly events = signal<boolean[]>([]);
+}
+
+describe('MkIntersect', () => {
+  let fixture: ComponentFixture<IntersectHost>;
+  let lastCb: IoCb;
+  let observed: number;
+  let disconnected: number;
+  let originalIO: typeof IntersectionObserver;
+
+  beforeEach(async () => {
+    observed = 0;
+    disconnected = 0;
+    originalIO = globalThis.IntersectionObserver;
+    class MockIO {
+      constructor(cb: IoCb) {
+        lastCb = cb;
+      }
+      observe() {
+        observed++;
+      }
+      disconnect() {
+        disconnected++;
+      }
+      unobserve() {}
+    }
+    globalThis.IntersectionObserver = MockIO as unknown as typeof IntersectionObserver;
+
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(IntersectHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  afterEach(() => {
+    globalThis.IntersectionObserver = originalIO;
+    fixture.destroy();
+  });
+
+  it('observes the host and emits on visibility changes', () => {
+    expect(observed).toBe(1);
+    lastCb([{ isIntersecting: true }]);
+    lastCb([{ isIntersecting: false }]);
+    expect(fixture.componentInstance.events()).toEqual([true, false]);
+  });
+
+  it('does not re-emit the same visibility state', () => {
+    lastCb([{ isIntersecting: true }]);
+    lastCb([{ isIntersecting: true }]);
+    expect(fixture.componentInstance.events()).toEqual([true]);
+  });
+
+  it('disconnects after the first hit when once is set', async () => {
+    fixture.componentInstance.once.set(true);
+    fixture.detectChanges();
+    lastCb([{ isIntersecting: true }]);
+    expect(disconnected).toBe(1);
+    // A later callback is ignored (observer gone in real usage).
+    lastCb([{ isIntersecting: false }]);
+    expect(fixture.componentInstance.events()).toEqual([true]);
+  });
+});
+
+// --- MkInfiniteScroll -------------------------------------------------------
+@Component({
+  imports: [MkInfiniteScroll],
+  template: `<div
+    mkInfiniteScroll
+    [distance]="50"
+    [disabled]="disabled()"
+    (mkInfiniteScroll)="hits.set(hits() + 1)"
+  ></div>`,
+})
+class InfiniteHost {
+  readonly disabled = signal(false);
+  readonly hits = signal(0);
+}
+
+describe('MkInfiniteScroll', () => {
+  let fixture: ComponentFixture<InfiniteHost>;
+  let el: HTMLElement;
+
+  function setScroll(scrollTop: number, clientH = 200, scrollH = 1000): void {
+    Object.defineProperty(el, 'clientHeight', { value: clientH, configurable: true });
+    Object.defineProperty(el, 'scrollHeight', { value: scrollH, configurable: true });
+    el.scrollTop = scrollTop;
+  }
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(InfiniteHost);
+    el = fixture.nativeElement.querySelector('div') as HTMLElement;
+    // Not near the bottom when the initial check runs on afterNextRender.
+    setScroll(0);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('fires once when scrolled within distance of the bottom', () => {
+    setScroll(760); // remaining = 1000 - 760 - 200 = 40 <= 50
+    el.dispatchEvent(new Event('scroll'));
+    el.dispatchEvent(new Event('scroll')); // still near bottom → armed=false, no re-fire
+    expect(fixture.componentInstance.hits()).toBe(1);
+  });
+
+  it('re-arms after scrolling back up past the threshold', () => {
+    setScroll(760);
+    el.dispatchEvent(new Event('scroll'));
+    setScroll(100); // remaining = 700 > 50 → re-arm
+    el.dispatchEvent(new Event('scroll'));
+    setScroll(760);
+    el.dispatchEvent(new Event('scroll'));
+    expect(fixture.componentInstance.hits()).toBe(2);
+  });
+
+  it('does not fire while disabled', () => {
+    fixture.componentInstance.disabled.set(true);
+    fixture.detectChanges();
+    setScroll(760);
+    el.dispatchEvent(new Event('scroll'));
+    expect(fixture.componentInstance.hits()).toBe(0);
   });
 });

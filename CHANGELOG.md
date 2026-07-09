@@ -8,6 +8,13 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mkIntersect`** — a thin `IntersectionObserver` wrapper. Emits
+  `(mkIntersect)` with the host's visibility and exposes an `intersecting()`
+  signal; `once` fires a single time and disconnects (reveal-on-scroll, lazy
+  loading).
+- **`mkInfiniteScroll`** — emits `(mkInfiniteScroll)` when its scroll container
+  nears the bottom (`distance`), re-arming after you scroll back up; `disabled`
+  pauses it while loading or when everything is loaded.
 - **`mk-week-picker`** — pick a whole calendar week from the popover calendar;
   hovering a day previews its entire week, clicking selects it. Value is an
   `MkWeek` (`{ start, end }`, aligned to `firstDayOfWeek`); `showWeekNumber`

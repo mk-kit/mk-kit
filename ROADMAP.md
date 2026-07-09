@@ -98,7 +98,11 @@ live-announcer core.
 ### Directives / utilities
 - ✅ **clickOutside** (`mkClickOutside`) + **copy-to-clipboard**
   (`mkCopyToClipboard`) — shipped; docs at `/components/utilities`.
-- ✅ **autofocus** (`mkAutofocus`) shipped. **P2 intersection/lazy-load**, **P2 infinite-scroll**, **P3 ripple** remaining.
+- ✅ **autofocus** (`mkAutofocus`) shipped.
+- ✅ **intersect / lazy-load** (`mkIntersect`) — `IntersectionObserver` wrapper,
+  `(mkIntersect)` + `intersecting()` signal, `once` for reveal/lazy (shipped).
+- ✅ **infinite-scroll** (`mkInfiniteScroll`) — fires near the scroll bottom,
+  re-arms, `disabled` guard (shipped). **P3 ripple** remaining.
 
 ### Pickers
 - ✅ **Month / year picker** (`mk-month-picker`, `mode="month" | "year"`) — compact
@@ -144,7 +148,6 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
-1. **Intersection / lazy-load / infinite-scroll** directives — remaining P2 utilities.
-2. **Mini inline date** — remaining picker P3.
-3. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
+1. **Mini inline date** — remaining picker P3.
+2. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
    high-contrast theme, heatmap/scatter charts).

@@ -1,9 +1,11 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import {
   MkAutofocus,
   MkButton,
   MkClickOutside,
   MkCopyToClipboard,
+  MkInfiniteScroll,
+  MkIntersect,
   MkScrollspy,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
@@ -22,6 +24,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkCopyToClipboard,
     MkAutofocus,
     MkScrollspy,
+    MkIntersect,
+    MkInfiniteScroll,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -140,6 +144,61 @@ import { DocsExample } from '../../shared/docs-example';
           </div>
         </div>
       </docs-example>
+
+      <!-- intersect -->
+      <h2>Intersect (reveal on scroll)</h2>
+      <p>
+        <code class="docs-inline">mkIntersect</code> wraps
+        <code class="docs-inline">IntersectionObserver</code>: it emits
+        <code class="docs-inline">(mkIntersect)</code> as the host enters/leaves
+        the viewport and exposes an
+        <code class="docs-inline">intersecting()</code> signal. Add
+        <code class="docs-inline">once</code> to fire a single time (lazy loading,
+        one-shot animations). Scroll the box — the card fades in when it appears.
+      </p>
+      <docs-example [code]="intersectCode" [column]="true">
+        <div class="io-demo" #ioRoot>
+          <p class="io-hint">Scroll down ↓</p>
+          <div
+            class="io-target"
+            mkIntersect
+            [root]="ioRoot"
+            rootMargin="0px 0px -20px 0px"
+            #io="mkIntersect"
+            [class.io-target--in]="io.intersecting()"
+          >
+            {{ io.intersecting() ? '✓ In view' : 'Out of view' }}
+          </div>
+        </div>
+      </docs-example>
+
+      <!-- infinite scroll -->
+      <h2>Infinite scroll</h2>
+      <p>
+        <code class="docs-inline">mkInfiniteScroll</code> emits
+        <code class="docs-inline">(mkInfiniteScroll)</code> when its scroll
+        container nears the bottom, so you can load the next page. It fires once
+        per approach and re-arms after you scroll back up.
+        <code class="docs-inline">disabled</code> pauses it while loading or when
+        everything is loaded. Loaded <strong>{{ feedItems().length }}</strong> of
+        60 items.
+      </p>
+      <docs-example [code]="infiniteCode" [column]="true">
+        <div
+          class="feed"
+          mkInfiniteScroll
+          [distance]="80"
+          [disabled]="feedDone()"
+          (mkInfiniteScroll)="loadMore()"
+        >
+          @for (n of feedItems(); track n) {
+            <div class="feed-item">Item #{{ n }}</div>
+          }
+          @if (feedDone()) {
+            <div class="feed-end">— end —</div>
+          }
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -196,6 +255,56 @@ import { DocsExample } from '../../shared/docs-example';
       .spy-body h3 {
         margin: 0 0 var(--mk-space-2);
       }
+      .io-demo {
+        height: 12rem;
+        overflow-y: auto;
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        background: var(--mk-surface);
+      }
+      .io-hint {
+        height: 14rem;
+        margin: 0;
+        display: grid;
+        place-items: center;
+        color: var(--mk-text-subtle);
+      }
+      .io-target {
+        margin: 0 var(--mk-space-4) var(--mk-space-4);
+        padding: var(--mk-space-6);
+        display: grid;
+        place-items: center;
+        font-weight: var(--mk-font-weight-semibold);
+        color: var(--mk-text-muted);
+        background: var(--mk-surface-2);
+        border-radius: var(--mk-radius-md);
+        opacity: 0;
+        transform: translateY(1rem);
+        transition:
+          opacity var(--mk-duration-slow, 400ms) var(--mk-ease-standard),
+          transform var(--mk-duration-slow, 400ms) var(--mk-ease-standard);
+      }
+      .io-target--in {
+        opacity: 1;
+        transform: none;
+        color: var(--mk-success);
+      }
+      .feed {
+        height: 14rem;
+        overflow-y: auto;
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        background: var(--mk-surface);
+      }
+      .feed-item {
+        padding: var(--mk-space-3) var(--mk-space-4);
+        border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+      }
+      .feed-end {
+        padding: var(--mk-space-4);
+        text-align: center;
+        color: var(--mk-text-subtle);
+      }
     `,
   ],
 })
@@ -218,6 +327,31 @@ export class UtilitiesPage {
     const el = container.querySelector<HTMLElement>(`#${id}`);
     if (el) container.scrollTo({ top: el.offsetTop, behavior: 'smooth' });
   }
+
+  // --- Infinite scroll ------------------------------------------------------
+  protected readonly feedItems = signal<number[]>(
+    Array.from({ length: 20 }, (_, i) => i + 1),
+  );
+  protected readonly feedDone = computed(() => this.feedItems().length >= 60);
+
+  protected loadMore(): void {
+    const start = this.feedItems().length;
+    if (start >= 60) return;
+    this.feedItems.update((items) => [
+      ...items,
+      ...Array.from({ length: 10 }, (_, i) => start + i + 1),
+    ]);
+  }
+
+  protected readonly intersectCode = `<div class="target" mkIntersect once
+  #io="mkIntersect" [class.in-view]="io.intersecting()">
+  {{ io.intersecting() ? 'In view' : 'Out of view' }}
+</div>`;
+
+  protected readonly infiniteCode = `<div class="feed" mkInfiniteScroll
+  [disabled]="loading() || done()" (mkInfiniteScroll)="loadMore()">
+  @for (item of items(); track item.id) { … }
+</div>`;
 
   protected readonly scrollspyCode = `<nav mkScrollspy="section[id]" [root]="body" #spy="mkScrollspy">
   @for (s of sections; track s.id) {
