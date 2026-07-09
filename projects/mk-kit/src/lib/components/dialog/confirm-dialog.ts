@@ -20,6 +20,8 @@ export interface MkConfirmDialogData {
   cancelText?: string;
   /** Tone of the confirm button (and `alertdialog` semantics when `danger`). */
   tone?: 'primary' | 'danger' | 'warning' | 'success';
+  /** Hide the cancel button — a single-button acknowledgement (`alert`). */
+  hideCancel?: boolean;
 }
 
 /**

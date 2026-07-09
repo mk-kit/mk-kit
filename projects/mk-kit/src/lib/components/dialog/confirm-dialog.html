@@ -2,9 +2,11 @@
   <p class="mk-confirm-dialog__message">{{ data.message }}</p>
 
   <div mkDialogFooter>
-    <button mkButton variant="ghost" tone="neutral" (click)="cancel()">
-      {{ cancelText() }}
-    </button>
+    @if (!data.hideCancel) {
+      <button mkButton variant="ghost" tone="neutral" (click)="cancel()">
+        {{ cancelText() }}
+      </button>
+    }
     <button mkButton [tone]="confirmTone()" (click)="confirm()">
       {{ confirmText() }}
     </button>

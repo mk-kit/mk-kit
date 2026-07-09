@@ -155,8 +155,54 @@ live-announcer core.
 ## Suggested near-term order
 
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
-are shipped. What's left is P2/P3:
+are shipped. What's left of Round 1 is P2/P3:
 
 1. **Mini inline date** — remaining picker P3.
 2. RTL audit + density mode; then P3 polish (QR, theme-builder,
    high-contrast theme, funnel/treemap charts).
+
+---
+
+## Round 2 — proposed new controls
+
+The Round 1 gap analysis above is essentially complete. This is a fresh pass of
+genuinely useful controls still missing, measured against modern component
+libraries (Radix, Ark, PrimeNG, Ant) and SaaS/admin needs. Each notes the
+existing primitive it would reuse. Priorities as before.
+
+### Tier 1 — high value, clean fit
+- ✅ **Imperative dialogs** — `MkDialogService` already had `confirm()`; added
+  `alert()` (single-button) and `prompt()` (text input) — Promise-based, over the
+  existing overlay/dialog (shipped).
+- **P1 `mkMask`** — input-mask directive (phone, card, date, custom pattern) with
+  a clean unmasked model value. A very common gap.
+- **P1 `mk-tag-input`** — freeform token/chip input (create-on-Enter, paste-split,
+  Backspace-removes). Distinct from `mk-multi-select` (option-bound); reuses
+  `MkChip`. Keywords/tags for the CMS.
+- **P1 `mkEditable` / `mk-inline-edit`** — click text to edit in place, with
+  save/cancel/Escape and a pending state. Ubiquitous in admin tables & detail views.
+- **P2 `mk-password-input`** — reveal toggle + strength meter + optional rules
+  checklist. Auth/settings forms.
+
+### Tier 2 — useful, moderate size
+- **P2 `mk-transfer-list`** — dual list box to move items between "available" and
+  "selected" (role/permission assignment). Reuses list + checkbox + button.
+- **P2 `mk-tree-select`** — hierarchical dropdown select (category/folder pickers);
+  reuses `mk-tree` inside an `MkAnchoredPanel`.
+- **P2 `mk-hovercard`** — rich hover-preview panel (user/link cards); reuses
+  `MkAnchoredPanel` with open/close delays.
+- **P2 `MkHotkeys` + `mkHotkey`** — global keyboard-shortcut registry (scopes,
+  `⌘K`-style chords) with a "?" cheat-sheet overlay. Power-user admin.
+- **P3 `mk-tour`** — product-onboarding coach marks anchored to elements; reuses
+  `MkAnchoredPanel` + focus management.
+
+### Tier 3 — larger / specialized
+- **P2 Data-grid pro** — extend `mk-table`: column resize / reorder / pin, sticky
+  columns, inline cell edit. The biggest single value-add for admin.
+- **P3 `mk-event-calendar`** — month scheduler with events (reuses `mk-calendar`
+  grid math).
+- **P3 `mk-kanban`** — draggable board columns (reuses the dnd module).
+- **P3 `mk-notification-center`** — notification inbox panel (reuses drawer/list/badge).
+- **P3 `mk-result`** — full-page success / error / 404 status states (complements
+  `mk-empty-state`).
+- **P3 `mk-countdown`** — count-to-date / stopwatch display.

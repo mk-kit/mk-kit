@@ -5,6 +5,7 @@ import {
 } from '../../core/overlay/overlay.service';
 import { MkOverlayRef } from '../../core/overlay/overlay-ref';
 import { MkConfirmDialog, MkConfirmDialogData } from './confirm-dialog';
+import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
 
 /** Configuration for `MkDialogService.open`. Extends the raw overlay config. */
 export interface MkDialogConfig<TData = unknown>
@@ -56,6 +57,34 @@ export class MkDialogService {
       },
     );
     return ref.afterClosed.then((result) => result === true);
+  }
+
+  /**
+   * Open a single-button acknowledgement dialog. Resolves when the user
+   * dismisses it (button, Escape, or backdrop).
+   */
+  alert(data: Omit<MkConfirmDialogData, 'hideCancel' | 'cancelText'>): Promise<void> {
+    const ref = this.open<MkConfirmDialog, boolean, MkConfirmDialogData>(
+      MkConfirmDialog,
+      {
+        data: { ...data, hideCancel: true, confirmText: data.confirmText ?? 'OK' },
+        role: data.tone === 'danger' ? 'alertdialog' : 'dialog',
+        ariaLabel: data.title,
+      },
+    );
+    return ref.afterClosed.then(() => undefined);
+  }
+
+  /**
+   * Open a single-field prompt dialog. Resolves with the entered string, or
+   * `null` if the user cancels, presses Escape, or clicks the backdrop.
+   */
+  prompt(data: MkPromptDialogData): Promise<string | null> {
+    const ref = this.open<MkPromptDialog, string | null, MkPromptDialogData>(
+      MkPromptDialog,
+      { data, ariaLabel: data.title },
+    );
+    return ref.afterClosed.then((result) => result ?? null);
   }
 
   private mergePanelClass(

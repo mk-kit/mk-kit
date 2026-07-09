@@ -1,0 +1,27 @@
+<mk-dialog [dialogTitle]="data.title" hideClose>
+  @if (data.message) {
+    <p class="mk-confirm-dialog__message">{{ data.message }}</p>
+  }
+
+  <mk-form-field [label]="data.label ?? ''">
+    <input
+      #input
+      mkInput
+      [attr.type]="data.inputType ?? 'text'"
+      [value]="value()"
+      [attr.placeholder]="data.placeholder ?? null"
+      [attr.required]="data.required ? '' : null"
+      (input)="onInput($event)"
+      (keydown.enter)="submit()"
+    />
+  </mk-form-field>
+
+  <div mkDialogFooter>
+    <button mkButton variant="ghost" tone="neutral" (click)="cancel()">
+      {{ cancelText() }}
+    </button>
+    <button mkButton (click)="submit()" [disabled]="!canConfirm()">
+      {{ confirmText() }}
+    </button>
+  </div>
+</mk-dialog>

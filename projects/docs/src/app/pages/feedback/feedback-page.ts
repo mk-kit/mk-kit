@@ -485,6 +485,23 @@ export class DemoDialogContent {
         </span>
       </docs-example>
 
+      <h3>Alert &amp; prompt</h3>
+      <p>
+        <code class="docs-inline">alert()</code> shows a single-button
+        acknowledgement (resolves when dismissed);
+        <code class="docs-inline">prompt()</code> collects one value and resolves
+        with the string, or <code class="docs-inline">null</code> if cancelled.
+      </p>
+      <docs-example [code]="alertPromptCode">
+        <button mkButton variant="outline" (click)="openAlert()">Show alert…</button>
+        <button mkButton variant="outline" (click)="openPrompt()">Rename…</button>
+        <span class="docs-status">
+          @if (promptResult(); as r) {
+            Renamed to: {{ r }}
+          }
+        </span>
+      </docs-example>
+
       <h3>Custom dialog</h3>
       <p>
         Pass a standalone component to
@@ -652,6 +669,7 @@ router.events.subscribe(e => {
   protected readonly alertVisible = signal(true);
   protected readonly confirmResult = signal<boolean | null>(null);
   protected readonly openResult = signal<string | null>(null);
+  protected readonly promptResult = signal<string | null>(null);
   protected readonly deleteStatus = signal('Nothing deleted yet.');
   protected readonly bannerOpen = signal(true);
   protected readonly bannerCode = `<mk-banner tone="warning" title="Storage almost full" dismissible>
@@ -714,6 +732,24 @@ router.events.subscribe(e => {
     });
     const result = await ref.afterClosed;
     this.openResult.set(result ?? 'dismissed');
+  }
+
+  protected async openAlert(): Promise<void> {
+    await this.dialog.alert({
+      title: 'Export started',
+      message: 'Your export is being prepared. We’ll email you when it’s ready.',
+    });
+  }
+
+  protected async openPrompt(): Promise<void> {
+    const name = await this.dialog.prompt({
+      title: 'Rename workspace',
+      label: 'Workspace name',
+      value: 'Acme Inc.',
+      required: true,
+      confirmText: 'Rename',
+    });
+    if (name !== null) this.promptResult.set(name);
   }
 
   // --------------------------- Code snippets ---------------------------
@@ -794,6 +830,22 @@ async delete(): Promise<void> {
   });
   if (confirmed) remove();
 }`;
+
+  protected readonly alertPromptCode = `// Single-button acknowledgement
+await this.dialog.alert({
+  title: 'Export started',
+  message: 'We’ll email you when it’s ready.',
+});
+
+// Collect one value — resolves to the string, or null on cancel
+const name = await this.dialog.prompt({
+  title: 'Rename workspace',
+  label: 'Workspace name',
+  value: 'Acme Inc.',
+  required: true,
+  confirmText: 'Rename',
+});
+if (name !== null) rename(name);`;
 
   protected readonly openCode = `const ref = this.dialog.open<DemoDialogContent, string>(DemoDialogContent, {
   ariaLabel: 'Invite teammate',

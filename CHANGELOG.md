@@ -6,6 +6,13 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **`MkDialogService.alert()` and `.prompt()`** — imperative single-button
+  acknowledgement and single-field prompt dialogs, alongside the existing
+  `confirm()`. `alert()` resolves on dismiss; `prompt()` resolves with the
+  entered string (or `null` on cancel), supports `required` / `inputType`.
+
 ## [0.1.6] — 2026-07-09
 
 ### Added
