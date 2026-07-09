@@ -6,6 +6,7 @@ import {
   MkButtonToggle,
   MkButtonToggleGroup,
   MkFormField,
+  MkMultiSelect,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -28,6 +29,7 @@ interface Framework {
     MkButtonToggle,
     MkButtonToggleGroup,
     MkFormField,
+    MkMultiSelect,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -110,6 +112,58 @@ interface Framework {
       </docs-example>
 
       <!-- ============================================================ -->
+      <!-- MULTI-SELECT -->
+      <!-- ============================================================ -->
+      <h2>Multi-select</h2>
+      <p>
+        A combobox that commits <strong>multiple</strong> values, rendering each
+        selection as a removable chip. Type to filter, Arrow keys move,
+        Enter/Space toggles the active option, Backspace on an empty query
+        removes the last chip. The dropdown renders in the top layer, so it is
+        never clipped by a scrolling container.
+      </p>
+      <docs-example [code]="multiSelectCode" column>
+        <div style="max-width: 26rem; width: 100%;">
+          <mk-multi-select
+            placeholder="Add frameworks…"
+            [options]="frameworks"
+            [(value)]="tags"
+          />
+          <p class="echo">
+            Selected: <code class="docs-inline">{{ tags().join(', ') || '—' }}</code>
+          </p>
+        </div>
+      </docs-example>
+
+      <h3>Async source, capped, in a form field</h3>
+      <p>
+        Set <code class="docs-inline">filterMode="none"</code> and drive
+        <code class="docs-inline">options</code> from the
+        <code class="docs-inline">search</code> output for server-side results;
+        <code class="docs-inline">max</code> caps the number of selections.
+        Chips keep their labels even after an option leaves the async list.
+      </p>
+      <docs-example [code]="multiAsyncCode" column>
+        <div style="max-width: 26rem; width: 100%;">
+          <mk-form-field label="Reviewers" hint="Pick up to 3" required>
+            <mk-multi-select
+              placeholder="Search people…"
+              filterMode="none"
+              [max]="3"
+              [options]="userResults()"
+              [loading]="searching()"
+              (search)="onUserSearch($event)"
+              [(value)]="reviewers"
+            />
+          </mk-form-field>
+          <p class="echo">
+            Reviewers:
+            <code class="docs-inline">{{ reviewers().join(', ') || '—' }}</code>
+          </p>
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
       <!-- ============================================================ -->
       <h2>Button toggle</h2>
@@ -187,6 +241,8 @@ export class SelectionPage {
 
   protected readonly picked = signal<unknown>(null);
   protected readonly picked2 = signal<unknown>(null);
+  protected readonly tags = signal<unknown[]>(['angular']);
+  protected readonly reviewers = signal<unknown[]>([]);
 
   // --- async demo ---
   private readonly allUsers: Framework[] = [
@@ -230,6 +286,21 @@ export class SelectionPage {
 
   protected readonly fieldCode = `<mk-form-field label="Framework" hint="Start typing to filter" required>
   <mk-autocomplete [options]="frameworks" [(value)]="picked" />
+</mk-form-field>`;
+
+  protected readonly multiSelectCode = `<mk-multi-select
+  placeholder="Add frameworks…"
+  [options]="frameworks"
+  [(value)]="tags" />`;
+
+  protected readonly multiAsyncCode = `<mk-form-field label="Reviewers" hint="Pick up to 3" required>
+  <mk-multi-select
+    filterMode="none"
+    [max]="3"
+    [options]="userResults()"
+    [loading]="searching()"
+    (search)="onUserSearch($event)"
+    [(value)]="reviewers" />
 </mk-form-field>`;
 
   protected readonly asyncCode = `<mk-autocomplete

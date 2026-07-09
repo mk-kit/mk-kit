@@ -10,17 +10,15 @@ Driven by the **mk-cms** admin panel (schema-driven CRUD over the content
 engine). These gate specific admin screens — see the readiness analysis in
 `mk-cms/docs/ADMIN-UI-READINESS.md`. Prioritized above the general list below.
 
-- **[BLOCKER] File upload / dropzone** (`mk-file-upload`) — the media library and
-  every image/media field need it. Click + drag-drop, multi-file, per-file
-  progress, image preview, type/size validation, and an upload hook (POSTs
-  multipart to the CMS `POST /media`). Also unblocks a **media-picker dialog**
-  (browse grid + upload + select) the admin app composes from this + card +
-  dialog. Same as the P1 form-control gap below — promoted to blocker.
-- **[BLOCKER] Multi-select + chips + async** — the `relation` field type and
-  taxonomy/term assignment select N options fetched from GraphQL. `mk-select` is
-  single-value; `mk-autocomplete` is async but single/no-chips. Add multiple
-  selection with removable chips over an async option source. Same as the P1
-  multi-select gap below — promoted to blocker.
+- ✅ **File upload / dropzone** (`mk-file-upload`) — **shipped.** Click + drag-drop,
+  multi-file, per-file progress, image preview, type/size/count validation, and
+  an async `uploadFn` hook (stream each file to the CMS `POST /media`). Still
+  unblocks a **media-picker dialog** (browse grid + upload + select) to compose
+  from this + card + dialog.
+- ✅ **Multi-select + chips + async** (`mk-multi-select`) — **shipped.** Multiple
+  selection with removable chips over an async option source (`filterMode="none"`
+  + `(search)`); chips keep their labels after options leave the list, `max`
+  caps the count. Covers the `relation` field type + taxonomy/term assignment.
 - **[P1] JSON / code editor** (`mk-code-editor` / `mk-json-field`) — the `json`
   field type and plugin/settings JSONB editing. Syntax highlight + validation;
   `block-editor` is for rich content, not JSON. A textarea is the stopgap. (New —
@@ -40,7 +38,8 @@ editor, charts) is already covered by shipping components.
 
 ## What already ships (for reference)
 
-Buttons, button-toggle, inputs, form-field, select, autocomplete, checkbox,
+Buttons, button-toggle, inputs, form-field, select, autocomplete,
+**multi-select** (chips + async), **file-upload** (dropzone), checkbox,
 radio, switch, slider, calendar + date/time/range pickers · card, divider,
 badge, tag, chip, avatar, list, stat-card, progress-bar, **progress-ring**,
 spinner, skeleton, table (+ standalone `mkSort`), **charts** (sparkline, bar,
@@ -55,10 +54,11 @@ live-announcer core.
 ## Components
 
 ### Form controls
-- **P1 File upload / dropzone** (`mk-file-upload`) — click + drag-drop, preview,
-  progress, validation. The single most-requested missing form control.
-- **P1 Multi-select** — `mk-select` is single-value; add multiple selection with
-  chips (or a `multiple` mode). Pairs with a **token/tag input**.
+- ✅ **File upload / dropzone** (`mk-file-upload`) — click + drag-drop, preview,
+  progress, type/size/count validation, async `uploadFn` (shipped).
+- ✅ **Multi-select** (`mk-multi-select`) — multiple selection with removable
+  chips over a sync/async option source (shipped). A token/tag input could still
+  reuse its chip + query internals.
 - **P2 Rating** (`mk-rating`) — star input + read-only display.
 - **P2 Number stepper input** — numeric field with +/- and clamp/step.
 - **P2 OTP / PIN input** — segmented one-time-code field.

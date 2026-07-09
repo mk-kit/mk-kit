@@ -2,6 +2,9 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { FormsModule } from '@angular/forms';
 import {
   MkCheckbox,
+  MkFileUpload,
+  type MkUploadFile,
+  type MkUploadFn,
   MkFormField,
   MkInput,
   MkRadio,
@@ -31,6 +34,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkRadio,
     MkSwitch,
     MkSlider,
+    MkFileUpload,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -286,6 +290,51 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>value</td><td>model&lt;number&gt;</td><td>0</td><td>Two-way current value.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- FILE UPLOAD -->
+      <!-- ============================================================ -->
+      <h2>File upload</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-file-upload&gt;</code> is an accessible
+        click-or-drag dropzone with multi-file support, type/size/count
+        validation, image thumbnails and per-file progress. Provide an
+        <code class="docs-inline">uploadFn</code> to stream each accepted file to
+        your backend (it reports progress and resolves/rejects); the dropzone is
+        a real button, so Enter/Space opens the native picker.
+      </p>
+
+      <docs-example [code]="fileUploadCode" [column]="true">
+        <mk-file-upload
+          accept="image/*"
+          multiple
+          [maxSize]="5000000"
+          [maxFiles]="4"
+          hint="PNG, JPG or GIF up to 5 MB — max 4 files"
+          [uploadFn]="fakeUpload"
+          [(files)]="uploads"
+        />
+        <p class="echo">
+          Tracked: {{ uploads().length }} file(s) —
+          {{ uploadSummary() }}
+        </p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>accept</td><td>string</td><td>''</td><td>Native accept filter (e.g. <code class="docs-inline">image/*</code>, <code class="docs-inline">.pdf,.doc</code>).</td></tr>
+          <tr><td>multiple</td><td>boolean</td><td>false</td><td>Allow selecting more than one file.</td></tr>
+          <tr><td>maxSize</td><td>number</td><td>0</td><td>Max bytes per file (0 = unlimited).</td></tr>
+          <tr><td>maxFiles</td><td>number</td><td>0</td><td>Max files kept (0 = unlimited).</td></tr>
+          <tr><td>uploadFn</td><td>MkUploadFn | null</td><td>null</td><td>Async handler; reports progress + resolves/rejects.</td></tr>
+          <tr><td>files</td><td>model&lt;MkUploadFile[]&gt;</td><td>[]</td><td>Two-way tracked file list.</td></tr>
+          <tr><td>(filesSelected)</td><td>File[]</td><td>—</td><td>Accepted files each time files are added.</td></tr>
+          <tr><td>(rejected)</td><td>MkUploadRejection[]</td><td>—</td><td>Rejected files with a reason.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -335,6 +384,28 @@ export class FormsPage {
   // --- Slider ---------------------------------------------------------------
   protected readonly volume = signal(40);
 
+  // --- File upload ----------------------------------------------------------
+  protected readonly uploads = signal<MkUploadFile[]>([]);
+  protected readonly uploadSummary = computed(() => {
+    const files = this.uploads();
+    if (!files.length) return 'none yet';
+    const done = files.filter((f) => f.status === 'success').length;
+    return `${done} uploaded`;
+  });
+
+  /** Demo uploader: streams fake progress, then resolves. */
+  protected readonly fakeUpload: MkUploadFn = (_file, onProgress) =>
+    new Promise<void>((resolve) => {
+      let pct = 0;
+      const tick = () => {
+        pct += 20;
+        onProgress(pct);
+        if (pct >= 100) resolve();
+        else setTimeout(tick, 220);
+      };
+      setTimeout(tick, 220);
+    });
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
   protected readonly formFieldCode = `<mk-form-field
   label="Email"
@@ -375,4 +446,13 @@ export class FormsPage {
 <mk-switch [(checked)]="dark" tone="success" size="lg">Dark mode</mk-switch>`;
 
   protected readonly sliderCode = `<mk-slider [min]="0" [max]="100" [step]="5" [(value)]="volume" aria-label="Volume" />`;
+
+  protected readonly fileUploadCode = `<mk-file-upload
+  accept="image/*"
+  multiple
+  [maxSize]="5_000_000"
+  [maxFiles]="4"
+  hint="PNG, JPG or GIF up to 5 MB — max 4 files"
+  [uploadFn]="upload"
+  [(files)]="uploads" />`;
 }

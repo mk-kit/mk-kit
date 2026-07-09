@@ -1,0 +1,96 @@
+<div
+  #control
+  class="mk-multi-select__control"
+  (pointerdown)="onControlPointerdown($event)"
+>
+  @for (chip of chips(); track chip.value) {
+    <mk-chip
+      class="mk-multi-select__chip"
+      size="sm"
+      [removable]="!isDisabled()"
+      [disabled]="isDisabled()"
+      [removeLabel]="'Remove ' + chip.label"
+      (removed)="removeChip(chip.value)"
+    >
+      {{ chip.label }}
+    </mk-chip>
+  }
+
+  <input
+    #input
+    type="text"
+    class="mk-multi-select__input"
+    [id]="inputId"
+    role="combobox"
+    autocomplete="off"
+    aria-haspopup="listbox"
+    aria-autocomplete="list"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="listId"
+    [attr.aria-activedescendant]="
+      open() && activeIndex() >= 0 ? optionId(activeIndex()) : null
+    "
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [placeholder]="chips().length ? '' : placeholder()"
+    [value]="query()"
+    [disabled]="isDisabled()"
+    (input)="onInput($event)"
+    (focus)="onFocus()"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur($event)"
+  />
+
+  <span class="mk-multi-select__arrow" aria-hidden="true"></span>
+</div>
+
+@if (open()) {
+  <ul
+    #list
+    class="mk-multi-select__list"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="control"
+    [matchWidth]="true"
+    (dismiss)="onOutsideDismiss()"
+    [id]="listId"
+    role="listbox"
+    aria-multiselectable="true"
+    [attr.aria-labelledby]="labelledBy()"
+  >
+    @if (loading()) {
+      <li class="mk-multi-select__status" role="presentation">
+        <span class="mk-multi-select__spinner" aria-hidden="true"></span>
+        Loading…
+      </li>
+    } @else {
+      @for (opt of filtered(); track $index; let i = $index) {
+        <li
+          class="mk-multi-select__option"
+          [id]="optionId(i)"
+          role="option"
+          [attr.aria-selected]="isSelected(opt.value)"
+          [attr.aria-disabled]="
+            opt.disabled || (atMax() && !isSelected(opt.value)) || null
+          "
+          [class.mk-multi-select__option--active]="i === activeIndex()"
+          [class.mk-multi-select__option--selected]="isSelected(opt.value)"
+          [class.mk-multi-select__option--disabled]="
+            opt.disabled || (atMax() && !isSelected(opt.value))
+          "
+          (mousedown)="$event.preventDefault()"
+          (mousemove)="!opt.disabled && activeIndex.set(i)"
+          (click)="toggleOption(i)"
+        >
+          <span class="mk-multi-select__check" aria-hidden="true"></span>
+          <span class="mk-multi-select__option-label">{{ opt.label }}</span>
+        </li>
+      } @empty {
+        <li class="mk-multi-select__status" role="presentation">
+          {{ emptyMessage() }}
+        </li>
+      }
+    }
+  </ul>
+}

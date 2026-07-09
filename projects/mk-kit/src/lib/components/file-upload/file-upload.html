@@ -1,0 +1,116 @@
+<div
+  class="mk-file-upload__dropzone"
+  role="button"
+  [attr.tabindex]="disabled() ? null : 0"
+  [attr.aria-label]="label()"
+  [attr.aria-disabled]="disabled() || null"
+  (click)="openPicker()"
+  (keydown)="onKeydown($event)"
+  (dragover)="onDragOver($event)"
+  (dragleave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+>
+  <span class="mk-file-upload__icon" aria-hidden="true">
+    <svg viewBox="0 0 24 24" width="28" height="28" fill="none"
+      stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+      stroke-linejoin="round">
+      <path d="M12 15V3M8 7l4-4 4 4" />
+      <path d="M4 15v4a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-4" />
+    </svg>
+  </span>
+  <span class="mk-file-upload__prompt">{{ label() }}</span>
+  @if (hint()) {
+    <span class="mk-file-upload__hint">{{ hint() }}</span>
+  }
+
+  <input
+    #fileInput
+    type="file"
+    class="mk-file-upload__input"
+    [id]="inputId"
+    [accept]="accept()"
+    [multiple]="multiple()"
+    [disabled]="disabled()"
+    tabindex="-1"
+    aria-hidden="true"
+    (change)="onInputChange($event)"
+  />
+</div>
+
+<div class="mk-file-upload__sr" role="status" aria-live="polite">
+  {{ announcement() }}
+</div>
+
+@if (!hideList() && files().length) {
+  <ul class="mk-file-upload__list">
+    @for (item of files(); track item.id) {
+      <li
+        class="mk-file-upload__item"
+        [class.mk-file-upload__item--error]="item.status === 'error'"
+        [class.mk-file-upload__item--success]="item.status === 'success'"
+      >
+        <span class="mk-file-upload__thumb" aria-hidden="true">
+          @if (item.previewUrl) {
+            <img [src]="item.previewUrl" [alt]="item.name" />
+          } @else {
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none"
+              stroke="currentColor" stroke-width="1.75" stroke-linecap="round"
+              stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z" />
+              <path d="M14 2v6h6" />
+            </svg>
+          }
+        </span>
+
+        <span class="mk-file-upload__meta">
+          <span class="mk-file-upload__name">{{ item.name }}</span>
+          <span class="mk-file-upload__size">
+            @if (item.status === 'error') {
+              {{ item.error }}
+            } @else {
+              {{ formatBytes(item.size) }}
+              @if (item.status === 'uploading') {
+                · {{ item.progress }}%
+              }
+            }
+          </span>
+          @if (item.status === 'uploading') {
+            <span
+              class="mk-file-upload__progress"
+              role="progressbar"
+              [attr.aria-valuenow]="item.progress"
+              aria-valuemin="0"
+              aria-valuemax="100"
+            >
+              <span class="mk-file-upload__bar" [style.width.%]="item.progress"></span>
+            </span>
+          }
+        </span>
+
+        <span class="mk-file-upload__status" aria-hidden="true">
+          @if (item.status === 'success') {
+            <span class="mk-file-upload__check"></span>
+          } @else if (item.status === 'error') {
+            <button
+              type="button"
+              class="mk-file-upload__retry"
+              aria-label="Retry upload"
+              (click)="retry(item)"
+            >
+              ↻
+            </button>
+          }
+        </span>
+
+        <button
+          type="button"
+          class="mk-file-upload__remove"
+          [attr.aria-label]="'Remove ' + item.name"
+          (click)="remove(item)"
+        >
+          <span aria-hidden="true">&times;</span>
+        </button>
+      </li>
+    }
+  </ul>
+}

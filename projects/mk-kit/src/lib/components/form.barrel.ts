@@ -6,6 +6,8 @@ export * from './form-field';
 export * from './input';
 export * from './select';
 export * from './autocomplete';
+export * from './multi-select';
+export * from './file-upload';
 export * from './button-toggle';
 export * from './checkbox';
 export * from './radio';
