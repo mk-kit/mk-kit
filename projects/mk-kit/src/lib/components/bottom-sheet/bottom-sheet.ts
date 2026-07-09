@@ -9,6 +9,7 @@ import {
   input,
 } from '@angular/core';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkOverlayRef } from '../../core/overlay/overlay-ref';
 
 /** Distance in px the sheet must be dragged down before it dismisses. */
@@ -42,6 +43,8 @@ const DISMISS_THRESHOLD = 120;
 })
 export class MkBottomSheet {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   private readonly overlayRef = inject(MkOverlayRef, { optional: true });
 
   /** Optional plain-text title rendered in the header. */

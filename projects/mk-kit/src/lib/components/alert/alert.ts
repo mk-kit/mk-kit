@@ -5,7 +5,9 @@ import {
   computed,
   input,
   output,
+  inject,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Semantic tones supported by {@link MkAlert}. */
 export type MkAlertTone = 'info' | 'success' | 'warning' | 'danger' | 'neutral';
@@ -43,6 +45,8 @@ export type MkAlertVariant = 'soft' | 'solid' | 'outline';
   },
 })
 export class MkAlert {
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   /** Semantic color tone. */
   readonly tone = input<MkAlertTone>('info');
   /** Visual treatment. */

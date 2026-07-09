@@ -15,6 +15,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /**
  * A single slide inside {@link MkCarousel}. Mark each slide element with
@@ -55,6 +56,8 @@ export class MkCarouselSlide {
 export class MkCarousel {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly slides = contentChildren(MkCarouselSlide);
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
 
   /** Two-way current slide index. */
   readonly index = model(0);

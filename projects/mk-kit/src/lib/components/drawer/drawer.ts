@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkFocusTrap } from '../../core/a11y/focus-trap';
 
 /** Edge the drawer slides in from. */
@@ -53,6 +54,8 @@ export type MkDrawerSide = 'start' | 'end' | 'top' | 'bottom';
 })
 export class MkDrawer {
   private readonly document = inject(DOCUMENT);
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly panelRef = viewChild.required<ElementRef<HTMLElement>>('panel');
 

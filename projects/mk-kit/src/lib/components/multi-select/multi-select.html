@@ -62,7 +62,7 @@
     @if (loading()) {
       <li class="mk-multi-select__status" role="presentation">
         <span class="mk-multi-select__spinner" aria-hidden="true"></span>
-        Loading…
+        {{ i18n.loading }}
       </li>
     } @else {
       @for (opt of filtered(); track $index; let i = $index) {

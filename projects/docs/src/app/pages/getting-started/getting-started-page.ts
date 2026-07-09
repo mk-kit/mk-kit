@@ -1,9 +1,38 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MkAlert, MkButton, MkThemeService } from '@mkornas/ui';
+import {
+  MkAlert,
+  MkAutocomplete,
+  MkButton,
+  MkSelect,
+  MkThemeService,
+  provideMkI18n,
+} from '@mkornas/ui';
+
+/** A subtree with Polish strings, to show `provideMkI18n` scoping. */
+@Component({
+  selector: 'docs-i18n-demo',
+  imports: [MkSelect, MkAutocomplete],
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    provideMkI18n({
+      noOptions: 'Brak opcji',
+      noResults: 'Brak wyników',
+      clear: 'Wyczyść',
+      loading: 'Ładowanie…',
+    }),
+  ],
+  template: `
+    <div style="display: flex; gap: var(--mk-space-3); flex-wrap: wrap;">
+      <mk-select placeholder="Wybierz…" [options]="[]" style="max-width: 14rem;" />
+      <mk-autocomplete placeholder="Szukaj…" [options]="[]" style="max-width: 14rem;" />
+    </div>
+  `,
+})
+export class I18nDemo {}
 
 @Component({
   selector: 'docs-getting-started-page',
-  imports: [MkButton, MkAlert],
+  imports: [MkButton, MkAlert, I18nDemo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -62,7 +91,19 @@ import { MkAlert, MkButton, MkThemeService } from '@mkornas/ui';
       </div>
       <pre class="gs-code"><code>{{ themeSnippet }}</code></pre>
 
-      <h2>6. Publish your own build</h2>
+      <h2>6. Localization (i18n)</h2>
+      <p>
+        Every string the library renders itself — empty-state text, aria-labels
+        and screen-reader announcements — comes from an injectable map. Override
+        any subset with <code class="docs-inline">provideMkI18n</code> at bootstrap
+        (or scoped to a subtree). The demo below is scoped to Polish:
+      </p>
+      <div class="gs-theme-demo">
+        <docs-i18n-demo />
+      </div>
+      <pre class="gs-code"><code>{{ i18nSnippet }}</code></pre>
+
+      <h2>7. Publish your own build</h2>
       <p>The library builds into a standards-compliant Angular package:</p>
       <pre class="gs-code"><code>{{ publishSnippet }}</code></pre>
     </div>
@@ -91,6 +132,21 @@ import { MkAlert, MkButton, MkThemeService } from '@mkornas/ui';
 })
 export class GettingStartedPage {
   protected readonly theme = inject(MkThemeService);
+
+  protected readonly i18nSnippet = `import { bootstrapApplication } from '@angular/platform-browser';
+import { provideMkI18n } from '@mkornas/ui';
+
+bootstrapApplication(App, {
+  providers: [
+    provideMkI18n({
+      noResults: 'Brak wyników',
+      noOptions: 'Brak opcji',
+      close: 'Zamknij',
+      sortedBy: (col, dir) =>
+        \`Posortowano wg \${col} \${dir === 'asc' ? 'rosnąco' : 'malejąco'}\`,
+    }),
+  ],
+});`;
 
   protected readonly usageSnippet = `import { Component, inject } from '@angular/core';
 import { MkButton, MkCard, MkThemeService } from '@mkornas/ui';

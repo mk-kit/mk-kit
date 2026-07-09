@@ -14,6 +14,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
@@ -69,6 +70,8 @@ export interface MkSelectOption {
 })
 export class MkSelect implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   private readonly triggerRef =
     viewChild<ElementRef<HTMLButtonElement>>('trigger');
 

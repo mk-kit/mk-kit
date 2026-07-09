@@ -107,9 +107,11 @@ live-announcer core.
 - ✅ **CI pipeline** — `.github/workflows/ci.yml` (build lib → test lib → test
   docs → build docs → publish dry-run, on push/PR) + `release.yml` (publish to
   GitHub Packages on `v*` tags). (shipped.)
-- **P1 i18n of built-in strings.** Hardcoded English exists in aria labels and
-  UI text ("No results", "No options", "Close", announcer messages). Provide an
-  injectable string/`InjectionToken` map so consumers can localize.
+- ✅ **i18n of built-in strings** — `MK_I18N` token + `provideMkI18n(overrides)`
+  over English defaults (`MkI18nStrings`); wired through select/autocomplete/
+  multi-select/table/command-palette (empty text), dialog/drawer/bottom-sheet
+  (close), alert/banner (dismiss), pagination/calendar/carousel (aria) and the
+  sort announcer. (shipped.)
 - **P2 Storybook (or keep the docs app) + visual-regression** snapshots
   (Playwright) in light/dark to catch UI regressions.
 - **P2 Automated a11y checks** (axe) in CI over the docs pages.
@@ -129,12 +131,12 @@ live-announcer core.
 
 ## Suggested near-term order
 
-Tests, CI, the SCSS migration and all mk-cms blockers are done. What's left:
+Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
+are shipped. What's left is P2/P3:
 
-1. **i18n token map** — the last P1: localise the built-in strings.
-2. **Chart variants** (gauge/radial, horizontal bar, stacked area) and
+1. **Chart variants** (gauge/radial, horizontal bar, stacked area) and
    **month/year/week pickers** — highest-value remaining P2 components.
-3. **Expandable table rows**, **skeleton presets**, **top loading bar**,
+2. **Expandable table rows**, **skeleton presets**, **top loading bar**,
    **scrollspy**.
-4. RTL audit + density mode; then P3 polish (range slider, QR, ripple,
+3. RTL audit + density mode; then P3 polish (range slider, QR, ripple,
    theme-builder, high-contrast theme).

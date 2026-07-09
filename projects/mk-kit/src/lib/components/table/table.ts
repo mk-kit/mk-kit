@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkCheckbox } from '../checkbox/checkbox';
 
 /** Horizontal text alignment for a table column. */
@@ -77,6 +78,7 @@ export interface MkSortChange {
 })
 export class MkTable<T = Record<string, unknown>> {
   private readonly announcer = inject(MkLiveAnnouncer);
+  private readonly i18n = inject(MK_I18N);
 
   /** Column definitions (order = display order). */
   readonly columns = input.required<MkTableColumn<T>[]>();
@@ -93,7 +95,7 @@ export class MkTable<T = Record<string, unknown>> {
   /** Style rows as clickable and emit `rowClick`. */
   readonly clickableRows = input(false, { transform: booleanAttribute });
   /** Message shown when there are no rows. */
-  readonly emptyMessage = input('No data to display');
+  readonly emptyMessage = input(this.i18n.noData);
   /** Render a leading checkbox column for row selection. */
   readonly selectable = input(false, { transform: booleanAttribute });
   /**

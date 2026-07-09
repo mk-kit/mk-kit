@@ -7,6 +7,7 @@ import {
   output,
 } from '@angular/core';
 import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkSortDirection } from '../table/table';
 
 /** Current sort state emitted by {@link MkSort.mkSortChange}. */
@@ -56,6 +57,7 @@ export interface MkSortable {
 })
 export class MkSort {
   private readonly announcer = inject(MkLiveAnnouncer);
+  private readonly i18n = inject(MK_I18N);
 
   /** Id of the currently sorted column (two-way; empty when unsorted). */
   readonly active = model<string>('', { alias: 'mkSortActive' });
@@ -123,8 +125,8 @@ export class MkSort {
     const label = header.sortLabel() || header.id();
     const message =
       direction === 'none'
-        ? `${label} unsorted`
-        : `Sorted by ${label} ${direction === 'asc' ? 'ascending' : 'descending'}`;
+        ? this.i18n.sortingCleared(label)
+        : this.i18n.sortedBy(label, direction === 'asc' ? 'asc' : 'desc');
     this.announcer.announce(message, 'polite');
   }
 }

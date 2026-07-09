@@ -4,7 +4,7 @@
       <button
         type="button"
         class="mk-pagination__btn mk-pagination__btn--nav"
-        aria-label="Go to previous page"
+        [attr.aria-label]="i18n.previousPage"
         [disabled]="!hasPrev()"
         (click)="prev()"
       >
@@ -39,7 +39,7 @@
       <button
         type="button"
         class="mk-pagination__btn mk-pagination__btn--nav"
-        aria-label="Go to next page"
+        [attr.aria-label]="i18n.nextPage"
         [disabled]="!hasNext()"
         (click)="next()"
       >

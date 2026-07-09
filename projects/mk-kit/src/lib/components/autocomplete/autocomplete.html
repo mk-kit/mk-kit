@@ -30,7 +30,7 @@
     <button
       type="button"
       class="mk-autocomplete__clear"
-      aria-label="Clear"
+      [attr.aria-label]="i18n.clear"
       tabindex="-1"
       (mousedown)="$event.preventDefault()"
       (click)="clear()"
@@ -54,7 +54,7 @@
     @if (loading()) {
       <li class="mk-autocomplete__status" role="presentation">
         <span class="mk-autocomplete__spinner" aria-hidden="true"></span>
-        Loading…
+        {{ i18n.loading }}
       </li>
     } @else {
       @for (opt of filtered(); track $index; let i = $index) {

@@ -16,6 +16,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
@@ -79,6 +80,8 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
 })
 export class MkAutocomplete implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** The list of suggestions. Update it from `search` for async sources. */
@@ -100,7 +103,7 @@ export class MkAutocomplete implements ControlValueAccessor {
   /** Clear the input on blur unless the text matches a selectable option. */
   readonly requireSelection = input(false, { transform: booleanAttribute });
   /** Message shown when there are no matching options. */
-  readonly emptyMessage = input('No results');
+  readonly emptyMessage = input(this.i18n.noResults);
 
   /** Two-way selected value (the `value` of the chosen option, or `null`). */
   readonly value = model<unknown>(null);

@@ -6,3 +6,4 @@ export * from './a11y/unique-id';
 export * from './overlay/overlay-ref';
 export * from './overlay/overlay.service';
 export * from './overlay/anchored-overlay';
+export * from './i18n/mk-i18n';

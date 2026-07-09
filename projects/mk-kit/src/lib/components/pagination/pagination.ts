@@ -5,7 +5,9 @@ import {
   input,
   model,
   numberAttribute,
+  inject,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** A rendered pagination cell: a real page number or a gap marker. */
 export type MkPageItem = number | 'ellipsis';
@@ -34,6 +36,8 @@ export type MkPageItem = number | 'ellipsis';
   },
 })
 export class MkPagination {
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   /** Total number of items (used with `pageSize` when `pageCount` is unset). */
   readonly total = input(0, { transform: numberAttribute });
   /** Items per page. */

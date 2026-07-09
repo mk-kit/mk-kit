@@ -17,6 +17,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 import { MkFocusTrap } from '../../core/a11y/focus-trap';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkIcon } from '../icon/icon';
 
 /** A single actionable entry in the {@link MkCommandPalette}. */
@@ -77,6 +78,7 @@ interface Group {
 export class MkCommandPalette {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly i18n = inject(MK_I18N);
   private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
@@ -87,7 +89,7 @@ export class MkCommandPalette {
   /** Search field placeholder. */
   readonly placeholder = input('Type a command or search…');
   /** Message shown when nothing matches. */
-  readonly emptyMessage = input('No results');
+  readonly emptyMessage = input(this.i18n.noResults);
   /** Toggle open with ⌘K / Ctrl+K anywhere. */
   readonly hotkey = input(true, { transform: booleanAttribute });
 

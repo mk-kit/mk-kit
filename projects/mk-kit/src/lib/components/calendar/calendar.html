@@ -2,7 +2,7 @@
   <button
     type="button"
     class="mk-calendar__nav"
-    aria-label="Previous month"
+    [attr.aria-label]="i18n.previousMonth"
     (click)="prevMonth()"
   >
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -24,7 +24,7 @@
   <button
     type="button"
     class="mk-calendar__nav"
-    aria-label="Next month"
+    [attr.aria-label]="i18n.nextMonth"
     (click)="nextMonth()"
   >
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">

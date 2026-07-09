@@ -6,8 +6,10 @@ import {
   input,
   model,
   output,
+  inject,
 } from '@angular/core';
 import type { MkTone } from '../../core/types';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /**
  * Banner — a persistent, full-width page/section message with a tone, optional
@@ -35,6 +37,8 @@ import type { MkTone } from '../../core/types';
   },
 })
 export class MkBanner {
+  /** Localised strings (override globally via `provideMkI18n`). */
+  protected readonly i18n = inject(MK_I18N);
   /** Semantic color tone. */
   readonly tone = input<MkTone>('info');
   /** Optional bold title above the message. */

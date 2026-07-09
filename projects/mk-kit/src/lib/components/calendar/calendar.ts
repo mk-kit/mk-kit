@@ -17,6 +17,7 @@ import {
 } from '@angular/core';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
 import {
   addDays,
@@ -73,6 +74,7 @@ interface MkWeekdayHeader {
 })
 export class MkCalendar {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly i18n = inject(MK_I18N);
   private readonly injector = inject(Injector);
   private readonly announcer = inject(MkLiveAnnouncer);
 

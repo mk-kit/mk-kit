@@ -21,7 +21,7 @@
     <button
       type="button"
       class="mk-carousel__arrow mk-carousel__arrow--prev"
-      aria-label="Previous slide"
+      [attr.aria-label]="i18n.previousSlide"
       (click)="prev()"
     >
       <span aria-hidden="true">‹</span>
@@ -29,7 +29,7 @@
     <button
       type="button"
       class="mk-carousel__arrow mk-carousel__arrow--next"
-      aria-label="Next slide"
+      [attr.aria-label]="i18n.nextSlide"
       (click)="next()"
     >
       <span aria-hidden="true">›</span>
