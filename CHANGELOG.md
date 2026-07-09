@@ -19,6 +19,9 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 - **`mk-scatter-chart`** — plot `(x, y)` points across two numeric axes; give
   points a `size` and set `bubble` for a bubble chart. Nice-tick axes, legend,
   per-point hover tooltip, screen-reader table. Dependency-free SVG.
+- **`mk-radar-chart`** — a radar / spider chart comparing several series across
+  shared axes (one polygon each), with concentric grid rings, a legend and a
+  screen-reader table.
 - **`mk-heatmap`** — a value-shaded matrix rendered as a semantic table; cell
   colours are mixed from `accent` over the surface via `color-mix` (theme-aware),
   with an optional min→max scale legend and in-cell values.

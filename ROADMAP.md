@@ -77,7 +77,9 @@ live-announcer core.
 - ✅ **Scatter / bubble** (`mk-scatter-chart`) — numeric x/y axes, optional
   `bubble` sizing, per-point tooltip (shipped).
 - ✅ **Heatmap** (`mk-heatmap`) — value-shaded matrix table, theme-aware via
-  `color-mix`, min→max legend (shipped). **P3 funnel / radar / treemap** remaining.
+  `color-mix`, min→max legend (shipped).
+- ✅ **Radar / spider** (`mk-radar-chart`) — multi-series polygons over shared
+  axes, concentric rings (shipped). **P3 funnel / treemap** remaining.
 
 ### Navigation & layout
 - ✅ **Drawer** (`mk-drawer`) — declarative slide-out side panel (shipped).
@@ -157,4 +159,4 @@ are shipped. What's left is P2/P3:
 
 1. **Mini inline date** — remaining picker P3.
 2. RTL audit + density mode; then P3 polish (QR, theme-builder,
-   high-contrast theme, funnel/radar charts).
+   high-contrast theme, funnel/treemap charts).

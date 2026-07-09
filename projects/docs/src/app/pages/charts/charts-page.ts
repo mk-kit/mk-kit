@@ -9,6 +9,7 @@ import {
   MkHeatmap,
   MkLineChart,
   MkProgressRing,
+  MkRadarChart,
   MkScatterChart,
   MkSparkline,
 } from '@mkornas/ui';
@@ -31,6 +32,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkGauge,
     MkScatterChart,
     MkHeatmap,
+    MkRadarChart,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -184,6 +186,18 @@ import { DocsExample } from '../../shared/docs-example';
           showValues
         />
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Radar chart</h2>
+      <p>
+        Compare several series across the same axes — product profiles, skill
+        sets, survey dimensions. Each series is a polygon over the shared spokes.
+      </p>
+      <docs-example [code]="radarCode" column>
+        <div style="max-width: 26rem;">
+          <mk-radar-chart [axes]="radarAxes" [series]="radarSeries" [max]="10" />
+        </div>
+      </docs-example>
     </div>
   `,
 })
@@ -246,6 +260,12 @@ export class ChartsPage {
     },
   ];
 
+  protected readonly radarAxes = ['Speed', 'Power', 'Range', 'Comfort', 'Price', 'Safety'];
+  protected readonly radarSeries: MkChartSeries[] = [
+    { name: 'Model S', data: [9, 8, 7, 8, 5, 9] },
+    { name: 'Model E', data: [6, 5, 9, 7, 8, 8] },
+  ];
+
   protected readonly hours = ['9a', '12p', '3p', '6p', '9p'];
   protected readonly days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   protected readonly activity: (number | null)[][] = [
@@ -298,4 +318,12 @@ export class ChartsPage {
 
   protected readonly heatmapCode = `<mk-heatmap [xLabels]="hours" [yLabels]="days"
   [data]="activity" showValues />`;
+
+  protected readonly radarCode = `<mk-radar-chart
+  [axes]="['Speed','Power','Range','Comfort','Price','Safety']"
+  [series]="[
+    { name: 'Model S', data: [9,8,7,8,5,9] },
+    { name: 'Model E', data: [6,5,9,7,8,8] },
+  ]"
+  [max]="10" />`;
 }

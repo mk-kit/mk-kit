@@ -1,0 +1,87 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Grid rings -->
+    @for (ring of rings(); track ring.key) {
+      <polygon class="mk-chart__grid mk-radar__ring" [attr.points]="ring.points" />
+    }
+
+    <!-- Axis spokes + labels -->
+    @for (axis of axisSpokes(); track axis.label) {
+      <line
+        class="mk-chart__grid"
+        [attr.x1]="width() / 2"
+        [attr.y1]="height() / 2"
+        [attr.x2]="axis.x"
+        [attr.y2]="axis.y"
+      />
+      <text
+        class="mk-chart__axis-label mk-radar__axis-label"
+        [attr.x]="axis.lx"
+        [attr.y]="axis.ly"
+        [attr.text-anchor]="axis.anchor"
+      >
+        {{ axis.label }}
+      </text>
+    }
+
+    <!-- Series polygons -->
+    @for (r of rendered(); track r.name) {
+      <polygon
+        class="mk-radar__area"
+        [attr.points]="r.polygon"
+        [style.fill]="r.color"
+        [style.stroke]="r.color"
+      />
+      @if (showDots()) {
+        @for (p of r.points; track $index) {
+          <circle
+            class="mk-chart__dot"
+            [attr.cx]="p.x"
+            [attr.cy]="p.y"
+            r="3"
+            [style.fill]="r.color"
+          />
+        }
+      }
+    }
+  </svg>
+</div>
+
+@if (legendVisible()) {
+  <ul class="mk-chart__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        {{ item.name }}
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Axis</th>
+      @for (s of series(); track s.name) {
+        <th scope="col">{{ s.name }}</th>
+      }
+    </tr>
+  </thead>
+  <tbody>
+    @for (axis of axes(); track axis; let a = $index) {
+      <tr>
+        <th scope="row">{{ axis }}</th>
+        @for (s of series(); track s.name) {
+          <td>{{ s.data[a] }}</td>
+        }
+      </tr>
+    }
+  </tbody>
+</table>

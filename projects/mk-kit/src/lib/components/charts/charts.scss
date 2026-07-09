@@ -87,6 +87,20 @@
   fill-opacity: 1;
 }
 
+/* Radar */
+.mk-radar__ring {
+  fill: none;
+}
+.mk-radar__area {
+  fill-opacity: 0.16;
+  stroke-width: 2;
+  stroke-linejoin: round;
+  vector-effect: non-scaling-stroke;
+}
+.mk-radar__axis-label {
+  dominant-baseline: middle;
+}
+
 /* Axis titles (scatter) */
 .mk-chart__axis-title {
   fill: var(--mk-chart-axis);

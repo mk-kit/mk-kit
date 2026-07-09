@@ -6,3 +6,4 @@ export * from './donut-chart';
 export * from './gauge';
 export * from './scatter-chart';
 export * from './heatmap';
+export * from './radar-chart';
