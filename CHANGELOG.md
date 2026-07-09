@@ -6,6 +6,14 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **Expandable table rows** — `mk-table` gains `expandable` (a leading expander
+  column) and `singleExpand` (accordion). Each row reveals a detail panel
+  supplied via `<ng-template mkTableRowDetail let-row>`, with the row object as
+  the implicit context; `(expandedChange)` reports the open rows. Full ARIA
+  (`aria-expanded` / `aria-controls`).
+
 ## [0.1.5] — 2026-07-09
 
 ### Added

@@ -126,6 +126,56 @@
   color: var(--mk-selected-text);
 }
 
+/* Expander column */
+.mk-table__th--expand,
+.mk-table__td--expand {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mk-table__expander {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+}
+.mk-table__expander:hover {
+  background-color: var(--mk-hover-overlay);
+  color: var(--mk-text);
+}
+.mk-table__expander:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+.mk-table__expander-icon {
+  /* inline-block so the rotate transform applies (transforms are ignored on
+     inline-level boxes). */
+  display: inline-block;
+  font-size: var(--mk-font-size-lg);
+  line-height: 1;
+  transition: transform var(--mk-transition-fast, 120ms) ease;
+}
+.mk-table__expander--open .mk-table__expander-icon {
+  transform: rotate(90deg);
+}
+
+/* Detail row */
+.mk-table__detail {
+  padding: 0;
+  background-color: var(--mk-surface-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+.mk-table__detail-inner {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+}
+
 /* Empty state */
 .mk-table__empty {
   padding: var(--mk-space-8) var(--_cell-pad-x);

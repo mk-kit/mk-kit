@@ -2,6 +2,11 @@
   <table class="mk-table__table">
     <thead class="mk-table__head">
       <tr>
+        @if (expandable()) {
+          <th scope="col" class="mk-table__th mk-table__th--expand">
+            <span class="mk-visually-hidden">Expand</span>
+          </th>
+        }
         @if (selectable()) {
           <th scope="col" class="mk-table__th mk-table__th--select">
             <mk-checkbox
@@ -35,14 +40,33 @@
       </tr>
     </thead>
     <tbody class="mk-table__body">
-      @for (row of sortedData(); track $index) {
+      @for (row of sortedData(); track $index; let i = $index) {
         <tr
           class="mk-table__row"
           [class.mk-table__row--selected]="selectable() && isSelected(row)"
+          [class.mk-table__row--expanded]="expandable() && isExpanded(row)"
           [attr.tabindex]="clickableRows() ? 0 : null"
           [attr.aria-selected]="selectable() ? isSelected(row) : null"
           (click)="onRowClick(row)"
         >
+          @if (expandable()) {
+            <td
+              class="mk-table__td mk-table__td--expand"
+              (click)="$event.stopPropagation()"
+            >
+              <button
+                type="button"
+                class="mk-table__expander"
+                [class.mk-table__expander--open]="isExpanded(row)"
+                [attr.aria-expanded]="isExpanded(row)"
+                [attr.aria-controls]="detailId(i)"
+                [attr.aria-label]="isExpanded(row) ? 'Collapse row' : 'Expand row'"
+                (click)="toggleExpand(row, $event)"
+              >
+                <span class="mk-table__expander-icon" aria-hidden="true">›</span>
+              </button>
+            </td>
+          }
           @if (selectable()) {
             <td
               class="mk-table__td mk-table__td--select"
@@ -61,12 +85,21 @@
             </td>
           }
         </tr>
+        @if (expandable() && isExpanded(row) && rowDetail()) {
+          <tr class="mk-table__detail-row">
+            <td class="mk-table__detail" [id]="detailId(i)" [attr.colspan]="totalColumns()">
+              <div class="mk-table__detail-inner">
+                <ng-container
+                  [ngTemplateOutlet]="rowDetail()!.template"
+                  [ngTemplateOutletContext]="{ $implicit: row }"
+                />
+              </div>
+            </td>
+          </tr>
+        }
       } @empty {
         <tr class="mk-table__row mk-table__row--empty">
-          <td
-            class="mk-table__empty"
-            [attr.colspan]="columns().length + (selectable() ? 1 : 0)"
-          >
+          <td class="mk-table__empty" [attr.colspan]="totalColumns()">
             <ng-content select="[mkTableEmpty]">{{ emptyMessage() }}</ng-content>
           </td>
         </tr>

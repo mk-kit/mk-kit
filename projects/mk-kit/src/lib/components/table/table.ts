@@ -3,15 +3,19 @@ import {
   Component,
   booleanAttribute,
   computed,
+  contentChild,
   inject,
   input,
   model,
   output,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
 import { MK_I18N } from '../../core/i18n/mk-i18n';
+import { mkUniqueId } from '../../core/a11y/unique-id';
 import { MkCheckbox } from '../checkbox/checkbox';
+import { MkTableRowDetail } from './table-row-detail';
 
 /** Horizontal text alignment for a table column. */
 export type MkTableAlign = 'start' | 'center' | 'end';
@@ -65,7 +69,7 @@ export interface MkSortChange {
   templateUrl: './table.html',
   styleUrl: './table.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MkCheckbox],
+  imports: [MkCheckbox, NgTemplateOutlet],
   host: {
     class: 'mk-table',
     '[class.mk-table--sticky]': 'stickyHeader()',
@@ -74,6 +78,7 @@ export interface MkSortChange {
     '[class.mk-table--compact]': "density() === 'compact'",
     '[class.mk-table--clickable]': 'clickableRows()',
     '[class.mk-table--selectable]': 'selectable()',
+    '[class.mk-table--expandable]': 'expandable()',
   },
 })
 export class MkTable<T = Record<string, unknown>> {
@@ -109,6 +114,13 @@ export class MkTable<T = Record<string, unknown>> {
    * are matched by reference.
    */
   readonly trackKey = input<string>();
+  /**
+   * Render a leading expander column. Each row can reveal a detail panel
+   * supplied via an `<ng-template mkTableRowDetail let-row>`.
+   */
+  readonly expandable = input(false, { transform: booleanAttribute });
+  /** Allow only one row expanded at a time (accordion). */
+  readonly singleExpand = input(false, { transform: booleanAttribute });
 
   /** Emitted when the sort column/direction changes. */
   readonly sortChange = output<MkSortChange>();
@@ -116,10 +128,25 @@ export class MkTable<T = Record<string, unknown>> {
   readonly rowClick = output<T>();
   /** Emitted with the new selection whenever it changes (enable via `selectable`). */
   readonly selectionChange = output<T[]>();
+  /** Emitted with the currently expanded rows whenever they change. */
+  readonly expandedChange = output<T[]>();
+
+  /** The projected row-detail template (enable via `expandable`). */
+  protected readonly rowDetail = contentChild(MkTableRowDetail);
 
   private readonly sortKey = signal<string | null>(null);
   private readonly sortDir = signal<Exclude<MkSortDirection, 'none'> | null>(
     null,
+  );
+  /** Stable id prefix so each detail row can be referenced by aria-controls. */
+  private readonly detailIdBase = mkUniqueId('mk-table-detail');
+
+  /** Total rendered columns, including the select and expander columns. */
+  protected readonly totalColumns = computed(
+    () =>
+      this.columns().length +
+      (this.selectable() ? 1 : 0) +
+      (this.expandable() ? 1 : 0),
   );
 
   /** Data sorted by the active column, or the input order when unsorted. */
@@ -251,5 +278,32 @@ export class MkTable<T = Record<string, unknown>> {
         ...rows.filter((r) => !has.has(this.rowKey(r))),
       ]);
     }
+  }
+
+  // --- Expansion ------------------------------------------------------------
+  private readonly expandedKeys = signal<Set<unknown>>(new Set());
+
+  /** Whether `row`'s detail panel is currently expanded. */
+  protected isExpanded(row: T): boolean {
+    return this.expandedKeys().has(this.rowKey(row));
+  }
+
+  /** The DOM id of a row's detail panel (for `aria-controls`). */
+  protected detailId(index: number): string {
+    return `${this.detailIdBase}-${index}`;
+  }
+
+  /** Toggle a row's detail panel, honouring `singleExpand`. */
+  protected toggleExpand(row: T, event?: Event): void {
+    event?.stopPropagation();
+    const rk = this.rowKey(row);
+    const open = this.expandedKeys().has(rk);
+    const next = this.singleExpand() ? new Set<unknown>() : new Set(this.expandedKeys());
+    if (open) next.delete(rk);
+    else next.add(rk);
+    this.expandedKeys.set(next);
+    this.expandedChange.emit(
+      this.data().filter((r) => next.has(this.rowKey(r))),
+    );
   }
 }

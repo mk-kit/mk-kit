@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import {
   MkAvatar,
   MkAvatarGroup,
@@ -24,6 +24,7 @@ import {
   MkSpinner,
   MkStatCard,
   MkTable,
+  MkTableRowDetail,
   MkTag,
   type MkSortChange,
   type MkTableColumn,
@@ -71,6 +72,7 @@ interface DemoUser {
     MkSpinner,
     MkStatCard,
     MkTable,
+    MkTableRowDetail,
     MkTag,
   ],
   template: `
@@ -761,6 +763,35 @@ interface DemoUser {
         <code class="docs-inline">format</code> callback.
       </p>
 
+      <h2>Expandable rows</h2>
+      <p>
+        Set <code class="docs-inline">expandable</code> to add a leading expander
+        column. Each row reveals a detail panel supplied via an
+        <code class="docs-inline">&lt;ng-template mkTableRowDetail let-row&gt;</code>
+        — the row object is the template's implicit context. Add
+        <code class="docs-inline">singleExpand</code> for accordion behaviour.
+        Expanded: <strong>{{ expandedNames() }}</strong>.
+      </p>
+      <docs-example [code]="expandableCode" column>
+        <mk-table
+          [columns]="columns"
+          [data]="users"
+          expandable
+          hover
+          trackKey="email"
+          (expandedChange)="onExpand($event)"
+          style="width: 100%"
+        >
+          <ng-template mkTableRowDetail let-row>
+            <mk-description-list layout="stacked">
+              <mk-desc-item term="Email">{{ row.email }}</mk-desc-item>
+              <mk-desc-item term="Role">{{ row.role }}</mk-desc-item>
+              <mk-desc-item term="Status">{{ row.status }}</mk-desc-item>
+            </mk-description-list>
+          </ng-template>
+        </mk-table>
+      </docs-example>
+
       <h2>Description list</h2>
       <p>
         <code class="docs-inline">&lt;mk-description-list&gt;</code> renders a
@@ -983,6 +1014,17 @@ published: true`;
     this.tableStatus.set(`clicked ${row.name}`);
   }
 
+  // ----- Expandable rows ----------------------------------------------
+  protected readonly expandedRows = signal<DemoUser[]>([]);
+  protected readonly expandedNames = computed(() => {
+    const rows = this.expandedRows();
+    return rows.length ? rows.map((r) => r.name).join(', ') : 'none';
+  });
+
+  protected onExpand(rows: DemoUser[]): void {
+    this.expandedRows.set(rows);
+  }
+
   // ----- Code snippets -------------------------------------------------
   protected readonly cardCode = `<mk-card variant="elevated">
   <mk-card-header>
@@ -1089,4 +1131,19 @@ published: true`;
   clickableRows
   (sortChange)="onSort($event)"
   (rowClick)="onRowClick($event)" />`;
+
+  protected readonly expandableCode = `<mk-table
+  [columns]="columns"
+  [data]="users"
+  expandable
+  trackKey="email"
+  (expandedChange)="onExpand($event)"
+>
+  <ng-template mkTableRowDetail let-row>
+    <mk-description-list layout="stacked">
+      <mk-desc-item term="Email">{{ row.email }}</mk-desc-item>
+      <mk-desc-item term="Role">{{ row.role }}</mk-desc-item>
+    </mk-description-list>
+  </ng-template>
+</mk-table>`;
 }

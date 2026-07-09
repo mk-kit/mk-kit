@@ -59,7 +59,9 @@ live-announcer core.
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value
   pairs for entity-detail panels; grid/stacked, rich values (shipped).
 - ✅ **Virtual scroll** (`mk-virtual-scroll`) — windowed rendering for long lists (shipped).
-- **P2 Expandable / nested table rows** — detail rows + row grouping.
+- ✅ **Expandable table rows** (`mk-table expandable`) — per-row detail panel via
+  `<ng-template mkTableRowDetail let-row>`, multi- or `singleExpand` accordion,
+  `(expandedChange)` (shipped). **P3 nested/grouped rows** remaining.
 - ✅ **Avatar group** (`mk-avatar-group`) — overlapped avatars with "+N" overflow (shipped).
 - ✅ **Code block** (`mk-code`) — themed read-only block, highlight + copy (shipped).
 - ✅ **Carousel** (`mk-carousel`) — accessible slides/gallery (shipped).
@@ -138,7 +140,7 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
-1. **Expandable table rows** and **scrollspy** — remaining structural P2s.
+1. **Scrollspy** — remaining structural P2.
 2. **Week picker** + mini inline date — remaining picker P3s.
 3. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
    high-contrast theme, heatmap/scatter charts).
