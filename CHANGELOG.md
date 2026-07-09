@@ -8,6 +8,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mkRipple`** — a Material-style press ripple for any surface (button, list
+  item, card). Makes the host a positioned, clipping container and paints a
+  short-lived wave from the pointer; `mkRippleCentered` / `mkRippleColor`
+  options, respects `prefers-reduced-motion`.
 - **`mk-form-error-summary`** — an accessible summary of a form's validation
   errors (WAI/GOV.UK pattern): an `alert` region listing each error as a link
   that focuses its field. Call `focus()` after a failed submit to send

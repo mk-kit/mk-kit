@@ -107,7 +107,9 @@ live-announcer core.
 - ✅ **intersect / lazy-load** (`mkIntersect`) — `IntersectionObserver` wrapper,
   `(mkIntersect)` + `intersecting()` signal, `once` for reveal/lazy (shipped).
 - ✅ **infinite-scroll** (`mkInfiniteScroll`) — fires near the scroll bottom,
-  re-arms, `disabled` guard (shipped). **P3 ripple** remaining.
+  re-arms, `disabled` guard (shipped).
+- ✅ **ripple** (`mkRipple`) — Material-style press ripple for any surface;
+  centered/color options, respects reduced-motion (shipped).
 
 ### Pickers
 - ✅ **Month / year picker** (`mk-month-picker`, `mode="month" | "year"`) — compact
@@ -154,5 +156,5 @@ Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
 1. **Mini inline date** — remaining picker P3.
-2. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
+2. RTL audit + density mode; then P3 polish (QR, theme-builder,
    high-contrast theme, funnel/radar charts).

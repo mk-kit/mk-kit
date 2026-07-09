@@ -5,6 +5,7 @@ import { MkCopyToClipboard } from './copy-to-clipboard';
 import { MkScrollspy } from './scrollspy';
 import { MkIntersect } from './intersect';
 import { MkInfiniteScroll } from './infinite-scroll';
+import { MkRipple } from './ripple';
 
 @Component({
   imports: [MkClickOutside],
@@ -335,5 +336,58 @@ describe('MkInfiniteScroll', () => {
     setScroll(760);
     el.dispatchEvent(new Event('scroll'));
     expect(fixture.componentInstance.hits()).toBe(0);
+  });
+});
+
+// --- MkRipple ---------------------------------------------------------------
+@Component({
+  imports: [MkRipple],
+  template: `<button mkRipple [mkRippleDisabled]="disabled()" mkRippleCentered>
+    press
+  </button>`,
+})
+class RippleHost {
+  readonly disabled = signal(false);
+}
+
+describe('MkRipple', () => {
+  let fixture: ComponentFixture<RippleHost>;
+  let btn: HTMLElement;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(RippleHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    btn = fixture.nativeElement.querySelector('button') as HTMLElement;
+  });
+
+  afterEach(() => {
+    fixture.nativeElement.remove();
+    fixture.destroy();
+  });
+
+  it('appends a wave element on pointerdown and clips the host', () => {
+    btn.dispatchEvent(new PointerEvent('pointerdown', { clientX: 5, clientY: 5 }));
+    expect(btn.querySelectorAll('.mk-ripple__wave')).toHaveLength(1);
+    expect(btn.style.overflow).toBe('hidden');
+  });
+
+  it('does not spawn a wave when disabled', () => {
+    fixture.componentInstance.disabled.set(true);
+    fixture.detectChanges();
+    btn.dispatchEvent(new PointerEvent('pointerdown', { clientX: 5, clientY: 5 }));
+    expect(btn.querySelectorAll('.mk-ripple__wave')).toHaveLength(0);
+  });
+
+  it('removes the wave after the fallback timer', () => {
+    vi.useFakeTimers();
+    btn.dispatchEvent(new PointerEvent('pointerdown', { clientX: 5, clientY: 5 }));
+    expect(btn.querySelectorAll('.mk-ripple__wave')).toHaveLength(1);
+    vi.advanceTimersByTime(700);
+    expect(btn.querySelectorAll('.mk-ripple__wave')).toHaveLength(0);
+    vi.useRealTimers();
   });
 });

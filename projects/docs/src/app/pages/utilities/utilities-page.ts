@@ -6,6 +6,7 @@ import {
   MkCopyToClipboard,
   MkInfiniteScroll,
   MkIntersect,
+  MkRipple,
   MkScrollspy,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
@@ -26,6 +27,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkScrollspy,
     MkIntersect,
     MkInfiniteScroll,
+    MkRipple,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -199,6 +201,30 @@ import { DocsExample } from '../../shared/docs-example';
           }
         </div>
       </docs-example>
+
+      <!-- ripple -->
+      <h2>Ripple</h2>
+      <p>
+        <code class="docs-inline">mkRipple</code> adds a Material-style press
+        ripple to any surface. It makes the host a positioned, clipping container
+        and paints a short-lived wave from the pointer;
+        <code class="docs-inline">mkRippleCentered</code> starts from the middle,
+        <code class="docs-inline">mkRippleColor</code> tints it, and it respects
+        reduced-motion. Press the surfaces below.
+      </p>
+      <docs-example [code]="rippleCode" [column]="true">
+        <div class="ripple-demo">
+          <button mkButton mkRipple>Button</button>
+          <div class="ripple-tile" mkRipple mkRippleColor="var(--mk-primary)">
+            Card surface
+          </div>
+          <ul class="ripple-list">
+            <li mkRipple>Inbox</li>
+            <li mkRipple>Archive</li>
+            <li mkRipple>Trash</li>
+          </ul>
+        </div>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -305,6 +331,42 @@ import { DocsExample } from '../../shared/docs-example';
         text-align: center;
         color: var(--mk-text-subtle);
       }
+      .ripple-demo {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: flex-start;
+        gap: var(--mk-space-4);
+      }
+      .ripple-tile {
+        display: grid;
+        place-items: center;
+        width: 10rem;
+        height: 5rem;
+        color: var(--mk-text);
+        background: var(--mk-surface);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        cursor: pointer;
+        user-select: none;
+      }
+      .ripple-list {
+        margin: 0;
+        padding: 0;
+        list-style: none;
+        width: 12rem;
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        overflow: hidden;
+      }
+      .ripple-list li {
+        padding: var(--mk-space-3) var(--mk-space-4);
+        border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+        cursor: pointer;
+        user-select: none;
+      }
+      .ripple-list li:last-child {
+        border-bottom: 0;
+      }
     `,
   ],
 })
@@ -352,6 +414,12 @@ export class UtilitiesPage {
   [disabled]="loading() || done()" (mkInfiniteScroll)="loadMore()">
   @for (item of items(); track item.id) { … }
 </div>`;
+
+  protected readonly rippleCode = `<button mkButton mkRipple>Button</button>
+
+<div class="tile" mkRipple mkRippleColor="var(--mk-primary)">Card</div>
+
+<li mkRipple>Inbox</li>`;
 
   protected readonly scrollspyCode = `<nav mkScrollspy="section[id]" [root]="body" #spy="mkScrollspy">
   @for (s of sections; track s.id) {
