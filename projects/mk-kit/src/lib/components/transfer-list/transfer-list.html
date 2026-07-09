@@ -1,0 +1,145 @@
+<!-- Available (left) list -->
+<div class="mk-transfer-list__panel">
+  <div class="mk-transfer-list__heading" [id]="availableLabelId">
+    {{ availableLabel() }}
+    <span class="mk-transfer-list__count">{{ available().length }}</span>
+  </div>
+
+  @if (filterable()) {
+    <input
+      class="mk-transfer-list__search"
+      type="text"
+      [value]="availableQuery()"
+      [disabled]="isDisabled()"
+      [attr.aria-label]="availableLabel() + ' filter'"
+      placeholder="Filter…"
+      (input)="onQueryInput('available', $event)"
+    />
+  }
+
+  <ul
+    class="mk-transfer-list__list"
+    role="listbox"
+    aria-multiselectable="true"
+    [id]="availableListId"
+    [attr.aria-labelledby]="availableLabelId"
+  >
+    @for (item of filteredAvailable(); track item.value) {
+      <li
+        class="mk-transfer-list__option"
+        [class.mk-transfer-list__option--checked]="isChecked('available', item.value)"
+        [class.mk-transfer-list__option--disabled]="item.disabled"
+        role="option"
+        [attr.aria-selected]="isChecked('available', item.value)"
+        [attr.aria-disabled]="item.disabled || null"
+        [attr.tabindex]="isDisabled() || item.disabled ? null : 0"
+        (click)="toggleCheck('available', item)"
+        (keydown)="onRowKeydown('available', item, $event)"
+      >
+        <span class="mk-transfer-list__check" aria-hidden="true"></span>
+        <span class="mk-transfer-list__label">{{ item.label }}</span>
+      </li>
+    } @empty {
+      <li class="mk-transfer-list__empty">No items</li>
+    }
+  </ul>
+</div>
+
+<!-- Middle controls -->
+<div class="mk-transfer-list__controls">
+  <button
+    mkButton
+    variant="outline"
+    size="sm"
+    iconOnly
+    type="button"
+    aria-label="Move selected to selected list"
+    [disabled]="isDisabled() || !canMoveRight()"
+    (click)="moveRight()"
+  >
+    →
+  </button>
+  <button
+    mkButton
+    variant="outline"
+    size="sm"
+    iconOnly
+    type="button"
+    aria-label="Move all to selected list"
+    [disabled]="isDisabled() || !canMoveAllRight()"
+    (click)="moveAllRight()"
+  >
+    ≫
+  </button>
+  <button
+    mkButton
+    variant="outline"
+    size="sm"
+    iconOnly
+    type="button"
+    aria-label="Move all to available list"
+    [disabled]="isDisabled() || !canMoveAllLeft()"
+    (click)="moveAllLeft()"
+  >
+    ≪
+  </button>
+  <button
+    mkButton
+    variant="outline"
+    size="sm"
+    iconOnly
+    type="button"
+    aria-label="Move selected to available list"
+    [disabled]="isDisabled() || !canMoveLeft()"
+    (click)="moveLeft()"
+  >
+    ←
+  </button>
+</div>
+
+<!-- Selected (right) list -->
+<div class="mk-transfer-list__panel">
+  <div class="mk-transfer-list__heading" [id]="selectedLabelId">
+    {{ selectedLabel() }}
+    <span class="mk-transfer-list__count">{{ selected().length }}</span>
+  </div>
+
+  @if (filterable()) {
+    <input
+      class="mk-transfer-list__search"
+      type="text"
+      [value]="selectedQuery()"
+      [disabled]="isDisabled()"
+      [attr.aria-label]="selectedLabel() + ' filter'"
+      placeholder="Filter…"
+      (input)="onQueryInput('selected', $event)"
+    />
+  }
+
+  <ul
+    class="mk-transfer-list__list"
+    role="listbox"
+    aria-multiselectable="true"
+    [id]="selectedListId"
+    [attr.aria-labelledby]="selectedLabelId"
+  >
+    @for (item of filteredSelected(); track item.value) {
+      <li
+        class="mk-transfer-list__option"
+        [class.mk-transfer-list__option--checked]="isChecked('selected', item.value)"
+        [class.mk-transfer-list__option--disabled]="item.disabled"
+        role="option"
+        [attr.aria-selected]="isChecked('selected', item.value)"
+        [attr.aria-disabled]="item.disabled || null"
+        [attr.tabindex]="isDisabled() || item.disabled ? null : 0"
+        (click)="toggleCheck('selected', item)"
+        (keydown)="onRowKeydown('selected', item, $event)"
+      >
+        <span class="mk-transfer-list__check" aria-hidden="true"></span>
+        <span class="mk-transfer-list__label">{{ item.label }}</span>
+      </li>
+    } @empty {
+      <li class="mk-transfer-list__empty">No items</li>
+    }
+  </ul>
+</div>

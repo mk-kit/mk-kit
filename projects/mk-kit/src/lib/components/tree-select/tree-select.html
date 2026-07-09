@@ -1,0 +1,61 @@
+<div #field class="mk-tree-select__field">
+  <button
+    #trigger
+    type="button"
+    class="mk-tree-select__trigger"
+    [id]="triggerId"
+    aria-haspopup="tree"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+    (keydown)="onTriggerKeydown($event)"
+  >
+    @if (selectedLabel()) {
+      <span class="mk-tree-select__value">{{ selectedLabel() }}</span>
+    } @else {
+      <span class="mk-tree-select__value mk-tree-select__value--placeholder">{{
+        placeholder()
+      }}</span>
+    }
+    <span class="mk-tree-select__icon" aria-hidden="true"></span>
+  </button>
+
+  @if (clearable() && value() !== null && value() !== undefined && !isDisabled()) {
+    <button
+      type="button"
+      class="mk-tree-select__clear"
+      aria-label="Clear"
+      (click)="clear($event)"
+    >
+      <span class="mk-tree-select__clear-icon" aria-hidden="true"></span>
+    </button>
+  }
+</div>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-tree-select__panel"
+    role="dialog"
+    [id]="panelId"
+    [attr.aria-labelledby]="labelledBy()"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    [matchWidth]="true"
+    (dismiss)="close()"
+    (keydown)="onPanelKeydown($event)"
+  >
+    <mk-tree
+      class="mk-tree-select__tree"
+      selectable
+      [nodes]="nodes()"
+      [selected]="value()"
+      (selectedChange)="onPick($event)"
+    />
+  </div>
+}

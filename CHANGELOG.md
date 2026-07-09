@@ -8,6 +8,29 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-password-input`** — password field with a reveal toggle, optional 0–4
+  strength meter and a rules checklist; CVA over `string`, form-field wiring.
+- **`mk-transfer-list`** — dual list box for moving items between an available
+  and a selected list (role/permission assignment); CVA over the selected values,
+  optional per-list filtering.
+- **`mk-tree-select`** — a hierarchical dropdown select: an `mk-tree` inside a
+  top-layer popover; CVA over the picked node's value, clearable.
+- **`mk-hovercard`** + `[mkHovercardFor]` — a rich hover-preview panel with
+  open/close delays that stays open while hovered; top-layer via `MkAnchoredPanel`.
+- **`MkHotkeysService` + `[mkHotkey]`** — a global keyboard-shortcut registry
+  (`mod+k`, chords like `g i`), ignoring editable targets by default; the
+  directive binds a combo to a host click or `(mkHotkeyPressed)`. Pure
+  `mkParseHotkey` / `mkMatchesHotkey` helpers exported.
+- **`mk-event-calendar`** — a month-grid scheduler showing event pills per day
+  (with "+N more"), month navigation, `(dayClick)` / `(eventClick)`.
+- **`mk-kanban`** — a draggable board of columns and cards built on the dnd
+  module; two-way `columns`, `(cardMoved)`, custom card `<ng-template>`.
+- **`mk-notification-center`** — a bell trigger with an unread badge opening a
+  top-layer panel of notifications, with mark-(all-)read and an empty state.
+- **`mk-result`** — a full-page status state (success / error / 404 / …) with a
+  status icon, title, subtitle and projected action slots.
+- **`mk-countdown`** — counts down to a target date (days/hours/minutes/seconds),
+  emits `(finished)`; pure `mkSplitDuration` helper exported.
 - **`mk-inline-edit`** — click-to-edit text: the display swaps to an input on
   click (or Enter/Space), Enter or blur saves, Escape reverts. `multiline`
   textarea variant, `saveOnBlur`, `(saved)` / `(cancelled)`; CVA over `string`.

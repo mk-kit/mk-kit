@@ -10,3 +10,4 @@ export * from './time-picker';
 export * from './date-range-picker';
 export * from './month-picker';
 export * from './week-picker';
+export * from './event-calendar';

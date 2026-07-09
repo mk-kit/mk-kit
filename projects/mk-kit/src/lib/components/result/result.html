@@ -1,0 +1,61 @@
+<div class="mk-result__icon" aria-hidden="true">
+  <span class="mk-result__icon-custom"><ng-content select="[mkResultIcon]" /></span>
+  <span class="mk-result__icon-default">
+    @switch (iconName()) {
+      @case ('check') {
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" focusable="false">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+          <path d="M8 12.5l2.5 2.5L16 9.5" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" stroke-linejoin="round" />
+        </svg>
+      }
+      @case ('x') {
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" focusable="false">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+          <path d="M9 9l6 6M15 9l-6 6" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" />
+        </svg>
+      }
+      @case ('alert') {
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" focusable="false">
+          <path d="M12 3.5l9 15.5H3z" stroke="currentColor" stroke-width="1.6"
+            stroke-linejoin="round" />
+          <path d="M12 10v4" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <circle cx="12" cy="16.5" r="1" fill="currentColor" />
+        </svg>
+      }
+      @case ('search') {
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" focusable="false">
+          <circle cx="10.5" cy="10.5" r="6.5" stroke="currentColor" stroke-width="1.6" />
+          <path d="M15.5 15.5L21 21" stroke="currentColor" stroke-width="1.6"
+            stroke-linecap="round" />
+        </svg>
+      }
+      @default {
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" focusable="false">
+          <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6" />
+          <path d="M12 11v5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" />
+          <circle cx="12" cy="8" r="1" fill="currentColor" />
+        </svg>
+      }
+    }
+  </span>
+</div>
+
+@if (resultTitle(); as heading) {
+  <h2 class="mk-result__title">{{ heading }}</h2>
+} @else {
+  <ng-content select="[mkResultTitle]" />
+}
+
+@if (subtitle(); as text) {
+  <p class="mk-result__subtitle">{{ text }}</p>
+}
+
+<div class="mk-result__body">
+  <ng-content />
+</div>
+
+<div class="mk-result__actions">
+  <ng-content select="[mkResultActions]" />
+</div>

@@ -1,0 +1,52 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  display: inline-flex;
+  align-items: flex-start;
+  gap: var(--mk-space-2);
+  color: var(--mk-text);
+  font-variant-numeric: tabular-nums;
+}
+
+.mk-countdown__segment {
+  display: inline-flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-space-1);
+}
+
+.mk-countdown__value {
+  font-size: var(--mk-font-size-2xl);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+
+.mk-countdown__label {
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-xs);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.mk-countdown__sep {
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-2xl);
+  line-height: 1;
+}
+
+.mk-countdown__done {
+  font-size: var(--mk-font-size-lg);
+}
+
+.mk-countdown__sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

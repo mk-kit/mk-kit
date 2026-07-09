@@ -1,0 +1,90 @@
+<div class="mk-event-calendar__header">
+  <button
+    type="button"
+    class="mk-event-calendar__nav"
+    aria-label="Previous month"
+    (click)="prevMonth()"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M15 5l-7 7 7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+
+  <span class="mk-event-calendar__label" [id]="labelId" aria-live="polite">{{
+    monthLabel()
+  }}</span>
+
+  <button
+    type="button"
+    class="mk-event-calendar__nav"
+    aria-label="Next month"
+    (click)="nextMonth()"
+  >
+    <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
+      <path
+        d="M9 5l7 7-7 7"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+    </svg>
+  </button>
+</div>
+
+<div class="mk-event-calendar__grid" role="grid" [attr.aria-labelledby]="labelId">
+  <div class="mk-event-calendar__weekdays" role="row">
+    @for (wd of weekdays(); track $index) {
+      <span class="mk-event-calendar__weekday" role="columnheader">
+        <abbr [title]="wd.full">{{ wd.short }}</abbr>
+      </span>
+    }
+  </div>
+
+  @for (week of weekCells(); track $index) {
+    <div class="mk-event-calendar__week" role="row">
+      @for (cell of week; track cell.date.getTime()) {
+        <button
+          type="button"
+          class="mk-event-calendar__cell"
+          role="gridcell"
+          [class.mk-event-calendar__cell--outside]="cell.outside"
+          [class.mk-event-calendar__cell--today]="cell.today"
+          [attr.aria-label]="dayLabel(cell.date)"
+          [attr.aria-current]="cell.today ? 'date' : null"
+          (click)="onDayClick(cell.date)"
+        >
+          <span class="mk-event-calendar__day-num">{{
+            cell.date.getDate()
+          }}</span>
+
+          <span class="mk-event-calendar__events">
+            @for (event of cell.visible; track $index) {
+              <span
+                class="mk-event-calendar__pill"
+                [style.background-color]="event.color || 'var(--mk-primary)'"
+                [title]="event.title"
+                (click)="onEventClick($event, event)"
+              >
+                {{ event.title }}
+              </span>
+            }
+            @if (cell.overflow > 0) {
+              <span class="mk-event-calendar__more"
+                >+{{ cell.overflow }} more</span
+              >
+            }
+          </span>
+        </button>
+      }
+    </div>
+  }
+</div>

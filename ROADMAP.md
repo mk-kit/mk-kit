@@ -181,28 +181,30 @@ existing primitive it would reuse. Priorities as before.
   `allowDuplicates` / `addOnBlur` (shipped).
 - ✅ **`mk-inline-edit`** — click text to edit in place; Enter/blur saves,
   Escape reverts, `multiline` textarea, CVA over string (shipped).
-- **P2 `mk-password-input`** — reveal toggle + strength meter + optional rules
-  checklist. Auth/settings forms.
+- ✅ **`mk-password-input`** — reveal toggle + 0–4 strength meter + rules
+  checklist, CVA over string (shipped).
 
 ### Tier 2 — useful, moderate size
-- **P2 `mk-transfer-list`** — dual list box to move items between "available" and
-  "selected" (role/permission assignment). Reuses list + checkbox + button.
-- **P2 `mk-tree-select`** — hierarchical dropdown select (category/folder pickers);
-  reuses `mk-tree` inside an `MkAnchoredPanel`.
-- **P2 `mk-hovercard`** — rich hover-preview panel (user/link cards); reuses
-  `MkAnchoredPanel` with open/close delays.
-- **P2 `MkHotkeys` + `mkHotkey`** — global keyboard-shortcut registry (scopes,
-  `⌘K`-style chords) with a "?" cheat-sheet overlay. Power-user admin.
-- **P3 `mk-tour`** — product-onboarding coach marks anchored to elements; reuses
-  `MkAnchoredPanel` + focus management.
+- ✅ **`mk-transfer-list`** — dual list box (available ⇄ selected), CVA over the
+  selected values, per-list filter (shipped).
+- ✅ **`mk-tree-select`** — hierarchical dropdown (mk-tree in a top-layer popover),
+  CVA, clearable (shipped).
+- ✅ **`mk-hovercard`** + `[mkHovercardFor]` — hover-preview panel with open/close
+  delays, stays open while hovered (shipped).
+- ✅ **`MkHotkeysService` + `[mkHotkey]`** — global shortcut registry (`mod+k`,
+  chords), ignores editable targets; `mkParseHotkey`/`mkMatchesHotkey` (shipped).
+- ⏳ **`mk-tour`** — product-onboarding coach marks (in progress).
 
 ### Tier 3 — larger / specialized
 - **P2 Data-grid pro** — extend `mk-table`: column resize / reorder / pin, sticky
   columns, inline cell edit. The biggest single value-add for admin.
-- **P3 `mk-event-calendar`** — month scheduler with events (reuses `mk-calendar`
-  grid math).
-- **P3 `mk-kanban`** — draggable board columns (reuses the dnd module).
-- **P3 `mk-notification-center`** — notification inbox panel (reuses drawer/list/badge).
-- **P3 `mk-result`** — full-page success / error / 404 status states (complements
-  `mk-empty-state`).
-- **P3 `mk-countdown`** — count-to-date / stopwatch display.
+- ✅ **`mk-event-calendar`** — month scheduler with event pills + "+N more",
+  month nav, day/event click (shipped).
+- ✅ **`mk-kanban`** — draggable board columns/cards on the dnd module,
+  `(cardMoved)`, custom card template (shipped).
+- ✅ **`mk-notification-center`** — bell + unread badge + top-layer inbox panel,
+  mark-(all-)read (shipped).
+- ✅ **`mk-result`** — full-page success/error/404 status states + action slots
+  (shipped).
+- ✅ **`mk-countdown`** — count-to-date display, `(finished)`, `mkSplitDuration`
+  helper (shipped).

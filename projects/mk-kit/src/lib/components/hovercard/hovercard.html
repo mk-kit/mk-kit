@@ -1,0 +1,20 @@
+@if (opened()) {
+  <div
+    #panel
+    class="mk-hovercard__panel"
+    role="dialog"
+    tabindex="-1"
+    [id]="panelId"
+    [attr.aria-label]="ariaLabel()"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="anchorEl()"
+    [placement]="placement()"
+    [gap]="8"
+    (dismiss)="close()"
+    (mouseenter)="onCardEnter()"
+    (mouseleave)="onCardLeave()"
+    (keydown.escape)="onEscape($event)"
+  >
+    <ng-content />
+  </div>
+}

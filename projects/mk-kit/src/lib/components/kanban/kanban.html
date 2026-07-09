@@ -1,0 +1,45 @@
+<div class="mk-kanban__board">
+  @for (column of columns(); track column.id; let colIndex = $index) {
+    <section
+      class="mk-kanban__column"
+      role="region"
+      [attr.aria-label]="column.title"
+    >
+      <header class="mk-kanban__column-header">
+        <span class="mk-kanban__column-title">{{ column.title }}</span>
+        <span class="mk-kanban__column-count" aria-hidden="true">
+          {{ column.cards.length }}
+        </span>
+      </header>
+
+      <div
+        mkDropList
+        class="mk-kanban__cards"
+        [mkDropListData]="column.cards"
+        [mkDropListId]="listIds()[colIndex]"
+        [mkDropListConnectedTo]="connectedTo(colIndex)"
+        [mkDropListDisabled]="disabled()"
+        mkDropListOrientation="vertical"
+        (mkDropListDropped)="onDrop($event)"
+      >
+        @for (card of column.cards; track card.id) {
+          <div
+            mkDrag
+            class="mk-kanban__card"
+            [mkDragData]="card"
+            [mkDragDisabled]="disabled()"
+          >
+            <ng-container
+              [ngTemplateOutlet]="cardTemplate() ?? defaultCard"
+              [ngTemplateOutletContext]="{ $implicit: card, column: column }"
+            />
+          </div>
+        }
+      </div>
+    </section>
+  }
+</div>
+
+<ng-template #defaultCard let-card>
+  <span class="mk-kanban__card-title">{{ card.title }}</span>
+</ng-template>

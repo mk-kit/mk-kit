@@ -1,0 +1,100 @@
+<button
+  #trigger
+  type="button"
+  class="mk-notification-center__trigger"
+  aria-haspopup="dialog"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="open() ? panelId : null"
+  [attr.aria-label]="triggerLabel()"
+  (click)="toggle()"
+>
+  <mk-icon name="bell" />
+  @if (unreadCount() > 0) {
+    <mk-badge
+      class="mk-notification-center__count"
+      tone="danger"
+      variant="solid"
+      size="sm"
+      aria-hidden="true"
+    >
+      {{ badgeText() }}
+    </mk-badge>
+  }
+</button>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-notification-center__panel"
+    role="dialog"
+    tabindex="-1"
+    [id]="panelId"
+    [attr.aria-labelledby]="titleId"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="trigger"
+    placement="bottom-end"
+    [gap]="8"
+    (dismiss)="close(false)"
+    (keydown.escape)="onEscape($event)"
+    (focusout)="onPanelFocusout($event)"
+  >
+    <header class="mk-notification-center__header">
+      <h2 [id]="titleId" class="mk-notification-center__title">
+        {{ panelTitle() }}
+      </h2>
+      <button
+        type="button"
+        class="mk-notification-center__mark-all"
+        [disabled]="unreadCount() === 0"
+        (click)="markAllRead()"
+      >
+        Mark all read
+      </button>
+    </header>
+
+    @if (notifications().length > 0) {
+      <ul
+        class="mk-notification-center__list"
+        [style.max-height]="maxHeight()"
+      >
+        @for (item of notifications(); track item.id) {
+          <li>
+            <button
+              type="button"
+              class="mk-notification-center__item"
+              [class.mk-notification-center__item--unread]="!item.read"
+              (click)="onRowClick(item)"
+            >
+              <span
+                class="mk-notification-center__dot"
+                aria-hidden="true"
+              ></span>
+              <span class="mk-notification-center__body">
+                <span class="mk-notification-center__item-title">
+                  {{ item.title }}
+                </span>
+                @if (item.body) {
+                  <span class="mk-notification-center__item-text">
+                    {{ item.body }}
+                  </span>
+                }
+                @if (item.time) {
+                  <span class="mk-notification-center__item-time">
+                    {{ item.time }}
+                  </span>
+                }
+              </span>
+            </button>
+          </li>
+        }
+      </ul>
+    } @else {
+      <mk-empty-state
+        class="mk-notification-center__empty"
+        icon="bell"
+        size="sm"
+        [title]="emptyText()"
+      />
+    }
+  </div>
+}

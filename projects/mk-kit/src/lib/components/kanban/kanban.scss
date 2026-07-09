@@ -1,0 +1,83 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  display: block;
+  color: var(--mk-text);
+}
+
+.mk-kanban__board {
+  display: flex;
+  gap: var(--mk-space-4);
+  align-items: flex-start;
+  overflow-x: auto;
+  padding-bottom: var(--mk-space-2);
+}
+
+.mk-kanban__column {
+  display: flex;
+  flex-direction: column;
+  flex: 0 0 auto;
+  width: 17rem;
+  max-height: 100%;
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+}
+
+.mk-kanban__column-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-3) var(--mk-space-4);
+  font-weight: 600;
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+}
+
+.mk-kanban__column-title {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-kanban__column-count {
+  flex: 0 0 auto;
+  min-width: 1.5rem;
+  padding: 0 var(--mk-space-2);
+  font-size: 0.75rem;
+  font-weight: 600;
+  line-height: 1.5rem;
+  text-align: center;
+  color: var(--mk-text-muted);
+  background-color: var(--mk-surface);
+  border-radius: var(--mk-radius-md);
+}
+
+.mk-kanban__cards {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  flex: 1 1 auto;
+  min-height: var(--mk-space-8);
+  padding: var(--mk-space-3);
+  overflow-y: auto;
+}
+
+.mk-kanban__card {
+  padding: var(--mk-space-3) var(--mk-space-4);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-sm);
+}
+
+.mk-kanban__card:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-kanban__card-title {
+  display: block;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
