@@ -4,44 +4,25 @@ A curated gap analysis for `@mkornas/ui`, measured against Angular Material and
 common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 **P2** useful, **P3** nice-to-have. This is a planning doc, not a commitment.
 
-## ⭑ mk-cms admin blockers (build first)
+## ⭑ mk-cms admin blockers
 
-Driven by the **mk-cms** admin panel (schema-driven CRUD over the content
-engine). These gate specific admin screens — see the readiness analysis in
-`mk-cms/docs/ADMIN-UI-READINESS.md`. Prioritized above the general list below.
+Driven by the **mk-cms** admin panel (schema-driven CRUD). The original blockers
+— **file-upload**, **multi-select + chips**, **JSON/code editor**,
+**popover/popconfirm** and **description-list** — are all ✅ **shipped** (details
+in the component sections below). Two items remain:
 
-- ✅ **File upload / dropzone** (`mk-file-upload`) — **shipped.** Click + drag-drop,
-  multi-file, per-file progress, image preview, type/size/count validation, and
-  an async `uploadFn` hook (stream each file to the CMS `POST /media`). Still
-  unblocks a **media-picker dialog** (browse grid + upload + select) to compose
-  from this + card + dialog.
-- ✅ **Multi-select + chips + async** (`mk-multi-select`) — **shipped.** Multiple
-  selection with removable chips over an async option source (`filterMode="none"`
-  + `(search)`); chips keep their labels after options leave the list, `max`
-  caps the count. Covers the `relation` field type + taxonomy/term assignment.
-- ✅ **JSON / code editor** (`mk-code-editor`) — **shipped.** Dependency-free
-  textarea-over-highlight editor with a JSON tokenizer, live validation (inline
-  error + `(validate)`), `format()` pretty-print, line numbers and Tab-indent
-  (Escape releases the trap). `language="json"` covers the `json` field type +
-  plugin/settings JSONB editing.
 - **[P1] Block-editor ↔ HTML bridge** (`mk-block-editor`) — the editor's value is
   a structured `MkBlockDocument`, but the CMS `richtext` field type stores an
-  **HTML string**. There is no way to seed the editor from HTML or serialize its
-  document back to HTML, so the admin currently falls back to a plain `textarea`
-  for richtext. Add an HTML (de)serializer — `MkBlockDocument` ⇄ HTML — or a
-  plain-HTML value mode, so block-editor can back a string-typed richtext field.
-  (Found wiring the entry editor, 2026-07-09.)
-- **[P2] Description list** (`mk-description-list`) — entity-detail / revision-meta
-  panels. Also listed under Data display below.
-- ✅ **Popover / popconfirm** (`mk-popover` / `mk-popconfirm`) — **shipped.**
-  Top-layer non-modal popover + inline row-level "Delete?" confirm (built on
-  `MkAnchoredPanel`). Also listed under Feedback below.
-- **[P3] Revision diff / comparison view** — the CMS stores a snapshot per save;
-  a diff view makes the revisions screen shine. Also listed under Data display.
+  **HTML string**. There's no way to seed the editor from HTML or serialize its
+  document back to HTML, so the admin falls back to a plain `textarea` for
+  richtext. Add an HTML (de)serializer — `MkBlockDocument` ⇄ HTML — or a
+  plain-HTML value mode. (Found wiring the entry editor, 2026-07-09.)
+- **[P3] Revision diff / comparison view** — the CMS snapshots each save; a diff
+  view makes the revisions screen shine. Also listed under Data display below.
 
-The rest of the admin (tables + row-selection bulk actions, app-shell, nav-group,
-command palette, tree + dnd menu builder, dialogs, toasts, date pickers, block
-editor, charts) is already covered by shipping components.
+The rest of the admin (tables + bulk actions, app-shell, nav-group, command
+palette, tree + dnd menu builder, dialogs, toasts, date pickers, charts) is
+covered by shipping components.
 
 ---
 
