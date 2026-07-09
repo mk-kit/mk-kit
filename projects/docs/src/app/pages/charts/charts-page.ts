@@ -2,11 +2,14 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   type MkChartSeries,
   type MkChartSlice,
+  type MkScatterSeries,
   MkBarChart,
   MkDonutChart,
   MkGauge,
+  MkHeatmap,
   MkLineChart,
   MkProgressRing,
+  MkScatterChart,
   MkSparkline,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
@@ -26,6 +29,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkLineChart,
     MkDonutChart,
     MkGauge,
+    MkScatterChart,
+    MkHeatmap,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -137,6 +142,48 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-donut-chart [slices]="traffic" [thickness]="0" [size]="200" />
         </div>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Scatter &amp; bubble chart</h2>
+      <p>
+        Plot <code class="docs-inline">(x, y)</code> points across two numeric
+        axes to reveal correlation and clusters. Give each point a
+        <code class="docs-inline">size</code> and set
+        <code class="docs-inline">bubble</code> for a bubble chart. Hover a point
+        for its values.
+      </p>
+      <docs-example [code]="scatterCode" column>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--mk-space-6); width: 100%; align-items: start;">
+          <mk-scatter-chart
+            xLabel="Spend ($)"
+            yLabel="Revenue ($)"
+            [series]="spendRevenue"
+          />
+          <mk-scatter-chart
+            bubble
+            xLabel="Reach"
+            yLabel="Engagement"
+            [series]="bubbleData"
+          />
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Heatmap</h2>
+      <p>
+        A matrix of cells shaded by value intensity — for activity-by-time
+        grids, correlation matrices and cohort tables. Rendered as a semantic
+        table; cell colours are mixed from the accent over the surface, so they
+        track the theme.
+      </p>
+      <docs-example [code]="heatmapCode" column>
+        <mk-heatmap
+          [xLabels]="hours"
+          [yLabels]="days"
+          [data]="activity"
+          showValues
+        />
+      </docs-example>
     </div>
   `,
 })
@@ -168,6 +215,45 @@ export class ChartsPage {
   protected readonly channels = ['Organic search', 'Paid ads', 'Email', 'Social'];
   protected readonly channelSeries: MkChartSeries[] = [
     { name: 'Conversions', data: [540, 320, 260, 180] },
+  ];
+
+  protected readonly spendRevenue: MkScatterSeries[] = [
+    {
+      name: 'Search',
+      points: [
+        { x: 120, y: 480 }, { x: 200, y: 620 }, { x: 260, y: 700 },
+        { x: 340, y: 910 }, { x: 410, y: 980 }, { x: 500, y: 1240 },
+      ],
+    },
+    {
+      name: 'Social',
+      points: [
+        { x: 90, y: 260 }, { x: 180, y: 340 }, { x: 250, y: 300 },
+        { x: 330, y: 520 }, { x: 420, y: 610 },
+      ],
+    },
+  ];
+  protected readonly bubbleData: MkScatterSeries[] = [
+    {
+      name: 'Campaigns',
+      points: [
+        { x: 1200, y: 4.2, size: 60, label: 'Launch' },
+        { x: 2600, y: 6.1, size: 140, label: 'Spring sale' },
+        { x: 1800, y: 3.4, size: 40, label: 'Newsletter' },
+        { x: 3400, y: 7.8, size: 220, label: 'Black Friday' },
+        { x: 900, y: 2.1, size: 25, label: 'Teaser' },
+      ],
+    },
+  ];
+
+  protected readonly hours = ['9a', '12p', '3p', '6p', '9p'];
+  protected readonly days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
+  protected readonly activity: (number | null)[][] = [
+    [2, 8, 12, 6, 3],
+    [4, 10, 14, 9, 5],
+    [3, 9, 16, 11, 4],
+    [5, 12, 18, 13, 7],
+    [6, 15, 20, 10, 8],
   ];
 
   protected readonly sparklineCode = `<mk-sparkline [data]="trend" type="line" showDot />
@@ -202,4 +288,14 @@ export class ChartsPage {
 
 <!-- full pie: thickness 0 -->
 <mk-donut-chart [slices]="traffic" [thickness]="0" />`;
+
+  protected readonly scatterCode = `<mk-scatter-chart xLabel="Spend ($)" yLabel="Revenue ($)"
+  [series]="spendRevenue" />
+
+<!-- bubble: size each point -->
+<mk-scatter-chart bubble xLabel="Reach" yLabel="Engagement"
+  [series]="bubbleData" />`;
+
+  protected readonly heatmapCode = `<mk-heatmap [xLabels]="hours" [yLabels]="days"
+  [data]="activity" showValues />`;
 }

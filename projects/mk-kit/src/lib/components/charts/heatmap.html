@@ -1,0 +1,49 @@
+<div class="mk-chart__frame mk-heatmap__scroll">
+  <table class="mk-heatmap__grid">
+    <caption class="mk-visually-hidden">{{ resolvedLabel() }}</caption>
+    <thead>
+      <tr>
+        <td class="mk-heatmap__corner"></td>
+        @for (x of xLabels(); track $index) {
+          <th scope="col" class="mk-heatmap__col-head">{{ x }}</th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.label) {
+        <tr>
+          <th scope="row" class="mk-heatmap__row-head">{{ row.label }}</th>
+          @for (cell of row.cells; track $index) {
+            <td
+              class="mk-heatmap__cell"
+              [class.mk-heatmap__cell--strong]="cell.strong"
+              [class.mk-heatmap__cell--empty]="cell.value === null"
+              [style.background]="cell.bg"
+              [attr.title]="
+                cell.value === null
+                  ? null
+                  : row.label + ' · ' + cell.xLabel + ': ' + cell.display
+              "
+            >
+              @if (showValues() && cell.value !== null) {
+                <span class="mk-heatmap__value">{{ cell.display }}</span>
+              }
+            </td>
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (showScale()) {
+  <div class="mk-heatmap__legend" aria-hidden="true">
+    <span class="mk-heatmap__legend-label">{{ scaleStops().min }}</span>
+    <span class="mk-heatmap__legend-ramp">
+      @for (sw of scaleStops().swatches; track $index) {
+        <span class="mk-heatmap__legend-swatch" [style.background]="sw"></span>
+      }
+    </span>
+    <span class="mk-heatmap__legend-label">{{ scaleStops().max }}</span>
+  </div>
+}

@@ -1,0 +1,125 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Horizontal gridlines + y-axis labels -->
+    @for (row of yGrid(); track row.value) {
+      @if (showGrid()) {
+        <line
+          class="mk-chart__grid"
+          [attr.x1]="row.x1"
+          [attr.x2]="row.x2"
+          [attr.y1]="row.y"
+          [attr.y2]="row.y"
+        />
+      }
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--y"
+        [attr.x]="plot().x - 8"
+        [attr.y]="row.y"
+      >
+        {{ row.label }}
+      </text>
+    }
+
+    <!-- x-axis labels -->
+    @for (col of xGrid(); track col.value) {
+      <text
+        class="mk-chart__axis-label mk-chart__axis-label--x"
+        [attr.x]="col.x"
+        [attr.y]="height() - 12"
+      >
+        {{ col.label }}
+      </text>
+    }
+
+    <!-- Axis titles -->
+    @if (xLabel()) {
+      <text
+        class="mk-chart__axis-title mk-chart__axis-title--x"
+        [attr.x]="plot().x + plot().w / 2"
+        [attr.y]="height() - 1"
+      >
+        {{ xLabel() }}
+      </text>
+    }
+    @if (yLabel()) {
+      <text
+        class="mk-chart__axis-title mk-chart__axis-title--y"
+        [attr.transform]="'rotate(-90 10 ' + (plot().y + plot().h / 2) + ')'"
+        [attr.x]="10"
+        [attr.y]="plot().y + plot().h / 2"
+      >
+        {{ yLabel() }}
+      </text>
+    }
+
+    <!-- Points -->
+    @for (p of points(); track $index; let i = $index) {
+      <circle
+        class="mk-chart__point"
+        [class.mk-chart__point--active]="hoverKey() === keyOf(i)"
+        [attr.cx]="p.cx"
+        [attr.cy]="p.cy"
+        [attr.r]="p.r"
+        [style.fill]="p.color"
+        (pointerenter)="setHover(keyOf(i))"
+        (pointerleave)="setHover(null)"
+      />
+    }
+  </svg>
+
+  @if (tooltip(); as t) {
+    <div class="mk-chart__tooltip" [style.left.%]="t.left" [style.top.%]="t.top">
+      <span class="mk-chart__tooltip-title">
+        <span class="mk-chart__swatch" [style.background]="t.color"></span>
+        {{ t.title }}
+      </span>
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__tooltip-name">{{ xLabel() || 'x' }}</span>
+        <span class="mk-chart__tooltip-value">{{ t.x }}</span>
+      </span>
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__tooltip-name">{{ yLabel() || 'y' }}</span>
+        <span class="mk-chart__tooltip-value">{{ t.y }}</span>
+      </span>
+    </div>
+  }
+</div>
+
+@if (legendVisible()) {
+  <ul class="mk-chart__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        {{ item.name }}
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Series</th>
+      <th scope="col">{{ xLabel() || 'x' }}</th>
+      <th scope="col">{{ yLabel() || 'y' }}</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (s of series(); track s.name) {
+      @for (p of s.points; track $index) {
+        <tr>
+          <th scope="row">{{ s.name }}</th>
+          <td>{{ p.x }}</td>
+          <td>{{ p.y }}</td>
+        </tr>
+      }
+    }
+  </tbody>
+</table>

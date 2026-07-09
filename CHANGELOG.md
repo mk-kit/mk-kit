@@ -8,6 +8,12 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-scatter-chart`** — plot `(x, y)` points across two numeric axes; give
+  points a `size` and set `bubble` for a bubble chart. Nice-tick axes, legend,
+  per-point hover tooltip, screen-reader table. Dependency-free SVG.
+- **`mk-heatmap`** — a value-shaded matrix rendered as a semantic table; cell
+  colours are mixed from `accent` over the surface via `color-mix` (theme-aware),
+  with an optional min→max scale legend and in-cell values.
 - **`mkIntersect`** — a thin `IntersectionObserver` wrapper. Emits
   `(mkIntersect)` with the host's visibility and exposes an `intersecting()`
   signal; `once` fires a single time and disconnects (reveal-on-scroll, lazy

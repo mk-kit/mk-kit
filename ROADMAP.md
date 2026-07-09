@@ -72,7 +72,10 @@ live-announcer core.
   area** (`mk-line-chart stacked`) shipped.
 - ✅ **Gauge / radial** (`mk-gauge`) — single-metric KPI dial, configurable sweep
   (shipped).
-- **P3 Heatmap**, **P3 scatter**, **P3 funnel**, **P3 radar**, **P3 treemap**.
+- ✅ **Scatter / bubble** (`mk-scatter-chart`) — numeric x/y axes, optional
+  `bubble` sizing, per-point tooltip (shipped).
+- ✅ **Heatmap** (`mk-heatmap`) — value-shaded matrix table, theme-aware via
+  `color-mix`, min→max legend (shipped). **P3 funnel / radar / treemap** remaining.
 
 ### Navigation & layout
 - ✅ **Drawer** (`mk-drawer`) — declarative slide-out side panel (shipped).
@@ -150,4 +153,4 @@ are shipped. What's left is P2/P3:
 
 1. **Mini inline date** — remaining picker P3.
 2. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
-   high-contrast theme, heatmap/scatter charts).
+   high-contrast theme, funnel/radar charts).

@@ -73,6 +73,33 @@
   opacity: 0.6;
 }
 
+/* Scatter / bubble points */
+.mk-chart__point {
+  fill-opacity: 0.72;
+  stroke: var(--mk-surface);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  cursor: pointer;
+  transition: fill-opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-chart__point:hover,
+.mk-chart__point--active {
+  fill-opacity: 1;
+}
+
+/* Axis titles (scatter) */
+.mk-chart__axis-title {
+  fill: var(--mk-chart-axis);
+  font-size: 11px;
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-chart__axis-title--x {
+  text-anchor: middle;
+}
+.mk-chart__axis-title--y {
+  text-anchor: middle;
+}
+
 /* Donut slices */
 .mk-chart__slice {
   stroke: var(--mk-surface);
