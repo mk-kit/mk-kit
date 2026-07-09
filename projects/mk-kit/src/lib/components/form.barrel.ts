@@ -3,6 +3,7 @@
  * Re-exports every public component and type in the form group.
  */
 export * from './form-field';
+export * from './form-error-summary';
 export * from './input';
 export * from './select';
 export * from './autocomplete';

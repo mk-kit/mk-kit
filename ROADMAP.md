@@ -53,7 +53,9 @@ live-announcer core.
 - ✅ **Color picker** (`mk-color-picker`) — swatch + hex + native OS picker (shipped).
 - ✅ **Textarea autosize** (`mkAutosize`) — grow-with-content directive (shipped).
 - ✅ **Range slider** (`mk-range-slider`) — two-thumb `[low,high]` variant (shipped).
-- **P3 Form error summary** — aggregated, linkable validation list.
+- ✅ **Form error summary** (`mk-form-error-summary`) — WAI/GOV.UK alert listing
+  validation errors, each linking to + focusing its field; `focus()` on submit
+  (shipped).
 
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value

@@ -9,6 +9,8 @@ import {
   type MkUploadFile,
   type MkUploadFn,
   MkFormField,
+  MkFormErrorSummary,
+  type MkFormError,
   MkInput,
   MkAutosize,
   MkColorPicker,
@@ -37,6 +39,7 @@ import { DocsExample } from '../../shared/docs-example';
     FormsModule,
     DocsExample,
     MkFormField,
+    MkFormErrorSummary,
     MkInput,
     MkSelect,
     MkCheckbox,
@@ -106,6 +109,46 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size; nested controls inherit it.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- FORM ERROR SUMMARY -->
+      <!-- ============================================================ -->
+      <h2>Form error summary</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-form-error-summary&gt;</code> lists a
+        form's validation errors at the top on a failed submit; each entry links
+        to — and focuses — its field. Following the WAI/GOV.UK pattern it is an
+        <code class="docs-inline">alert</code> region; call
+        <code class="docs-inline">focus()</code> after a failed submit to send
+        screen-reader and keyboard users straight to the problems. Submit the
+        form empty to see it.
+      </p>
+
+      <docs-example [code]="errorSummaryCode" [column]="true">
+        <form
+          class="es-form"
+          (ngSubmit)="submitErrorDemo(esSummary, esEmailField, esAgeField)"
+        >
+          <mk-form-error-summary #esSummary [errors]="esErrors(esEmailField, esAgeField)" />
+          <mk-form-field
+            #esEmailField
+            label="Email"
+            required
+            [error]="esSubmitted() && !esEmailValid() ? 'Enter a valid email address' : null"
+          >
+            <input mkInput type="email" [(ngModel)]="esEmail" name="esEmail" />
+          </mk-form-field>
+          <mk-form-field
+            #esAgeField
+            label="Age"
+            required
+            [error]="esSubmitted() && !esAgeValid() ? 'Age must be a whole number' : null"
+          >
+            <input mkInput [(ngModel)]="esAge" name="esAge" />
+          </mk-form-field>
+          <button mkButton type="submit">Submit</button>
+        </form>
+      </docs-example>
 
       <!-- ============================================================ -->
       <!-- INPUT & TEXTAREA -->
@@ -497,6 +540,13 @@ import { DocsExample } from '../../shared/docs-example';
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
       }
+      .es-form {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-4);
+        max-width: 28rem;
+        width: 100%;
+      }
     `,
   ],
 })
@@ -510,6 +560,37 @@ export class FormsPage {
   });
   protected readonly name = signal('');
   protected readonly message = signal('');
+
+  // --- Form error summary ---------------------------------------------------
+  protected readonly esEmail = signal('');
+  protected readonly esAge = signal('');
+  protected readonly esSubmitted = signal(false);
+
+  protected esEmailValid(): boolean {
+    return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(this.esEmail());
+  }
+  protected esAgeValid(): boolean {
+    const v = this.esAge().trim();
+    return v !== '' && Number.isInteger(Number(v));
+  }
+  protected esErrors(email: MkFormField, age: MkFormField): MkFormError[] {
+    if (!this.esSubmitted()) return [];
+    const errors: MkFormError[] = [];
+    if (!this.esEmailValid())
+      errors.push({ fieldId: email.controlId, message: 'Enter a valid email address' });
+    if (!this.esAgeValid())
+      errors.push({ fieldId: age.controlId, message: 'Age must be a whole number' });
+    return errors;
+  }
+  protected submitErrorDemo(
+    summary: MkFormErrorSummary,
+    email: MkFormField,
+    age: MkFormField,
+  ): void {
+    this.esSubmitted.set(true);
+    // Focus the summary once it has rendered with the new errors.
+    if (this.esErrors(email, age).length) setTimeout(() => summary.focus());
+  }
 
   // --- Select ---------------------------------------------------------------
   protected readonly roleOptions: readonly MkSelectOption[] = [
@@ -585,6 +666,22 @@ export class FormsPage {
     });
 
   // --- Code snippets (plain strings shown in the code blocks) ---------------
+  protected readonly errorSummaryCode = `<form (ngSubmit)="onSubmit()">
+  <mk-form-error-summary #summary [errors]="errors()" />
+
+  <mk-form-field #emailField label="Email" [error]="emailError()">
+    <input mkInput [(ngModel)]="email" name="email" />
+  </mk-form-field>
+  <!-- … more fields … -->
+  <button mkButton type="submit">Submit</button>
+</form>
+
+onSubmit() {
+  this.submitted.set(true);
+  if (this.errors().length) this.summary.focus();  // move focus to the list
+}
+// errors(): { fieldId: field.controlId, message: '…' }[]`;
+
   protected readonly formFieldCode = `<mk-form-field
   label="Email"
   hint="We never share it."

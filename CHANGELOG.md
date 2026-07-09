@@ -8,6 +8,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-form-error-summary`** — an accessible summary of a form's validation
+  errors (WAI/GOV.UK pattern): an `alert` region listing each error as a link
+  that focuses its field. Call `focus()` after a failed submit to send
+  screen-reader and keyboard users straight to the problems.
 - **`mk-scatter-chart`** — plot `(x, y)` points across two numeric axes; give
   points a `size` and set `bubble` for a bubble chart. Nice-tick axes, legend,
   per-point hover tooltip, screen-reader table. Dependency-free SVG.

@@ -1,0 +1,15 @@
+@if (hasErrors()) {
+  <p [id]="titleId" class="mk-form-error-summary__title">{{ summaryTitle() }}</p>
+  <ul class="mk-form-error-summary__list">
+    @for (error of errors(); track error.fieldId) {
+      <li class="mk-form-error-summary__item">
+        <a
+          class="mk-form-error-summary__link"
+          [href]="'#' + error.fieldId"
+          (click)="focusField($event, error.fieldId)"
+          >{{ error.message }}</a
+        >
+      </li>
+    }
+  </ul>
+}
