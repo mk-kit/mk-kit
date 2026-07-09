@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { MkSort, MkSortHeader, type MkSortState } from '@mk-kit/ui';
+import { MkSort, MkSortHeader, type MkSortState } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface Repo {
@@ -11,7 +11,7 @@ interface Repo {
 
 /**
  * Documentation + live demo page for the standalone `mkSort` / `mkSortHeader`
- * directives of `@mk-kit/ui`.
+ * directives of `@mkornas/ui`.
  */
 @Component({
   selector: 'docs-sort-page',

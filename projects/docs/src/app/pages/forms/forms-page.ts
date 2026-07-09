@@ -10,11 +10,11 @@ import {
   type MkSelectOption,
   MkSlider,
   MkSwitch,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the FORM components of `@mk-kit/ui`:
+ * Documentation + live demo page for the FORM components of `@mkornas/ui`:
  * FormField, Input/Textarea, Select, Checkbox, Radio group, Switch and Slider.
  */
 @Component({

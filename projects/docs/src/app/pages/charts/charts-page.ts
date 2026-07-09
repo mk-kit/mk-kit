@@ -7,12 +7,12 @@ import {
   MkLineChart,
   MkProgressRing,
   MkSparkline,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the chart & progress components of
- * `@mk-kit/ui`: sparkline, bar/line/donut charts and the circular progress ring.
+ * `@mkornas/ui`: sparkline, bar/line/donut charts and the circular progress ring.
  */
 @Component({
   selector: 'docs-charts-page',

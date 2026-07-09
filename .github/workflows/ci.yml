@@ -40,5 +40,5 @@ jobs:
         run: npm run build
 
       - name: Verify package (publish dry-run)
-        run: npm publish --dry-run --access public
+        run: npm publish --dry-run
         working-directory: dist/mk-kit

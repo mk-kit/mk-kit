@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkTree, type MkTreeNode } from '@mk-kit/ui';
+import { MkTree, type MkTreeNode } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the `<mk-tree>` data component of
- * `@mk-kit/ui`.
+ * `@mkornas/ui`.
  */
 @Component({
   selector: 'docs-tree-page',

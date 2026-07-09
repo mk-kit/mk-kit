@@ -1,6 +1,6 @@
 # Backlog
 
-Future work for `@mk-kit/ui`, deferred from the main line of development.
+Future work for `@mkornas/ui`, deferred from the main line of development.
 
 ## Tooling
 

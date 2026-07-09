@@ -4,7 +4,7 @@ import {
   MkMenu,
   MkMenuItem,
   MkToastService,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({

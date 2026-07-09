@@ -1,5 +1,5 @@
 /**
- * Data Display components group barrel for @mk-kit/ui.
+ * Data Display components group barrel for @mkornas/ui.
  * Re-exports every public symbol from each component folder.
  */
 export * from './card';

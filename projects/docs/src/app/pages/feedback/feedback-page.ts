@@ -13,7 +13,7 @@ import {
   MkOverlayRef,
   MkToastService,
   MkTooltip,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**

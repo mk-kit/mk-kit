@@ -1,5 +1,5 @@
 /*
- * Public API Surface of @mk-kit/ui
+ * Public API Surface of @mkornas/ui
  */
 
 // Core: theme, a11y, overlay, shared types

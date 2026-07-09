@@ -1,5 +1,5 @@
 /**
- * DATE & TIME components group barrel for @mk-kit/ui.
+ * DATE & TIME components group barrel for @mkornas/ui.
  * Re-exports every public component, the shared date helpers, and the
  * `MkDateRange` type.
  */

@@ -1,8 +1,42 @@
 # Roadmap — missing components & features
 
-A curated gap analysis for `@mk-kit/ui`, measured against Angular Material and
+A curated gap analysis for `@mkornas/ui`, measured against Angular Material and
 common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 **P2** useful, **P3** nice-to-have. This is a planning doc, not a commitment.
+
+## ⭑ mk-cms admin blockers (build first)
+
+Driven by the **mk-cms** admin panel (schema-driven CRUD over the content
+engine). These gate specific admin screens — see the readiness analysis in
+`mk-cms/docs/ADMIN-UI-READINESS.md`. Prioritized above the general list below.
+
+- **[BLOCKER] File upload / dropzone** (`mk-file-upload`) — the media library and
+  every image/media field need it. Click + drag-drop, multi-file, per-file
+  progress, image preview, type/size validation, and an upload hook (POSTs
+  multipart to the CMS `POST /media`). Also unblocks a **media-picker dialog**
+  (browse grid + upload + select) the admin app composes from this + card +
+  dialog. Same as the P1 form-control gap below — promoted to blocker.
+- **[BLOCKER] Multi-select + chips + async** — the `relation` field type and
+  taxonomy/term assignment select N options fetched from GraphQL. `mk-select` is
+  single-value; `mk-autocomplete` is async but single/no-chips. Add multiple
+  selection with removable chips over an async option source. Same as the P1
+  multi-select gap below — promoted to blocker.
+- **[P1] JSON / code editor** (`mk-code-editor` / `mk-json-field`) — the `json`
+  field type and plugin/settings JSONB editing. Syntax highlight + validation;
+  `block-editor` is for rich content, not JSON. A textarea is the stopgap. (New —
+  not previously tracked.)
+- **[P2] Description list** (`mk-description-list`) — entity-detail / revision-meta
+  panels. Also listed under Data display below.
+- **[P2] Popover / popconfirm** — inline row-level "Delete?" confirm. `mk-dialog`
+  covers it today. Also listed under Feedback below.
+- **[P3] Revision diff / comparison view** — the CMS stores a snapshot per save;
+  a diff view makes the revisions screen shine. Also listed under Data display.
+
+The rest of the admin (tables + row-selection bulk actions, app-shell, nav-group,
+command palette, tree + dnd menu builder, dialogs, toasts, date pickers, block
+editor, charts) is already covered by shipping components.
+
+---
 
 ## What already ships (for reference)
 

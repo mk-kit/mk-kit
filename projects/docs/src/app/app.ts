@@ -8,7 +8,7 @@ import {
   MkNavItem,
   MkNavList,
   MkThemeService,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 
 interface NavLink {
   label: string;

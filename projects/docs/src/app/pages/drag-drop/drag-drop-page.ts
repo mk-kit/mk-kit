@@ -7,7 +7,7 @@ import {
   mkMoveItemInArray,
   mkTransferArrayItem,
   type MkDropEvent,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface Task {

@@ -16,7 +16,7 @@ import {
   type MkSortChange,
   type MkSortDirection,
   type MkTableColumn,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface TableUser {

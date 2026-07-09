@@ -7,13 +7,13 @@ import {
   MkInput,
   MkPageHeader,
   MkToolbar,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { FormsModule } from '@angular/forms';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the admin/CMS structural components of
- * `@mk-kit/ui`: PageHeader, Toolbar and Drawer.
+ * `@mkornas/ui`: PageHeader, Toolbar and Drawer.
  */
 @Component({
   selector: 'docs-structure-page',

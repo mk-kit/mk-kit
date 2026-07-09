@@ -1,5 +1,5 @@
 /**
- * FORM COMPONENTS group barrel for @mk-kit/ui.
+ * FORM COMPONENTS group barrel for @mkornas/ui.
  * Re-exports every public component and type in the form group.
  */
 export * from './form-field';

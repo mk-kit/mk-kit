@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MkButton, MkIcon, MkIconRegistry } from '@mk-kit/ui';
+import { MkButton, MkIcon, MkIconRegistry } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the `<mk-icon>` component and
- * `MkIconRegistry` of `@mk-kit/ui`.
+ * `MkIconRegistry` of `@mkornas/ui`.
  */
 @Component({
   selector: 'docs-icon-page',

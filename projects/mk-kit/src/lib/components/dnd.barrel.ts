@@ -1,5 +1,5 @@
 /**
- * Drag & Drop component group barrel for @mk-kit/ui.
+ * Drag & Drop component group barrel for @mkornas/ui.
  *
  * Re-exports every public symbol of the group:
  * - Directives/components: `MkDropList`, `MkDrag`, `MkDragHandle`, `MkSortableList`

@@ -7,8 +7,8 @@
     "noPropertyAccessFromIndexSignature": true,
     "noImplicitReturns": true,
     "paths": {
-      "@mk-kit/ui": ["./dist/mk-kit"],
-      "@mk-kit/ui/*": ["./dist/mk-kit/*"]
+      "@mkornas/ui": ["./dist/mk-kit"],
+      "@mkornas/ui/*": ["./dist/mk-kit/*"]
     },
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,

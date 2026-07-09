@@ -19,7 +19,7 @@ import {
   MkTag,
   type MkSortChange,
   type MkTableColumn,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface DemoUser {

@@ -4,12 +4,12 @@ import {
   MkEmptyState,
   MkTimeline,
   MkTimelineItem,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the `mk-empty-state` and `mk-timeline`
- * dashboard components of `@mk-kit/ui`.
+ * dashboard components of `@mkornas/ui`.
  */
 @Component({
   selector: 'docs-empty-timeline-page',

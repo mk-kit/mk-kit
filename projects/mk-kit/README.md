@@ -1,4 +1,4 @@
-# @mk-kit/ui
+# @mkornas/ui
 
 **Themable, accessible Angular 22 component library for admin dashboards & UIs.**
 
@@ -10,8 +10,21 @@ dark mode out of the box. Zero runtime dependencies beyond Angular.
 
 ## Install
 
+`@mkornas/ui` is published **privately to GitHub Packages**. Tell npm where the
+`@mkornas` scope lives, once per consuming project — add an `.npmrc`:
+
+```ini
+# .npmrc
+@mkornas:registry=https://npm.pkg.github.com
+//npm.pkg.github.com/:_authToken=${NODE_AUTH_TOKEN}
+```
+
+Then export a token with `read:packages` (a GitHub PAT locally, or the
+`GITHUB_TOKEN` in Actions) and install:
+
 ```bash
-npm install @mk-kit/ui
+export NODE_AUTH_TOKEN=ghp_your_pat_with_read_packages
+npm install @mkornas/ui
 ```
 
 Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms` (v22+).
@@ -22,7 +35,7 @@ Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms` (v22+).
 global `styles.css`):
 
 ```css
-@import '@mk-kit/ui/styles.css';
+@import '@mkornas/ui/styles.css';
 ```
 
 **2. Add the `mk-app` class** to your `<body>` (or a top-level wrapper) so the
@@ -36,7 +49,7 @@ background, text color, fonts and themed scrollbars apply:
 
 ```ts
 import { Component, inject } from '@angular/core';
-import { MkButton, MkCard, MkThemeService } from '@mk-kit/ui';
+import { MkButton, MkCard, MkThemeService } from '@mkornas/ui';
 
 @Component({
   selector: 'app-root',

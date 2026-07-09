@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MkBadge, MkButton, MkCard } from '@mk-kit/ui';
+import { MkBadge, MkButton, MkCard } from '@mkornas/ui';
 
 interface Feature {
   icon: string;
@@ -189,7 +189,7 @@ export class IntroductionPage {
     {
       icon: '📦',
       title: 'Publishable package',
-      body: 'Ships as a standard Angular package (FESM2022 + typings) — npm install @mk-kit/ui.',
+      body: 'Ships as a standard Angular package (FESM2022 + typings) — npm install @mkornas/ui.',
     },
     {
       icon: '🧭',

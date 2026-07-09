@@ -6,7 +6,7 @@ import {
   MkButtonToggle,
   MkButtonToggleGroup,
   MkFormField,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface Framework {
@@ -15,7 +15,7 @@ interface Framework {
 }
 
 /**
- * Documentation + live demo page for the selection controls of `@mk-kit/ui`:
+ * Documentation + live demo page for the selection controls of `@mkornas/ui`:
  * the filtering Autocomplete combobox and the segmented ButtonToggle group.
  */
 @Component({

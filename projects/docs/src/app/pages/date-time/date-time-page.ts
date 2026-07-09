@@ -6,11 +6,11 @@ import {
   MkTimePicker,
   type MkDateRange,
   formatDate,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the DATE & TIME components of `@mk-kit/ui`:
+ * Documentation + live demo page for the DATE & TIME components of `@mkornas/ui`:
  * Calendar, DatePicker, TimePicker and DateRangePicker. Every control is
  * signal-driven and implements a two-way `value` model (the pickers are also
  * `ControlValueAccessor`s, so they work with `[(ngModel)]` and reactive forms).

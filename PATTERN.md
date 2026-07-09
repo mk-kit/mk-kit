@@ -1,6 +1,6 @@
 # mk-kit Component Authoring Spec (READ FIRST)
 
-You are building components for **@mk-kit/ui**, an Angular 22 admin/dashboard
+You are building components for **@mkornas/ui**, an Angular 22 admin/dashboard
 component library. Every component MUST follow this spec exactly so the whole
 library compiles and looks like one coherent system. The reference
 implementation is `projects/mk-kit/src/lib/components/button/` — read it and
@@ -48,7 +48,7 @@ mirror its structure precisely.
    `import { MkSize, MkTone } from '../../core/types';`
    `import { mkUniqueId } from '../../core/a11y/unique-id';`
    `import { MkOverlayService } from '../../core/overlay/overlay.service';`
-   Do NOT import from `'@mk-kit/ui'` or `'mk-kit'` (circular).
+   Do NOT import from `'@mkornas/ui'` or `'mk-kit'` (circular).
 9. **Do NOT run `ng build`** (parallel builds race on the dist folder). Do NOT
    edit `public-api.ts`, `angular.json`, or any file outside your assigned
    component folders and your group barrel. Do NOT edit the Button. Do NOT

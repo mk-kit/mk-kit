@@ -1,4 +1,4 @@
-# Block Editor (`@mk-kit/ui`)
+# Block Editor (`@mkornas/ui`)
 
 A configurable, Gutenberg-style **block content editor** for authoring blog
 posts and content pages, plus a read-only **renderer** for displaying the saved
@@ -16,7 +16,7 @@ import {
   MkBlockRenderer,
   mkBlocksToHtml,
   type MkBlockDocument,
-} from '@mk-kit/ui'; // (barrel: block-editor.barrel.ts)
+} from '@mkornas/ui'; // (barrel: block-editor.barrel.ts)
 ```
 
 ---
@@ -61,7 +61,7 @@ Built-in block `data` shapes:
 
 ```ts
 import { Component, signal } from '@angular/core';
-import { MkBlockEditor, mkEmptyDocument, type MkBlockDocument } from '@mk-kit/ui';
+import { MkBlockEditor, mkEmptyDocument, type MkBlockDocument } from '@mkornas/ui';
 
 @Component({
   selector: 'app-post-editor',
@@ -113,7 +113,7 @@ A block is described by an `MkBlockDefinition`. Supply extras via the `blocks`
 input or, app-wide, via the `MK_BLOCK_DEFINITIONS` multi-token.
 
 ```ts
-import { type MkBlockDefinition, MK_DEFAULT_BLOCKS, mkBlockId } from '@mk-kit/ui';
+import { type MkBlockDefinition, MK_DEFAULT_BLOCKS, mkBlockId } from '@mkornas/ui';
 
 const calloutBlock: MkBlockDefinition = {
   type: 'callout',
@@ -137,7 +137,7 @@ class Editor {
 App-wide via the token (merged over `MK_DEFAULT_BLOCKS`, then the input wins):
 
 ```ts
-import { MK_BLOCK_DEFINITIONS } from '@mk-kit/ui';
+import { MK_BLOCK_DEFINITIONS } from '@mkornas/ui';
 
 providers: [
   { provide: MK_BLOCK_DEFINITIONS, multi: true, useValue: [calloutBlock] },
@@ -160,7 +160,7 @@ resolve to a URL. Otherwise the image falls back to an inline `data:` URL via
 `FileReader`.
 
 ```ts
-import { MK_BLOCK_UPLOAD_HANDLER } from '@mk-kit/ui';
+import { MK_BLOCK_UPLOAD_HANDLER } from '@mkornas/ui';
 
 async function uploadToCdn(file: File): Promise<string> {
   const body = new FormData();
@@ -187,7 +187,7 @@ Embeds render a **sandboxed** iframe for allow-listed providers (YouTube and
 Vimeo out of the box). Add your own:
 
 ```ts
-import { type MkEmbedProvider } from '@mk-kit/ui';
+import { type MkEmbedProvider } from '@mkornas/ui';
 
 const codepen: MkEmbedProvider = {
   name: 'CodePen',
@@ -218,7 +218,7 @@ raw pasted string.
 ### Component (themed, interactive iframes)
 
 ```ts
-import { MkBlockRenderer } from '@mk-kit/ui';
+import { MkBlockRenderer } from '@mkornas/ui';
 
 @Component({
   imports: [MkBlockRenderer],
@@ -233,7 +233,7 @@ identical when published, and renders embeds as sandboxed iframes.
 ### Static HTML string (SSG/SSR, emails, feeds)
 
 ```ts
-import { mkBlocksToHtml, mkBlocksToText } from '@mk-kit/ui';
+import { mkBlocksToHtml, mkBlocksToText } from '@mkornas/ui';
 
 const html = mkBlocksToHtml(doc);   // clean, self-contained semantic HTML
 const text = mkBlocksToText(doc);   // plain text for excerpts / meta descriptions

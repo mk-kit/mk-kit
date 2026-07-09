@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MkAlert, MkButton, MkThemeService } from '@mk-kit/ui';
+import { MkAlert, MkButton, MkThemeService } from '@mkornas/ui';
 
 @Component({
   selector: 'docs-getting-started-page',
@@ -93,7 +93,7 @@ export class GettingStartedPage {
   protected readonly theme = inject(MkThemeService);
 
   protected readonly usageSnippet = `import { Component, inject } from '@angular/core';
-import { MkButton, MkCard, MkThemeService } from '@mk-kit/ui';
+import { MkButton, MkCard, MkThemeService } from '@mkornas/ui';
 
 @Component({
   selector: 'app-root',

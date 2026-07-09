@@ -11,7 +11,7 @@ import {
   MkTab,
   mkBlocksToHtml,
   type MkBlockDocument,
-} from '@mk-kit/ui';
+} from '@mkornas/ui';
 
 @Component({
   selector: 'docs-block-editor-page',
@@ -205,7 +205,7 @@ export class BlockEditorPage {
   protected readonly json = computed(() => JSON.stringify(this.doc(), null, 2));
 
   protected readonly wireCode = `import { Component, signal } from '@angular/core';
-import { MkBlockEditor, mkEmptyDocument, type MkBlockDocument } from '@mk-kit/ui';
+import { MkBlockEditor, mkEmptyDocument, type MkBlockDocument } from '@mkornas/ui';
 
 @Component({
   imports: [MkBlockEditor],
@@ -215,7 +215,7 @@ export class PostEditor {
   readonly doc = signal<MkBlockDocument>(mkEmptyDocument());
 }`;
 
-  protected readonly blockCode = `import { type MkBlockDefinition, MK_DEFAULT_BLOCKS, mkBlockId } from '@mk-kit/ui';
+  protected readonly blockCode = `import { type MkBlockDefinition, MK_DEFAULT_BLOCKS, mkBlockId } from '@mkornas/ui';
 
 const callout: MkBlockDefinition = {
   type: 'callout',
@@ -238,7 +238,7 @@ const callout: MkBlockDefinition = {
 // <mk-block-editor [(value)]="doc" [uploadHandler]="upload" />
 // or app-wide: { provide: MK_BLOCK_UPLOAD_HANDLER, useValue: upload }`;
 
-  protected readonly embedCode = `import { type MkEmbedProvider } from '@mk-kit/ui';
+  protected readonly embedCode = `import { type MkEmbedProvider } from '@mkornas/ui';
 
 const codepen: MkEmbedProvider = {
   name: 'CodePen',
@@ -252,7 +252,7 @@ const codepen: MkEmbedProvider = {
 
 // <mk-block-editor [(value)]="doc" [embedProviders]="[codepen]" />`;
 
-  protected readonly renderCode = `import { MkBlockRenderer, mkBlocksToHtml } from '@mk-kit/ui';
+  protected readonly renderCode = `import { MkBlockRenderer, mkBlocksToHtml } from '@mkornas/ui';
 
 // In a component: <mk-block-renderer [value]="doc()" />
 
