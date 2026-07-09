@@ -1,0 +1,57 @@
+<div class="mk-color-picker__field">
+  <button
+    type="button"
+    class="mk-color-picker__swatch"
+    [id]="inputId"
+    [style.background-color]="value()"
+    [disabled]="isDisabled()"
+    [attr.aria-label]="ariaLabel() + ': ' + value()"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    (click)="openNative()"
+  ></button>
+
+  <input
+    #native
+    type="color"
+    class="mk-color-picker__native"
+    tabindex="-1"
+    aria-hidden="true"
+    [value]="nativeValue()"
+    [disabled]="isDisabled()"
+    (input)="onNativeInput($event)"
+  />
+
+  @if (hexInput()) {
+    <input
+      type="text"
+      class="mk-color-picker__hex"
+      spellcheck="false"
+      autocomplete="off"
+      [value]="hexText()"
+      [disabled]="isDisabled()"
+      [attr.aria-label]="'Hex value'"
+      [attr.aria-required]="isRequired() || null"
+      (input)="onHexInput($event)"
+      (blur)="commitHex()"
+      (keydown.enter)="commitHex()"
+    />
+  }
+</div>
+
+@if (swatches().length) {
+  <div class="mk-color-picker__swatches" role="group" aria-label="Preset colors">
+    @for (s of swatches(); track s) {
+      <button
+        type="button"
+        class="mk-color-picker__preset"
+        [class.mk-color-picker__preset--active]="s.toLowerCase() === value()"
+        [style.background-color]="s"
+        [disabled]="isDisabled()"
+        [attr.aria-label]="s"
+        [attr.aria-pressed]="s.toLowerCase() === value()"
+        (click)="pickSwatch(s)"
+      ></button>
+    }
+  </div>
+}

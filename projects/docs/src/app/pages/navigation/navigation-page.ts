@@ -14,6 +14,9 @@ import {
   MkMenu,
   MkMenuItem,
   MkMenuTrigger,
+  MkBackToTop,
+  MkFab,
+  MkFabAction,
   MkNavItem,
   MkNavList,
   MkPagination,
@@ -41,6 +44,9 @@ import { DocsExample } from '../../shared/docs-example';
     MkMenuItem,
     MkNavList,
     MkNavItem,
+    MkFab,
+    MkFabAction,
+    MkBackToTop,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -366,6 +372,37 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>[mkNavIcon]</code></td><td>—</td><td>slot</td><td>—</td><td>Projection slot for the leading icon.</td></tr>
         </tbody>
       </table>
+
+      <h2>FAB &amp; speed-dial</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-fab&gt;</code> is a floating action button
+        (fixed to a corner, or <code class="docs-inline">position="static"</code>
+        for inline use). Add <code class="docs-inline">mkFabAction</code> buttons
+        to turn it into a speed-dial that reveals them on toggle.
+      </p>
+      <docs-example [code]="fabCode" [column]="true">
+        <div style="display: flex; gap: var(--mk-space-6); align-items: flex-end;">
+          <mk-fab position="static" label="Create" extended (action)="fabHits.set(fabHits() + 1)">＋</mk-fab>
+          <mk-fab position="static" label="Actions">
+            ⋯
+            <button mkFabAction>📄 Document</button>
+            <button mkFabAction>📁 Folder</button>
+          </mk-fab>
+        </div>
+        <p class="echo">Extended FAB clicks: {{ fabHits() }}</p>
+      </docs-example>
+
+      <h2>Back to top</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-back-to-top&gt;</code> appears once the page
+        scrolls past <code class="docs-inline">threshold</code> and smooth-scrolls
+        back up. It's live on this page — scroll down and look bottom-right.
+      </p>
+      <docs-example [code]="backToTopCode" [column]="true">
+        <p style="color: var(--mk-text-muted);">Scroll this page down to reveal the button.</p>
+      </docs-example>
+
+      <mk-back-to-top [threshold]="300" />
     </div>
   `,
   styles: [
@@ -386,6 +423,15 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class NavigationPage {
+  // FAB / back-to-top
+  protected readonly fabHits = signal(0);
+  protected readonly fabCode = `<mk-fab label="Actions">
+  ⋯
+  <button mkFabAction>Document</button>
+  <button mkFabAction>Folder</button>
+</mk-fab>`;
+  protected readonly backToTopCode = `<mk-back-to-top [threshold]="300" />`;
+
   // Tabs
   protected readonly pillTab = signal(1);
 

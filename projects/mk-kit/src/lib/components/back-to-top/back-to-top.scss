@@ -1,0 +1,37 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  position: fixed;
+  bottom: var(--mk-space-5);
+  right: var(--mk-space-5);
+  z-index: var(--mk-z-sticky, 100);
+}
+
+.mk-back-to-top__button {
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-circle);
+  box-shadow: var(--mk-shadow-lg);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-back-to-top__button:hover {
+  background-color: var(--mk-surface-2);
+  transform: translateY(-2px);
+}
+.mk-back-to-top__button:focus-visible {
+  @include mk.focus-ring;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-back-to-top__button {
+    transition: none;
+  }
+}

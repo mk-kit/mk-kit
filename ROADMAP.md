@@ -24,6 +24,13 @@ engine). These gate specific admin screens — see the readiness analysis in
   error + `(validate)`), `format()` pretty-print, line numbers and Tab-indent
   (Escape releases the trap). `language="json"` covers the `json` field type +
   plugin/settings JSONB editing.
+- **[P1] Block-editor ↔ HTML bridge** (`mk-block-editor`) — the editor's value is
+  a structured `MkBlockDocument`, but the CMS `richtext` field type stores an
+  **HTML string**. There is no way to seed the editor from HTML or serialize its
+  document back to HTML, so the admin currently falls back to a plain `textarea`
+  for richtext. Add an HTML (de)serializer — `MkBlockDocument` ⇄ HTML — or a
+  plain-HTML value mode, so block-editor can back a string-typed richtext field.
+  (Found wiring the entry editor, 2026-07-09.)
 - **[P2] Description list** (`mk-description-list`) — entity-detail / revision-meta
   panels. Also listed under Data display below.
 - ✅ **Popover / popconfirm** (`mk-popover` / `mk-popconfirm`) — **shipped.**
@@ -65,7 +72,7 @@ live-announcer core.
 - ✅ **Rating** (`mk-rating`) — star input + read-only display (shipped).
 - ✅ **Number input** (`mk-number-input`) — numeric field with −/+ and clamp/step (shipped).
 - ✅ **OTP / PIN input** (`mk-otp`) — segmented one-time-code field (shipped).
-- **P2 Color picker** — swatch grid + hex/HSL, token-friendly.
+- ✅ **Color picker** (`mk-color-picker`) — swatch + hex + native OS picker (shipped).
 - ✅ **Textarea autosize** (`mkAutosize`) — grow-with-content directive (shipped).
 - **P3 Range slider** — two-thumb variant of `mk-slider`.
 - **P3 Form error summary** — aggregated, linkable validation list.
@@ -94,21 +101,20 @@ live-announcer core.
 - ✅ **Nav group** (`mk-nav-group`) — collapsible sidebar sections (shipped).
 - ✅ **Split panes / resizable layout** (`mk-splitter`) — two panes, draggable +
   keyboard ARIA separator, horizontal/vertical (shipped).
-- **P2 FAB / speed-dial**, **P2 scrollspy**, **P2 back-to-top**.
+- ✅ **FAB / speed-dial** (`mk-fab` + `mkFabAction`) and ✅ **back-to-top** (`mk-back-to-top`) shipped. **P2 scrollspy** remaining.
 - **P3 Scroll-area** — cross-browser custom scrollbar container.
 
 ### Feedback & overlay
 - ✅ **Popover** (`mk-popover`) + **popconfirm** (`mk-popconfirm`) — rich non-text
   floating panel + inline confirm, top-layer via `MkAnchoredPanel` (shipped).
-- **P2 Banner** — page/section-level persistent alert with actions.
+- ✅ **Banner** (`mk-banner`) — persistent page/section notice, tone + actions + dismiss (shipped).
 - **P2 Top loading bar** — route-level progress (YouTube/GitHub style).
 - **P2 Skeleton presets** — text/paragraph/card/table skeleton shapes.
 
 ### Directives / utilities
 - ✅ **clickOutside** (`mkClickOutside`) + **copy-to-clipboard**
   (`mkCopyToClipboard`) — shipped; docs at `/components/utilities`.
-- **P2 intersection/lazy-load**, **P2 autofocus**, **P2 infinite-scroll**,
-  **P3 ripple**.
+- ✅ **autofocus** (`mkAutofocus`) shipped. **P2 intersection/lazy-load**, **P2 infinite-scroll**, **P3 ripple** remaining.
 
 ### Pickers
 - **P2 Month / year / week pickers** (reuse `calendar`), **P3 mini inline date**.

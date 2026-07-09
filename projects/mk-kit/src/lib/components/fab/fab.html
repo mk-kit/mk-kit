@@ -1,0 +1,24 @@
+<div
+  class="mk-fab__actions"
+  [attr.hidden]="hasActions() && open() ? null : ''"
+  (keydown)="onKeydown($event)"
+>
+  <ng-content select="[mkFabAction]" />
+</div>
+
+<button
+  type="button"
+  class="mk-fab__button"
+  [attr.data-tone]="tone()"
+  [attr.aria-label]="label()"
+  [attr.aria-haspopup]="hasActions() ? 'menu' : null"
+  [attr.aria-expanded]="hasActions() ? open() : null"
+  [disabled]="disabled()"
+  (click)="onClick()"
+  (keydown)="onKeydown($event)"
+>
+  <span class="mk-fab__icon"><ng-content /></span>
+  @if (extended()) {
+    <span class="mk-fab__label">{{ label() }}</span>
+  }
+</button>

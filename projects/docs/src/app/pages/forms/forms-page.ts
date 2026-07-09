@@ -11,6 +11,7 @@ import {
   MkFormField,
   MkInput,
   MkAutosize,
+  MkColorPicker,
   MkNumberInput,
   MkOtp,
   MkRadio,
@@ -48,6 +49,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkNumberInput,
     MkOtp,
     MkAutosize,
+    MkColorPicker,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -456,6 +458,17 @@ import { DocsExample } from '../../shared/docs-example';
           style="width: 100%; max-width: 30rem;"
         ></textarea>
       </docs-example>
+
+      <h2>Color picker</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-color-picker&gt;</code> is a compact color
+        control: a live swatch that opens the native OS picker, an editable hex
+        field and an optional row of preset swatches.
+      </p>
+      <docs-example [code]="colorCode" [column]="true">
+        <mk-color-picker [(value)]="brand" [swatches]="palette" />
+        <p class="echo">Value: <code class="docs-inline">{{ brand() }}</code></p>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -519,8 +532,13 @@ export class FormsPage {
   protected readonly qty = signal<number | null>(1);
   protected readonly otp = signal('');
   protected readonly note = signal('');
+  protected readonly brand = signal('#4f46e5');
+  protected readonly palette = [
+    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#111827',
+  ];
 
   protected readonly ratingCode = `<mk-rating [(value)]="score" />`;
+  protected readonly colorCode = `<mk-color-picker [(value)]="brand" [swatches]="palette" />`;
   protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
   protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
   protected readonly autosizeCode = `<textarea mkInput mkAutosize [mkAutosizeMaxRows]="8"

@@ -1,0 +1,22 @@
+@if (open()) {
+  <div class="mk-banner__box" [attr.role]="role()">
+    <span class="mk-banner__icon"><ng-content select="[mkBannerIcon]" /></span>
+    <div class="mk-banner__body">
+      @if (title()) {
+        <p class="mk-banner__title">{{ title() }}</p>
+      }
+      <div class="mk-banner__message"><ng-content /></div>
+    </div>
+    <div class="mk-banner__actions"><ng-content select="[mkBannerActions]" /></div>
+    @if (dismissible()) {
+      <button
+        type="button"
+        class="mk-banner__close"
+        aria-label="Dismiss"
+        (click)="dismiss()"
+      >
+        <span aria-hidden="true">&times;</span>
+      </button>
+    }
+  </div>
+}

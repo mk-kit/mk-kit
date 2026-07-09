@@ -19,3 +19,5 @@ export * from './toolbar';
 export * from './page-header';
 export * from './command-palette';
 export * from './splitter';
+export * from './fab';
+export * from './back-to-top';

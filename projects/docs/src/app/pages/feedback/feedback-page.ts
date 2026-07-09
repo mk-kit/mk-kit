@@ -6,6 +6,7 @@ import {
 } from '@angular/core';
 import {
   MkAlert,
+  MkBanner,
   MkButton,
   MkDialog,
   MkDialogService,
@@ -69,6 +70,7 @@ export class DemoDialogContent {
   imports: [
     DocsExample,
     MkAlert,
+    MkBanner,
     MkButton,
     MkTooltip,
     MkPopover,
@@ -269,6 +271,30 @@ export class DemoDialogContent {
           </tr>
         </tbody>
       </table>
+
+      <!-- ============================ BANNER ============================ -->
+      <h2>Banner</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-banner&gt;</code> is a persistent,
+        full-width notice (tone, optional title, actions slot, dismiss) — heavier
+        than an inline alert. Danger/warning banners announce assertively.
+      </p>
+      <docs-example [code]="bannerCode" [column]="true">
+        <div style="display: flex; flex-direction: column; gap: var(--mk-space-3); width: 100%;">
+          <mk-banner tone="info" title="New workspace features">
+            Boards and timelines are now available on every plan.
+            <button mkButton size="sm" variant="outline" mkBannerActions>Learn more</button>
+          </mk-banner>
+          @if (bannerOpen()) {
+            <mk-banner tone="warning" title="Storage almost full" dismissible [(open)]="bannerOpen">
+              You've used 90% of your quota.
+              <button mkButton size="sm" mkBannerActions>Upgrade</button>
+            </mk-banner>
+          } @else {
+            <button mkButton variant="ghost" size="sm" (click)="bannerOpen.set(true)">Restore dismissed banner</button>
+          }
+        </div>
+      </docs-example>
 
       <!-- ============================ POPOVER ============================ -->
       <h2>Popover</h2>
@@ -599,6 +625,11 @@ export class FeedbackPage {
   protected readonly confirmResult = signal<boolean | null>(null);
   protected readonly openResult = signal<string | null>(null);
   protected readonly deleteStatus = signal('Nothing deleted yet.');
+  protected readonly bannerOpen = signal(true);
+  protected readonly bannerCode = `<mk-banner tone="warning" title="Storage almost full" dismissible>
+  You've used 90% of your quota.
+  <button mkButton size="sm" mkBannerActions>Upgrade</button>
+</mk-banner>`;
 
   protected onDeleted(): void {
     this.deleteStatus.set('Item deleted ✓');

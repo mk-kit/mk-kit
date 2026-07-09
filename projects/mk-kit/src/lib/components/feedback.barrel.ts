@@ -9,3 +9,4 @@ export * from './dialog';
 export * from './toast';
 export * from './snackbar';
 export * from './bottom-sheet';
+export * from './banner';
