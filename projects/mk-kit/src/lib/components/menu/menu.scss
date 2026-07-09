@@ -3,8 +3,7 @@
 }
 
 .mk-menu__panel {
-  position: fixed;
-  z-index: var(--mk-z-menu);
+  // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
   min-width: 12rem;
   max-width: min(20rem, calc(100vw - var(--mk-space-4)));
   max-height: calc(100vh - var(--mk-space-8));

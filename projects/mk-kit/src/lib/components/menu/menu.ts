@@ -2,24 +2,26 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
-  ElementRef,
+  Injector,
   PLATFORM_ID,
-  computed,
+  afterNextRender,
   contentChildren,
   inject,
   signal,
-  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkMenuItem } from './menu-item';
-
-const GAP = 4;
 
 /**
  * Dropdown menu implementing the ARIA menu pattern (roving focus, Arrow / Home
  * / End / typeahead, Enter/Space to activate). Attach it to a trigger with the
  * `mkMenuTriggerFor` directive; the trigger controls opening and positioning.
+ *
+ * The panel is rendered in the browser top layer via {@link MkAnchoredPanel}, so
+ * it is never clipped by an ancestor's `overflow`/`transform` and always flips
+ * back on-screen near a viewport edge.
  *
  * ```html
  * <button mkButton [mkMenuTriggerFor]="menu">Actions</button>
@@ -35,17 +37,17 @@ const GAP = 4;
   templateUrl: './menu.html',
   styleUrl: './menu.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkAnchoredPanel],
   host: {
     class: 'mk-menu',
   },
 })
 export class MkMenu {
   private readonly document = inject(DOCUMENT);
+  private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly items = contentChildren(MkMenuItem);
-  protected readonly panelEl =
-    viewChild<ElementRef<HTMLElement>>('panel');
 
   /** Stable id for `aria-controls` on the trigger. */
   readonly panelId = mkUniqueId('mk-menu');
@@ -57,71 +59,48 @@ export class MkMenu {
   /** Accessible label for the menu (defaults via the trigger if unset). */
   readonly ariaLabel = signal<string | undefined>(undefined);
 
-  protected readonly top = signal(0);
-  protected readonly left = signal(0);
+  /** Element to anchor the panel to (element-anchored open). */
+  protected readonly anchorEl = signal<HTMLElement | undefined>(undefined);
+  /** Viewport point to anchor to (`openAt` / context menu). */
+  protected readonly anchorPoint = signal<{ x: number; y: number } | undefined>(
+    undefined,
+  );
 
   private triggerEl: HTMLElement | null = null;
   private typeahead = '';
   private typeaheadTimer?: ReturnType<typeof setTimeout>;
 
-  private readonly onDocMousedown = (e: MouseEvent) => {
-    const target = e.target as Node;
-    const panel = this.panelEl()?.nativeElement;
-    if (panel?.contains(target) || this.triggerEl?.contains(target)) return;
-    this.close(false);
-  };
-  private readonly onWinResize = () => this.close(false);
-
   /** Open the menu anchored to `trigger`. */
   open(trigger: HTMLElement, focusFirst = true): void {
     if (!this.isBrowser || this._open()) return;
     this.triggerEl = trigger;
-    const rect = trigger.getBoundingClientRect();
-    this.left.set(rect.left);
-    this.top.set(rect.bottom + GAP);
+    this.anchorEl.set(trigger);
+    this.anchorPoint.set(undefined);
     this._open.set(true);
-
-    this.document.addEventListener('mousedown', this.onDocMousedown, true);
-    this.document.defaultView?.addEventListener('resize', this.onWinResize);
-    this.document.defaultView?.addEventListener('scroll', this.onWinResize, true);
-
-    queueMicrotask(() => {
-      this.reposition(rect);
-      if (focusFirst) this.focusFirst();
-    });
+    if (focusFirst) this.focusAfterOpen();
   }
 
   /**
    * Open the menu at viewport coordinates — e.g. a right-click point from a
-   * `contextmenu` event. The panel's top-left is placed at (`x`, `y`) and then
-   * flipped up / shifted left by the same edge logic as {@link reposition}
-   * (a zero-size rect at the point is synthesized). Focus moves to the first
+   * `contextmenu` event. Positioning (and flip/shift back on-screen) is handled
+   * by {@link MkAnchoredPanel} via the point anchor. Focus moves to the first
    * item; `restoreFocusEl` (when provided) regains focus on close.
    */
   openAt(x: number, y: number, restoreFocusEl?: HTMLElement): void {
     if (!this.isBrowser || this._open()) return;
     this.triggerEl = restoreFocusEl ?? null;
-    this.left.set(x);
-    this.top.set(y);
+    this.anchorEl.set(undefined);
+    this.anchorPoint.set({ x, y });
     this._open.set(true);
-
-    this.document.addEventListener('mousedown', this.onDocMousedown, true);
-    this.document.defaultView?.addEventListener('resize', this.onWinResize);
-    this.document.defaultView?.addEventListener('scroll', this.onWinResize, true);
-
-    queueMicrotask(() => {
-      this.reposition(new DOMRect(x, y, 0, 0));
-      this.focusFirst();
-    });
+    this.focusAfterOpen();
   }
 
   /** Close the menu; optionally restore focus to the trigger. */
   close(restoreFocus = true): void {
     if (!this._open()) return;
     this._open.set(false);
-    this.document.removeEventListener('mousedown', this.onDocMousedown, true);
-    this.document.defaultView?.removeEventListener('resize', this.onWinResize);
-    this.document.defaultView?.removeEventListener('scroll', this.onWinResize, true);
+    this.anchorEl.set(undefined);
+    this.anchorPoint.set(undefined);
     const trigger = this.triggerEl;
     this.triggerEl = null;
     if (restoreFocus) trigger?.focus();
@@ -134,6 +113,14 @@ export class MkMenu {
     } else {
       this.open(trigger, focusFirst);
     }
+  }
+
+  /** Focus the first item once the panel is in the top layer and painted. */
+  private focusAfterOpen(): void {
+    afterNextRender(
+      { write: () => this.focusFirst() },
+      { injector: this.injector },
+    );
   }
 
   protected onPanelKeydown(event: KeyboardEvent): void {
@@ -223,23 +210,6 @@ export class MkMenu {
         item.focusEl();
         return;
       }
-    }
-  }
-
-  private reposition(triggerRect: DOMRect): void {
-    const panel = this.panelEl()?.nativeElement;
-    const view = this.document.defaultView;
-    if (!panel || !view) return;
-    const rect = panel.getBoundingClientRect();
-
-    // Flip above the trigger when it would overflow the bottom edge.
-    if (triggerRect.bottom + rect.height + GAP > view.innerHeight) {
-      const above = triggerRect.top - rect.height - GAP;
-      if (above > 0) this.top.set(above);
-    }
-    // Shift left to stay within the right edge.
-    if (triggerRect.left + rect.width > view.innerWidth) {
-      this.left.set(Math.max(GAP, view.innerWidth - rect.width - GAP));
     }
   }
 }

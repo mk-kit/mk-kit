@@ -32,6 +32,10 @@
 @if (open()) {
   <ul
     class="mk-select__list"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="trigger"
+    [matchWidth]="true"
+    (dismiss)="close()"
     [id]="listId"
     role="listbox"
     [attr.aria-labelledby]="labelledBy()"

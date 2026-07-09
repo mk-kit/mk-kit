@@ -136,12 +136,8 @@
   transform: rotate(-45deg);
 }
 
-/* Popover panel */
+/* Popover panel — positioning (fixed, top layer) owned by mkAnchoredPanel. */
 .mk-date-range-picker__panel {
-  position: absolute;
-  z-index: var(--mk-z-menu);
-  top: calc(100% + var(--mk-space-1));
-  left: 0;
   box-shadow: var(--mk-shadow-lg);
   border-radius: var(--mk-radius-lg);
 }

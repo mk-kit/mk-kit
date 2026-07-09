@@ -1,4 +1,4 @@
-<div class="mk-time-picker__field">
+<div #field class="mk-time-picker__field">
   <input
     #textInput
     type="text"
@@ -61,7 +61,16 @@
 </div>
 
 @if (open()) {
-  <ul class="mk-time-picker__list" [id]="listId" role="listbox">
+  <ul
+    #list
+    class="mk-time-picker__list"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    [matchWidth]="true"
+    (dismiss)="close()"
+    [id]="listId"
+    role="listbox"
+  >
     @for (opt of options(); track opt.value; let i = $index) {
       <li
         class="mk-time-picker__option"

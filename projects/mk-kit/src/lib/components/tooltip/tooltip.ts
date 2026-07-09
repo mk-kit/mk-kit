@@ -14,6 +14,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { mkComputeAnchoredPosition } from '../../core/overlay/anchored-overlay';
 import type { MkPlacement } from '../../core/types';
 
 /** Delay (ms) before a pointer-triggered tooltip opens. Focus opens instantly. */
@@ -117,6 +118,17 @@ export class MkTooltip {
     }
     this.previousDescribedBy = null;
 
+    const panel = this.ref.location.nativeElement as HTMLElement & {
+      hidePopover?: () => void;
+    };
+    if (panel.matches('[popover]') && typeof panel.hidePopover === 'function') {
+      try {
+        panel.hidePopover();
+      } catch {
+        // Already disconnected — nothing to do.
+      }
+    }
+
     this.appRef.detachView(this.ref.hostView);
     this.ref.destroy();
     this.ref = undefined;
@@ -136,6 +148,18 @@ export class MkTooltip {
     const panel = ref.location.nativeElement as HTMLElement;
     this.document.body.appendChild(panel);
     this.ref = ref;
+
+    // Promote into the top layer so the tooltip is never clipped by an
+    // ancestor's overflow/transform or hidden behind a stacking context.
+    const withPopover = panel as HTMLElement & { showPopover?: () => void };
+    if (typeof withPopover.showPopover === 'function') {
+      panel.setAttribute('popover', 'manual');
+      try {
+        withPopover.showPopover();
+      } catch {
+        // Unsupported context — fall back to the plain body portal.
+      }
+    }
 
     // Wire aria-describedby, preserving any pre-existing value.
     const trigger = this.host.nativeElement;
@@ -157,49 +181,22 @@ export class MkTooltip {
   private position(panel: HTMLElement): void {
     const rect = this.host.nativeElement.getBoundingClientRect();
     const tip = panel.getBoundingClientRect();
-    const gap = 8;
-    const placement = this.mkTooltipPlacement();
-    let top = 0;
-    let left = 0;
-
-    switch (placement) {
-      case 'bottom':
-      case 'bottom-start':
-      case 'bottom-end':
-        top = rect.bottom + gap;
-        break;
-      case 'left':
-        top = rect.top + rect.height / 2 - tip.height / 2;
-        left = rect.left - tip.width - gap;
-        break;
-      case 'right':
-        top = rect.top + rect.height / 2 - tip.height / 2;
-        left = rect.right + gap;
-        break;
-      default: // top variants
-        top = rect.top - tip.height - gap;
-        break;
-    }
-
-    if (placement === 'left' || placement === 'right') {
-      // top/left already computed above
-    } else if (placement.endsWith('-start')) {
-      left = rect.left;
-    } else if (placement.endsWith('-end')) {
-      left = rect.right - tip.width;
-    } else {
-      left = rect.left + rect.width / 2 - tip.width / 2;
-    }
-
-    // Clamp within the viewport.
-    const vw = this.document.documentElement.clientWidth;
-    const vh = this.document.documentElement.clientHeight;
-    left = Math.max(gap, Math.min(left, vw - tip.width - gap));
-    top = Math.max(gap, Math.min(top, vh - tip.height - gap));
-
+    const pos = mkComputeAnchoredPosition(
+      rect,
+      { width: tip.width, height: tip.height },
+      {
+        width: this.document.documentElement.clientWidth,
+        height: this.document.documentElement.clientHeight,
+      },
+      // Clamp back on-screen but keep the requested side (no flip) so the
+      // panel's `data-placement` styling stays correct.
+      { placement: this.mkTooltipPlacement(), gap: 8, flip: false, clamp: true },
+    );
     panel.style.position = 'fixed';
-    panel.style.top = `${Math.round(top)}px`;
-    panel.style.left = `${Math.round(left)}px`;
+    panel.style.margin = '0';
+    panel.style.inset = 'auto';
+    panel.style.top = `${pos.top}px`;
+    panel.style.left = `${pos.left}px`;
   }
 
   ngOnDestroy(): void {

@@ -14,6 +14,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single selectable option for {@link MkSelect}. */
@@ -48,6 +49,7 @@ export interface MkSelectOption {
   templateUrl: './select.html',
   styleUrl: './select.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkAnchoredPanel],
   host: {
     class: 'mk-select',
     '[class.mk-select--sm]': "effectiveSize() === 'sm'",
@@ -56,7 +58,6 @@ export interface MkSelectOption {
     '[class.mk-select--open]': 'open()',
     '[class.mk-select--invalid]': 'isInvalid()',
     '[class.mk-select--disabled]': 'isDisabled()',
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
   },
   providers: [
     {
@@ -68,7 +69,6 @@ export interface MkSelectOption {
 })
 export class MkSelect implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly triggerRef =
     viewChild<ElementRef<HTMLButtonElement>>('trigger');
 
@@ -211,12 +211,6 @@ export class MkSelect implements ControlValueAccessor {
     // Closing on blur also fires onTouched via close().
     if (this.open()) this.close();
     else this.onTouched();
-  }
-
-  protected onDocumentPointerdown(event: Event): void {
-    if (!this.open()) return;
-    const target = event.target as Node;
-    if (!this.host.nativeElement.contains(target)) this.close();
   }
 
   private move(delta: number): void {

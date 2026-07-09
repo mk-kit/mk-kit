@@ -18,6 +18,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
 /** A selectable time option. */
@@ -51,6 +52,7 @@ function pad2(n: number): string {
   templateUrl: './time-picker.html',
   styleUrl: './time-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkAnchoredPanel],
   host: {
     class: 'mk-time-picker',
     '[class.mk-time-picker--sm]': "effectiveSize() === 'sm'",
@@ -59,7 +61,6 @@ function pad2(n: number): string {
     '[class.mk-time-picker--open]': 'open()',
     '[class.mk-time-picker--invalid]': 'isInvalid()',
     '[class.mk-time-picker--disabled]': 'isDisabled()',
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
     '(focusout)': 'onFocusOut($event)',
   },
   providers: [
@@ -76,6 +77,8 @@ export class MkTimePicker implements ControlValueAccessor {
   private readonly injector = inject(Injector);
   private readonly inputRef =
     viewChild<ElementRef<HTMLInputElement>>('textInput');
+  /** The listbox panel — lives in the top layer once opened. */
+  private readonly listRef = viewChild<ElementRef<HTMLElement>>('list');
 
   /** Two-way selected time as canonical `HH:mm` (24h), or `null`. */
   readonly value = model<string | null>(null);
@@ -306,7 +309,7 @@ export class MkTimePicker implements ControlValueAccessor {
     afterNextRender(
       {
         write: () => {
-          const el = this.host.nativeElement.querySelector<HTMLElement>(
+          const el = this.listRef()?.nativeElement.querySelector<HTMLElement>(
             '.mk-time-picker__option--active',
           );
           el?.scrollIntoView({ block: 'nearest' });
@@ -316,14 +319,10 @@ export class MkTimePicker implements ControlValueAccessor {
     );
   }
 
-  protected onDocumentPointerdown(event: Event): void {
-    if (!this.open()) return;
-    if (!this.host.nativeElement.contains(event.target as Node)) this.close();
-  }
-
   protected onFocusOut(event: Event): void {
     const related = (event as FocusEvent).relatedTarget as Node | null;
     if (related && this.host.nativeElement.contains(related)) return;
+    if (related && this.listRef()?.nativeElement.contains(related)) return;
     this.commitInput();
     this.onTouched();
   }

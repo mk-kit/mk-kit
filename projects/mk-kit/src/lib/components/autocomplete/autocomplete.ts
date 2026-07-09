@@ -16,6 +16,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single suggestion for {@link MkAutocomplete}. */
@@ -58,6 +59,7 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
   templateUrl: './autocomplete.html',
   styleUrl: './autocomplete.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkAnchoredPanel],
   host: {
     class: 'mk-autocomplete',
     '[class.mk-autocomplete--sm]': "effectiveSize() === 'sm'",
@@ -66,7 +68,6 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
     '[class.mk-autocomplete--open]': 'open()',
     '[class.mk-autocomplete--invalid]': 'isInvalid()',
     '[class.mk-autocomplete--disabled]': 'isDisabled()',
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
   },
   providers: [
     {
@@ -78,7 +79,6 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
 })
 export class MkAutocomplete implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** The list of suggestions. Update it from `search` for async sources. */
@@ -272,13 +272,10 @@ export class MkAutocomplete implements ControlValueAccessor {
     }
   }
 
-  protected onDocumentPointerdown(event: Event): void {
+  protected onOutsideDismiss(): void {
     if (!this.open()) return;
-    const target = event.target as Node;
-    if (!this.host.nativeElement.contains(target)) {
-      this.close();
-      this.reconcileOnBlur();
-    }
+    this.close();
+    this.reconcileOnBlur();
   }
 
   protected clear(): void {

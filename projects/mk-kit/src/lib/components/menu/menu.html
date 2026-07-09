@@ -1,12 +1,14 @@
 @if (opened()) {
   <div
-    #panel
     class="mk-menu__panel"
     role="menu"
     [id]="panelId"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="anchorEl()"
+    [anchorRect]="anchorPoint()"
+    placement="bottom-start"
+    (dismiss)="close(false)"
     [attr.aria-label]="ariaLabel()"
-    [style.top.px]="top()"
-    [style.left.px]="left()"
     (keydown)="onPanelKeydown($event)"
   >
     <ng-content />

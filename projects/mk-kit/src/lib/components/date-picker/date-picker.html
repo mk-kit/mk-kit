@@ -1,4 +1,4 @@
-<div class="mk-date-picker__field">
+<div #field class="mk-date-picker__field">
   <input
     #textInput
     type="text"
@@ -57,7 +57,16 @@
 </div>
 
 @if (open()) {
-  <div class="mk-date-picker__panel" [id]="panelId" role="dialog" aria-label="Choose date">
+  <div
+    #panel
+    class="mk-date-picker__panel"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    (dismiss)="close()"
+    [id]="panelId"
+    role="dialog"
+    aria-label="Choose date"
+  >
     <mk-calendar
       [value]="value()"
       (valueChange)="onCalendarPick($event)"

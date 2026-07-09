@@ -18,6 +18,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkCalendar } from '../calendar/calendar';
 import {
@@ -46,7 +47,7 @@ import {
   templateUrl: './date-picker.html',
   styleUrl: './date-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MkCalendar],
+  imports: [MkCalendar, MkAnchoredPanel],
   host: {
     class: 'mk-date-picker',
     '[class.mk-date-picker--sm]': "effectiveSize() === 'sm'",
@@ -55,7 +56,6 @@ import {
     '[class.mk-date-picker--open]': 'open()',
     '[class.mk-date-picker--invalid]': 'isInvalid()',
     '[class.mk-date-picker--disabled]': 'isDisabled()',
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
     '(focusout)': 'onFocusOut($event)',
   },
   providers: [
@@ -72,6 +72,8 @@ export class MkDatePicker implements ControlValueAccessor {
   private readonly injector = inject(Injector);
   private readonly inputRef =
     viewChild<ElementRef<HTMLInputElement>>('textInput');
+  /** The calendar panel — lives in the top layer once opened. */
+  private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
 
   /** Two-way selected date. */
   readonly value = model<Date | null>(null);
@@ -140,7 +142,7 @@ export class MkDatePicker implements ControlValueAccessor {
     afterNextRender(
       {
         write: () => {
-          const el = this.host.nativeElement.querySelector<HTMLElement>(
+          const el = this.panelRef()?.nativeElement.querySelector<HTMLElement>(
             '.mk-calendar__day[tabindex="0"]',
           );
           el?.focus();
@@ -218,14 +220,11 @@ export class MkDatePicker implements ControlValueAccessor {
     this.onChange(date);
   }
 
-  protected onDocumentPointerdown(event: Event): void {
-    if (!this.open()) return;
-    if (!this.host.nativeElement.contains(event.target as Node)) this.close();
-  }
-
   protected onFocusOut(event: Event): void {
     const related = (event as FocusEvent).relatedTarget as Node | null;
+    // Ignore focus moving into the field or the (top-layer) calendar panel.
     if (related && this.host.nativeElement.contains(related)) return;
+    if (related && this.panelRef()?.nativeElement.contains(related)) return;
     this.commitInput();
     this.close();
     this.onTouched();

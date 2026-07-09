@@ -1,4 +1,4 @@
-<div class="mk-autocomplete__field">
+<div #field class="mk-autocomplete__field">
   <input
     #input
     type="text"
@@ -43,6 +43,10 @@
 @if (open()) {
   <ul
     class="mk-autocomplete__list"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    [matchWidth]="true"
+    (dismiss)="onOutsideDismiss()"
     [id]="listId"
     role="listbox"
     [attr.aria-labelledby]="labelledBy()"

@@ -128,14 +128,8 @@
   transform: rotate(-45deg);
 }
 
-/* Popup list */
+/* Popup list — positioning (fixed, top layer) owned by mkAnchoredPanel. */
 .mk-time-picker__list {
-  position: absolute;
-  z-index: var(--mk-z-menu);
-  top: calc(100% + var(--mk-space-1));
-  left: 0;
-  right: 0;
-  margin: 0;
   padding: var(--mk-space-1);
   list-style: none;
   max-height: 15rem;

@@ -84,12 +84,7 @@
 
 /* Popup list */
 .mk-select__list {
-  position: absolute;
-  z-index: var(--mk-z-menu);
-  top: calc(100% + var(--mk-space-1));
-  left: 0;
-  right: 0;
-  margin: 0;
+  // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
   padding: var(--mk-space-1);
   list-style: none;
   max-height: 16rem;

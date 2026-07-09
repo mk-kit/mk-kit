@@ -17,6 +17,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkCalendar } from '../calendar/calendar';
 import { formatDate, isBefore, startOfDay } from '../datetime/date-utils';
@@ -43,7 +44,7 @@ export interface MkDateRange {
   templateUrl: './date-range-picker.html',
   styleUrl: './date-range-picker.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MkCalendar],
+  imports: [MkCalendar, MkAnchoredPanel],
   host: {
     class: 'mk-date-range-picker',
     '[class.mk-date-range-picker--sm]': "effectiveSize() === 'sm'",
@@ -52,7 +53,6 @@ export interface MkDateRange {
     '[class.mk-date-range-picker--open]': 'open()',
     '[class.mk-date-range-picker--invalid]': 'isInvalid()',
     '[class.mk-date-range-picker--disabled]': 'isDisabled()',
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
     '(focusout)': 'onFocusOut($event)',
   },
   providers: [
@@ -69,6 +69,8 @@ export class MkDateRangePicker implements ControlValueAccessor {
   private readonly injector = inject(Injector);
   private readonly triggerRef =
     viewChild<ElementRef<HTMLButtonElement>>('trigger');
+  /** The calendar panel — lives in the top layer once opened. */
+  private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
 
   /** Two-way selected range. */
   readonly value = model<MkDateRange>({ start: null, end: null });
@@ -148,7 +150,7 @@ export class MkDateRangePicker implements ControlValueAccessor {
     afterNextRender(
       {
         write: () => {
-          const el = this.host.nativeElement.querySelector<HTMLElement>(
+          const el = this.panelRef()?.nativeElement.querySelector<HTMLElement>(
             '.mk-calendar__day[tabindex="0"]',
           );
           el?.focus();
@@ -202,14 +204,10 @@ export class MkDateRangePicker implements ControlValueAccessor {
     this.onChange(range);
   }
 
-  protected onDocumentPointerdown(event: Event): void {
-    if (!this.open()) return;
-    if (!this.host.nativeElement.contains(event.target as Node)) this.close();
-  }
-
   protected onFocusOut(event: Event): void {
     const related = (event as FocusEvent).relatedTarget as Node | null;
     if (related && this.host.nativeElement.contains(related)) return;
+    if (related && this.panelRef()?.nativeElement.contains(related)) return;
     this.close();
     this.onTouched();
   }
