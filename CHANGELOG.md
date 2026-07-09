@@ -8,6 +8,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mkScrollspy`** — a directive that tracks which section is in view and
+  exposes its `id` (via `activeId()` / `(activeChange)`), so a table of contents
+  can highlight the current link. `root` and `offset` inputs; activates the last
+  section when scrolled to the bottom.
 - **Expandable table rows** — `mk-table` gains `expandable` (a leading expander
   column) and `singleExpand` (accordion). Each row reveals a detail panel
   supplied via `<ng-template mkTableRowDetail let-row>`, with the row object as

@@ -83,7 +83,9 @@ live-announcer core.
 - ✅ **Nav group** (`mk-nav-group`) — collapsible sidebar sections (shipped).
 - ✅ **Split panes / resizable layout** (`mk-splitter`) — two panes, draggable +
   keyboard ARIA separator, horizontal/vertical (shipped).
-- ✅ **FAB / speed-dial** (`mk-fab` + `mkFabAction`) and ✅ **back-to-top** (`mk-back-to-top`) shipped. **P2 scrollspy** remaining.
+- ✅ **FAB / speed-dial** (`mk-fab` + `mkFabAction`) and ✅ **back-to-top** (`mk-back-to-top`) shipped.
+- ✅ **Scrollspy** (`mkScrollspy`) — tracks the in-view section and exposes its
+  `id` for table-of-contents highlighting; `root`/`offset` inputs (shipped).
 - **P3 Scroll-area** — cross-browser custom scrollbar container.
 
 ### Feedback & overlay
@@ -140,7 +142,7 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left is P2/P3:
 
-1. **Scrollspy** — remaining structural P2.
-2. **Week picker** + mini inline date — remaining picker P3s.
+1. **Week picker** + mini inline date — remaining picker P3s.
+2. **Intersection / lazy-load / infinite-scroll** directives — remaining P2 utilities.
 3. RTL audit + density mode; then P3 polish (QR, ripple, theme-builder,
    high-contrast theme, heatmap/scatter charts).
