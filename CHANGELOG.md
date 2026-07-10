@@ -19,6 +19,12 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
   under `MK_I18N.blockEditor` (~90 keys), plus `qrCodeLabel` and `moreEvents`
   (event-calendar overflow pill). No user-facing string in the library
   bypasses `MK_I18N` anymore.
+- **Theme builder rebuilt as a token generator** — the `/theme-builder` docs
+  page now edits ~26 high-impact `--mk-*` tokens (brand & tones, surfaces &
+  text per light/dark mode, radius/type/control-height scales, focus ring,
+  spacing) with side-by-side light and dark component-gallery previews, and
+  exports only the changed tokens as a drop-in stylesheet — copy to
+  clipboard or download `tokens.css`.
 - **CI quality gates** — an axe-core accessibility smoke test (17 rendered
   component fixtures, zero-violation assertion) and an SSR render smoke test
   (`renderApplication` over a 21-component gallery, catching unguarded
@@ -26,6 +32,16 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Fixed
 
+- **Anchored overlays no longer detach on scroll** — panels (select,
+  autocomplete, all pickers, menu, hovercard, …) previously kept clamping to
+  the viewport while the page scrolled, ending up "stuck" at the screen edge
+  far from their trigger. Scroll-driven repositioning now tracks the trigger
+  exactly, and the panel dismisses as soon as the trigger scrolls fully out
+  of the viewport (the CDK reposition-with-auto-close behaviour).
+- `mk-nav-item` never rendered its `[mkNavIcon]` slot for plain action items:
+  the icon `ng-content` appeared in all three template branches, and Angular
+  assigns a projection slot to only one — a collapsed sidebar rail showed no
+  icons at all. Same root cause as the breadcrumb fix below.
 - `mk-breadcrumb-item` rendered link crumbs with no text: the projected label
   was assigned to only one of the two `ng-content` branches, so any crumb
   with `href` set was blank (and an axe `link-name` violation). Found by the
