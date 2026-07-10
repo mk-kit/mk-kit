@@ -67,6 +67,47 @@ import { DocsExample } from '../../shared/docs-example';
       <docs-example [code]="persistentCode">
         <button mkButton (click)="persistent()">Show persistent</button>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>API</h2>
+
+      <h3><code class="docs-inline">MkSnackbarService</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>open(message, action?, config?)</code></td><td>Show a snackbar, replacing any open one. <code>action</code> is the optional button label. Returns an <code>MkSnackbarRef</code>.</td></tr>
+          <tr><td><code>dismiss(id)</code></td><td>Dismiss the snackbar with the given id (if it is the active one).</td></tr>
+          <tr><td><code>pause()</code> / <code>resume()</code></td><td>Pause / resume the auto-dismiss countdown (used on hover/focus).</td></tr>
+          <tr><td><code>active</code></td><td>Readonly signal of the currently visible snackbar, or <code>null</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code class="docs-inline">MkSnackbarConfig</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Option</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>tone</code></td><td><code>'neutral' | 'info' | 'success' | 'warning' | 'danger'</code></td><td><code>'neutral'</code></td><td>Semantic tone; adds the coloured accent stripe.</td></tr>
+          <tr><td><code>duration</code></td><td><code>number</code></td><td><code>5000</code></td><td>Auto-dismiss delay in ms. <code>0</code> keeps it open until dismissed.</td></tr>
+          <tr><td><code>dismissible</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a close (×) button.</td></tr>
+          <tr><td><code>politeness</code></td><td><code>'polite' | 'assertive'</code></td><td><code>'polite'</code></td><td>Live-region politeness for the screen-reader announcement.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code class="docs-inline">MkSnackbarRef</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>onAction()</code></td><td>Promise that resolves when the action button is activated.</td></tr>
+          <tr><td><code>afterDismissed()</code></td><td>Promise that resolves when the snackbar closes, with the reason: <code>'action' | 'timeout' | 'dismiss'</code>.</td></tr>
+          <tr><td><code>dismiss()</code></td><td>Dismiss this snackbar programmatically.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })

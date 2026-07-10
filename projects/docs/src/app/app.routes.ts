@@ -95,6 +95,14 @@ export const routes: Routes = [
       import('./pages/theming/theming-page').then((m) => m.ThemingPage),
   },
   {
+    path: 'core-services',
+    title: 'Core & services — mk-kit',
+    loadComponent: () =>
+      import('./pages/core-services/core-services-page').then(
+        (m) => m.CoreServicesPage,
+      ),
+  },
+  {
     path: 'theme-builder',
     title: 'Theme builder — mk-kit',
     loadComponent: () =>

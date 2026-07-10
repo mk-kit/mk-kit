@@ -62,6 +62,7 @@ export class App {
         { label: 'Getting started', path: '/getting-started', icon: '▶' },
         { label: 'Theming', path: '/theming', icon: '◑' },
         { label: 'Theme builder', path: '/theme-builder', icon: '⛭' },
+        { label: 'Core & services', path: '/core-services', icon: '⚙' },
       ],
     },
     {

@@ -58,6 +58,20 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>icon</code></td><td><code>string</code></td><td><code>''</code></td><td>Name of a registered icon shown above the title.</td></tr>
+          <tr><td><code>title</code></td><td><code>string</code></td><td><code>''</code></td><td>Main heading, e.g. "No invoices yet".</td></tr>
+          <tr><td><code>description</code></td><td><code>string</code></td><td><code>''</code></td><td>Supporting sentence under the title.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Overall scale of the block (icon, spacing, type).</td></tr>
+          <tr><td><code>[mkEmptyStateMedia]</code></td><td><code>slot</code></td><td>—</td><td>Custom illustration projected in place of <code>icon</code>.</td></tr>
+          <tr><td><code>[mkEmptyStateActions]</code></td><td><code>slot</code></td><td>—</td><td>Call-to-action buttons rendered under the text.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <h2>Timeline</h2>
       <p>
@@ -103,6 +117,23 @@ import { DocsExample } from '../../shared/docs-example';
           </mk-timeline>
         </div>
       </docs-example>
+
+      <p>
+        <code class="docs-inline">&lt;mk-timeline&gt;</code> itself has no
+        inputs — it draws the rail and exposes the list semantics. Each
+        <code class="docs-inline">&lt;mk-timeline-item&gt;</code> takes:
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>tone</code></td><td><code>'primary' | 'neutral' | 'success' | 'warning' | 'danger' | 'info'</code></td><td><code>'primary'</code></td><td>Semantic colour of the marker dot.</td></tr>
+          <tr><td><code>icon</code></td><td><code>string</code></td><td><code>''</code></td><td>Name of a registered icon rendered inside the marker.</td></tr>
+          <tr><td><code>time</code></td><td><code>string</code></td><td><code>''</code></td><td>Time or label shown above the heading (e.g. "09:30", "2m ago").</td></tr>
+          <tr><td><code>heading</code></td><td><code>string</code></td><td><code>''</code></td><td>Event title; projected content becomes the body.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })

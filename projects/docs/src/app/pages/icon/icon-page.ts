@@ -96,6 +96,39 @@ import { DocsExample } from '../../shared/docs-example';
         default. Pass <code class="docs-inline">label</code> to expose a
         meaningful icon as <code class="docs-inline">role="img"</code>.
       </p>
+
+      <!-- ============================================================ -->
+      <h2>API</h2>
+
+      <h3><code class="docs-inline">&lt;mk-icon&gt;</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>name</code></td><td><code>string</code></td><td><code>''</code></td><td>Name of a registered icon; when empty, projected <code>&lt;svg&gt;</code> content renders instead.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg' | number</code></td><td><code>'md'</code></td><td>Icon box size; a number is treated as pixels.</td></tr>
+          <tr><td><code>label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible name. When set the icon becomes <code>role="img"</code>; otherwise it is <code>aria-hidden</code>.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code class="docs-inline">MkIconRegistry</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Method</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>register(name, svg)</code></td><td>Register (or overwrite) a single named icon from raw SVG markup. Returns the registry for chaining.</td></tr>
+          <tr><td><code>registerIcons(icons)</code></td><td>Register many icons at once from a <code>{{ '{' }} name: svg {{ '}' }}</code> map.</td></tr>
+          <tr><td><code>get(name)</code></td><td>Sanitized SVG for a name, or <code>null</code> when it is not registered.</td></tr>
+          <tr><td><code>has(name)</code></td><td>Whether an icon with this name is registered.</td></tr>
+          <tr><td><code>names()</code></td><td>All registered icon names (useful for a picker / catalogue).</td></tr>
+        </tbody>
+      </table>
+      <p>
+        SVG markup passed to the registry is trusted verbatim — only register
+        icons from sources you control, never user input.
+      </p>
     </div>
   `,
   styles: [

@@ -218,6 +218,23 @@ interface DemoUser {
           style="width: 100%"
         />
       </docs-example>
+
+      <p><strong>Keyboard:</strong></p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (on a sortable header)</td><td>Cycle sorting: ascending → descending → cleared. Changes are announced to screen readers.</td></tr>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd> (on a focused column separator)</td><td>Shrink / widen the column by 10&nbsp;px (never below the column's <code class="docs-inline">minWidth</code>, default 60&nbsp;px). The new width is announced.</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>ArrowLeft</kbd> / <kbd>Shift</kbd>+<kbd>ArrowRight</kbd> (on a separator)</td><td>Fine-grained resize in 1&nbsp;px steps.</td></tr>
+          <tr><td><kbd>Alt</kbd>+<kbd>ArrowLeft</kbd> / <kbd>Alt</kbd>+<kbd>ArrowRight</kbd> (on a focused header)</td><td>Move the column one position left / right (pinned columns cannot be reordered). The new position is announced.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>F2</kbd> (on a focused editable cell)</td><td>Start inline editing the cell.</td></tr>
+          <tr><td><kbd>Enter</kbd> (while editing)</td><td>Save the new value and restore focus to the cell. Blurring the input also saves.</td></tr>
+          <tr><td><kbd>Escape</kbd> (while editing)</td><td>Cancel the edit and restore focus to the cell.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (on a focused row, with <code class="docs-inline">clickableRows</code>)</td><td>Activate the row — emits <code class="docs-inline">rowClick</code>.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [

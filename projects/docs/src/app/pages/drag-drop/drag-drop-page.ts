@@ -205,6 +205,31 @@ interface BoardColumn {
         </tbody>
       </table>
 
+      <h3>Keyboard</h3>
+      <p>
+        Applies to every <code class="docs-inline">[mkDrag]</code> item — the
+        sortable lists here and the kanban board below inherit it. Each step,
+        drop and cancel is announced via the live announcer.
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (on a focused item)</td><td>Pick the item up. Announces its position and the available keys.</td></tr>
+          <tr><td><kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd> (while lifted, vertical list)</td><td>Move one position up / down; at the first/last position, cross into the previous / next connected list.</td></tr>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd> (while lifted, vertical list)</td><td>Jump to the previous / next connected list, keeping the closest index.</td></tr>
+          <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (while lifted)</td><td>Drop the item at the placeholder position — emits <code class="docs-inline">mkDropListDropped</code> with <code class="docs-inline">isPointerEvent: false</code>.</td></tr>
+          <tr><td><kbd>Escape</kbd> (while lifted)</td><td>Cancel — the item returns to its starting position.</td></tr>
+          <tr><td>Blur (focus leaves the item while lifted)</td><td>Also cancels, so the drag can never get stuck.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        In a <code class="docs-inline">horizontal</code> list the axes swap:
+        <kbd>ArrowLeft</kbd>/<kbd>ArrowRight</kbd> move within the list and
+        <kbd>ArrowUp</kbd>/<kbd>ArrowDown</kbd> cross between connected lists.
+      </p>
+
       <!-- ======================== DRAG HANDLE ======================== -->
       <h2>Drag handle</h2>
       <p>

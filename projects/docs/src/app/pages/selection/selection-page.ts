@@ -119,6 +119,26 @@ interface Framework {
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>options</code></td><td><code>MkAutocompleteOption[]</code></td><td><code>[]</code></td><td>The suggestion list. Update it from <code>(search)</code> for async sources.</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown&gt;</code></td><td><code>null</code></td><td>Two-way selected value (the chosen option's <code>value</code>, or null).</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>''</code></td><td>Placeholder shown when the input is empty.</td></tr>
+          <tr><td><code>filterMode</code></td><td><code>'contains' | 'startsWith' | 'none'</code></td><td><code>'contains'</code></td><td>How options are filtered against the typed text; <code>'none'</code> for server-driven lists.</td></tr>
+          <tr><td><code>minChars</code></td><td><code>number</code></td><td><code>0</code></td><td>Only open the list once this many characters are typed.</td></tr>
+          <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a loading row instead of "no results" (async fetches).</td></tr>
+          <tr><td><code>requireSelection</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Clear the input on blur unless the text matches a selectable option.</td></tr>
+          <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td><code>'No results'</code></td><td>Message shown when nothing matches.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size. Ignored inside an <code>mk-form-field</code>.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(search)</code></td><td><code>string</code></td><td>—</td><td>Current input text on every keystroke — drive async loading.</td></tr>
+          <tr><td><code>(optionSelected)</code></td><td><code>MkAutocompleteOption</code></td><td>—</td><td>The option committed by click or Enter.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <!-- MULTI-SELECT -->
       <!-- ============================================================ -->
@@ -171,6 +191,28 @@ interface Framework {
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>options</code></td><td><code>MkMultiSelectOption[]</code></td><td><code>[]</code></td><td>The option list. Update it from <code>(search)</code> for async sources.</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown[]&gt;</code></td><td><code>[]</code></td><td>Two-way array of selected values.</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>''</code></td><td>Placeholder shown when nothing is selected.</td></tr>
+          <tr><td><code>filterMode</code></td><td><code>'contains' | 'startsWith' | 'none'</code></td><td><code>'contains'</code></td><td>How options are filtered against the typed text; <code>'none'</code> for server-driven lists.</td></tr>
+          <tr><td><code>minChars</code></td><td><code>number</code></td><td><code>0</code></td><td>Only open the list once this many characters are typed.</td></tr>
+          <tr><td><code>max</code></td><td><code>number</code></td><td><code>0</code></td><td>Maximum number of selections (0 = unlimited).</td></tr>
+          <tr><td><code>closeOnSelect</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Close the dropdown after each selection (default keeps it open).</td></tr>
+          <tr><td><code>loading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a loading row instead of "no results" (async fetches).</td></tr>
+          <tr><td><code>emptyMessage</code></td><td><code>string</code></td><td><code>'No results'</code></td><td>Message shown when nothing matches.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size. Ignored inside an <code>mk-form-field</code>.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(search)</code></td><td><code>string</code></td><td>—</td><td>Current query text on every keystroke — drive async loading.</td></tr>
+          <tr><td><code>(optionAdded)</code></td><td><code>MkMultiSelectOption</code></td><td>—</td><td>The option just added to the selection.</td></tr>
+          <tr><td><code>(optionRemoved)</code></td><td><code>unknown</code></td><td>—</td><td>The value just removed from the selection.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <!-- TAG INPUT -->
       <!-- ============================================================ -->
@@ -190,6 +232,24 @@ interface Framework {
           </p>
         </div>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>value</code></td><td><code>model&lt;string[]&gt;</code></td><td><code>[]</code></td><td>Two-way list of tags.</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>''</code></td><td>Placeholder shown in the text field.</td></tr>
+          <tr><td><code>max</code></td><td><code>number</code></td><td><code>0</code></td><td>Maximum number of tags (0 = unlimited).</td></tr>
+          <tr><td><code>allowDuplicates</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow the same tag more than once.</td></tr>
+          <tr><td><code>addOnBlur</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Commit the pending text as a tag when the field loses focus.</td></tr>
+          <tr><td><code>separators</code></td><td><code>string[]</code></td><td><code>[',']</code></td><td>Extra characters that commit the pending text (Enter always does); pasted strings are split on these.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size. Ignored inside an <code>mk-form-field</code>.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(added)</code></td><td><code>string</code></td><td>—</td><td>The tag just added.</td></tr>
+          <tr><td><code>(removed)</code></td><td><code>string</code></td><td>—</td><td>The tag just removed.</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <!-- TRANSFER LIST -->
@@ -218,6 +278,35 @@ interface Framework {
         </p>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>items</code></td><td><code>MkTransferItem[]</code></td><td><code>[]</code></td><td>All items (value, label, optional disabled).</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown[]&gt;</code></td><td><code>[]</code></td><td>Two-way array of the values in the selected list.</td></tr>
+          <tr><td><code>availableLabel</code></td><td><code>string</code></td><td><code>'Available'</code></td><td>Heading over the available list.</td></tr>
+          <tr><td><code>selectedLabel</code></td><td><code>string</code></td><td><code>'Selected'</code></td><td>Heading over the selected list.</td></tr>
+          <tr><td><code>filterable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Add a search box above each list.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(change)</code></td><td><code>unknown[]</code></td><td>—</td><td>The new selected values after any move.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Move the active row (roving tabindex).</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Jump to the first / last row.</td></tr>
+          <tr><td><kbd>Space</kbd></td><td>Check / uncheck the active row.</td></tr>
+          <tr><td><kbd>Enter</kbd></td><td>Move the row to the opposite list.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <!-- TREE SELECT -->
       <!-- ============================================================ -->
@@ -245,6 +334,31 @@ interface Framework {
           </p>
         </div>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>nodes</code></td><td><code>MkTreeNode[]</code></td><td><code>[]</code></td><td>The hierarchical options (label, value, children, expanded…).</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown | null&gt;</code></td><td><code>null</code></td><td>Two-way value of the selected node.</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>'Select…'</code></td><td>Trigger text while nothing is selected.</td></tr>
+          <tr><td><code>clearable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a reset button when a value is set.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size. Ignored inside an <code>mk-form-field</code>.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>On the trigger: open the panel. In the tree: select the active node and close.</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close the panel and return focus to the trigger.</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
@@ -307,6 +421,22 @@ interface Framework {
           </mk-button-toggle-group>
         </div>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown&gt;</code></td><td><code>null</code></td><td>Two-way value: a single value, or an array when <code>multiple</code>.</td></tr>
+          <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow any number of pressed items (toolbar mode).</td></tr>
+          <tr><td><code>tone</code></td><td><code>MkTone</code></td><td><code>'primary'</code></td><td>Semantic color of the selected segment.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size.</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the whole group.</td></tr>
+          <tr><td><code>aria-label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible name for the group.</td></tr>
+          <tr><td><code>value</code> <span style="color: var(--mk-text-muted);">(item)</span></td><td><code>unknown</code></td><td><code>undefined</code></td><td>On <code>mk-button-toggle</code>: the value this item contributes.</td></tr>
+          <tr><td><code>disabled</code> <span style="color: var(--mk-text-muted);">(item)</span></td><td><code>boolean</code></td><td><code>false</code></td><td>On <code>mk-button-toggle</code>: disable just this item.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })

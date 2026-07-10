@@ -83,6 +83,21 @@ import { DocsExample } from '../../shared/docs-example';
         </tbody>
       </table>
 
+      <p><strong>Keyboard:</strong></p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd></td><td>Move focus one day back / forward (crossing a month boundary updates the view).</td></tr>
+          <tr><td><kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd></td><td>Move focus one week back / forward.</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Move focus to the first / last day of the focused week.</td></tr>
+          <tr><td><kbd>PageUp</kbd> / <kbd>PageDown</kbd></td><td>Move focus to the same day in the previous / next month.</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>PageUp</kbd> / <kbd>Shift</kbd>+<kbd>PageDown</kbd></td><td>Move focus to the same day in the previous / next year.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Select the focused day (ignored when the day is disabled).</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <!-- DATE PICKER -->
       <!-- ============================================================ -->
@@ -346,6 +361,21 @@ import { DocsExample } from '../../shared/docs-example';
         <mk-mini-date [(value)]="mini" order="dmy" />
         <p class="echo">Value: {{ mini() ? formatDate(mini()!, 'MMM d, yyyy') : '—' }}</p>
       </docs-example>
+
+      <p><strong>Keyboard:</strong> (per focused segment — each is an ARIA spinbutton)</p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>0</kbd>–<kbd>9</kbd></td><td>Type into the segment (OTP-style buffer); auto-advances to the next segment when full or when another digit could only overflow.</td></tr>
+          <tr><td><kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd></td><td>Step the segment value up / down (day wraps within the month, month wraps 1–12, year clamps to <code>yearMin</code>/<code>yearMax</code>).</td></tr>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd></td><td>Move focus to the previous / next segment.</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Set the segment to its minimum / maximum value.</td></tr>
+          <tr><td><kbd>Backspace</kbd></td><td>Clear the segment and move focus to the previous segment.</td></tr>
+          <tr><td><kbd>Delete</kbd></td><td>Clear the segment (focus stays).</td></tr>
+        </tbody>
+      </table>
 
     </div>
   `,

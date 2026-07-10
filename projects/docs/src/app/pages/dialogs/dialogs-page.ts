@@ -247,6 +247,23 @@ export class DemoDialogContent {
           </tr>
         </tbody>
       </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Tab</kbd></td><td>Move to the next focusable element inside the dialog; focus is trapped and wraps from the last element back to the first (<code class="docs-inline">trapFocus</code>, default on).</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>Tab</kbd></td><td>Move to the previous focusable element; wraps from the first element to the last.</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close the dialog (<code class="docs-inline">closeOnEscape</code>, default on) — <code class="docs-inline">confirm()</code> resolves <code class="docs-inline">false</code>, <code class="docs-inline">prompt()</code> resolves <code class="docs-inline">null</code>.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        On open, focus moves to the first focusable element in the panel (or the
+        panel itself); on close, focus is restored to the element that had it
+        before the dialog opened.
+      </p>
     </div>
   `,
   styles: [

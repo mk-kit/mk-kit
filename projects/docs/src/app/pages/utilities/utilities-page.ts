@@ -68,6 +68,16 @@ import { DocsExample } from '../../shared/docs-example';
         <p class="echo">Box is {{ boxOpen() ? 'open' : 'closed' }}.</p>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkClickOutsideEnabled</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Disable the listener without removing the directive.</td></tr>
+          <tr><td><code>(mkClickOutside)</code></td><td><code>PointerEvent</code></td><td>—</td><td>Fires when a pointerdown lands outside the host (capture phase).</td></tr>
+        </tbody>
+      </table>
+
       <!-- copyToClipboard -->
       <h2>Copy to clipboard</h2>
       <p>
@@ -94,6 +104,18 @@ import { DocsExample } from '../../shared/docs-example';
         </p>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkCopyToClipboard</code></td><td><code>string</code></td><td>required</td><td>The text copied when the host is clicked (or <code>copy()</code> is called).</td></tr>
+          <tr><td><code>mkCopyFeedbackDuration</code></td><td><code>number</code></td><td><code>1500</code></td><td>How long (ms) <code>justCopied()</code> stays true after a copy.</td></tr>
+          <tr><td><code>(copiedText)</code></td><td><code>string</code></td><td>—</td><td>The copied text, on success.</td></tr>
+          <tr><td><code>(copyFailed)</code></td><td><code>unknown</code></td><td>—</td><td>The error, when the clipboard write fails.</td></tr>
+        </tbody>
+      </table>
+
       <!-- autofocus -->
       <h2>Autofocus</h2>
       <p>
@@ -113,6 +135,16 @@ import { DocsExample } from '../../shared/docs-example';
           />
         }
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkAutofocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Whether to focus. The bare attribute means true.</td></tr>
+          <tr><td><code>mkAutofocusDelay</code></td><td><code>number</code></td><td><code>0</code></td><td>Delay (ms) before focusing — e.g. to wait out an entrance animation.</td></tr>
+        </tbody>
+      </table>
 
       <!-- scrollspy -->
       <h2>Scrollspy</h2>
@@ -153,6 +185,18 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkScrollspy</code></td><td><code>string</code></td><td>required</td><td>CSS selector for the section elements to track (queried within <code>root</code>).</td></tr>
+          <tr><td><code>root</code></td><td><code>HTMLElement | null</code></td><td><code>null</code></td><td>Scroll container; null tracks the whole document / viewport.</td></tr>
+          <tr><td><code>offset</code></td><td><code>number</code></td><td><code>96</code></td><td>Distance (px) below the root's top at which a section becomes active — raise for sticky headers.</td></tr>
+          <tr><td><code>(activeChange)</code></td><td><code>string | null</code></td><td>—</td><td>The active section id whenever it changes; also readable as <code>activeId()</code> via <code>exportAs</code>.</td></tr>
+        </tbody>
+      </table>
+
       <!-- intersect -->
       <h2>Intersect (reveal on scroll)</h2>
       <p>
@@ -179,6 +223,19 @@ import { DocsExample } from '../../shared/docs-example';
           </div>
         </div>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>root</code></td><td><code>HTMLElement | null</code></td><td><code>null</code></td><td>Element used as the observer viewport; null means the browser viewport.</td></tr>
+          <tr><td><code>rootMargin</code></td><td><code>string</code></td><td><code>'0px'</code></td><td>Margin grown/shrunk around the root before computing intersection.</td></tr>
+          <tr><td><code>threshold</code></td><td><code>number | number[]</code></td><td><code>0</code></td><td>Visibility ratio(s) at which the observer fires.</td></tr>
+          <tr><td><code>once</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Emit the first time the host becomes visible, then disconnect.</td></tr>
+          <tr><td><code>(mkIntersect)</code></td><td><code>boolean</code></td><td>—</td><td>The host's <code>isIntersecting</code> state on every change; also readable as <code>intersecting()</code> via <code>exportAs</code>.</td></tr>
+        </tbody>
+      </table>
 
       <!-- infinite scroll -->
       <h2>Infinite scroll</h2>
@@ -208,6 +265,17 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>distance</code></td><td><code>number</code></td><td><code>200</code></td><td>Distance (px) from the bottom at which the output fires.</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Pause firing — e.g. while a page loads or when everything is loaded.</td></tr>
+          <tr><td><code>(mkInfiniteScroll)</code></td><td><code>void</code></td><td>—</td><td>Fires once per approach to the bottom; re-arms after scrolling away.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ripple -->
       <h2>Ripple</h2>
       <p>
@@ -232,6 +300,17 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkRippleColor</code></td><td><code>string</code></td><td><code>''</code></td><td>Wave color (any CSS color). Defaults to the host's <code>currentColor</code>.</td></tr>
+          <tr><td><code>mkRippleCentered</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Start every ripple from the center instead of the pointer.</td></tr>
+          <tr><td><code>mkRippleDisabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Turn the effect off.</td></tr>
+        </tbody>
+      </table>
+
       <!-- mask -->
       <h2>Input mask</h2>
       <p>
@@ -251,6 +330,17 @@ import { DocsExample } from '../../shared/docs-example';
           <p class="echo">Raw phone: {{ phone() || '—' }}</p>
         </div>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkMask</code></td><td><code>string</code></td><td>required</td><td>The token pattern: <code>0</code> digit, <code>A</code> letter, <code>*</code> alphanumeric; other characters are literals.</td></tr>
+          <tr><td><code>(maskedChange)</code></td><td><code>string</code></td><td>—</td><td>The formatted value, on every change.</td></tr>
+          <tr><td><code>(unmaskedChange)</code></td><td><code>string</code></td><td>—</td><td>The raw value (token characters only), on every change.</td></tr>
+        </tbody>
+      </table>
 
       <!-- hotkeys -->
       <h2>Hotkeys</h2>
@@ -283,6 +373,18 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
         <p class="echo">Last shortcut: {{ lastHotkey() || '—' }}</p>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkHotkey</code></td><td><code>string</code></td><td>required</td><td>The combo or space-separated chord to bind, e.g. <code>mod+k</code>, <code>g h</code>, <code>?</code>.</td></tr>
+          <tr><td><code>mkHotkeyAllowInInput</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Fire even while an editable field is focused.</td></tr>
+          <tr><td><code>mkHotkeyPreventDefault</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Call <code>preventDefault()</code> when the hotkey fires.</td></tr>
+          <tr><td><code>(mkHotkeyPressed)</code></td><td><code>KeyboardEvent</code></td><td>—</td><td>Fires when the combo triggers and the host is not a button/link (those are clicked instead).</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [

@@ -63,6 +63,53 @@ import { DocsExample } from '../../shared/docs-example';
           </p>
         </div>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>API</h2>
+
+      <h3><code class="docs-inline">&lt;mk-tree&gt;</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>nodes</code></td><td><code>MkTreeNode[]</code></td><td><code>[]</code></td><td>The hierarchical data to render.</td></tr>
+          <tr><td><code>selectable</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow choosing a node (adds selection styling + <code>aria-selected</code>).</td></tr>
+          <tr><td><code>selected</code></td><td><code>model&lt;unknown&gt;</code></td><td><code>null</code></td><td>Two-way selected value (a node's <code>value</code>, or the node itself if unset).</td></tr>
+          <tr><td><code>aria-label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible name for the tree.</td></tr>
+          <tr><td><code>(selectionChange)</code></td><td><code>output&lt;unknown&gt;</code></td><td>—</td><td>Emits the selected value whenever the selection changes.</td></tr>
+          <tr><td><code>(nodeToggle)</code></td><td><code>output&lt;MkTreeNode&gt;</code></td><td>—</td><td>Emits a node whenever it is expanded or collapsed.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code class="docs-inline">MkTreeNode</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>label</code></td><td><code>string</code></td><td>required</td><td>Text shown for the node.</td></tr>
+          <tr><td><code>value</code></td><td><code>unknown</code></td><td>the node</td><td>Value bound to the selection when the node is chosen.</td></tr>
+          <tr><td><code>children</code></td><td><code>MkTreeNode[]</code></td><td>—</td><td>Child nodes; a non-empty array makes the node expandable.</td></tr>
+          <tr><td><code>expanded</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Expand this node initially.</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable selection/toggling (still focusable).</td></tr>
+          <tr><td><code>icon</code></td><td><code>string</code></td><td>—</td><td>Optional leading glyph (any short string / emoji).</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>↓</kbd> / <kbd>↑</kbd></td><td>Move to the next / previous visible row.</td></tr>
+          <tr><td><kbd>→</kbd></td><td>Expand a collapsed parent, or step into the first child.</td></tr>
+          <tr><td><kbd>←</kbd></td><td>Collapse an expanded parent, or step out to the parent row.</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Jump to the first / last visible row.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Toggle expansion and select the row (when <code>selectable</code>).</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })

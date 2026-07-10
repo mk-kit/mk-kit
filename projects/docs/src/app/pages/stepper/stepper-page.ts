@@ -122,6 +122,52 @@ import { DocsExample } from '../../shared/docs-example';
           </mk-stepper>
         </div>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>API</h2>
+
+      <h3><code class="docs-inline">&lt;mk-stepper&gt;</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>selectedIndex</code></td><td><code>model&lt;number&gt;</code></td><td><code>0</code></td><td>Zero-based index of the active step (two-way).</td></tr>
+          <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Header rail orientation.</td></tr>
+          <tr><td><code>linear</code></td><td><code>boolean</code></td><td><code>false</code></td><td>A step is only reachable once every earlier required step is completed.</td></tr>
+          <tr><td><code>(selectionChange)</code></td><td><code>output&lt;number&gt;</code></td><td>—</td><td>Emits the newly selected index whenever the active step changes.</td></tr>
+          <tr><td><code>next()</code> / <code>previous()</code></td><td><code>method</code></td><td>—</td><td>Move to the adjacent step (forward only if reachable).</td></tr>
+          <tr><td><code>reset()</code></td><td><code>method</code></td><td>—</td><td>Return to the first step and clear every step's completed flag.</td></tr>
+        </tbody>
+      </table>
+
+      <h3><code class="docs-inline">&lt;mk-step&gt;</code></h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>label</code></td><td><code>string</code></td><td><code>''</code></td><td>Title shown in the step header.</td></tr>
+          <tr><td><code>description</code></td><td><code>string</code></td><td><code>''</code></td><td>Optional secondary line under the label.</td></tr>
+          <tr><td><code>completed</code></td><td><code>model&lt;boolean&gt;</code></td><td><code>false</code></td><td>Marks the step complete (two-way; drives linear gating and the ✓).</td></tr>
+          <tr><td><code>optional</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Skippable in a <code>linear</code> stepper.</td></tr>
+          <tr><td><code>hasError</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Shows the error state in the header (e.g. failed validation).</td></tr>
+          <tr><td><code>editable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Allow returning to this step after it is completed.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard (header rail)</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>→</kbd> / <kbd>↓</kbd></td><td>Focus and select the next reachable step (wraps).</td></tr>
+          <tr><td><kbd>←</kbd> / <kbd>↑</kbd></td><td>Focus and select the previous reachable step (wraps).</td></tr>
+          <tr><td><kbd>Home</kbd></td><td>Jump to the first reachable step.</td></tr>
+          <tr><td><kbd>End</kbd></td><td>Jump to the last reachable step.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })

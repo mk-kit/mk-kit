@@ -120,6 +120,19 @@ import { DocsExample } from '../../shared/docs-example';
         </tbody>
       </table>
 
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>ArrowRight</kbd> / <kbd>ArrowDown</kbd></td><td>Select and focus the next enabled tab (wraps to the first).</td></tr>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowUp</kbd></td><td>Select and focus the previous enabled tab (wraps to the last).</td></tr>
+          <tr><td><kbd>Home</kbd></td><td>Select and focus the first enabled tab.</td></tr>
+          <tr><td><kbd>End</kbd></td><td>Select and focus the last enabled tab.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ======================================================= ACCORDION -->
       <h2>Accordion</h2>
       <p>
@@ -285,6 +298,22 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>mk-menu-item</code></td><td><code>disabled</code></td><td><code>boolean</code></td><td>Prevents selection &amp; focus.</td></tr>
           <tr><td><code>mk-menu-item</code></td><td><code>href</code></td><td><code>string?</code></td><td>Navigates on activation instead of emitting only.</td></tr>
           <tr><td><code>[mkMenuItemIcon]</code></td><td>—</td><td>slot</td><td>Projection slot for a leading icon.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> / <kbd>ArrowDown</kbd> (on the trigger)</td><td>Open the menu and focus the first enabled item.</td></tr>
+          <tr><td><kbd>ArrowDown</kbd> / <kbd>ArrowUp</kbd></td><td>Move focus to the next / previous enabled item (wraps).</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd></td><td>Focus the first / last enabled item.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Activate the focused item and close the menu.</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Close the menu and restore focus to the trigger.</td></tr>
+          <tr><td><kbd>Tab</kbd></td><td>Close the menu (focus returns to the trigger).</td></tr>
+          <tr><td>Printable characters</td><td>Typeahead — focus the next item whose text starts with the typed string (buffer resets after 500&nbsp;ms).</td></tr>
         </tbody>
       </table>
 

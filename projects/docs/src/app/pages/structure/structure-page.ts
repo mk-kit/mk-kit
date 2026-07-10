@@ -69,6 +69,20 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>heading</code></td><td><code>string</code></td><td><code>''</code></td><td>The page title.</td></tr>
+          <tr><td><code>description</code></td><td><code>string</code></td><td><code>''</code></td><td>Muted line under the title.</td></tr>
+          <tr><td><code>mkPageHeaderBreadcrumb</code></td><td>slot</td><td>—</td><td>Projected above the title (e.g. an <code>mk-breadcrumb</code>).</td></tr>
+          <tr><td><code>mkPageHeaderMeta</code></td><td>slot</td><td>—</td><td>Inline meta next to the title (badges, status).</td></tr>
+          <tr><td><code>mkPageHeaderActions</code></td><td>slot</td><td>—</td><td>Right-aligned actions cluster.</td></tr>
+          <tr><td><code>mkPageHeaderTabs</code></td><td>slot</td><td>—</td><td>Tabs row under the header.</td></tr>
+        </tbody>
+      </table>
+
       <!-- ============================================================ -->
       <h2>Toolbar</h2>
       <p>
@@ -87,6 +101,17 @@ import { DocsExample } from '../../shared/docs-example';
           </span>
         </mk-toolbar>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>bordered</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Draw the bordered, surfaced variant.</td></tr>
+          <tr><td><code>aria-label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible name for the toolbar region.</td></tr>
+          <tr><td><code>mkToolbarEnd</code></td><td>slot</td><td>—</td><td>Content pushed to the end side; everything else stays at the start.</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <h2>Drawer</h2>
@@ -121,6 +146,24 @@ import { DocsExample } from '../../shared/docs-example';
         <p style="color: var(--mk-text-muted);">Keyword bound from the other drawer: {{ keyword() || '—' }}</p>
       </mk-drawer>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>open</code></td><td><code>model&lt;boolean&gt;</code></td><td><code>false</code></td><td>Two-way visibility of the panel.</td></tr>
+          <tr><td><code>side</code></td><td><code>'start' | 'end' | 'top' | 'bottom'</code></td><td><code>'end'</code></td><td>Edge the drawer slides in from.</td></tr>
+          <tr><td><code>size</code></td><td><code>string</code></td><td><code>'20rem'</code></td><td>Panel width (or height for top/bottom), any CSS length.</td></tr>
+          <tr><td><code>heading</code></td><td><code>string</code></td><td><code>''</code></td><td>Title shown in the panel header.</td></tr>
+          <tr><td><code>hasBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Dim the page behind the panel.</td></tr>
+          <tr><td><code>closeOnBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Clicking the backdrop closes the drawer.</td></tr>
+          <tr><td><code>closeOnEscape</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Escape closes the drawer.</td></tr>
+          <tr><td><code>trapFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Keep Tab focus inside while open; focus is restored on close.</td></tr>
+          <tr><td><code>hideClose</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Hide the built-in close button.</td></tr>
+          <tr><td><code>mkDrawerHeader</code> / <code>mkDrawerFooter</code></td><td>slot</td><td>—</td><td>Custom header content / pinned footer actions.</td></tr>
+        </tbody>
+      </table>
+
       <h2>Splitter</h2>
       <p>
         <code class="docs-inline">&lt;mk-splitter&gt;</code> gives two resizable
@@ -132,7 +175,7 @@ import { DocsExample } from '../../shared/docs-example';
       </p>
       <docs-example [code]="splitterCode" [column]="true">
         <mk-splitter
-          [(size)]="splitPos"
+          [(position)]="splitPos"
           [min]="20"
           [max]="80"
           style="height: 12rem; border: var(--mk-border-width) solid var(--mk-border);
@@ -153,6 +196,33 @@ import { DocsExample } from '../../shared/docs-example';
         </mk-splitter>
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>position</code></td><td><code>model&lt;number&gt;</code></td><td><code>50</code></td><td>Two-way separator position = start-pane size, in percent.</td></tr>
+          <tr><td><code>orientation</code></td><td><code>'horizontal' | 'vertical'</code></td><td><code>'horizontal'</code></td><td>Split direction (horizontal = side-by-side panes).</td></tr>
+          <tr><td><code>min</code> / <code>max</code></td><td><code>number</code></td><td><code>10</code> / <code>90</code></td><td>Bounds (%) the start pane is clamped to.</td></tr>
+          <tr><td><code>step</code></td><td><code>number</code></td><td><code>5</code></td><td>Percent moved per Arrow key press.</td></tr>
+          <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Freeze the separator.</td></tr>
+          <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>'Resize panes'</code></td><td>Accessible name for the separator handle.</td></tr>
+          <tr><td><code>mkSplitterStart</code> / <code>mkSplitterEnd</code></td><td>slot</td><td>—</td><td>The two projected panes.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>←</kbd> / <kbd>→</kbd> (or <kbd>↑</kbd> / <kbd>↓</kbd> when vertical)</td><td>Shrink / grow the start pane by <code>step</code>.</td></tr>
+          <tr><td><kbd>Home</kbd></td><td>Jump to <code>min</code>.</td></tr>
+          <tr><td><kbd>End</kbd></td><td>Jump to <code>max</code>.</td></tr>
+        </tbody>
+      </table>
+
       <h2>Scroll area</h2>
       <p>
         <code class="docs-inline">&lt;mk-scroll-area&gt;</code> wraps overflowing
@@ -172,6 +242,18 @@ import { DocsExample } from '../../shared/docs-example';
           </div>
         </mk-scroll-area>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>maxHeight</code></td><td><code>string</code></td><td><code>''</code></td><td>CSS max-height that makes the content scroll.</td></tr>
+          <tr><td><code>orientation</code></td><td><code>'vertical' | 'horizontal' | 'both'</code></td><td><code>'vertical'</code></td><td>Which axes may scroll.</td></tr>
+          <tr><td><code>hideDelay</code></td><td><code>number</code></td><td><code>1000</code></td><td>Delay (ms) before the custom scrollbars fade out after scrolling.</td></tr>
+          <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible name for the scrollable region.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -199,7 +281,7 @@ export class StructurePage {
   protected readonly keyword = signal('');
   protected readonly splitPos = signal(35);
 
-  protected readonly splitterCode = `<mk-splitter [(size)]="splitPos" [min]="20" [max]="80">
+  protected readonly splitterCode = `<mk-splitter [(position)]="splitPos" [min]="20" [max]="80">
   <div mkSplitterStart>Sidebar</div>
   <div mkSplitterEnd>Content</div>
 </mk-splitter>`;
