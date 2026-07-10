@@ -181,6 +181,7 @@ describe('MkTable — data-grid pro', () => {
       col,
     );
     (table as any).onResizeMove({ clientX: -500 }); // way negative
+    (table as any).onResizeEnd(); // flushes the rAF-coalesced move
     expect((table as any).colStyleWidth(col)).toBe('60px'); // clamped to min
   });
 
@@ -232,5 +233,60 @@ describe('MkTable — data-grid pro', () => {
     (table as any).cancelEdit();
     expect((table as any).isEditing(0, GRID_COLUMNS[2])).toBe(false);
     expect(edited).not.toHaveBeenCalled();
+  });
+
+  it('resizes a column with arrow keys on the separator', () => {
+    const resized = vi.fn();
+    table.columnResize.subscribe(resized);
+    const col = GRID_COLUMNS[1];
+    const evt = {
+      key: 'ArrowRight',
+      shiftKey: false,
+      preventDefault() {},
+      stopPropagation() {},
+      target: { closest: () => null },
+    } as unknown as KeyboardEvent;
+    (table as any).onResizeKeydown(evt, col);
+    expect((table as any).colStyleWidth(col)).toBe('160px'); // 150 default + 10
+    expect(resized).toHaveBeenCalledWith({ key: 'name', width: 160 });
+  });
+
+  it('reorders a column with Alt+ArrowRight on the header', () => {
+    const reordered = vi.fn();
+    table.columnReorder.subscribe(reordered);
+    const evt = Object.assign(
+      new KeyboardEvent('keydown', { key: 'ArrowRight', altKey: true }),
+      { preventDefault() {} },
+    );
+    (table as any).onReorderKeydown(evt, GRID_COLUMNS[1]); // move name right
+    expect(
+      (table as any).orderedColumns().map((c: MkTableColumn<Row>) => c.key),
+    ).toEqual(['id', 'notes', 'name']);
+    expect(reordered).toHaveBeenCalledWith(['id', 'notes', 'name']);
+  });
+
+  it('enters edit mode from the keyboard (Enter on an editable cell)', () => {
+    const evt = {
+      key: 'Enter',
+      preventDefault() {},
+      stopPropagation() {},
+      target: { closest: () => null },
+    } as unknown as KeyboardEvent;
+    (table as any).onCellKeydown(evt, 0, GRID_COLUMNS[1]);
+    expect((table as any).isEditing(0, GRID_COLUMNS[1])).toBe(true);
+  });
+
+  it('keeps desc sort stable and null-consistent (negated comparator)', () => {
+    fixture.componentRef.setInput('data', [
+      { id: 2, name: 'b', notes: '' },
+      { id: 1, name: null as unknown as string, notes: '' },
+      { id: 3, name: 'a', notes: '' },
+    ]);
+    (table as any).onSort({ key: 'name', header: 'Name', sortable: true });
+    // asc: null first, then a, b
+    expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([1, 3, 2]);
+    (table as any).onSort({ key: 'name', header: 'Name', sortable: true });
+    // desc: b, a, then null last
+    expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([2, 3, 1]);
   });
 });

@@ -61,8 +61,34 @@
   background-color: var(--mk-surface-3);
   color: var(--mk-text);
 }
-.mk-table__th--sortable:focus-visible {
+
+/* Header sort/reorder button — fills the cell, inherits header typography. */
+.mk-table__th-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  width: 100%;
+  margin: calc(-1 * var(--_cell-pad-y)) calc(-1 * var(--_cell-pad-x));
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.mk-table__th-button--static {
+  cursor: grab;
+}
+.mk-table__th-button:focus-visible {
   @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+.mk-table__th[data-align='center'] .mk-table__th-button {
+  justify-content: center;
+}
+.mk-table__th[data-align='end'] .mk-table__th-button {
+  justify-content: flex-end;
 }
 .mk-table__th[aria-sort='ascending'],
 .mk-table__th[aria-sort='descending'] {
@@ -203,8 +229,12 @@
   height: 50%;
   background-color: var(--mk-border);
 }
-.mk-table__resize:hover::after {
+.mk-table__resize:hover::after,
+.mk-table__resize:focus-visible::after {
   background-color: var(--mk-primary);
+}
+.mk-table__resize:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 /* Reorder drag state */
@@ -249,6 +279,9 @@
 }
 .mk-table__td--editable:hover {
   background-color: var(--mk-hover-overlay);
+}
+.mk-table__td--editable:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 .mk-table__cell-input {
   width: 100%;

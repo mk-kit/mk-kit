@@ -56,6 +56,14 @@ export interface MkSortChange {
   direction: MkSortDirection;
 }
 
+/** Payload emitted by {@link MkTable.columnResize} after a column resize. */
+export interface MkColumnResize {
+  /** The resized column's key. */
+  key: string;
+  /** The new width in pixels. */
+  width: number;
+}
+
 /** Payload emitted by {@link MkTable.cellEdit} when an editable cell is saved. */
 export interface MkCellEdit<T = Record<string, unknown>> {
   /** The edited row. */
@@ -101,7 +109,7 @@ export interface MkCellEdit<T = Record<string, unknown>> {
 })
 export class MkTable<T = Record<string, unknown>> {
   private readonly announcer = inject(MkLiveAnnouncer);
-  private readonly i18n = inject(MK_I18N);
+  protected readonly i18n = inject(MK_I18N);
   private readonly document = inject(DOCUMENT);
 
   /** Column definitions (order = display order). */
@@ -153,8 +161,8 @@ export class MkTable<T = Record<string, unknown>> {
   readonly selectionChange = output<T[]>();
   /** Emitted with the currently expanded rows whenever they change. */
   readonly expandedChange = output<T[]>();
-  /** Emitted when a column is resized: `{ key, width }` (px). */
-  readonly columnResize = output<{ key: string; width: number }>();
+  /** Emitted when a column is resized (px). */
+  readonly columnResize = output<MkColumnResize>();
   /** Emitted with the new column key order after a reorder. */
   readonly columnReorder = output<string[]>();
   /** Emitted when an inline-editable cell is saved. */
@@ -177,7 +185,8 @@ export class MkTable<T = Record<string, unknown>> {
     const byKey = new Map(cols.map((c) => [c.key, c]));
     const ordered = order.map((k) => byKey.get(k)).filter((c): c is MkTableColumn<T> => !!c);
     // Append any columns not present in the saved order (e.g. newly added).
-    for (const c of cols) if (!order.includes(c.key)) ordered.push(c);
+    const seen = new Set(order);
+    for (const c of cols) if (!seen.has(c.key)) ordered.push(c);
     return ordered;
   });
 
@@ -188,20 +197,31 @@ export class MkTable<T = Record<string, unknown>> {
     return col.width ?? null;
   }
 
-  /** Sticky offset (px) for a pinned column, summing the pinned ones before it. */
-  protected pinnedOffset(col: MkTableColumn<T>): number {
-    const side = col.pinned;
-    if (!side) return 0;
-    const cols = this.orderedColumns().filter((c) => c.pinned === side);
-    const idx = cols.indexOf(col);
-    const before = side === 'left' ? cols.slice(0, idx) : cols.slice(idx + 1);
-    let offset = 0;
-    for (const c of before) offset += this.colWidths()[c.key] ?? this.numericWidth(c);
+  /** Sticky offsets for every pinned column, computed once per layout change. */
+  private readonly pinnedOffsets = computed<Map<string, number>>(() => {
+    const map = new Map<string, number>();
+    const cols = this.orderedColumns();
+    const widths = this.colWidths();
     // Account for the leading select / expander columns on the left.
-    if (side === 'left') {
-      offset += (this.selectable() ? 44 : 0) + (this.expandable() ? 44 : 0);
+    let left = (this.selectable() ? 44 : 0) + (this.expandable() ? 44 : 0);
+    for (const c of cols) {
+      if (c.pinned !== 'left') continue;
+      map.set(c.key, left);
+      left += widths[c.key] ?? this.numericWidth(c);
     }
-    return offset;
+    let right = 0;
+    for (let i = cols.length - 1; i >= 0; i--) {
+      const c = cols[i];
+      if (c.pinned !== 'right') continue;
+      map.set(c.key, right);
+      right += widths[c.key] ?? this.numericWidth(c);
+    }
+    return map;
+  });
+
+  /** Sticky offset (px) for a pinned column. */
+  protected pinnedOffset(col: MkTableColumn<T>): number {
+    return this.pinnedOffsets().get(col.key) ?? 0;
   }
 
   private numericWidth(col: MkTableColumn<T>): number {
@@ -214,6 +234,9 @@ export class MkTable<T = Record<string, unknown>> {
   private resizeStartX = 0;
   private resizeStartW = 0;
   private resizeMin = 60;
+
+  private resizeRaf: number | null = null;
+  private pendingResizeX = 0;
 
   /** Begin a drag-resize from a header handle. */
   protected startResize(event: PointerEvent, col: MkTableColumn<T>): void {
@@ -228,28 +251,85 @@ export class MkTable<T = Record<string, unknown>> {
     this.resizeMin = col.minWidth ?? 60;
     this.document.addEventListener('pointermove', this.onResizeMove);
     this.document.addEventListener('pointerup', this.onResizeEnd);
+    this.document.addEventListener('pointercancel', this.onResizeEnd);
   }
 
+  /** rAF-coalesced: at most one width write (and CD pass) per frame. */
   private readonly onResizeMove = (event: PointerEvent): void => {
+    if (!this.resizeKey) return;
+    this.pendingResizeX = event.clientX;
+    if (this.resizeRaf != null) return;
+    this.resizeRaf = this.document.defaultView?.requestAnimationFrame(() => {
+      this.resizeRaf = null;
+      this.applyPendingResize();
+    }) ?? null;
+  };
+
+  private applyPendingResize(): void {
     if (!this.resizeKey) return;
     const width = Math.max(
       this.resizeMin,
-      Math.round(this.resizeStartW + (event.clientX - this.resizeStartX)),
+      Math.round(this.resizeStartW + (this.pendingResizeX - this.resizeStartX)),
     );
     this.colWidths.update((w) => ({ ...w, [this.resizeKey as string]: width }));
-  };
+  }
 
   private readonly onResizeEnd = (): void => {
+    if (this.resizeRaf != null) {
+      // Flush (don't drop) the last pending move so a fast drag lands exactly.
+      this.document.defaultView?.cancelAnimationFrame(this.resizeRaf);
+      this.resizeRaf = null;
+      this.applyPendingResize();
+    }
     if (this.resizeKey) {
-      this.columnResize.emit({
-        key: this.resizeKey,
-        width: this.colWidths()[this.resizeKey],
-      });
+      const col = this.columns().find((c) => c.key === this.resizeKey);
+      const width =
+        this.colWidths()[this.resizeKey] ?? Math.round(this.resizeStartW);
+      this.columnResize.emit({ key: this.resizeKey, width });
+      if (col) this.announcer.announce(this.i18n.columnWidth(col.header, width));
     }
     this.resizeKey = null;
     this.document.removeEventListener('pointermove', this.onResizeMove);
     this.document.removeEventListener('pointerup', this.onResizeEnd);
+    this.document.removeEventListener('pointercancel', this.onResizeEnd);
   };
+
+  /** Keyboard column resize on the focused separator (APG window splitter). */
+  protected onResizeKeydown(event: KeyboardEvent, col: MkTableColumn<T>): void {
+    if (!this.resizableColumns() || !col.resizable) return;
+    const step = event.shiftKey ? 1 : 10;
+    let delta = 0;
+    if (event.key === 'ArrowLeft') delta = -step;
+    else if (event.key === 'ArrowRight') delta = step;
+    else return;
+    event.preventDefault();
+    event.stopPropagation();
+    const min = col.minWidth ?? 60;
+    const th = (event.target as HTMLElement).closest('th');
+    const current =
+      this.colWidths()[col.key] ??
+      th?.getBoundingClientRect().width ??
+      this.numericWidth(col);
+    const width = Math.max(min, Math.round(current + delta));
+    this.colWidths.update((w) => ({ ...w, [col.key]: width }));
+    this.columnResize.emit({ key: col.key, width });
+    this.announcer.announce(this.i18n.columnWidth(col.header, width));
+  }
+
+  /** The current width of a column, for the separator's aria-valuenow. */
+  protected resizeValueNow(col: MkTableColumn<T>): number {
+    return Math.round(this.colWidths()[col.key] ?? this.numericWidth(col));
+  }
+
+  ngOnDestroy(): void {
+    if (this.resizeRaf != null) {
+      this.document.defaultView?.cancelAnimationFrame(this.resizeRaf);
+      this.resizeRaf = null;
+    }
+    this.document.removeEventListener('pointermove', this.onResizeMove);
+    this.document.removeEventListener('pointerup', this.onResizeEnd);
+    this.document.removeEventListener('pointercancel', this.onResizeEnd);
+  }
 
   // --- Column reorder (native drag) -----------------------------------------
   protected readonly dragKey = signal<string | null>(null);
@@ -271,16 +351,44 @@ export class MkTable<T = Record<string, unknown>> {
     if (!from || from === target.key) return;
     event.preventDefault();
     const order = this.orderedColumns().map((c) => c.key);
-    const fromIdx = order.indexOf(from);
     const toIdx = order.indexOf(target.key);
-    if (fromIdx < 0 || toIdx < 0) return;
-    order.splice(toIdx, 0, order.splice(fromIdx, 1)[0]);
-    this.colOrder.set(order);
-    this.columnReorder.emit(order);
+    this.moveColumn(from, toIdx);
   }
 
   protected onColDragEnd(): void {
     this.dragKey.set(null);
+  }
+
+  /** Move a column to `toIdx` in the display order and announce it. */
+  private moveColumn(key: string, toIdx: number): void {
+    const order = this.orderedColumns().map((c) => c.key);
+    const fromIdx = order.indexOf(key);
+    if (fromIdx < 0 || toIdx < 0 || toIdx >= order.length || fromIdx === toIdx) {
+      return;
+    }
+    order.splice(toIdx, 0, order.splice(fromIdx, 1)[0]);
+    this.colOrder.set(order);
+    this.columnReorder.emit(order);
+    const col = this.columns().find((c) => c.key === key);
+    if (col) {
+      this.announcer.announce(
+        this.i18n.columnMoved(col.header, toIdx + 1, order.length),
+      );
+    }
+  }
+
+  /** Keyboard column reorder: Alt+Arrow moves the focused header. */
+  protected onReorderKeydown(event: KeyboardEvent, col: MkTableColumn<T>): void {
+    if (!this.reorderableColumns() || col.pinned || !event.altKey) return;
+    const order = this.orderedColumns().map((c) => c.key);
+    const idx = order.indexOf(col.key);
+    if (event.key === 'ArrowLeft' && idx > 0) {
+      event.preventDefault();
+      this.moveColumn(col.key, idx - 1);
+    } else if (event.key === 'ArrowRight' && idx < order.length - 1) {
+      event.preventDefault();
+      this.moveColumn(col.key, idx + 1);
+    }
   }
 
   // --- Inline cell edit -----------------------------------------------------
@@ -289,19 +397,49 @@ export class MkTable<T = Record<string, unknown>> {
     return !!e && e.index === index && e.key === col.key;
   }
 
+  /** The cell element being edited, so focus can be restored after. */
+  private editingCell: HTMLElement | null = null;
+
   protected startEdit(index: number, col: MkTableColumn<T>, event?: Event): void {
     if (!col.editable) return;
     event?.stopPropagation();
+    this.editingCell =
+      ((event?.target as HTMLElement | null)?.closest('td') as HTMLElement | null) ??
+      null;
     this.editing.set({ index, key: col.key });
   }
 
-  protected commitEdit(row: T, col: MkTableColumn<T>, value: string): void {
-    this.editing.set(null);
-    this.cellEdit.emit({ row, key: col.key, value });
+  /** Keyboard path into edit mode (Enter / F2 on a focused editable cell). */
+  protected onCellKeydown(
+    event: KeyboardEvent,
+    index: number,
+    col: MkTableColumn<T>,
+  ): void {
+    if (!col.editable || this.isEditing(index, col)) return;
+    if (event.key === 'Enter' || event.key === 'F2') {
+      event.preventDefault();
+      event.stopPropagation();
+      this.startEdit(index, col, event);
+    }
   }
 
-  protected cancelEdit(): void {
+  protected commitEdit(
+    row: T,
+    col: MkTableColumn<T>,
+    value: string,
+    restoreFocus = false,
+  ): void {
     this.editing.set(null);
+    this.cellEdit.emit({ row, key: col.key, value });
+    this.announcer.announce(this.i18n.cellSaved(value));
+    if (restoreFocus) this.editingCell?.focus();
+    this.editingCell = null;
+  }
+
+  protected cancelEdit(restoreFocus = false): void {
+    this.editing.set(null);
+    if (restoreFocus) this.editingCell?.focus();
+    this.editingCell = null;
   }
 
   protected onEditKeydown(
@@ -311,10 +449,11 @@ export class MkTable<T = Record<string, unknown>> {
   ): void {
     if (event.key === 'Enter') {
       event.preventDefault();
-      this.commitEdit(row, col, (event.target as HTMLInputElement).value);
+      this.commitEdit(row, col, (event.target as HTMLInputElement).value, true);
     } else if (event.key === 'Escape') {
       event.preventDefault();
-      this.cancelEdit();
+      event.stopPropagation();
+      this.cancelEdit(true);
     }
   }
 
@@ -342,7 +481,7 @@ export class MkTable<T = Record<string, unknown>> {
     const dir = this.sortDir();
     const rows = this.data();
     if (!key || !dir) return rows;
-    const sorted = [...rows].sort((a, b) => {
+    const compare = (a: T, b: T): number => {
       const av = (a as Record<string, unknown>)[key];
       const bv = (b as Record<string, unknown>)[key];
       if (av == null && bv == null) return 0;
@@ -350,8 +489,10 @@ export class MkTable<T = Record<string, unknown>> {
       if (bv == null) return 1;
       if (typeof av === 'number' && typeof bv === 'number') return av - bv;
       return String(av).localeCompare(String(bv));
-    });
-    return dir === 'desc' ? sorted.reverse() : sorted;
+    };
+    // Negate the comparator for desc (instead of reversing) so the sort stays
+    // stable and null ordering is consistent in both directions.
+    return [...rows].sort(dir === 'desc' ? (a, b) => -compare(a, b) : compare);
   });
 
   /** `aria-sort` value for a header cell. */
@@ -393,24 +534,32 @@ export class MkTable<T = Record<string, unknown>> {
     this.sortChange.emit({ key: col.key, direction });
     this.announcer.announce(
       direction === 'none'
-        ? `${col.header} unsorted`
-        : `Sorted by ${col.header}, ${
-            direction === 'asc' ? 'ascending' : 'descending'
-          }`,
+        ? this.i18n.sortingCleared(col.header)
+        : this.i18n.sortedBy(col.header, direction),
     );
-  }
-
-  protected onHeaderKeydown(event: Event, col: MkTableColumn<T>): void {
-    if (!col.sortable) return;
-    const key = (event as KeyboardEvent).key;
-    if (key === 'Enter' || key === ' ') {
-      event.preventDefault();
-      this.onSort(col);
-    }
   }
 
   protected onRowClick(row: T): void {
     if (this.clickableRows()) this.rowClick.emit(row);
+  }
+
+  /** Keyboard activation for clickable rows (Enter / Space). */
+  protected onRowKeydown(event: KeyboardEvent, row: T): void {
+    if (!this.clickableRows()) return;
+    if (event.target !== event.currentTarget) return; // ignore inner controls
+    if (event.key === 'Enter' || event.key === ' ') {
+      event.preventDefault();
+      this.rowClick.emit(row);
+    }
+  }
+
+  /** Stable row identity for `@for` tracking (trackKey when set, else the row). */
+  protected trackRow = (row: T): unknown => this.rowKey(row);
+
+  /** Leading cell text used to label per-row controls for screen readers. */
+  protected rowLabel(row: T): string {
+    const first = this.orderedColumns()[0];
+    return first ? this.cellText(row, first) : '';
   }
 
   // --- Selection ------------------------------------------------------------
@@ -419,22 +568,31 @@ export class MkTable<T = Record<string, unknown>> {
     return key ? (row as Record<string, unknown>)[key] : row;
   }
 
+  /** Selected row keys as a Set — O(1) membership per cell per CD pass. */
+  private readonly selectedKeys = computed<Set<unknown>>(
+    () => new Set(this.selected().map((r) => this.rowKey(r))),
+  );
+
   /** Whether `row` is currently selected. */
   protected isSelected(row: T): boolean {
-    const rk = this.rowKey(row);
-    return this.selected().some((r) => this.rowKey(r) === rk);
+    return this.selectedKeys().has(this.rowKey(row));
   }
 
   /** True when every visible row is selected. */
   protected readonly allSelected = computed<boolean>(() => {
     const rows = this.sortedData();
-    return rows.length > 0 && rows.every((row) => this.isSelected(row));
+    const keys = this.selectedKeys();
+    return rows.length > 0 && rows.every((row) => keys.has(this.rowKey(row)));
   });
 
   /** True when some — but not all — visible rows are selected. */
-  protected readonly someSelected = computed<boolean>(
-    () => this.sortedData().some((row) => this.isSelected(row)) && !this.allSelected(),
-  );
+  protected readonly someSelected = computed<boolean>(() => {
+    const keys = this.selectedKeys();
+    return (
+      this.sortedData().some((row) => keys.has(this.rowKey(row))) &&
+      !this.allSelected()
+    );
+  });
 
   private commitSelection(next: T[]): void {
     this.selected.set(next);
@@ -445,7 +603,7 @@ export class MkTable<T = Record<string, unknown>> {
   protected toggleRow(row: T): void {
     const rk = this.rowKey(row);
     const current = this.selected();
-    const next = current.some((r) => this.rowKey(r) === rk)
+    const next = this.selectedKeys().has(rk)
       ? current.filter((r) => this.rowKey(r) !== rk)
       : [...current, row];
     this.commitSelection(next);
