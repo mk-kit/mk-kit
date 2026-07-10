@@ -171,15 +171,27 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   private popover = false;
 
   private repositionRaf: number | null = null;
+  /**
+   * Scroll-driven repositions track the anchor without clamping, so the
+   * panel follows its trigger instead of detaching and hugging the viewport
+   * edge; open/resize positioning clamps as usual.
+   */
+  private pendingTrack = true;
   /** rAF-coalesced repositioning — at most one layout pass per frame. */
-  private readonly onReposition = () => {
+  private reposition(track: boolean): void {
+    // A clamped (open/resize) request in the same frame wins over tracking.
+    this.pendingTrack &&= track;
     if (this.repositionRaf != null) return;
     this.repositionRaf =
       this.document.defaultView?.requestAnimationFrame(() => {
         this.repositionRaf = null;
-        this.position();
+        const wasTrack = this.pendingTrack;
+        this.pendingTrack = true;
+        this.position(wasTrack);
       }) ?? null;
-  };
+  }
+  private readonly onScroll = () => this.reposition(true);
+  private readonly onResize = () => this.reposition(false);
   private readonly onDocPointerdown = (e: Event) => {
     const target = e.target as Node;
     if (this.host.nativeElement.contains(target)) return;
@@ -221,8 +233,8 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     this.position();
 
     const view = this.document.defaultView;
-    view?.addEventListener('scroll', this.onReposition, true);
-    view?.addEventListener('resize', this.onReposition);
+    view?.addEventListener('scroll', this.onScroll, true);
+    view?.addEventListener('resize', this.onResize);
     view?.addEventListener('blur', this.onWindowBlur);
     this.document.addEventListener('pointerdown', this.onDocPointerdown, true);
 
@@ -230,8 +242,13 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     view?.requestAnimationFrame(() => this.position());
   }
 
-  /** Recompute and apply the panel position. Safe to call at any time. */
-  position(): void {
+  /**
+   * Recompute and apply the panel position. Safe to call at any time.
+   * With `track` (scroll-driven), the panel follows the anchor unclamped and
+   * dismisses once the anchor leaves the viewport (matching the CDK's
+   * reposition-with-auto-close scroll behaviour).
+   */
+  position(track = false): void {
     if (!this.isBrowser) return;
     const el = this.host.nativeElement;
     const view = this.document.defaultView;
@@ -239,6 +256,24 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
 
     const anchor = this.resolveAnchorRect();
     if (!anchor) return;
+
+    const vw = this.document.documentElement.clientWidth;
+    const vh = this.document.documentElement.clientHeight;
+
+    // Anchor scrolled fully out of view — the panel would float detached.
+    // Zero-size anchor rects and a zero-size viewport are skipped: they mean
+    // "not yet measured" (jsdom, SSR hydration), not "off-screen".
+    if (
+      track &&
+      !this.anchorRect() &&
+      vw > 0 &&
+      vh > 0 &&
+      (anchor.width > 0 || anchor.height > 0) &&
+      (anchor.bottom <= 0 || anchor.top >= vh || anchor.right <= 0 || anchor.left >= vw)
+    ) {
+      this.dismiss.emit();
+      return;
+    }
 
     if (this.matchWidth() && anchor.width > 0) {
       el.style.minWidth = `${Math.round(anchor.width)}px`;
@@ -248,15 +283,12 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     const pos = mkComputeAnchoredPosition(
       anchor,
       { width: rect.width, height: rect.height },
-      {
-        width: this.document.documentElement.clientWidth,
-        height: this.document.documentElement.clientHeight,
-      },
+      { width: vw, height: vh },
       {
         placement: this.placement(),
         gap: this.gap(),
         flip: this.flip(),
-        clamp: this.clamp(),
+        clamp: this.clamp() && !track,
         rtl: this.isAnchorRtl(),
       },
     );
@@ -302,8 +334,8 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
       view?.cancelAnimationFrame(this.repositionRaf);
       this.repositionRaf = null;
     }
-    view?.removeEventListener('scroll', this.onReposition, true);
-    view?.removeEventListener('resize', this.onReposition);
+    view?.removeEventListener('scroll', this.onScroll, true);
+    view?.removeEventListener('resize', this.onResize);
     view?.removeEventListener('blur', this.onWindowBlur);
     this.document.removeEventListener('pointerdown', this.onDocPointerdown, true);
 

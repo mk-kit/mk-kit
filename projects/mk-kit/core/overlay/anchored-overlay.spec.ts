@@ -79,12 +79,20 @@ describe('mkComputeAnchoredPosition', () => {
   template: `
     <button #trigger>trigger</button>
     @if (open()) {
-      <div class="panel" mkAnchoredPanel [mkAnchoredPanelFor]="trigger">panel</div>
+      <div
+        class="panel"
+        mkAnchoredPanel
+        [mkAnchoredPanelFor]="trigger"
+        (dismiss)="dismissed.set(dismissed() + 1)"
+      >
+        panel
+      </div>
     }
   `,
 })
 class AnchoredHost {
   readonly open = signal(false);
+  readonly dismissed = signal(0);
 }
 
 describe('MkAnchoredPanel (directive lifecycle)', () => {
@@ -92,6 +100,21 @@ describe('MkAnchoredPanel (directive lifecycle)', () => {
     TestBed.configureTestingModule({
       providers: [provideZonelessChangeDetection()],
     });
+    // jsdom reports a 0x0 viewport; the scroll-tracking logic treats that as
+    // "unmeasurable" and skips its out-of-view check, so give it a real one.
+    Object.defineProperty(document.documentElement, 'clientWidth', {
+      value: 1000,
+      configurable: true,
+    });
+    Object.defineProperty(document.documentElement, 'clientHeight', {
+      value: 800,
+      configurable: true,
+    });
+  });
+
+  afterEach(() => {
+    delete (document.documentElement as any).clientWidth;
+    delete (document.documentElement as any).clientHeight;
   });
 
   function panelCount(): number {
@@ -131,6 +154,49 @@ describe('MkAnchoredPanel (directive lifecycle)', () => {
       // component view — so nothing accumulates in the DOM.
       expect(panelCount()).toBe(0);
     }
+
+    fixture.destroy();
+  });
+
+  it('tracks the anchor unclamped on scroll, without dismissing while visible', async () => {
+    const fixture = TestBed.createComponent(AnchoredHost);
+    fixture.detectChanges();
+    fixture.componentInstance.open.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const trigger = fixture.nativeElement.querySelector('button');
+    // On-screen anchor near the left edge; a clamped reposition would pull the
+    // panel to x >= gap, a tracking one must honour the anchor exactly.
+    trigger.getBoundingClientRect = () =>
+      ({ top: 40, left: -2, right: 38, bottom: 70, width: 40, height: 30 }) as DOMRect;
+
+    window.dispatchEvent(new Event('scroll'));
+    await new Promise((r) => setTimeout(r, 50));
+
+    const panel = document.querySelector('.panel') as HTMLElement;
+    expect(panel.style.left).toBe('-2px');
+    expect(panel.style.top).toBe('74px');
+    expect(fixture.componentInstance.dismissed()).toBe(0);
+
+    fixture.destroy();
+  });
+
+  it('dismisses when the anchor scrolls fully out of the viewport', async () => {
+    const fixture = TestBed.createComponent(AnchoredHost);
+    fixture.detectChanges();
+    fixture.componentInstance.open.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const trigger = fixture.nativeElement.querySelector('button');
+    trigger.getBoundingClientRect = () =>
+      ({ top: -60, left: 10, right: 50, bottom: -30, width: 40, height: 30 }) as DOMRect;
+
+    window.dispatchEvent(new Event('scroll'));
+    await new Promise((r) => requestAnimationFrame(() => r(null)));
+
+    expect(fixture.componentInstance.dismissed()).toBe(1);
 
     fixture.destroy();
   });
