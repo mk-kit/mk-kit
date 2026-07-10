@@ -152,6 +152,11 @@ live-announcer core.
   `_mixins.scss` (`tone`/`focus-ring`/`control-size`). (shipped.)
 - **P2 Density mode** — global compact/comfortable switch (table has density;
   generalize to a token/attribute).
+- ✅ **Secondary entry points** — Material-style per-group FESMs; code-split
+  apps only carry the groups they use (docs main: 1,082KB → 415KB).
+- ✅ **Full i18n coverage** — every built-in string + localisable date names.
+- ✅ **Keyboard-complete data grid** — resize/reorder/edit all keyboard operable.
+- ✅ **Docs IA overhaul** — split pages, on-page TOC, ⌘K search, new nav.
 - **P2 RTL audit** — verify logical properties; add `dir="rtl"` coverage.
 - **P3 High-contrast / forced-colors theme**, **P3 additional prebuilt themes**,
   ✅ **a theme-builder page** in the docs (`/theme-builder` — live token controls +

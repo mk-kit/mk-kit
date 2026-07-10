@@ -6,6 +6,52 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **Secondary entry points** — the library now ships 15 Material-style entry
+  points (`@mkornas/ui/core`, `/forms`, `/table`, `/data`, `/feedback`,
+  `/navigation`, `/datetime`, `/charts`-in-`/data`, `/dnd`, `/block-editor`,
+  `/directives`, `/button`, `/icon`, `/chip`, `/context-menu`) plus the root
+  umbrella. Code-split apps no longer carry the whole library in their initial
+  bundle: the docs app's main chunk dropped from 1,082KB to 415KB with no
+  import changes. Root imports keep working; group imports are recommended for
+  eager shell code.
+- **Full localisation** — every built-in string (labels, placeholders,
+  announcements, block-editor chrome) now routes through `MK_I18N` (~75 new
+  keys), and month/weekday names are localisable via `dateNames` on
+  `provideMkI18n` (deep-merged). Passing a locale now localises the calendar
+  and every picker.
+- **Keyboard data grid** — mk-table's column resize (Arrow keys on the
+  separator), column reorder (Alt+Arrow on a header), and inline cell edit
+  (Enter/F2) are fully keyboard operable with live announcements; sort headers
+  are real buttons and clickable rows activate with Enter/Space.
+- Docs: on-page table of contents (powered by `mkScrollspy`), ⌘K search
+  (powered by `mk-command-palette`), reorganized navigation, and the three
+  overloaded pages split into 11 focused ones with chart props tables.
+
+### Fixed
+
+- Resource leaks: command-palette/drawer scroll-lock and focus traps released
+  on destroy; app-shell matchMedia listener; virtual-scroll ResizeObserver;
+  dnd drag preview on mid-drag destroy; file-upload preview object-URLs on
+  external model resets; splitter/scroll-area/table pointercancel handling.
+- Accessibility: hovercard keyboard access, tour focus containment + restore,
+  event-calendar event announcements, password reveal toggle in the tab
+  order, transfer-list roving tabindex + announcements, notification-center
+  unread state for AT, countdown live-region throttling, and more (25 audit
+  findings).
+- Performance: rows tracked by key (sorting no longer rebuilds the table DOM),
+  O(1) selection checks, rAF-coalesced overlay repositioning and scrollspy,
+  virtual-scroll no-op scroll updates, diff prefix/suffix trim + size guard.
+- Correctness: stable descending sort with consistent null ordering; countdown
+  re-arms on a new target; tag-input keeps rejected input.
+
+### Changed
+
+- `MkColumnResize` payload type exported; `mkHighlight` exported from the
+  forms group; deep import paths (`@mkornas/ui/src/...`) are replaced by the
+  documented entry points.
+
 ## [0.1.9] — 2026-07-10
 
 ### Added
