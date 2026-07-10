@@ -9,6 +9,7 @@ import {
   model,
   output,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MkNavList } from './nav-list';
 
@@ -34,6 +35,7 @@ import { MkNavList } from './nav-list';
   templateUrl: './nav-item.html',
   styleUrl: './nav-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet],
   host: {
     class: 'mk-nav-item',
     role: 'listitem',

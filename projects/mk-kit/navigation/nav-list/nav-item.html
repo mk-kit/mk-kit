@@ -1,3 +1,12 @@
+<!-- Projected slots captured once: a projection slot belongs to exactly one
+     ng-content, so referencing it directly from several @if branches leaves
+     all but one branch empty. -->
+<ng-template #iconTpl>
+  <span class="mk-nav-item__icon" aria-hidden="true">
+    <ng-content select="[mkNavIcon]" />
+  </span>
+</ng-template>
+
 @if (hasChildren()) {
   <button
     type="button"
@@ -8,9 +17,7 @@
     [disabled]="disabled()"
     (click)="toggle()"
   >
-    <span class="mk-nav-item__icon" aria-hidden="true">
-      <ng-content select="[mkNavIcon]" />
-    </span>
+    <ng-container [ngTemplateOutlet]="iconTpl" />
     <span class="mk-nav-item__label">{{ label() }}</span>
     @if (badge() !== undefined) {
       <span class="mk-nav-item__badge">{{ badge() }}</span>
@@ -39,9 +46,7 @@
     [attr.aria-disabled]="disabled() || null"
     [attr.tabindex]="disabled() ? -1 : null"
   >
-    <span class="mk-nav-item__icon" aria-hidden="true">
-      <ng-content select="[mkNavIcon]" />
-    </span>
+    <ng-container [ngTemplateOutlet]="iconTpl" />
     <span class="mk-nav-item__label">{{ label() }}</span>
     @if (badge() !== undefined) {
       <span class="mk-nav-item__badge">{{ badge() }}</span>
@@ -56,9 +61,7 @@
     [disabled]="disabled()"
     (click)="activate()"
   >
-    <span class="mk-nav-item__icon" aria-hidden="true">
-      <ng-content select="[mkNavIcon]" />
-    </span>
+    <ng-container [ngTemplateOutlet]="iconTpl" />
     <span class="mk-nav-item__label">{{ label() }}</span>
     @if (badge() !== undefined) {
       <span class="mk-nav-item__badge">{{ badge() }}</span>
