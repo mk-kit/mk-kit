@@ -6,6 +6,8 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+## [0.2.0] — 2026-07-10
+
 ### Added
 
 - **Secondary entry points** — the library now ships 15 Material-style entry
@@ -261,7 +263,8 @@ Initial private release as `@mkornas/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.1.9...HEAD
+[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.2.0...HEAD
+[0.2.0]: https://github.com/mkornas/mk-kit/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/mkornas/mk-kit/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/mkornas/mk-kit/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/mkornas/mk-kit/compare/v0.1.6...v0.1.7
