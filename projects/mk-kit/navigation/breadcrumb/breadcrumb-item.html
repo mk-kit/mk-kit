@@ -1,12 +1,17 @@
+<!-- A single ng-content captured in a template: the default projection slot
+     belongs to exactly one ng-content, so placing one in each branch leaves
+     whichever branch Angular didn't pick rendering empty. -->
+<ng-template #content><ng-content /></ng-template>
+
 @if (href() && !last()) {
   <a class="mk-breadcrumb-item__link" [href]="href()">
-    <ng-content />
+    <ng-container [ngTemplateOutlet]="content" />
   </a>
 } @else {
   <span
     class="mk-breadcrumb-item__current"
     [attr.aria-current]="last() ? 'page' : null"
   >
-    <ng-content />
+    <ng-container [ngTemplateOutlet]="content" />
   </span>
 }

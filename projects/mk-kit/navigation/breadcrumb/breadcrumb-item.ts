@@ -4,6 +4,7 @@ import {
   input,
   signal,
 } from '@angular/core';
+import { NgTemplateOutlet } from '@angular/common';
 
 /**
  * A single crumb inside `<mk-breadcrumb>`. Renders a link when `href` is set,
@@ -20,6 +21,7 @@ import {
   templateUrl: './breadcrumb-item.html',
   styleUrl: './breadcrumb-item.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [NgTemplateOutlet],
   host: {
     class: 'mk-breadcrumb-item',
     role: 'listitem',
