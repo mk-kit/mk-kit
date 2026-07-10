@@ -1,0 +1,79 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+  min-height: 0;
+  font-family: var(--mk-font-sans);
+}
+:host(.mk-splitter--vertical) {
+  flex-direction: column;
+}
+
+.mk-splitter__pane {
+  min-width: 0;
+  min-height: 0;
+  overflow: auto;
+}
+.mk-splitter__pane--start {
+  flex: 0 0 auto;
+}
+.mk-splitter__pane--end {
+  flex: 1 1 0;
+}
+
+.mk-splitter__separator {
+  flex: none;
+  position: relative;
+  display: grid;
+  place-items: center;
+  background-color: var(--mk-border-subtle);
+  touch-action: none;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-splitter__separator:hover,
+.mk-splitter__separator:focus-visible {
+  background-color: var(--mk-primary);
+}
+.mk-splitter__separator:focus-visible {
+  @include mk.focus-ring;
+  outline-offset: -2px;
+}
+
+/* Horizontal split → vertical handle */
+:host:not(.mk-splitter--vertical) .mk-splitter__separator {
+  width: 7px;
+  cursor: col-resize;
+}
+/* Vertical split → horizontal handle */
+:host(.mk-splitter--vertical) .mk-splitter__separator {
+  height: 7px;
+  cursor: row-resize;
+}
+
+:host(.mk-splitter--disabled) .mk-splitter__separator {
+  cursor: default;
+  pointer-events: none;
+}
+
+/* Grip dots for affordance */
+.mk-splitter__grip {
+  background-color: var(--mk-surface);
+  border-radius: var(--mk-radius-pill);
+  opacity: 0.9;
+}
+:host:not(.mk-splitter--vertical) .mk-splitter__grip {
+  width: 3px;
+  height: 1.75rem;
+}
+:host(.mk-splitter--vertical) .mk-splitter__grip {
+  width: 1.75rem;
+  height: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-splitter__separator {
+    transition: none;
+  }
+}

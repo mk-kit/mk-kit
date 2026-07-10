@@ -1,0 +1,67 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  /* tone defaults (primary) — overridden by [data-tone] blocks */
+  --_main: var(--mk-primary);
+  --_contrast: var(--mk-primary-contrast);
+  --_subtle: var(--mk-primary-subtle);
+  --_subtle-text: var(--mk-primary-subtle-text);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-space-1);
+  height: 1.375rem;
+  min-width: 1.375rem;
+  padding: 0 var(--mk-space-2);
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-pill);
+  font-family: inherit;
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  vertical-align: middle;
+}
+
+@include mk.tone-selectors;
+
+/* Sizes */
+:host(.mk-badge--sm) {
+  height: 1.125rem;
+  min-width: 1.125rem;
+  padding: 0 var(--mk-space-1);
+  font-size: var(--mk-font-size-xs);
+}
+:host(.mk-badge--lg) {
+  height: 1.625rem;
+  min-width: 1.625rem;
+  padding: 0 var(--mk-space-3);
+  font-size: var(--mk-font-size-sm);
+}
+
+/* Variants */
+:host(.mk-badge--solid) {
+  background-color: var(--_main);
+  color: var(--_contrast);
+}
+:host(.mk-badge--soft) {
+  background-color: var(--_subtle);
+  color: var(--_subtle-text);
+}
+:host(.mk-badge--outline) {
+  background-color: transparent;
+  color: var(--_subtle-text);
+  border-color: color-mix(in srgb, var(--_main) 42%, var(--mk-border-strong));
+}
+
+/* Dot mode: fixed square dot, ignores text/padding */
+:host(.mk-badge--dot) {
+  width: 0.625rem;
+  height: 0.625rem;
+  min-width: 0;
+  padding: 0;
+  border-radius: var(--mk-radius-circle);
+}
+:host(.mk-badge--dot.mk-badge--sm) { width: 0.5rem; height: 0.5rem; }
+:host(.mk-badge--dot.mk-badge--lg) { width: 0.75rem; height: 0.75rem; }

@@ -1,0 +1,98 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: contents;
+}
+
+.mk-tour__popup {
+  // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
+  box-sizing: border-box;
+  width: min(20rem, calc(100vw - var(--mk-space-4)));
+  padding: var(--mk-space-4);
+  color: var(--mk-text);
+  background: var(--mk-surface);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-lg);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+  animation: mk-tour-in var(--mk-duration-fast) var(--mk-ease-out);
+}
+
+.mk-tour__popup:focus-visible {
+  outline: none;
+}
+
+.mk-tour__title {
+  margin: 0 0 var(--mk-space-2);
+  font-size: var(--mk-font-size-lg);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.mk-tour__body {
+  margin: 0;
+  color: var(--mk-text-muted);
+  line-height: 1.5;
+}
+
+.mk-tour__footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-space-3);
+  margin-top: var(--mk-space-4);
+}
+
+.mk-tour__indicator {
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+  white-space: nowrap;
+}
+
+.mk-tour__actions {
+  display: flex;
+  gap: var(--mk-space-2);
+}
+
+.mk-tour__btn {
+  padding: var(--mk-space-1) var(--mk-space-3);
+  color: var(--mk-text);
+  background: transparent;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  font: inherit;
+  font-size: var(--mk-font-size-sm);
+  cursor: pointer;
+}
+
+.mk-tour__btn:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-tour__btn--ghost {
+  color: var(--mk-text-muted);
+  border-color: transparent;
+}
+
+.mk-tour__btn--primary {
+  color: var(--mk-primary-contrast);
+  background: var(--mk-primary);
+  border-color: var(--mk-primary);
+}
+
+@keyframes mk-tour-in {
+  from {
+    opacity: 0;
+    transform: translateY(calc(-1 * var(--mk-space-1))) scale(0.98);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-tour__popup {
+    animation: none;
+  }
+}

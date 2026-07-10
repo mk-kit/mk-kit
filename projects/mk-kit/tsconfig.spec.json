@@ -4,7 +4,11 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "paths": {
+      "@mkornas/ui": ["./src/public-api.ts"],
+      "@mkornas/ui/*": ["./*"]
+    }
   },
-  "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
+  "include": ["**/*.d.ts", "**/*.spec.ts"]
 }

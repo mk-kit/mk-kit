@@ -1,0 +1,236 @@
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  MkChip,
+  MkProgressBar,
+  MkSkeleton,
+  MkSkeletonPreset,
+  MkSpinner,
+} from '@mkornas/ui';
+import { DocsExample } from '../../shared/docs-example';
+
+/**
+ * Loading & progress demo page — Progress bar, Spinner, Skeleton and the
+ * skeleton presets.
+ */
+@Component({
+  selector: 'docs-loading-page',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [DocsExample, MkChip, MkProgressBar, MkSkeleton, MkSkeletonPreset, MkSpinner],
+  template: `
+    <div class="docs-page docs-container">
+      <h1>Loading & progress</h1>
+      <p class="docs-lead">
+        Indicators for pending work: determinate and indeterminate progress
+        bars, spinners with screen-reader labels, and skeleton placeholders —
+        as a primitive and as ready-made presets. Every component is themed
+        with <code class="docs-inline">--mk-*</code> tokens and ships with
+        sensible accessibility defaults.
+      </p>
+
+      <!-- ======================== PROGRESS BAR ======================= -->
+      <h2>Progress bar</h2>
+      <p>
+        A determinate (0–100) or indeterminate progress indicator with
+        <code class="docs-inline">role="progressbar"</code>. The live value below
+        is driven by component state:
+        <strong>{{ progress() }}%</strong>.
+      </p>
+      <docs-example [code]="progressCode" column>
+        <mk-progress-bar
+          [value]="progress()"
+          label="Uploading"
+          showValue
+          style="width: 100%"
+        />
+        <div style="display: flex; gap: var(--mk-space-2)">
+          <mk-chip selectable (selectedChange)="step(-10)">−10</mk-chip>
+          <mk-chip selectable (selectedChange)="step(10)">+10</mk-chip>
+        </div>
+        <mk-progress-bar indeterminate tone="info" label="Loading" style="width: 100%" />
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">value</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">0</code></td>
+            <td>Completion 0–100 (clamped).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">indeterminate</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Animated bar with no known completion.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">MkTone</code></td>
+            <td><code class="docs-inline">'primary'</code></td>
+            <td>Fill tone.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">size</code></td>
+            <td><code class="docs-inline">'sm' | 'md' | 'lg'</code></td>
+            <td><code class="docs-inline">'md'</code></td>
+            <td>Track thickness.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">label</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Visible caption; also labels the bar.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">showValue</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Show numeric percentage (determinate only).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- =========================== SPINNER ========================= -->
+      <h2>Spinner</h2>
+      <p>
+        A circular indeterminate loading indicator with
+        <code class="docs-inline">role="status"</code> and a visually-hidden
+        label announced to assistive tech.
+      </p>
+      <docs-example [code]="spinnerCode">
+        <mk-spinner size="sm" />
+        <mk-spinner />
+        <mk-spinner size="lg" tone="neutral" label="Fetching results" />
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">size</code></td>
+            <td><code class="docs-inline">'sm' | 'md' | 'lg'</code></td>
+            <td><code class="docs-inline">'md'</code></td>
+            <td>Size scale.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">MkTone</code></td>
+            <td><code class="docs-inline">'primary'</code></td>
+            <td>Semantic color tone.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">label</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'Loading'</code></td>
+            <td>Visually-hidden status label.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- ========================== SKELETON ========================= -->
+      <h2>Skeleton</h2>
+      <p>
+        A shimmering placeholder shown while content loads. It is
+        <code class="docs-inline">aria-hidden</code>; mark the surrounding region
+        <code class="docs-inline">aria-busy="true"</code> so assistive tech knows
+        content is pending.
+      </p>
+      <docs-example [code]="skeletonCode" column>
+        <div style="display: flex; gap: var(--mk-space-3); align-items: center; width: 100%">
+          <mk-skeleton shape="circle" [width]="40" [height]="40" />
+          <div style="flex: 1">
+            <mk-skeleton shape="text" [lines]="3" />
+          </div>
+        </div>
+        <mk-skeleton shape="rect" width="100%" [height]="120" />
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">shape</code></td>
+            <td><code class="docs-inline">'text' | 'rect' | 'circle'</code></td>
+            <td><code class="docs-inline">'text'</code></td>
+            <td>Placeholder geometry.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">width</code></td>
+            <td><code class="docs-inline">string | number</code></td>
+            <td>—</td>
+            <td>Number (px) or any CSS length.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">height</code></td>
+            <td><code class="docs-inline">string | number</code></td>
+            <td>—</td>
+            <td>Number (px) or any CSS length.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">lines</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">1</code></td>
+            <td>Line count for <code class="docs-inline">shape="text"</code>.</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <h2>Skeleton presets</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-skeleton-preset&gt;</code> assembles
+        ready-made loading layouts — <code class="docs-inline">paragraph</code>,
+        <code class="docs-inline">card</code>, <code class="docs-inline">list</code>
+        or <code class="docs-inline">table</code> — from the skeleton primitive.
+      </p>
+      <docs-example [code]="skeletonPresetCode" [column]="true">
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr)); gap: var(--mk-space-6); width: 100%;">
+          <mk-skeleton-preset preset="card" />
+          <mk-skeleton-preset preset="list" [rows]="3" />
+          <mk-skeleton-preset preset="table" [rows]="3" [columns]="4" />
+        </div>
+      </docs-example>
+    </div>
+  `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+      h2 {
+        margin-top: var(--mk-space-9, 3rem);
+      }
+    `,
+  ],
+})
+export class LoadingPage {
+  // ----- Progress ------------------------------------------------------
+  protected readonly progress = signal(40);
+
+  protected step(delta: number): void {
+    this.progress.update((v) => Math.min(100, Math.max(0, v + delta)));
+  }
+
+  // ----- Code snippets -------------------------------------------------
+  protected readonly progressCode = `<mk-progress-bar
+  [value]="progress()"
+  label="Uploading"
+  showValue />
+
+<mk-progress-bar indeterminate tone="info" label="Loading" />`;
+
+  protected readonly spinnerCode = `<mk-spinner size="sm" />
+<mk-spinner />
+<mk-spinner size="lg" tone="neutral" label="Fetching results" />`;
+
+  protected readonly skeletonCode = `<mk-skeleton shape="circle" [width]="40" [height]="40" />
+<mk-skeleton shape="text" [lines]="3" />
+<mk-skeleton shape="rect" width="100%" [height]="120" />`;
+
+  protected readonly skeletonPresetCode = `<mk-skeleton-preset preset="card" />
+<mk-skeleton-preset preset="list" [rows]="3" />
+<mk-skeleton-preset preset="table" [rows]="3" [columns]="4" />`;
+}

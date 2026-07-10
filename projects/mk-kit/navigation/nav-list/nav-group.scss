@@ -1,0 +1,82 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+}
+:host + :host {
+  margin-top: var(--mk-space-3);
+}
+
+.mk-nav-group__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-space-2);
+  width: 100%;
+  margin: 0;
+  padding: var(--mk-space-1) var(--mk-space-3);
+  background: transparent;
+  border: 0;
+  color: var(--mk-text-subtle);
+  font-family: inherit;
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-semibold);
+  letter-spacing: var(--mk-letter-spacing-wide);
+  text-transform: uppercase;
+}
+
+.mk-nav-group__header--toggle {
+  cursor: pointer;
+  border-radius: var(--mk-radius-sm);
+}
+.mk-nav-group__header--toggle:hover {
+  color: var(--mk-text-muted);
+  background-color: var(--mk-hover-overlay);
+}
+.mk-nav-group__header--toggle:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+.mk-nav-group__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-nav-group__chevron {
+  flex: none;
+  width: 0.4rem;
+  height: 0.4rem;
+  border-right: 1.5px solid currentColor;
+  border-bottom: 1.5px solid currentColor;
+  transform: rotate(45deg);
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-nav-group--closed) .mk-nav-group__chevron {
+  transform: rotate(-45deg);
+}
+
+.mk-nav-group__items {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+/* `display:flex` above beats the UA `[hidden]{display:none}`, so the collapsed
+   region would stay visible — re-hide it with matching specificity. */
+.mk-nav-group__items[hidden] {
+  display: none;
+}
+
+/* In a collapsed icon rail: no label, just a subtle separator above groups. */
+:host(.mk-nav-group--collapsed-rail) + :host(.mk-nav-group--collapsed-rail) {
+  margin-top: var(--mk-space-2);
+  padding-top: var(--mk-space-2);
+  border-top: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-nav-group__chevron {
+    transition: none;
+  }
+}

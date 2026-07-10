@@ -1,0 +1,96 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+}
+
+:host(:last-of-type) {
+  border-bottom: 0;
+}
+
+.mk-accordion-item__heading {
+  margin: 0;
+  font: inherit;
+}
+
+.mk-accordion-item__trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-space-3);
+  width: 100%;
+  min-height: 44px;
+  padding: var(--mk-space-4);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  color: var(--mk-text);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-medium);
+  text-align: start;
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-accordion-item__trigger:hover:not(:disabled) {
+  background: var(--mk-hover-overlay);
+}
+
+.mk-accordion-item__trigger:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+  border-radius: var(--mk-radius-sm);
+}
+
+.mk-accordion-item__trigger:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-accordion-item__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  min-width: 0;
+}
+
+.mk-accordion-item__chevron {
+  display: inline-flex;
+  flex: none;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-lg);
+  transition: transform var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+:host(.mk-accordion-item--open) .mk-accordion-item__chevron {
+  transform: rotate(180deg);
+}
+
+/* grid-template-rows 0fr -> 1fr collapse trick */
+.mk-accordion-item__panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+:host(.mk-accordion-item--open) .mk-accordion-item__panel {
+  grid-template-rows: 1fr;
+}
+
+.mk-accordion-item__panel-inner {
+  overflow: hidden;
+}
+
+.mk-accordion-item__body {
+  padding: 0 var(--mk-space-4) var(--mk-space-4);
+  color: var(--mk-text);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-normal);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-accordion-item__panel,
+  .mk-accordion-item__chevron {
+    transition: none;
+  }
+}

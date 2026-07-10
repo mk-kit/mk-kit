@@ -1,0 +1,110 @@
+@use '../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  position: relative;
+}
+
+.mk-rich-text__editable {
+  display: block;
+  width: 100%;
+  min-height: 1.5em;
+  outline: none;
+  color: var(--mk-text);
+  font-family: inherit;
+  font-size: inherit;
+  line-height: var(--mk-line-height-relaxed);
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.mk-rich-text__editable:focus-visible {
+  outline: none;
+}
+
+.mk-rich-text__editable--empty::before {
+  content: attr(data-placeholder);
+  color: var(--mk-text-subtle);
+  pointer-events: none;
+}
+
+.mk-rich-text__editable a {
+  color: var(--mk-primary);
+  text-decoration: underline;
+}
+
+.mk-rich-text__editable code {
+  font-family: var(--mk-font-mono);
+  font-size: 0.9em;
+  padding: 0.1em 0.3em;
+  border-radius: var(--mk-radius-xs);
+  background: var(--mk-code-bg);
+}
+
+/* Floating inline toolbar */
+.mk-rich-text__toolbar {
+  position: absolute;
+  z-index: var(--mk-z-menu);
+  display: flex;
+  gap: 2px;
+  padding: var(--mk-space-1);
+  transform: translate(-50%, -100%);
+  background: var(--mk-surface-inverse);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+  animation: mk-rich-text-pop var(--mk-duration-fast) var(--mk-ease-out);
+}
+
+@keyframes mk-rich-text-pop {
+  from {
+    opacity: 0;
+    transform: translate(-50%, -90%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, -100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-rich-text__toolbar {
+    animation: none;
+  }
+}
+
+.mk-rich-text__tool {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 28px;
+  height: 28px;
+  padding: 0 var(--mk-space-1);
+  border: none;
+  border-radius: var(--mk-radius-sm);
+  background: transparent;
+  color: var(--mk-text-inverse);
+  font-family: inherit;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-bold);
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-rich-text__tool--code {
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-normal);
+}
+
+.mk-rich-text__tool:hover {
+  background: var(--mk-hover-overlay);
+}
+
+.mk-rich-text__tool--active {
+  background: var(--mk-primary);
+  color: var(--mk-primary-contrast);
+}
+
+.mk-rich-text__tool:focus-visible {
+  @include mk.focus-ring;
+}

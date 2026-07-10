@@ -1,27 +1,18 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
 import {
   type MkChartSeries,
-  type MkChartSlice,
   type MkScatterSeries,
   MkBarChart,
-  MkDonutChart,
-  MkGauge,
   MkHeatmap,
   MkLineChart,
-  MkProgressRing,
-  MkFunnelChart,
-  type MkFunnelSegment,
-  MkRadarChart,
   MkScatterChart,
   MkSparkline,
-  MkTreemap,
-  type MkTreemapItem,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the chart & progress components of
- * `@mkornas/ui`: sparkline, bar/line/donut charts and the circular progress ring.
+ * Documentation + live demo page for the trend & comparison chart components
+ * of `@mkornas/ui`: sparkline, bar, line, scatter/bubble and heatmap.
  */
 @Component({
   selector: 'docs-charts-page',
@@ -29,27 +20,22 @@ import { DocsExample } from '../../shared/docs-example';
   imports: [
     DocsExample,
     MkSparkline,
-    MkProgressRing,
     MkBarChart,
     MkLineChart,
-    MkDonutChart,
-    MkGauge,
     MkScatterChart,
     MkHeatmap,
-    MkRadarChart,
-    MkFunnelChart,
-    MkTreemap,
   ],
   template: `
     <div class="docs-page docs-container">
-      <h1>Charts</h1>
+      <h1>Trend charts</h1>
       <p class="docs-lead">
-        Dependency-free, SVG dashboard charts themed by a validated,
-        colorblind-safe categorical palette (<code class="docs-inline"
-          >--mk-chart-1…8</code
-        >). Every multi-series chart carries a legend (identity is never
-        color-alone), a hover tooltip, and a screen-reader data table; dark mode
-        uses its own validated palette, not an auto-flip.
+        Charts for change over time and comparison across categories —
+        sparklines, bars, lines, scatter plots and heatmaps. Dependency-free,
+        SVG dashboard charts themed by a validated, colorblind-safe categorical
+        palette (<code class="docs-inline">--mk-chart-1…8</code>). Every
+        multi-series chart carries a legend (identity is never color-alone), a
+        hover tooltip, and a screen-reader data table; dark mode uses its own
+        validated palette, not an auto-flip.
       </p>
 
       <!-- ============================================================ -->
@@ -69,23 +55,21 @@ import { DocsExample } from '../../shared/docs-example';
           </span>
         </div>
       </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Progress ring</h2>
-      <p>
-        Circular progress — determinate by value, or
-        <code class="docs-inline">indeterminate</code> as a preloader when
-        duration is unknown.
-      </p>
-      <docs-example [code]="ringCode">
-        <div style="display: flex; align-items: center; gap: var(--mk-space-5); flex-wrap: wrap;">
-          <mk-progress-ring [value]="72" showLabel />
-          <mk-progress-ring [value]="40" tone="success" showLabel />
-          <mk-progress-ring [value]="88" tone="warning" [size]="64" showLabel />
-          <mk-progress-ring [value]="25" tone="danger" />
-          <mk-progress-ring indeterminate tone="neutral" [size]="28" label="Loading" />
-        </div>
-      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>data</code></td><td><code>number[]</code></td><td><code>[]</code></td><td>The values to plot (left → right). Single series only.</td></tr>
+          <tr><td><code>type</code></td><td><code>'line' | 'area' | 'bar'</code></td><td><code>'line'</code></td><td>Visual form.</td></tr>
+          <tr><td><code>color</code></td><td><code>string</code></td><td><code>'var(--mk-chart-1)'</code></td><td>Any CSS colour.</td></tr>
+          <tr><td><code>width</code></td><td><code>number</code></td><td><code>120</code></td><td>Intrinsic width in px (the SVG scales with its box).</td></tr>
+          <tr><td><code>height</code></td><td><code>number</code></td><td><code>32</code></td><td>Intrinsic height in px.</td></tr>
+          <tr><td><code>strokeWidth</code></td><td><code>number</code></td><td><code>2</code></td><td>Line/area stroke width.</td></tr>
+          <tr><td><code>showDot</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Draw a dot on the last point (line/area only).</td></tr>
+          <tr><td><code>min</code> / <code>max</code></td><td><code>number | undefined</code></td><td><code>undefined</code></td><td>Fixed domain bounds (default to the data min/max).</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <h2>Bar chart</h2>
@@ -111,6 +95,21 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-bar-chart orientation="horizontal" [categories]="channels" [series]="channelSeries" [height]="220" />
         </div>
       </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>categories</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Category labels along the category axis.</td></tr>
+          <tr><td><code>series</code></td><td><code>MkChartSeries[]</code></td><td><code>[]</code></td><td>One or more data series (values align to <code>categories</code>).</td></tr>
+          <tr><td><code>orientation</code></td><td><code>'vertical' | 'horizontal'</code></td><td><code>'vertical'</code></td><td>Bar direction.</td></tr>
+          <tr><td><code>width</code></td><td><code>number</code></td><td><code>480</code></td><td>Intrinsic width (viewBox units; scales to its container).</td></tr>
+          <tr><td><code>height</code></td><td><code>number</code></td><td><code>260</code></td><td>Intrinsic height.</td></tr>
+          <tr><td><code>stacked</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Stack series into one bar per category instead of grouping.</td></tr>
+          <tr><td><code>showGrid</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show gridlines behind the bars.</td></tr>
+          <tr><td><code>showLegend</code></td><td><code>boolean | undefined</code></td><td><code>undefined</code></td><td>Force the legend on/off (defaults to on when there are ≥ 2 series).</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <h2>Line chart</h2>
@@ -129,27 +128,22 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-line-chart [categories]="months" [series]="twoLines" stacked [height]="220" />
         </div>
       </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Gauge</h2>
-      <p>A single-metric radial dial (KPI). Configurable sweep, unit and label.</p>
-      <docs-example [code]="gaugeCode" column>
-        <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: center;">
-          <mk-gauge [value]="68" unit="%" label="of quota" [size]="160" />
-          <mk-gauge [value]="4.2" [max]="5" valueText="4.2" label="rating" color="var(--mk-warning)" [size]="160" />
-          <mk-gauge [value]="82" [arc]="180" unit="%" label="uptime" color="var(--mk-success)" [size]="160" />
-        </div>
-      </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Donut chart</h2>
-      <p>Proportions of a whole, with an optional centre total.</p>
-      <docs-example [code]="donutCode" column>
-        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--mk-space-6); width: 100%; align-items: start;">
-          <mk-donut-chart [slices]="traffic" centerLabel="1,240" centerSublabel="Sessions" />
-          <mk-donut-chart [slices]="traffic" [thickness]="0" [size]="200" />
-        </div>
-      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>categories</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Ordered category labels along the x axis.</td></tr>
+          <tr><td><code>series</code></td><td><code>MkChartSeries[]</code></td><td><code>[]</code></td><td>One or more data series (values align to <code>categories</code>).</td></tr>
+          <tr><td><code>width</code></td><td><code>number</code></td><td><code>480</code></td><td>Intrinsic width (viewBox units; scales to its container).</td></tr>
+          <tr><td><code>height</code></td><td><code>number</code></td><td><code>260</code></td><td>Intrinsic height.</td></tr>
+          <tr><td><code>area</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Fill the area under each line.</td></tr>
+          <tr><td><code>stacked</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Stack the series (cumulative bands) — implies filled areas.</td></tr>
+          <tr><td><code>showDots</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Draw a dot at every data point.</td></tr>
+          <tr><td><code>showGrid</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show gridlines.</td></tr>
+          <tr><td><code>showLegend</code></td><td><code>boolean | undefined</code></td><td><code>undefined</code></td><td>Force the legend on/off (defaults to on when there are ≥ 2 series).</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <h2>Scatter &amp; bubble chart</h2>
@@ -175,6 +169,22 @@ import { DocsExample } from '../../shared/docs-example';
           />
         </div>
       </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>series</code></td><td><code>MkScatterSeries[]</code></td><td><code>[]</code></td><td>One or more point series (<code>points</code> of <code>x</code>, <code>y</code>, optional <code>size</code>/<code>label</code>).</td></tr>
+          <tr><td><code>width</code></td><td><code>number</code></td><td><code>480</code></td><td>Intrinsic width (viewBox units; scales to its container).</td></tr>
+          <tr><td><code>height</code></td><td><code>number</code></td><td><code>300</code></td><td>Intrinsic height.</td></tr>
+          <tr><td><code>bubble</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Size points by their <code>size</code> value (bubble chart).</td></tr>
+          <tr><td><code>pointRadius</code></td><td><code>number</code></td><td><code>4</code></td><td>Radius of each point when not sizing by <code>size</code>.</td></tr>
+          <tr><td><code>maxRadius</code></td><td><code>number</code></td><td><code>20</code></td><td>Largest bubble radius when <code>bubble</code> is on.</td></tr>
+          <tr><td><code>xLabel</code> / <code>yLabel</code></td><td><code>string</code></td><td><code>''</code></td><td>Axis titles.</td></tr>
+          <tr><td><code>showGrid</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show gridlines.</td></tr>
+          <tr><td><code>showLegend</code></td><td><code>boolean | undefined</code></td><td><code>undefined</code></td><td>Force the legend on/off (defaults to on when there are ≥ 2 series).</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <h2>Heatmap</h2>
@@ -192,40 +202,21 @@ import { DocsExample } from '../../shared/docs-example';
           showValues
         />
       </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Radar chart</h2>
-      <p>
-        Compare several series across the same axes — product profiles, skill
-        sets, survey dimensions. Each series is a polygon over the shared spokes.
-      </p>
-      <docs-example [code]="radarCode" column>
-        <div style="max-width: 26rem;">
-          <mk-radar-chart [axes]="radarAxes" [series]="radarSeries" [max]="10" />
-        </div>
-      </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Funnel chart</h2>
-      <p>
-        Show drop-off through a sequence of stages — each band's width is
-        proportional to its value, with the conversion rate relative to the top.
-      </p>
-      <docs-example [code]="funnelCode" column>
-        <div style="max-width: 30rem;">
-          <mk-funnel-chart [segments]="funnel" />
-        </div>
-      </docs-example>
-
-      <!-- ============================================================ -->
-      <h2>Treemap</h2>
-      <p>
-        Nested rectangles sized by value (squarified layout) — good for
-        part-to-whole breakdowns like spend by channel or storage by folder.
-      </p>
-      <docs-example [code]="treemapCode" column>
-        <mk-treemap [items]="treemap" [width]="520" [height]="300" />
-      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>xLabels</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Column labels (x axis).</td></tr>
+          <tr><td><code>yLabels</code></td><td><code>string[]</code></td><td><code>[]</code></td><td>Row labels (y axis).</td></tr>
+          <tr><td><code>data</code></td><td><code>(number | null)[][]</code></td><td><code>[]</code></td><td>Row-major matrix: <code>data[row][col]</code>. Use <code>null</code> for a blank cell.</td></tr>
+          <tr><td><code>min</code> / <code>max</code></td><td><code>number | null</code></td><td><code>null</code></td><td>Override the colour-domain bounds (default to the data min/max).</td></tr>
+          <tr><td><code>accent</code></td><td><code>string</code></td><td><code>'var(--mk-primary)'</code></td><td>Base colour mixed over the surface for intensity.</td></tr>
+          <tr><td><code>showValues</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Print each cell's value inside it.</td></tr>
+          <tr><td><code>showScale</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the min → max colour scale legend.</td></tr>
+          <tr><td><code>format</code></td><td><code>(value: number) => string</code></td><td>compact</td><td>Formatter for cell + legend values.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })
@@ -247,12 +238,6 @@ export class ChartsPage {
   protected readonly twoLines: MkChartSeries[] = [
     { name: 'Desktop', data: [820, 932, 901, 934, 1290, 1330] },
     { name: 'Mobile', data: [620, 732, 791, 934, 1090, 1520] },
-  ];
-  protected readonly traffic: MkChartSlice[] = [
-    { name: 'Search', value: 540 },
-    { name: 'Direct', value: 380 },
-    { name: 'Social', value: 210 },
-    { name: 'Referral', value: 110 },
   ];
   protected readonly channels = ['Organic search', 'Paid ads', 'Email', 'Social'];
   protected readonly channelSeries: MkChartSeries[] = [
@@ -288,12 +273,6 @@ export class ChartsPage {
     },
   ];
 
-  protected readonly radarAxes = ['Speed', 'Power', 'Range', 'Comfort', 'Price', 'Safety'];
-  protected readonly radarSeries: MkChartSeries[] = [
-    { name: 'Model S', data: [9, 8, 7, 8, 5, 9] },
-    { name: 'Model E', data: [6, 5, 9, 7, 8, 8] },
-  ];
-
   protected readonly hours = ['9a', '12p', '3p', '6p', '9p'];
   protected readonly days = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'];
   protected readonly activity: (number | null)[][] = [
@@ -308,10 +287,6 @@ export class ChartsPage {
 <mk-sparkline [data]="trend" type="area" color="var(--mk-success)" />
 <mk-sparkline [data]="trend" type="bar" />`;
 
-  protected readonly ringCode = `<mk-progress-ring [value]="72" showLabel />
-<mk-progress-ring [value]="88" tone="warning" [size]="64" showLabel />
-<mk-progress-ring indeterminate tone="neutral" [size]="28" label="Loading" />`;
-
   protected readonly barCode = `<mk-bar-chart
   [categories]="['Q1','Q2','Q3','Q4']"
   [series]="[{ name: 'Revenue', data: [12,19,15,22] }]" />`;
@@ -322,20 +297,10 @@ export class ChartsPage {
   protected readonly horizontalCode = `<mk-bar-chart orientation="horizontal"
   [categories]="channels" [series]="channelSeries" />`;
 
-  protected readonly stackedAreaCode = `<mk-line-chart [categories]="months" [series]="twoLines" stacked />`;
-
-  protected readonly gaugeCode = `<mk-gauge [value]="68" unit="%" label="of quota" />
-<mk-gauge [value]="4.2" [max]="5" valueText="4.2" label="rating" color="var(--mk-warning)" />
-<mk-gauge [value]="82" [arc]="180" unit="%" label="uptime" color="var(--mk-success)" />`;
-
   protected readonly lineCode = `<mk-line-chart [categories]="months" [series]="sessions" area />
 <mk-line-chart [categories]="months" [series]="twoLines" showDots />`;
 
-  protected readonly donutCode = `<mk-donut-chart [slices]="traffic"
-  centerLabel="1,240" centerSublabel="Sessions" />
-
-<!-- full pie: thickness 0 -->
-<mk-donut-chart [slices]="traffic" [thickness]="0" />`;
+  protected readonly stackedAreaCode = `<mk-line-chart [categories]="months" [series]="twoLines" stacked />`;
 
   protected readonly scatterCode = `<mk-scatter-chart xLabel="Spend ($)" yLabel="Revenue ($)"
   [series]="spendRevenue" />
@@ -346,38 +311,4 @@ export class ChartsPage {
 
   protected readonly heatmapCode = `<mk-heatmap [xLabels]="hours" [yLabels]="days"
   [data]="activity" showValues />`;
-
-  protected readonly funnel: MkFunnelSegment[] = [
-    { label: 'Visits', value: 12400 },
-    { label: 'Signups', value: 4200 },
-    { label: 'Trials', value: 1800 },
-    { label: 'Paid', value: 640 },
-  ];
-  protected readonly treemap: MkTreemapItem[] = [
-    { label: 'Organic', value: 42 },
-    { label: 'Paid ads', value: 28 },
-    { label: 'Email', value: 16 },
-    { label: 'Social', value: 10 },
-    { label: 'Referral', value: 6 },
-  ];
-
-  protected readonly funnelCode = `<mk-funnel-chart [segments]="[
-  { label: 'Visits',  value: 12400 },
-  { label: 'Signups', value: 4200 },
-  { label: 'Trials',  value: 1800 },
-  { label: 'Paid',    value: 640 },
-]" />`;
-
-  protected readonly treemapCode = `<mk-treemap [items]="[
-  { label: 'Organic', value: 42 }, { label: 'Paid ads', value: 28 },
-  { label: 'Email', value: 16 }, { label: 'Social', value: 10 },
-]" />`;
-
-  protected readonly radarCode = `<mk-radar-chart
-  [axes]="['Speed','Power','Range','Comfort','Price','Safety']"
-  [series]="[
-    { name: 'Model S', data: [9,8,7,8,5,9] },
-    { name: 'Model E', data: [6,5,9,7,8,8] },
-  ]"
-  [max]="10" />`;
 }

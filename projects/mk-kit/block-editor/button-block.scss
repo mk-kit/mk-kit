@@ -1,0 +1,166 @@
+@use '../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+}
+
+.mk-button-block__preview {
+  text-align: left;
+}
+.mk-button-block__preview--center {
+  text-align: center;
+}
+.mk-button-block__preview--right {
+  text-align: right;
+}
+
+/* Themed CTA — tone selectors set local vars consumed by the variants. */
+.mk-cta {
+  --_main: var(--mk-primary);
+  --_hover: var(--mk-primary-hover);
+  --_contrast: var(--mk-primary-contrast);
+  --_subtle: var(--mk-primary-subtle);
+  --_subtle-text: var(--mk-primary-subtle-text);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: var(--mk-control-height-md);
+  padding: 0 var(--mk-space-5);
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  background: var(--_main);
+  color: var(--_contrast);
+  font-weight: var(--mk-font-weight-medium);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-cta:hover {
+  background: var(--_hover);
+}
+.mk-cta[data-tone='success'] {
+  --_main: var(--mk-success);
+  --_hover: var(--mk-success-hover);
+  --_contrast: var(--mk-success-contrast);
+  --_subtle: var(--mk-success-subtle);
+  --_subtle-text: var(--mk-success-subtle-text);
+}
+.mk-cta[data-tone='warning'] {
+  --_main: var(--mk-warning);
+  --_hover: var(--mk-warning-hover);
+  --_contrast: var(--mk-warning-contrast);
+  --_subtle: var(--mk-warning-subtle);
+  --_subtle-text: var(--mk-warning-subtle-text);
+}
+.mk-cta[data-tone='danger'] {
+  --_main: var(--mk-danger);
+  --_hover: var(--mk-danger-hover);
+  --_contrast: var(--mk-danger-contrast);
+  --_subtle: var(--mk-danger-subtle);
+  --_subtle-text: var(--mk-danger-subtle-text);
+}
+.mk-cta[data-tone='info'] {
+  --_main: var(--mk-info);
+  --_hover: var(--mk-info-hover);
+  --_contrast: var(--mk-info-contrast);
+  --_subtle: var(--mk-info-subtle);
+  --_subtle-text: var(--mk-info-subtle-text);
+}
+.mk-cta[data-tone='neutral'] {
+  --_main: var(--mk-surface-inverse);
+  --_hover: var(--mk-surface-inverse);
+  --_contrast: var(--mk-text-inverse);
+  --_subtle: var(--mk-neutral-subtle);
+  --_subtle-text: var(--mk-neutral-subtle-text);
+}
+
+.mk-cta--soft {
+  background: var(--_subtle);
+  color: var(--_subtle-text);
+}
+.mk-cta--soft:hover {
+  background-image: linear-gradient(var(--mk-hover-overlay), var(--mk-hover-overlay));
+}
+.mk-cta--outline {
+  background: transparent;
+  color: var(--_subtle-text);
+  border-color: color-mix(in srgb, var(--_main) 42%, var(--mk-border-strong));
+}
+.mk-cta--outline:hover {
+  background: var(--_subtle);
+}
+.mk-cta:focus-visible {
+  @include mk.focus-ring;
+}
+
+/* Settings */
+.mk-button-block__settings {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--mk-space-3);
+  margin-top: var(--mk-space-3);
+  padding: var(--mk-space-3);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-md);
+  background: var(--mk-surface-2);
+}
+.mk-button-block__field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-1);
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-xs);
+}
+.mk-button-block__field input {
+  height: var(--mk-control-height-sm);
+  padding: 0 var(--mk-space-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  color: var(--mk-text);
+  font: inherit;
+}
+.mk-button-block__row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-space-1);
+}
+.mk-button-block__swatch {
+  width: 24px;
+  height: 24px;
+  border: 2px solid transparent;
+  border-radius: var(--mk-radius-circle);
+  background: var(--mk-primary);
+  cursor: pointer;
+}
+.mk-button-block__swatch[data-tone='success'] { background: var(--mk-success); }
+.mk-button-block__swatch[data-tone='warning'] { background: var(--mk-warning); }
+.mk-button-block__swatch[data-tone='danger'] { background: var(--mk-danger); }
+.mk-button-block__swatch[data-tone='info'] { background: var(--mk-info); }
+.mk-button-block__swatch[data-tone='neutral'] { background: var(--mk-surface-inverse); }
+.mk-button-block__swatch--active {
+  border-color: var(--mk-text);
+}
+.mk-button-block__pill {
+  height: var(--mk-control-height-sm);
+  padding: 0 var(--mk-space-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  background: var(--mk-surface);
+  color: var(--mk-text-muted);
+  font: inherit;
+  font-size: var(--mk-font-size-xs);
+  text-transform: capitalize;
+  cursor: pointer;
+}
+.mk-button-block__pill--active {
+  background: var(--mk-primary);
+  border-color: var(--mk-primary);
+  color: var(--mk-primary-contrast);
+}
+.mk-button-block__swatch:focus-visible,
+.mk-button-block__pill:focus-visible,
+.mk-button-block__field input:focus-visible {
+  @include mk.focus-ring;
+}

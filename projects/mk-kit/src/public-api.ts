@@ -1,18 +1,23 @@
 /*
- * Public API Surface of @mkornas/ui
+ * Public API Surface of @mkornas/ui.
+ *
+ * The library ships Material-style secondary entry points — import from the
+ * group entries (`@mkornas/ui/forms`, `@mkornas/ui/table`, …) so a code-split
+ * app only carries the groups each chunk uses. This root entry re-exports
+ * everything for convenience; importing it eagerly pulls all groups into the
+ * importing chunk.
  */
-
-// Core: theme, a11y, overlay, shared types
-export * from './lib/core';
-
-// Components
-export * from './lib/components/button';
-export * from './lib/components/form.barrel';
-export * from './lib/components/data.barrel';
-export * from './lib/components/feedback.barrel';
-export * from './lib/components/nav.barrel';
-export * from './lib/components/context-menu.barrel';
-export * from './lib/components/datetime.barrel';
-export * from './lib/components/dnd.barrel';
-export * from './lib/components/block-editor.barrel';
-export * from './lib/components/directives.barrel';
+export * from '@mkornas/ui/core';
+export * from '@mkornas/ui/icon';
+export * from '@mkornas/ui/chip';
+export * from '@mkornas/ui/button';
+export * from '@mkornas/ui/directives';
+export * from '@mkornas/ui/dnd';
+export * from '@mkornas/ui/navigation';
+export * from '@mkornas/ui/forms';
+export * from '@mkornas/ui/datetime';
+export * from '@mkornas/ui/table';
+export * from '@mkornas/ui/data';
+export * from '@mkornas/ui/feedback';
+export * from '@mkornas/ui/block-editor';
+export * from '@mkornas/ui/context-menu';

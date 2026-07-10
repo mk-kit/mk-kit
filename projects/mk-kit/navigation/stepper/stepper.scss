@@ -1,0 +1,153 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-stepper__header {
+  display: flex;
+  align-items: center;
+}
+
+:host(.mk-stepper--vertical) .mk-stepper__header {
+  flex-direction: column;
+  align-items: stretch;
+}
+
+/* --- Step header button --- */
+.mk-stepper__step {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  flex: none;
+  padding: var(--mk-space-2) var(--mk-space-3);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  font-family: inherit;
+  color: var(--mk-text-muted);
+  text-align: left;
+  cursor: pointer;
+  transition:
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-stepper__step:hover:not(:disabled) {
+  color: var(--mk-text);
+  background-color: var(--mk-hover-overlay);
+}
+.mk-stepper__step:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-stepper__step:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-stepper__step--active {
+  color: var(--mk-text);
+}
+
+/* --- Marker circle --- */
+.mk-stepper__marker {
+  display: grid;
+  place-items: center;
+  flex: none;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: var(--mk-radius-circle);
+  background-color: var(--mk-surface-3);
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-semibold);
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-stepper__step--active .mk-stepper__marker {
+  background-color: var(--mk-primary);
+  color: var(--mk-primary-contrast);
+}
+.mk-stepper__step--completed:not(.mk-stepper__step--active) .mk-stepper__marker {
+  background-color: var(--mk-primary-subtle);
+  color: var(--mk-primary-subtle-text);
+}
+.mk-stepper__step--error .mk-stepper__marker {
+  background-color: var(--mk-danger);
+  color: var(--mk-danger-contrast);
+}
+
+.mk-stepper__bang {
+  line-height: 1;
+}
+
+.mk-stepper__check {
+  width: 0.4rem;
+  height: 0.7rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg) translateY(-1px);
+}
+
+/* --- Labels --- */
+.mk-stepper__labels {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+.mk-stepper__label {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-stepper__step--error .mk-stepper__label {
+  color: var(--mk-danger);
+}
+.mk-stepper__optional {
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-normal);
+  color: var(--mk-text-subtle);
+}
+.mk-stepper__description {
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text-subtle);
+}
+
+/* --- Connector --- */
+.mk-stepper__connector {
+  flex: 1 1 auto;
+  min-width: var(--mk-space-4);
+  height: var(--mk-border-width);
+  margin: 0 var(--mk-space-2);
+  background-color: var(--mk-border);
+}
+:host(.mk-stepper--vertical) .mk-stepper__connector {
+  flex: none;
+  width: var(--mk-border-width);
+  min-width: 0;
+  height: var(--mk-space-4);
+  /* align under the centre of the 1.75rem marker + step padding */
+  margin: 0 0 0 calc(var(--mk-space-3) + 0.875rem);
+}
+
+/* --- Panels --- */
+.mk-stepper__panels {
+  padding-top: var(--mk-space-4);
+}
+:host(.mk-stepper--vertical) .mk-stepper__panels {
+  padding-top: var(--mk-space-3);
+  padding-left: calc(var(--mk-space-3) + 0.875rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-stepper__step,
+  .mk-stepper__marker {
+    transition: none;
+  }
+}

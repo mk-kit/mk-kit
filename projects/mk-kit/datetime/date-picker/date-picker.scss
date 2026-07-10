@@ -1,0 +1,143 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-date-picker__field {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  height: var(--mk-control-height-md);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+:host(.mk-date-picker--sm) .mk-date-picker__field {
+  height: var(--mk-control-height-sm);
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-date-picker--lg) .mk-date-picker__field {
+  height: var(--mk-control-height-lg);
+}
+
+.mk-date-picker__field:hover {
+  border-color: var(--mk-border-strong);
+}
+.mk-date-picker__field:focus-within {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+
+:host(.mk-date-picker--invalid) .mk-date-picker__field {
+  border-color: var(--mk-danger);
+}
+:host(.mk-date-picker--invalid) .mk-date-picker__field:focus-within {
+  outline-color: var(--mk-danger);
+}
+
+:host(.mk-date-picker--disabled) .mk-date-picker__field {
+  background-color: var(--mk-surface-2);
+  border-color: var(--mk-border-subtle);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mk-date-picker__input {
+  flex: 1 1 auto;
+  min-width: 0;
+  height: 100%;
+  padding: 0 var(--mk-space-3);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  background: transparent;
+  border: 0;
+  outline: none;
+}
+:host(.mk-date-picker--sm) .mk-date-picker__input {
+  padding: 0 var(--mk-space-2);
+  font-size: var(--mk-font-size-sm);
+}
+:host(.mk-date-picker--lg) .mk-date-picker__input {
+  padding: 0 var(--mk-space-4);
+  font-size: var(--mk-font-size-lg);
+}
+.mk-date-picker__input::placeholder {
+  color: var(--mk-text-subtle);
+  opacity: 1;
+}
+.mk-date-picker__input:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-date-picker__toggle,
+.mk-date-picker__clear {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  height: 100%;
+  padding: 0 var(--mk-space-2);
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  transition: color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-date-picker__toggle:hover:not(:disabled),
+.mk-date-picker__clear:hover {
+  color: var(--mk-text);
+}
+.mk-date-picker__toggle:focus-visible,
+.mk-date-picker__clear:focus-visible {
+  @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
+  border-radius: var(--mk-radius-sm);
+}
+.mk-date-picker__toggle:disabled {
+  cursor: not-allowed;
+}
+
+.mk-date-picker__clear-icon {
+  position: relative;
+  width: 0.85rem;
+  height: 0.85rem;
+}
+.mk-date-picker__clear-icon::before,
+.mk-date-picker__clear-icon::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: currentColor;
+}
+.mk-date-picker__clear-icon::before {
+  transform: rotate(45deg);
+}
+.mk-date-picker__clear-icon::after {
+  transform: rotate(-45deg);
+}
+
+/* Popover panel — positioning (fixed, top layer) owned by mkAnchoredPanel. */
+.mk-date-picker__panel {
+  box-shadow: var(--mk-shadow-lg);
+  border-radius: var(--mk-radius-lg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-date-picker__field,
+  .mk-date-picker__toggle,
+  .mk-date-picker__clear {
+    transition: none;
+  }
+}

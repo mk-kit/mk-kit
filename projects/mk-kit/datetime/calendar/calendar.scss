@@ -1,0 +1,193 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_cell-size: 2.5rem;
+
+  display: inline-block;
+  /* Size to content so the calendar stays a compact, self-contained widget
+     even inside a stretching flex/grid parent (header + grid stay aligned). */
+  width: fit-content;
+  max-width: 100%;
+  padding: var(--mk-space-4);
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-xs);
+}
+
+:host(.mk-calendar--sm) {
+  --_cell-size: 2.1rem;
+  padding: var(--mk-space-3);
+  font-size: var(--mk-font-size-sm);
+}
+:host(.mk-calendar--lg) {
+  --_cell-size: 2.9rem;
+  font-size: var(--mk-font-size-lg);
+}
+
+/* Header ------------------------------------------------------------------- */
+.mk-calendar__header {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  margin-bottom: var(--mk-space-2);
+}
+
+.mk-calendar__label {
+  flex: 1 1 auto;
+  text-align: center;
+  font-weight: var(--mk-font-weight-semibold);
+  font-size: var(--mk-font-size-md);
+  white-space: nowrap;
+}
+
+.mk-calendar__nav {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--mk-control-height-sm);
+  height: var(--mk-control-height-sm);
+  flex: none;
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-calendar__nav:hover {
+  background-color: var(--mk-hover-overlay);
+  color: var(--mk-text);
+}
+.mk-calendar__nav:active {
+  background-color: var(--mk-active-overlay);
+}
+.mk-calendar__nav:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-calendar__nav svg {
+  display: block;
+}
+
+/* Grid --------------------------------------------------------------------- */
+.mk-calendar__grid {
+  border-collapse: separate;
+  border-spacing: 0;
+  table-layout: fixed;
+}
+
+.mk-calendar__weekday {
+  width: var(--_cell-size);
+  padding: 0 0 var(--mk-space-2);
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-semibold);
+  letter-spacing: var(--mk-letter-spacing-wide);
+  text-transform: uppercase;
+  color: var(--mk-text-subtle);
+}
+.mk-calendar__weekday abbr {
+  text-decoration: none;
+  cursor: default;
+}
+
+.mk-calendar__cell {
+  padding: 1px;
+  text-align: center;
+}
+
+.mk-calendar__day {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  width: var(--_cell-size);
+  height: var(--_cell-size);
+  font-family: inherit;
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-calendar__day:hover:not(.mk-calendar__day--disabled) {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-calendar__day:focus-visible {
+  @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
+}
+
+.mk-calendar__day--outside {
+  color: var(--mk-text-disabled);
+}
+
+/* Today — not signalled by color alone: underline dot + aria-current. */
+.mk-calendar__day--today .mk-calendar__day-num::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  bottom: 4px;
+  width: 4px;
+  height: 4px;
+  border-radius: var(--mk-radius-circle);
+  background-color: var(--mk-primary);
+  transform: translateX(-50%);
+}
+
+/* In-range fill (range mode). */
+.mk-calendar__day--in-range {
+  background-color: var(--mk-primary-subtle);
+  border-radius: 0;
+}
+
+/* Selected / endpoints. */
+.mk-calendar__day--selected,
+.mk-calendar__day--range-start,
+.mk-calendar__day--range-end {
+  background-color: var(--mk-primary);
+  color: var(--mk-primary-contrast);
+  font-weight: var(--mk-font-weight-semibold);
+}
+.mk-calendar__day--selected:hover,
+.mk-calendar__day--range-start:hover,
+.mk-calendar__day--range-end:hover {
+  background-color: var(--mk-primary-hover);
+}
+.mk-calendar__day--range-start {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+}
+.mk-calendar__day--range-end {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+}
+.mk-calendar__day--today.mk-calendar__day--selected .mk-calendar__day-num::after,
+.mk-calendar__day--today.mk-calendar__day--range-start .mk-calendar__day-num::after,
+.mk-calendar__day--today.mk-calendar__day--range-end .mk-calendar__day-num::after {
+  background-color: var(--mk-primary-contrast);
+}
+
+.mk-calendar__day--disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.mk-calendar__day-num {
+  position: relative;
+  line-height: 1;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-calendar__nav,
+  .mk-calendar__day {
+    transition: none;
+  }
+}

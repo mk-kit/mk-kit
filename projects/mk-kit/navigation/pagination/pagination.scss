@@ -1,0 +1,70 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+}
+
+.mk-pagination__list {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mk-space-1);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-pagination__btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--mk-control-height-md);
+  height: var(--mk-control-height-md);
+  padding: 0 var(--mk-space-2);
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  color: var(--mk-text);
+  font-family: inherit;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-pagination__btn:hover:not(:disabled):not(.mk-pagination__btn--active) {
+  background: var(--mk-hover-overlay);
+}
+
+.mk-pagination__btn:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-pagination__btn:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-pagination__btn--nav {
+  color: var(--mk-text-muted);
+}
+
+.mk-pagination__btn--active {
+  background: var(--mk-primary);
+  color: var(--mk-primary-contrast);
+  cursor: default;
+}
+
+.mk-pagination__ellipsis {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: var(--mk-control-height-md);
+  height: var(--mk-control-height-md);
+  color: var(--mk-text-subtle);
+  user-select: none;
+}

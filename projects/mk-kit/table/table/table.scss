@@ -1,0 +1,303 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_cell-pad-y: var(--mk-space-3);
+  --_cell-pad-x: var(--mk-space-4);
+
+  display: block;
+  color: var(--mk-text);
+}
+
+:host(.mk-table--compact) {
+  --_cell-pad-y: var(--mk-space-2);
+  --_cell-pad-x: var(--mk-space-3);
+}
+
+/* Horizontal scroll container */
+.mk-table__scroll {
+  width: 100%;
+  overflow-x: auto;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+}
+
+.mk-table__table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--mk-font-size-sm);
+  background-color: var(--mk-surface);
+}
+
+/* Header */
+.mk-table__th {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  background-color: var(--mk-surface-2);
+  color: var(--mk-text-muted);
+  font-weight: var(--mk-font-weight-semibold);
+  text-align: left;
+  white-space: nowrap;
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+  vertical-align: middle;
+}
+
+/* Sticky header */
+:host(.mk-table--sticky) .mk-table__head .mk-table__th {
+  position: sticky;
+  top: 0;
+  z-index: var(--mk-z-sticky);
+}
+
+.mk-table__th-inner {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+}
+
+.mk-table__th--sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.mk-table__th--sortable:hover {
+  background-color: var(--mk-surface-3);
+  color: var(--mk-text);
+}
+
+/* Header sort/reorder button — fills the cell, inherits header typography. */
+.mk-table__th-button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  width: 100%;
+  margin: calc(-1 * var(--_cell-pad-y)) calc(-1 * var(--_cell-pad-x));
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+}
+.mk-table__th-button--static {
+  cursor: grab;
+}
+.mk-table__th-button:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+.mk-table__th[data-align='center'] .mk-table__th-button {
+  justify-content: center;
+}
+.mk-table__th[data-align='end'] .mk-table__th-button {
+  justify-content: flex-end;
+}
+.mk-table__th[aria-sort='ascending'],
+.mk-table__th[aria-sort='descending'] {
+  color: var(--mk-text);
+}
+
+.mk-table__sort {
+  font-size: var(--mk-font-size-xs);
+  opacity: 0.7;
+  line-height: 1;
+}
+
+/* Body cells */
+.mk-table__td {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+  vertical-align: middle;
+}
+.mk-table__row:last-child .mk-table__td {
+  border-bottom: 0;
+}
+
+/* Alignment */
+.mk-table__th[data-align='center'],
+.mk-table__td[data-align='center'] { text-align: center; }
+.mk-table__th[data-align='end'],
+.mk-table__td[data-align='end'] { text-align: right; }
+
+/* Zebra */
+:host(.mk-table--zebra) .mk-table__body .mk-table__row:nth-child(even) .mk-table__td {
+  background-color: var(--mk-surface-2);
+}
+
+/* Hover */
+:host(.mk-table--hover) .mk-table__body .mk-table__row:not(.mk-table__row--empty):hover .mk-table__td {
+  background-color: var(--mk-neutral-subtle);
+}
+
+/* Clickable rows */
+:host(.mk-table--clickable) .mk-table__row:not(.mk-table__row--empty) {
+  cursor: pointer;
+}
+:host(.mk-table--clickable) .mk-table__row:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+/* Selection column */
+.mk-table__th--select,
+.mk-table__td--select {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+
+/* Selected rows — win over zebra + hover backgrounds */
+:host .mk-table__body .mk-table__row--selected .mk-table__td,
+:host(.mk-table--zebra) .mk-table__body .mk-table__row--selected:nth-child(even) .mk-table__td,
+:host(.mk-table--hover) .mk-table__body .mk-table__row--selected:hover .mk-table__td {
+  background-color: var(--mk-selected-bg);
+  color: var(--mk-selected-text);
+}
+
+/* Expander column */
+.mk-table__th--expand,
+.mk-table__td--expand {
+  width: 1%;
+  white-space: nowrap;
+  text-align: center;
+  vertical-align: middle;
+}
+
+.mk-table__expander {
+  display: inline-grid;
+  place-items: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+}
+.mk-table__expander:hover {
+  background-color: var(--mk-hover-overlay);
+  color: var(--mk-text);
+}
+.mk-table__expander:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+.mk-table__expander-icon {
+  /* inline-block so the rotate transform applies (transforms are ignored on
+     inline-level boxes). */
+  display: inline-block;
+  font-size: var(--mk-font-size-lg);
+  line-height: 1;
+  transition: transform var(--mk-transition-fast, 120ms) ease;
+}
+.mk-table__expander--open .mk-table__expander-icon {
+  transform: rotate(90deg);
+}
+
+/* Detail row */
+.mk-table__detail {
+  padding: 0;
+  background-color: var(--mk-surface-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+.mk-table__detail-inner {
+  padding: var(--_cell-pad-y) var(--_cell-pad-x);
+}
+
+/* --- Data-grid pro ------------------------------------------------------- */
+
+/* Header needs relative positioning for the resize handle. */
+.mk-table__th {
+  position: relative;
+}
+
+/* Column resize handle */
+.mk-table__resize {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 8px;
+  height: 100%;
+  cursor: col-resize;
+  touch-action: none;
+  user-select: none;
+}
+.mk-table__resize::after {
+  content: '';
+  position: absolute;
+  top: 25%;
+  right: 3px;
+  width: 2px;
+  height: 50%;
+  background-color: var(--mk-border);
+}
+.mk-table__resize:hover::after,
+.mk-table__resize:focus-visible::after {
+  background-color: var(--mk-primary);
+}
+.mk-table__resize:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+/* Reorder drag state */
+.mk-table__th[draggable='true'] {
+  cursor: grab;
+}
+.mk-table__th--dragging {
+  opacity: 0.5;
+}
+
+/* Pinned / sticky columns */
+.mk-table__th--pinned,
+.mk-table__td--pinned {
+  position: sticky;
+  z-index: 1;
+  background-color: var(--mk-surface);
+}
+.mk-table__th--pinned {
+  z-index: 2;
+  background-color: var(--mk-surface-2);
+}
+/* A shadow on the inner edge to separate frozen columns from scrolling ones. */
+.mk-table__th--pinned:not(.mk-table__th--pinned-right),
+.mk-table__td--pinned:not(.mk-table__td--pinned-right) {
+  box-shadow: 2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+.mk-table__th--pinned-right,
+.mk-table__td--pinned-right {
+  box-shadow: -2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+/* Keep zebra/selected backgrounds on pinned body cells opaque. */
+:host(.mk-table--zebra)
+  .mk-table__body
+  .mk-table__row:nth-child(even)
+  .mk-table__td--pinned {
+  background-color: var(--mk-surface-2);
+}
+
+/* Inline-editable cells */
+.mk-table__td--editable {
+  cursor: text;
+}
+.mk-table__td--editable:hover {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-table__td--editable:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+.mk-table__cell-input {
+  width: 100%;
+  margin: calc(-1 * var(--mk-space-1)) 0;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  font: inherit;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-primary);
+  border-radius: var(--mk-radius-sm);
+  outline: none;
+}
+
+/* Empty state */
+.mk-table__empty {
+  padding: var(--mk-space-8) var(--_cell-pad-x);
+  text-align: center;
+  color: var(--mk-text-subtle);
+}

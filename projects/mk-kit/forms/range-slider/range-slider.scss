@@ -1,0 +1,84 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_main: var(--mk-primary);
+  --_thumb-size: 1.15rem;
+  --_track-h: 0.4rem;
+  display: block;
+  padding: calc(var(--_thumb-size) / 2) 0;
+  touch-action: none;
+}
+:host(.mk-range-slider--sm) {
+  --_thumb-size: 0.95rem;
+  --_track-h: 0.3rem;
+}
+:host(.mk-range-slider--lg) {
+  --_thumb-size: 1.4rem;
+  --_track-h: 0.5rem;
+}
+:host([data-tone='success']) { --_main: var(--mk-success); }
+:host([data-tone='warning']) { --_main: var(--mk-warning); }
+:host([data-tone='danger']) { --_main: var(--mk-danger); }
+:host([data-tone='info']) { --_main: var(--mk-info); }
+:host([data-tone='neutral']) { --_main: var(--mk-text-muted); }
+
+.mk-range-slider__track-wrap {
+  position: relative;
+  height: var(--_thumb-size);
+  cursor: pointer;
+}
+
+.mk-range-slider__track {
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: var(--_track-h);
+  transform: translateY(-50%);
+  background-color: var(--mk-border-subtle);
+  border-radius: var(--mk-radius-pill);
+  overflow: hidden;
+}
+.mk-range-slider__fill {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  background-color: var(--_main);
+}
+
+.mk-range-slider__thumb {
+  position: absolute;
+  top: 50%;
+  width: var(--_thumb-size);
+  height: var(--_thumb-size);
+  transform: translate(-50%, -50%);
+  background-color: var(--mk-surface);
+  border: 2px solid var(--_main);
+  border-radius: var(--mk-radius-circle);
+  box-shadow: var(--mk-shadow-sm);
+  cursor: grab;
+  transition: box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-range-slider__thumb:hover {
+  box-shadow: var(--mk-shadow-md);
+}
+.mk-range-slider__thumb:active {
+  cursor: grabbing;
+}
+.mk-range-slider__thumb:focus-visible {
+  @include mk.focus-ring;
+}
+
+:host(.mk-range-slider--disabled) {
+  opacity: 0.6;
+}
+:host(.mk-range-slider--disabled) .mk-range-slider__track-wrap,
+:host(.mk-range-slider--disabled) .mk-range-slider__thumb {
+  cursor: not-allowed;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-range-slider__thumb {
+    transition: none;
+  }
+}

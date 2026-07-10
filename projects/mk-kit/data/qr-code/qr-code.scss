@@ -1,0 +1,15 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: inline-block;
+  max-width: 100%;
+  line-height: 0;
+  color: var(--mk-text);
+  background: var(--mk-surface);
+}
+
+.mk-qr-code__svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}

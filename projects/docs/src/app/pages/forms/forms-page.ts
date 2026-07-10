@@ -2,7 +2,6 @@ import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/c
 import { FormsModule } from '@angular/forms';
 import {
   MkButton,
-  MkCheckbox,
   MkCodeEditor,
   type MkCodeValidity,
   MkFileUpload,
@@ -12,26 +11,14 @@ import {
   MkFormErrorSummary,
   type MkFormError,
   MkInput,
-  MkAutosize,
-  MkColorPicker,
-  MkNumberInput,
-  MkOtp,
-  MkPasswordInput,
-  MkRadio,
-  MkRangeSlider,
-  type MkRange,
-  MkRadioGroup,
-  MkRating,
   MkSelect,
   type MkSelectOption,
-  MkSlider,
-  MkSwitch,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the FORM components of `@mkornas/ui`:
- * FormField, Input/Textarea, Select, Checkbox, Radio group, Switch and Slider.
+ * Documentation + live demo page for the FORM structure components of `@mkornas/ui`:
+ * FormField, Form error summary, Select, File upload and Code editor.
  */
 @Component({
   selector: 'docs-forms-page',
@@ -43,31 +30,22 @@ import { DocsExample } from '../../shared/docs-example';
     MkFormErrorSummary,
     MkInput,
     MkSelect,
-    MkCheckbox,
-    MkRadioGroup,
-    MkRadio,
-    MkSwitch,
-    MkSlider,
     MkFileUpload,
     MkCodeEditor,
     MkButton,
-    MkRating,
-    MkNumberInput,
-    MkOtp,
-    MkPasswordInput,
-    MkAutosize,
-    MkColorPicker,
-    MkRangeSlider,
   ],
   template: `
     <div class="docs-page docs-container">
       <h1>Forms</h1>
       <p class="docs-lead">
-        Accessible, signal-driven form controls. Every control implements
+        Form structure and composite fields: the accessible
+        <code class="docs-inline">&lt;mk-form-field&gt;</code> wrapper, a
+        submit-time error summary, a custom select, a file-upload dropzone and a
+        code editor. Every control implements
         <code class="docs-inline">ControlValueAccessor</code> and exposes a
         two-way model, so it works with <code class="docs-inline">[(ngModel)]</code>,
-        reactive forms and native <code class="docs-inline">[(value)]</code> /
-        <code class="docs-inline">[(checked)]</code> bindings. Wrap any control in
+        reactive forms and native <code class="docs-inline">[(value)]</code>
+        bindings. Wrap any control in
         <code class="docs-inline">&lt;mk-form-field&gt;</code> for a real
         <code class="docs-inline">&lt;label&gt;</code>, hint, error and required
         wiring — done automatically via dependency injection.
@@ -153,90 +131,6 @@ import { DocsExample } from '../../shared/docs-example';
       </docs-example>
 
       <!-- ============================================================ -->
-      <!-- INPUT & TEXTAREA -->
-      <!-- ============================================================ -->
-      <h2>Input &amp; Textarea</h2>
-      <p>
-        <code class="docs-inline">mkInput</code> is an attribute-selector applied to
-        a native <code class="docs-inline">&lt;input&gt;</code> or
-        <code class="docs-inline">&lt;textarea&gt;</code>, so all native semantics,
-        keyboard behaviour and form integration come for free — it only layers on
-        tokenised styling and aria state. Standalone it accepts
-        <code class="docs-inline">size</code> and <code class="docs-inline">invalid</code>;
-        inside a form field it inherits both.
-      </p>
-
-      <docs-example [code]="inputCode" [column]="true">
-        <input mkInput placeholder="Small" size="sm" [(ngModel)]="name" />
-        <input mkInput placeholder="Medium (default)" [(ngModel)]="name" />
-        <input mkInput placeholder="Large" size="lg" [(ngModel)]="name" />
-        <input mkInput placeholder="Invalid" [invalid]="true" />
-        <p class="echo">Name: {{ name() || '—' }}</p>
-      </docs-example>
-
-      <docs-example [code]="textareaCode" [column]="true">
-        <textarea mkInput rows="4" placeholder="Your message…" [(ngModel)]="message"></textarea>
-        <p class="echo">{{ message().length }} characters</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored (inherited) inside an mk-form-field.</td></tr>
-          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid visual + aria-invalid when used standalone.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
-      <!-- PASSWORD INPUT -->
-      <!-- ============================================================ -->
-      <h2>Password input</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-password-input&gt;</code> is a password
-        field with a reveal toggle (show/hide the characters), an optional 0–4
-        strength meter and an optional rules checklist that ticks off as the
-        password grows. It implements
-        <code class="docs-inline">ControlValueAccessor</code> over a string with a
-        two-way <code class="docs-inline">[(value)]</code> model and, inside an
-        <code class="docs-inline">&lt;mk-form-field&gt;</code>, wires its label,
-        description and validity automatically.
-      </p>
-
-      <docs-example [code]="passwordCode" [column]="true">
-        <div style="max-width: 26rem; width: 100%;">
-          <mk-password-input
-            [(value)]="password"
-            showStrength
-            showRules
-            [minLength]="10"
-            placeholder="Create a password"
-          />
-        </div>
-        <mk-form-field label="Password" style="max-width: 26rem; width: 100%;">
-          <mk-password-input [(value)]="password" [minLength]="10" placeholder="Create a password" />
-        </mk-form-field>
-        <p class="echo">{{ password().length }} characters</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way password value ([(value)] / [(ngModel)]).</td></tr>
-          <tr><td>placeholder</td><td>string</td><td>''</td><td>Placeholder shown when empty.</td></tr>
-          <tr><td>showStrength</td><td>boolean</td><td>false</td><td>Show the 0–4 strength meter below the field.</td></tr>
-          <tr><td>showRules</td><td>boolean</td><td>false</td><td>Show the rules checklist below the field.</td></tr>
-          <tr><td>minLength</td><td>number</td><td>8</td><td>Minimum length used by the strength score and rules.</td></tr>
-          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
-          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling when standalone.</td></tr>
-          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
       <!-- SELECT -->
       <!-- ============================================================ -->
       <h2>Select</h2>
@@ -264,140 +158,6 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling + aria-invalid when standalone.</td></tr>
           <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
           <tr><td>value</td><td>model&lt;unknown&gt;</td><td>null</td><td>Two-way selected value ([(value)] / [(ngModel)]).</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
-      <!-- CHECKBOX -->
-      <!-- ============================================================ -->
-      <h2>Checkbox</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-checkbox&gt;</code> wraps a visually-hidden
-        native <code class="docs-inline">input[type=checkbox]</code> (native keyboard
-        + form semantics) with a custom box. Supports an
-        <code class="docs-inline">indeterminate</code> ("mixed") state, a two-way
-        <code class="docs-inline">[(checked)]</code> model and semantic tones.
-      </p>
-
-      <docs-example [code]="checkboxCode" [column]="true">
-        <mk-checkbox [(checked)]="accepted">Accept terms</mk-checkbox>
-        <mk-checkbox [(checked)]="newsletter" tone="success">Subscribe to newsletter</mk-checkbox>
-        <mk-checkbox [checked]="true" disabled>Disabled &amp; checked</mk-checkbox>
-        <p class="echo">Accepted: {{ accepted() }} · Newsletter: {{ newsletter() }}</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>checked</td><td>model&lt;boolean&gt;</td><td>false</td><td>Two-way checked state.</td></tr>
-          <tr><td>indeterminate</td><td>model&lt;boolean&gt;</td><td>false</td><td>Two-way "mixed" state; cleared when the user toggles.</td></tr>
-          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
-          <tr><td>required</td><td>boolean</td><td>false</td><td>Mark required (adds aria-required).</td></tr>
-          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size.</td></tr>
-          <tr><td>tone</td><td>MkTone</td><td>'primary'</td><td>Semantic color of the checked box.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
-      <!-- RADIO GROUP -->
-      <!-- ============================================================ -->
-      <h2>Radio group</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-radio-group&gt;</code> is an ARIA
-        <code class="docs-inline">radiogroup</code> coordinating projected
-        <code class="docs-inline">&lt;mk-radio&gt;</code> children with roving tabindex
-        and Arrow-key navigation (wrapping, skipping disabled). It holds the value;
-        each radio contributes its <code class="docs-inline">value</code>.
-      </p>
-
-      <docs-example [code]="radioCode" [column]="true">
-        <mk-radio-group [(value)]="plan" aria-label="Plan" orientation="horizontal">
-          <mk-radio [value]="'free'">Free</mk-radio>
-          <mk-radio [value]="'pro'">Pro</mk-radio>
-          <mk-radio [value]="'team'" [disabled]="true">Team (soon)</mk-radio>
-        </mk-radio-group>
-        <p class="echo">Plan: {{ plan() ?? '—' }}</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Component</th><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>mk-radio-group</td><td>value</td><td>model&lt;unknown&gt;</td><td>null</td><td>Two-way selected value.</td></tr>
-          <tr><td>mk-radio-group</td><td>disabled</td><td>boolean</td><td>false</td><td>Disable the whole group.</td></tr>
-          <tr><td>mk-radio-group</td><td>required</td><td>boolean</td><td>false</td><td>Mark required (aria-required).</td></tr>
-          <tr><td>mk-radio-group</td><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Size applied to all child radios.</td></tr>
-          <tr><td>mk-radio-group</td><td>tone</td><td>MkTone</td><td>'primary'</td><td>Tone applied to all child radios.</td></tr>
-          <tr><td>mk-radio-group</td><td>name</td><td>string</td><td>auto</td><td>Shared name grouping (defaults to a generated id).</td></tr>
-          <tr><td>mk-radio-group</td><td>orientation</td><td>'horizontal' | 'vertical'</td><td>'vertical'</td><td>Layout + arrow-key mapping.</td></tr>
-          <tr><td>mk-radio</td><td>value</td><td>unknown</td><td>null</td><td>Value contributed to the group when selected.</td></tr>
-          <tr><td>mk-radio</td><td>disabled</td><td>boolean</td><td>false</td><td>Disable just this radio.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
-      <!-- SWITCH -->
-      <!-- ============================================================ -->
-      <h2>Switch</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-switch&gt;</code> is a toggle with
-        <code class="docs-inline">role="switch"</code> and an animated knob, operable
-        with Space/Enter. It projects its label and exposes a two-way
-        <code class="docs-inline">[(checked)]</code> model.
-      </p>
-
-      <docs-example [code]="switchCode" [column]="true">
-        <mk-switch [(checked)]="notify">Email notifications</mk-switch>
-        <mk-switch [(checked)]="dark" tone="success" size="lg">Dark mode</mk-switch>
-        <p class="echo">Notify: {{ notify() }} · Dark: {{ dark() }}</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>checked</td><td>model&lt;boolean&gt;</td><td>false</td><td>Two-way on/off state.</td></tr>
-          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
-          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size.</td></tr>
-          <tr><td>tone</td><td>MkTone</td><td>'primary'</td><td>Semantic color of the "on" track.</td></tr>
-          <tr><td>aria-label</td><td>string</td><td>''</td><td>Accessible label when no text is projected.</td></tr>
-        </tbody>
-      </table>
-
-      <!-- ============================================================ -->
-      <!-- SLIDER -->
-      <!-- ============================================================ -->
-      <h2>Slider</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-slider&gt;</code> is a single-value range
-        slider with <code class="docs-inline">role="slider"</code>, a filled track and
-        a draggable thumb. Keyboard: Arrows step, Page Up/Down take larger steps,
-        Home/End jump to the bounds. Two-way via
-        <code class="docs-inline">[(value)]</code>.
-      </p>
-
-      <docs-example [code]="sliderCode" [column]="true">
-        <mk-slider [min]="0" [max]="100" [step]="5" [(value)]="volume" aria-label="Volume" />
-        <p class="echo">Volume: {{ volume() }}</p>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>min</td><td>number</td><td>0</td><td>Minimum value.</td></tr>
-          <tr><td>max</td><td>number</td><td>100</td><td>Maximum value.</td></tr>
-          <tr><td>step</td><td>number</td><td>1</td><td>Step increment (must be &gt; 0).</td></tr>
-          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
-          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Track/thumb thickness.</td></tr>
-          <tr><td>tone</td><td>MkTone</td><td>'primary'</td><td>Semantic color of the filled track + thumb.</td></tr>
-          <tr><td>aria-label</td><td>string</td><td>''</td><td>Accessible label for the thumb.</td></tr>
-          <tr><td>value</td><td>model&lt;number&gt;</td><td>0</td><td>Two-way current value.</td></tr>
         </tbody>
       </table>
 
@@ -497,86 +257,6 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>(validate)</td><td>MkCodeValidity</td><td>—</td><td>Emits {{ '{ valid, error }' }} on change.</td></tr>
         </tbody>
       </table>
-
-      <!-- ============================================================ -->
-      <!-- RATING / NUMBER / OTP / AUTOSIZE -->
-      <!-- ============================================================ -->
-      <h2>Rating</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-rating&gt;</code> is a star rating input
-        (and read-only display) following the ARIA slider pattern — click/hover a
-        star, or focus and use Arrow keys.
-      </p>
-      <docs-example [code]="ratingCode" [column]="true">
-        <mk-rating [(value)]="score" />
-        <p class="echo">Score: {{ score() }} / 5 · <mk-rating [value]="4" readonly size="sm" /> (read-only)</p>
-      </docs-example>
-
-      <h2>Number input</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-number-input&gt;</code> is a numeric field
-        with −/+ steppers, clamping and Arrow-key stepping
-        (<code class="docs-inline">spinbutton</code>).
-      </p>
-      <docs-example [code]="numberCode" [column]="true">
-        <mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />
-        <p class="echo">Quantity: {{ qty() ?? '—' }}</p>
-      </docs-example>
-
-      <h2>OTP / PIN input</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-otp&gt;</code> is a segmented one-time-code
-        field: auto-advance, Backspace-to-previous, Arrow navigation and full-code
-        paste.
-      </p>
-      <docs-example [code]="otpCode" [column]="true">
-        <mk-otp [(value)]="otp" [length]="6" />
-        <p class="echo">Code: {{ otp() || '—' }}</p>
-      </docs-example>
-
-      <h2>Textarea autosize</h2>
-      <p>
-        <code class="docs-inline">mkAutosize</code> grows a
-        <code class="docs-inline">&lt;textarea&gt;</code> to fit its content,
-        between <code class="docs-inline">mkAutosizeMinRows</code> and
-        <code class="docs-inline">mkAutosizeMaxRows</code>. Type to watch it grow.
-      </p>
-      <docs-example [code]="autosizeCode" [column]="true">
-        <textarea
-          mkInput
-          mkAutosize
-          [mkAutosizeMinRows]="2"
-          [mkAutosizeMaxRows]="8"
-          [mkAutosizeValue]="note()"
-          placeholder="Type a few lines…"
-          [(ngModel)]="note"
-          style="width: 100%; max-width: 30rem;"
-        ></textarea>
-      </docs-example>
-
-      <h2>Color picker</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-color-picker&gt;</code> is a compact color
-        control: a live swatch that opens the native OS picker, an editable hex
-        field and an optional row of preset swatches.
-      </p>
-      <docs-example [code]="colorCode" [column]="true">
-        <mk-color-picker [(value)]="brand" [swatches]="palette" />
-        <p class="echo">Value: <code class="docs-inline">{{ brand() }}</code></p>
-      </docs-example>
-
-      <h2>Range slider</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-range-slider&gt;</code> selects a
-        <code class="docs-inline">[low, high]</code> range with two thumbs (each a
-        <code class="docs-inline">role="slider"</code>); the thumbs can't cross.
-      </p>
-      <docs-example [code]="rangeCode" [column]="true">
-        <div style="max-width: 26rem; width: 100%;">
-          <mk-range-slider [min]="0" [max]="1000" [step]="10" [(value)]="priceRange" />
-          <p class="echo">Range: {{ priceRange()[0] }} – {{ priceRange()[1] }}</p>
-        </div>
-      </docs-example>
     </div>
   `,
   styles: [
@@ -600,15 +280,13 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class FormsPage {
-  // --- FormField / Input ----------------------------------------------------
+  // --- FormField --------------------------------------------------------------
   protected readonly email = signal('');
   protected readonly emailError = computed(() => {
     const v = this.email();
     if (!v) return null;
     return /^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(v) ? null : 'Enter a valid email address.';
   });
-  protected readonly name = signal('');
-  protected readonly message = signal('');
 
   // --- Form error summary ---------------------------------------------------
   protected readonly esEmail = signal('');
@@ -650,20 +328,6 @@ export class FormsPage {
   ];
   protected readonly role = signal<unknown>(null);
 
-  // --- Checkbox -------------------------------------------------------------
-  protected readonly accepted = signal(false);
-  protected readonly newsletter = signal(true);
-
-  // --- Radio ----------------------------------------------------------------
-  protected readonly plan = signal<unknown>('free');
-
-  // --- Switch ---------------------------------------------------------------
-  protected readonly notify = signal(true);
-  protected readonly dark = signal(false);
-
-  // --- Slider ---------------------------------------------------------------
-  protected readonly volume = signal(40);
-
   // --- File upload ----------------------------------------------------------
   protected readonly uploads = signal<MkUploadFile[]>([]);
   protected readonly uploadSummary = computed(() => {
@@ -671,48 +335,6 @@ export class FormsPage {
     if (!files.length) return 'none yet';
     const done = files.filter((f) => f.status === 'success').length;
     return `${done} uploaded`;
-  });
-
-  // --- Password input -------------------------------------------------------
-  protected readonly password = signal('');
-
-  // --- Rating / number / otp / autosize -------------------------------------
-  protected readonly score = signal(3);
-  protected readonly qty = signal<number | null>(1);
-  protected readonly otp = signal('');
-  protected readonly note = signal('');
-  protected readonly brand = signal('#4f46e5');
-  protected readonly palette = [
-    '#4f46e5', '#0ea5e9', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6', '#111827',
-  ];
-
-  protected readonly passwordCode = `<mk-password-input
-  [(value)]="password"
-  showStrength
-  showRules
-  [minLength]="10"
-  placeholder="Create a password" />
-
-<mk-form-field label="Password">
-  <mk-password-input [(value)]="password" [minLength]="10" placeholder="Create a password" />
-</mk-form-field>`;
-
-  protected readonly ratingCode = `<mk-rating [(value)]="score" />`;
-  protected readonly colorCode = `<mk-color-picker [(value)]="brand" [swatches]="palette" />`;
-  protected readonly priceRange = signal<MkRange>([200, 750]);
-  protected readonly rangeCode = `<mk-range-slider [min]="0" [max]="1000" [step]="10" [(value)]="priceRange" />`;
-  protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
-  protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
-  protected readonly autosizeCode = `<textarea mkInput mkAutosize [mkAutosizeMaxRows]="8"
-  [mkAutosizeValue]="note()" [(ngModel)]="note"></textarea>`;
-
-  // --- Code editor ----------------------------------------------------------
-  protected readonly config = signal(
-    '{"theme":"dark","features":{"search":true,"beta":false},"limits":[10,20,30]}',
-  );
-  protected readonly jsonValid = signal<MkCodeValidity>({
-    valid: true,
-    error: null,
   });
 
   /** Demo uploader: streams fake progress, then resolves. */
@@ -728,7 +350,25 @@ export class FormsPage {
       setTimeout(tick, 220);
     });
 
+  // --- Code editor ----------------------------------------------------------
+  protected readonly config = signal(
+    '{"theme":"dark","features":{"search":true,"beta":false},"limits":[10,20,30]}',
+  );
+  protected readonly jsonValid = signal<MkCodeValidity>({
+    valid: true,
+    error: null,
+  });
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
+  protected readonly formFieldCode = `<mk-form-field
+  label="Email"
+  hint="We never share it."
+  required
+  [error]="emailError()"
+>
+  <input mkInput type="email" placeholder="you@example.com" [(ngModel)]="email" />
+</mk-form-field>`;
+
   protected readonly errorSummaryCode = `<form (ngSubmit)="onSubmit()">
   <mk-form-error-summary #summary [errors]="errors()" />
 
@@ -745,22 +385,6 @@ onSubmit() {
 }
 // errors(): { fieldId: field.controlId, message: '…' }[]`;
 
-  protected readonly formFieldCode = `<mk-form-field
-  label="Email"
-  hint="We never share it."
-  required
-  [error]="emailError()"
->
-  <input mkInput type="email" placeholder="you@example.com" [(ngModel)]="email" />
-</mk-form-field>`;
-
-  protected readonly inputCode = `<input mkInput placeholder="Small" size="sm" [(ngModel)]="name" />
-<input mkInput placeholder="Medium (default)" [(ngModel)]="name" />
-<input mkInput placeholder="Large" size="lg" [(ngModel)]="name" />
-<input mkInput placeholder="Invalid" [invalid]="true" />`;
-
-  protected readonly textareaCode = `<textarea mkInput rows="4" placeholder="Your message…" [(ngModel)]="message"></textarea>`;
-
   protected readonly selectCode = `roleOptions: MkSelectOption[] = [
   { label: 'Admin', value: 'admin' },
   { label: 'Editor', value: 'editor' },
@@ -769,21 +393,6 @@ onSubmit() {
 ];
 
 <mk-select placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />`;
-
-  protected readonly checkboxCode = `<mk-checkbox [(checked)]="accepted">Accept terms</mk-checkbox>
-<mk-checkbox [(checked)]="newsletter" tone="success">Subscribe to newsletter</mk-checkbox>
-<mk-checkbox [checked]="true" disabled>Disabled &amp; checked</mk-checkbox>`;
-
-  protected readonly radioCode = `<mk-radio-group [(value)]="plan" aria-label="Plan" orientation="horizontal">
-  <mk-radio [value]="'free'">Free</mk-radio>
-  <mk-radio [value]="'pro'">Pro</mk-radio>
-  <mk-radio [value]="'team'" [disabled]="true">Team (soon)</mk-radio>
-</mk-radio-group>`;
-
-  protected readonly switchCode = `<mk-switch [(checked)]="notify">Email notifications</mk-switch>
-<mk-switch [(checked)]="dark" tone="success" size="lg">Dark mode</mk-switch>`;
-
-  protected readonly sliderCode = `<mk-slider [min]="0" [max]="100" [step]="5" [(value)]="volume" aria-label="Volume" />`;
 
   protected readonly fileUploadCode = `<mk-file-upload
   accept="image/*"

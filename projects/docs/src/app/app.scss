@@ -66,3 +66,15 @@
     display: none;
   }
 }
+
+/* Header search button + kbd hint */
+.docs-search-btn .docs-kbd {
+  margin-left: var(--mk-space-2);
+  padding: 1px 5px;
+  font-family: var(--mk-font-mono);
+  font-size: 10px;
+  color: var(--mk-text-muted);
+  background: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+}

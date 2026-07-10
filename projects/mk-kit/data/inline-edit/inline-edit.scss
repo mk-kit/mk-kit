@@ -1,0 +1,106 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: inline-block;
+  max-width: 100%;
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+}
+:host(.mk-inline-edit--sm) {
+  font-size: var(--mk-font-size-sm);
+}
+:host(.mk-inline-edit--lg) {
+  font-size: var(--mk-font-size-lg);
+}
+:host(.mk-inline-edit--editing) {
+  display: block;
+}
+
+.mk-inline-edit__display {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  max-width: 100%;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  margin: calc(-1 * var(--mk-space-1)) calc(-1 * var(--mk-space-2));
+  font: inherit;
+  color: var(--mk-text);
+  text-align: left;
+  background: transparent;
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-sm);
+  cursor: text;
+}
+.mk-inline-edit__display:hover:not(:disabled) {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-inline-edit__display:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-inline-edit__display:disabled {
+  cursor: default;
+}
+.mk-inline-edit__display--empty .mk-inline-edit__text {
+  color: var(--mk-text-subtle);
+  font-style: italic;
+}
+
+.mk-inline-edit__text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-inline-edit__pencil {
+  flex: none;
+  color: var(--mk-text-muted);
+  opacity: 0;
+  transition: opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-inline-edit__display:hover .mk-inline-edit__pencil,
+.mk-inline-edit__display:focus-visible .mk-inline-edit__pencil {
+  opacity: 1;
+}
+
+.mk-inline-edit__input {
+  width: 100%;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  font: inherit;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-primary);
+  border-radius: var(--mk-radius-sm);
+  outline: none;
+}
+.mk-inline-edit__input:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-inline-edit__input--multiline {
+  resize: vertical;
+  min-height: 4rem;
+  line-height: var(--mk-line-height-normal);
+}
+
+.mk-inline-edit__actions {
+  display: flex;
+  gap: var(--mk-space-1);
+  margin-top: var(--mk-space-1);
+}
+.mk-inline-edit__action {
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  color: var(--mk-text-muted);
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+}
+.mk-inline-edit__action:hover {
+  background-color: var(--mk-surface-3);
+  color: var(--mk-text);
+}
+.mk-inline-edit__action:focus-visible {
+  @include mk.focus-ring;
+}

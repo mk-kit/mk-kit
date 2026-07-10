@@ -1,0 +1,125 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-tree-select__field {
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+
+.mk-tree-select__trigger {
+  flex: 1 1 auto;
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  width: 100%;
+  height: var(--mk-control-height-md);
+  padding: 0 var(--mk-space-3);
+  text-align: left;
+  font: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  cursor: pointer;
+}
+:host(.mk-tree-select--sm) .mk-tree-select__trigger {
+  @include mk.control-size(sm, 0 var(--mk-space-2));
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-tree-select--lg) .mk-tree-select__trigger {
+  @include mk.control-size(lg, 0 var(--mk-space-4));
+}
+.mk-tree-select__trigger:hover:not(:disabled) {
+  border-color: var(--mk-border-strong);
+}
+.mk-tree-select__trigger:focus-visible {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+:host(.mk-tree-select--invalid) .mk-tree-select__trigger {
+  border-color: var(--mk-danger);
+}
+:host(.mk-tree-select--disabled) .mk-tree-select__trigger {
+  background-color: var(--mk-surface-2);
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mk-tree-select__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-tree-select__value--placeholder {
+  color: var(--mk-text-subtle);
+}
+
+/* Chevron indicator. */
+.mk-tree-select__icon {
+  flex: none;
+  width: 0.6rem;
+  height: 0.6rem;
+  border-right: 2px solid var(--mk-text-muted);
+  border-bottom: 2px solid var(--mk-text-muted);
+  transform: rotate(45deg);
+  transform-origin: center;
+  margin-bottom: 0.15rem;
+}
+:host(.mk-tree-select--open) .mk-tree-select__icon {
+  transform: rotate(-135deg);
+  margin-bottom: -0.15rem;
+}
+
+.mk-tree-select__clear {
+  position: absolute;
+  right: var(--mk-space-8);
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: none;
+  border-radius: var(--mk-radius-circle);
+  cursor: pointer;
+}
+.mk-tree-select__clear:hover {
+  background-color: var(--mk-hover-overlay);
+  color: var(--mk-text);
+}
+.mk-tree-select__clear-icon::before,
+.mk-tree-select__clear-icon::after {
+  content: '';
+  position: absolute;
+  width: 0.7rem;
+  height: 2px;
+  background-color: currentColor;
+}
+.mk-tree-select__clear-icon::before { transform: rotate(45deg); }
+.mk-tree-select__clear-icon::after { transform: rotate(-45deg); }
+
+/* Panel — positioning (fixed, top layer) owned by mkAnchoredPanel. */
+.mk-tree-select__panel {
+  max-height: 20rem;
+  overflow-y: auto;
+  padding: var(--mk-space-1);
+  background: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+}
+
+.mk-tree-select__tree {
+  display: block;
+}

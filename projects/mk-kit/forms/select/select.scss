@@ -1,0 +1,149 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  position: relative;
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-select__trigger {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  width: 100%;
+  height: var(--mk-control-height-md);
+  padding: 0 var(--mk-space-3);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  text-align: left;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  cursor: pointer;
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+:host(.mk-select--sm) .mk-select__trigger {
+  @include mk.control-size(sm, 0 var(--mk-space-2));
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-select--lg) .mk-select__trigger {
+  @include mk.control-size(lg, 0 var(--mk-space-4));
+}
+
+.mk-select__trigger:hover:not(:disabled) {
+  border-color: var(--mk-border-strong);
+}
+.mk-select__trigger:focus-visible {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+
+:host(.mk-select--invalid) .mk-select__trigger {
+  border-color: var(--mk-danger);
+}
+:host(.mk-select--invalid) .mk-select__trigger:focus-visible {
+  outline-color: var(--mk-danger);
+}
+
+.mk-select__trigger:disabled {
+  background-color: var(--mk-surface-2);
+  color: var(--mk-text-disabled);
+  border-color: var(--mk-border-subtle);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+.mk-select__value {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-select__value--placeholder {
+  color: var(--mk-text-subtle);
+}
+
+.mk-select__arrow {
+  flex: none;
+  width: 0.5rem;
+  height: 0.5rem;
+  border-right: 2px solid var(--mk-text-muted);
+  border-bottom: 2px solid var(--mk-text-muted);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-select--open) .mk-select__arrow {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+/* Popup list */
+.mk-select__list {
+  // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
+  padding: var(--mk-space-1);
+  list-style: none;
+  max-height: 16rem;
+  overflow-y: auto;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+}
+
+.mk-select__option {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+.mk-select__option-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-select__option--active {
+  background-color: var(--mk-selected-bg);
+}
+.mk-select__option--selected {
+  color: var(--mk-selected-text);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-select__option--disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-select__check {
+  flex: none;
+  width: 0.4rem;
+  height: 0.7rem;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  transform: rotate(45deg);
+}
+
+.mk-select__empty {
+  padding: var(--mk-space-2) var(--mk-space-3);
+  color: var(--mk-text-subtle);
+  font-size: var(--mk-font-size-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-select__arrow,
+  .mk-select__trigger {
+    transition: none;
+  }
+}

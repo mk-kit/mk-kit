@@ -1,0 +1,64 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  padding: var(--mk-space-3) var(--mk-space-4);
+  min-height: 2.75rem;
+  border-top: var(--mk-border-width) solid var(--mk-list-item-border, transparent);
+  color: var(--mk-text);
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+:host(:first-child) {
+  border-top-color: transparent;
+}
+
+.mk-list-item__leading,
+.mk-list-item__trailing {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  color: var(--mk-text-muted);
+}
+.mk-list-item__leading:empty,
+.mk-list-item__trailing:empty {
+  display: none;
+}
+
+.mk-list-item__content {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: var(--mk-line-height-snug);
+}
+.mk-list-item__trailing {
+  margin-left: auto;
+}
+
+/* Interactive */
+:host(.mk-list-item--interactive) {
+  cursor: pointer;
+  user-select: none;
+}
+:host(.mk-list-item--interactive:hover) {
+  background-color: var(--mk-neutral-subtle);
+}
+:host(.mk-list-item--interactive:focus-visible) {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+/* Selected */
+:host(.mk-list-item--selected) {
+  background-color: var(--mk-selected-bg);
+  color: var(--mk-selected-text);
+}
+
+/* Disabled */
+:host(.mk-list-item--disabled) {
+  cursor: not-allowed;
+  opacity: 0.55;
+  pointer-events: none;
+}

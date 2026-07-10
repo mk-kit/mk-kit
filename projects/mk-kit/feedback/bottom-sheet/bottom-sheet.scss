@@ -1,0 +1,150 @@
+@use '../../src/styles/mixins' as mk;
+
+/* Unencapsulated (ViewEncapsulation.None): every rule is namespaced under
+ * `.mk-bottom-sheet`. `.mk-bottom-sheet-panel` targets the body-level overlay
+ * panel produced by MkOverlayService, re-anchoring it to the bottom edge. */
+
+.mk-bottom-sheet-panel {
+  align-self: flex-end;
+  /* `width` (not max-width) so the panel's inline max-width:100% can't win. */
+  width: min(100%, 42rem);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--mk-surface);
+  color: var(--mk-text);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-bottom: none;
+  border-top-left-radius: var(--mk-radius-xl);
+  border-top-right-radius: var(--mk-radius-xl);
+  box-shadow: var(--mk-shadow-xl);
+  animation: mk-bottom-sheet-in var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+@keyframes mk-bottom-sheet-in {
+  from {
+    transform: translateY(100%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-bottom-sheet-panel {
+    animation: none;
+  }
+}
+
+.mk-bottom-sheet {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  max-height: inherit;
+  flex: 1 1 auto;
+  font-family: var(--mk-font-sans);
+}
+
+/* Drag handle */
+.mk-bottom-sheet__handle-area {
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mk-space-2) 0;
+  cursor: grab;
+  touch-action: none;
+}
+.mk-bottom-sheet__handle-area:active {
+  cursor: grabbing;
+}
+.mk-bottom-sheet__handle {
+  width: 2.25rem;
+  height: 0.25rem;
+  border-radius: var(--mk-radius-pill);
+  background-color: var(--mk-border-strong);
+}
+
+/* Header */
+.mk-bottom-sheet__header {
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  flex-shrink: 0;
+  padding: var(--mk-space-2) var(--mk-space-5) var(--mk-space-3);
+  background-color: var(--mk-surface);
+}
+
+.mk-bottom-sheet__title {
+  flex: 1;
+  min-width: 0;
+  margin: 0;
+  font-size: var(--mk-font-size-lg);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text);
+}
+
+.mk-bottom-sheet__close {
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  background: transparent;
+  border: 0;
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-text-muted);
+  cursor: pointer;
+  transition:
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-bottom-sheet__close:hover {
+  color: var(--mk-text);
+  background-color: var(--mk-hover-overlay);
+}
+.mk-bottom-sheet__close:focus-visible {
+  color: var(--mk-text);
+  @include mk.focus-ring;
+}
+
+/* Body */
+.mk-bottom-sheet__body {
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow-y: auto;
+  padding: var(--mk-space-2) var(--mk-space-5) var(--mk-space-5);
+  font-size: var(--mk-font-size-md);
+  line-height: var(--mk-line-height-normal);
+  color: var(--mk-text);
+}
+
+/* Footer */
+.mk-bottom-sheet__footer {
+  position: sticky;
+  bottom: 0;
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-4) var(--mk-space-5);
+  border-top: var(--mk-border-width) solid var(--mk-border-subtle);
+  background-color: var(--mk-surface);
+}
+.mk-bottom-sheet__footer:empty {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-bottom-sheet__close {
+    transition: none;
+  }
+}

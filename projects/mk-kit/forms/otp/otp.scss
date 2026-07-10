@@ -1,0 +1,61 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: inline-flex;
+  gap: var(--mk-space-2);
+  font-family: var(--mk-font-sans);
+}
+
+.mk-otp__cell {
+  width: 2.75rem;
+  height: 3rem;
+  padding: 0;
+  text-align: center;
+  font-size: var(--mk-font-size-lg);
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-otp--sm) .mk-otp__cell {
+  width: 2.25rem;
+  height: 2.5rem;
+  font-size: var(--mk-font-size-md);
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-otp--lg) .mk-otp__cell {
+  width: 3.25rem;
+  height: 3.5rem;
+  font-size: var(--mk-font-size-xl);
+}
+
+.mk-otp__cell:hover:not(:disabled) {
+  border-color: var(--mk-border-strong);
+}
+.mk-otp__cell:focus-visible {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+.mk-otp__cell:disabled {
+  background-color: var(--mk-surface-2);
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+:host(.mk-otp--invalid) .mk-otp__cell {
+  border-color: var(--mk-danger);
+}
+:host(.mk-otp--invalid) .mk-otp__cell:focus-visible {
+  outline-color: var(--mk-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-otp__cell {
+    transition: none;
+  }
+}

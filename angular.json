@@ -10,7 +10,7 @@
     "mk-kit": {
       "projectType": "library",
       "root": "projects/mk-kit",
-      "sourceRoot": "projects/mk-kit/src",
+      "sourceRoot": "projects/mk-kit",
       "prefix": "mk",
       "architect": {
         "build": {
@@ -28,7 +28,11 @@
         "test": {
           "builder": "@angular/build:unit-test",
           "options": {
-            "tsConfig": "projects/mk-kit/tsconfig.spec.json"
+            "tsConfig": "projects/mk-kit/tsconfig.spec.json",
+            "exclude": [
+              "node_modules/**",
+              "dist/**"
+            ]
           }
         }
       }
@@ -56,7 +60,9 @@
                 "input": "projects/docs/public"
               }
             ],
-            "styles": ["projects/docs/src/styles.scss"]
+            "styles": [
+              "projects/docs/src/styles.scss"
+            ]
           },
           "configurations": {
             "production": {

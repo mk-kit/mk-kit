@@ -1,15 +1,18 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { toSignal } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { filter, map } from 'rxjs/operators';
 import {
   MkAppShell,
   MkButton,
+  MkCommandPalette,
+  type MkCommand,
   MkNavGroup,
   MkNavItem,
   MkNavList,
   MkThemeService,
 } from '@mkornas/ui';
+import { DocsToc } from './shared/docs-toc';
 
 interface NavLink {
   label: string;
@@ -25,7 +28,16 @@ interface NavSection {
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet, MkAppShell, MkNavList, MkNavGroup, MkNavItem, MkButton],
+  imports: [
+    RouterOutlet,
+    MkAppShell,
+    MkNavList,
+    MkNavGroup,
+    MkNavItem,
+    MkButton,
+    MkCommandPalette,
+    DocsToc,
+  ],
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -111,6 +123,20 @@ export class App {
       ],
     },
   ];
+
+  /** ⌘K docs search — every page becomes a palette command. */
+  protected readonly searchOpen = signal(false);
+  protected readonly searchCommands: MkCommand[] = this.sections.flatMap(
+    (section) =>
+      section.links.map((link) => ({
+        id: link.path,
+        label: link.label,
+        group: section.title,
+        hint: link.path,
+        keywords: section.title,
+        run: () => this.router.navigateByUrl(link.path),
+      })),
+  );
 
   protected isActive(path: string): boolean {
     return this.currentUrl().startsWith(path);

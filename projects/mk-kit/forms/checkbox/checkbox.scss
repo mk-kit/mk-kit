@@ -1,0 +1,119 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  /* tone defaults (primary) — overridden by [data-tone] blocks */
+  --_main: var(--mk-primary);
+  --_contrast: var(--mk-primary-contrast);
+
+  display: inline-flex;
+  font-family: var(--mk-font-sans);
+  --_box-size: 1.15rem;
+}
+:host(.mk-checkbox--sm) { --_box-size: 1rem; }
+:host(.mk-checkbox--lg) { --_box-size: 1.35rem; }
+
+@include mk.tone-main-selectors($contrast: true);
+
+.mk-checkbox__root {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  cursor: pointer;
+  user-select: none;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+}
+:host(.mk-checkbox--sm) .mk-checkbox__root { font-size: var(--mk-font-size-sm); }
+:host(.mk-checkbox--lg) .mk-checkbox__root { font-size: var(--mk-font-size-lg); }
+
+.mk-checkbox__control {
+  position: relative;
+  display: inline-flex;
+  flex: none;
+  width: var(--_box-size);
+  height: var(--_box-size);
+}
+
+/* Visually-hidden native input keeps native keyboard + form semantics */
+.mk-checkbox__native {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: inherit;
+}
+
+.mk-checkbox__box {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width-strong) solid var(--mk-border-strong);
+  border-radius: var(--mk-radius-sm);
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+/* Checkmark */
+.mk-checkbox__check {
+  width: 30%;
+  height: 55%;
+  border-right: 2px solid var(--_contrast);
+  border-bottom: 2px solid var(--_contrast);
+  transform: rotate(45deg) translateY(-8%);
+  opacity: 0;
+}
+/* Indeterminate dash */
+.mk-checkbox__dash {
+  position: absolute;
+  width: 55%;
+  height: 0;
+  border-top: 2px solid var(--_contrast);
+  opacity: 0;
+}
+
+:host(.mk-checkbox--checked:not(.mk-checkbox--indeterminate)) .mk-checkbox__box {
+  background-color: var(--_main);
+  border-color: var(--_main);
+}
+:host(.mk-checkbox--checked:not(.mk-checkbox--indeterminate)) .mk-checkbox__check {
+  opacity: 1;
+}
+
+:host(.mk-checkbox--indeterminate) .mk-checkbox__box {
+  background-color: var(--_main);
+  border-color: var(--_main);
+}
+:host(.mk-checkbox--indeterminate) .mk-checkbox__dash {
+  opacity: 1;
+}
+
+/* Hover */
+.mk-checkbox__root:hover .mk-checkbox__box {
+  border-color: var(--_main);
+}
+
+/* Focus ring on the box, driven by the hidden native input */
+.mk-checkbox__native:focus-visible + .mk-checkbox__box {
+  @include mk.focus-ring;
+}
+
+/* Invalid */
+:host(.mk-checkbox--invalid) .mk-checkbox__box {
+  border-color: var(--mk-danger);
+}
+
+/* Disabled */
+:host(.mk-checkbox--disabled) .mk-checkbox__root {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-checkbox__box { transition: none; }
+}

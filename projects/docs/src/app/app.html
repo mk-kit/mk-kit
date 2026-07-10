@@ -42,6 +42,18 @@
         variant="outline"
         tone="neutral"
         size="sm"
+        class="docs-search-btn"
+        (click)="searchOpen.set(true)"
+      >
+        <span aria-hidden="true">⌕</span>
+        Search
+        <kbd class="docs-kbd" aria-hidden="true">⌘K</kbd>
+      </button>
+      <button
+        mkButton
+        variant="outline"
+        tone="neutral"
+        size="sm"
         (click)="cycleTheme()"
         [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
       >
@@ -84,4 +96,10 @@
 
   <!-- Main content -->
   <router-outlet />
+
+  <!-- On-this-page rail (auto-generated from the routed page's h2 headings) -->
+  <docs-toc />
 </mk-app-shell>
+
+<!-- ⌘K docs search -->
+<mk-command-palette [(open)]="searchOpen" [commands]="searchCommands" />

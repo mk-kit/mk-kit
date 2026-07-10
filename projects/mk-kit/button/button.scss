@@ -1,0 +1,151 @@
+/* mk-button — reference styling pattern.
+ * Tone selectors set local --_* vars; variant selectors consume them.
+ * All interactive states composite --mk-hover/active-overlay so every tone
+ * works without per-tone hover tokens. */
+@use '../src/styles/mixins' as mk;
+
+:host {
+  /* tone defaults (primary) — overridden by [data-tone] blocks below */
+  @include mk.tone(primary);
+
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-space-2);
+  position: relative;
+  height: var(--mk-control-height-md);
+  padding: 0 var(--mk-space-4);
+  border: var(--mk-border-width) solid transparent;
+  border-radius: var(--mk-radius-md);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  text-decoration: none;
+  white-space: nowrap;
+  cursor: pointer;
+  user-select: none;
+  vertical-align: middle;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+/* Per-tone local vars (primary, success, warning, danger, info, neutral). */
+@include mk.tone-selectors;
+
+/* Sizes */
+:host(.mk-button--sm) {
+  @include mk.control-size(sm, 0 var(--mk-space-3));
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-button--lg) {
+  @include mk.control-size(lg, 0 var(--mk-space-5));
+}
+
+:host(.mk-button--block) {
+  display: flex;
+  width: 100%;
+}
+
+/* Icon-only: square */
+:host(.mk-button--icon) {
+  padding: 0;
+  width: var(--mk-control-height-md);
+  aspect-ratio: 1;
+}
+:host(.mk-button--icon.mk-button--sm) { width: var(--mk-control-height-sm); }
+:host(.mk-button--icon.mk-button--lg) { width: var(--mk-control-height-lg); }
+
+/* --- Variants --- */
+:host(.mk-button--solid) {
+  background-color: var(--_main);
+  color: var(--_contrast);
+}
+:host(.mk-button--solid:hover) { background-color: var(--_hover); }
+:host(.mk-button--solid:active) { background-color: var(--_active); }
+
+:host(.mk-button--soft) {
+  background-color: var(--_subtle);
+  color: var(--_subtle-text);
+}
+:host(.mk-button--soft:hover) {
+  background-image: linear-gradient(var(--mk-hover-overlay), var(--mk-hover-overlay));
+}
+:host(.mk-button--soft:active) {
+  background-image: linear-gradient(var(--mk-active-overlay), var(--mk-active-overlay));
+}
+
+:host(.mk-button--outline) {
+  background-color: transparent;
+  color: var(--_subtle-text);
+  border-color: color-mix(in srgb, var(--_main) 42%, var(--mk-border-strong));
+}
+:host(.mk-button--outline:hover) {
+  background-color: var(--_subtle);
+  border-color: var(--_main);
+}
+:host(.mk-button--outline:active) {
+  background-image: linear-gradient(var(--mk-active-overlay), var(--mk-active-overlay));
+}
+
+:host(.mk-button--ghost) {
+  background-color: transparent;
+  color: var(--_subtle-text);
+}
+:host(.mk-button--ghost:hover) { background-color: var(--_subtle); }
+:host(.mk-button--ghost:active) {
+  background-image: linear-gradient(var(--mk-active-overlay), var(--mk-active-overlay));
+}
+
+:host(.mk-button--link) {
+  height: auto;
+  padding: 0;
+  background: transparent;
+  color: var(--_main);
+  border-radius: var(--mk-radius-xs);
+}
+:host(.mk-button--link:hover) { text-decoration: underline; }
+
+/* Focus ring (keyboard only) */
+:host(:focus-visible) {
+  @include mk.focus-ring;
+}
+
+/* Disabled */
+:host(.mk-button--disabled),
+:host([disabled]) {
+  cursor: not-allowed;
+  opacity: 0.55;
+  box-shadow: none;
+  pointer-events: none;
+}
+
+/* Loading */
+:host(.mk-button--loading) { cursor: progress; }
+:host(.mk-button--loading) .mk-button__content { visibility: hidden; }
+
+.mk-button__content {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  min-width: 0;
+}
+
+.mk-button__spinner {
+  position: absolute;
+  width: 1em;
+  height: 1em;
+  border: 2px solid currentColor;
+  border-right-color: transparent;
+  border-radius: 50%;
+  animation: mk-button-spin 0.6s linear infinite;
+}
+@keyframes mk-button-spin {
+  to { transform: rotate(360deg); }
+}
+@media (prefers-reduced-motion: reduce) {
+  .mk-button__spinner { animation-duration: 1.2s; }
+}

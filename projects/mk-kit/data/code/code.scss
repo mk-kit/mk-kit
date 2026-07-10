@@ -1,0 +1,120 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_fs: var(--mk-font-size-sm);
+  --_lh: 1.6;
+  --_pad-y: var(--mk-space-3);
+  --_pad-x: var(--mk-space-3);
+  display: block;
+  overflow: hidden;
+  background-color: var(--mk-code-bg, var(--mk-surface-2));
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  font-family: var(--mk-font-mono);
+}
+
+.mk-code__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-1) var(--mk-space-2) var(--mk-space-1) var(--mk-space-3);
+  background-color: var(--mk-surface-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+.mk-code__filename {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+}
+
+.mk-code__copy {
+  flex: none;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-code__copy:hover {
+  background-color: var(--mk-hover-overlay);
+  color: var(--mk-text);
+}
+.mk-code__copy:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-code__scroll {
+  display: flex;
+  overflow: auto;
+}
+
+.mk-code__gutter {
+  flex: none;
+  padding: var(--_pad-y) var(--mk-space-2);
+  text-align: right;
+  font-size: var(--_fs);
+  line-height: var(--_lh);
+  color: var(--mk-text-subtle);
+  user-select: none;
+  border-right: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+.mk-code__lineno {
+  display: block;
+}
+
+.mk-code__pre {
+  margin: 0;
+  padding: var(--_pad-y) var(--_pad-x);
+  flex: 1 1 auto;
+  min-width: 0;
+  font-family: var(--mk-font-mono);
+  font-size: var(--_fs);
+  line-height: var(--_lh);
+  color: var(--mk-text);
+  white-space: pre;
+  overflow-wrap: normal;
+}
+.mk-code__pre code {
+  font: inherit;
+  color: inherit;
+  background: none;
+}
+
+:host(.mk-code--wrap) .mk-code__pre {
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* Syntax tokens (shared palette with mk-code-editor). */
+.mk-tok-key {
+  color: var(--mk-info);
+}
+.mk-tok-str {
+  color: var(--mk-success);
+}
+.mk-tok-num {
+  color: var(--mk-warning);
+}
+.mk-tok-kw {
+  color: var(--mk-primary);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-tok-punc {
+  color: var(--mk-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-code__copy {
+    transition: none;
+  }
+}

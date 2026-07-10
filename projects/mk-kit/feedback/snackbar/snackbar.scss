@@ -1,0 +1,123 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  min-width: 18rem;
+  max-width: min(36rem, calc(100vw - 2 * var(--mk-space-4)));
+  padding: var(--mk-space-3) var(--mk-space-4);
+  background-color: var(--mk-surface-inverse);
+  color: var(--mk-text-inverse);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+  pointer-events: auto;
+  animation: mk-snackbar-in var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+/* Tone accent — a coloured leading stripe on the dark bar. */
+:host([data-tone='info']) {
+  border-left: 3px solid var(--mk-info);
+}
+:host([data-tone='success']) {
+  border-left: 3px solid var(--mk-success);
+}
+:host([data-tone='warning']) {
+  border-left: 3px solid var(--mk-warning);
+}
+:host([data-tone='danger']) {
+  border-left: 3px solid var(--mk-danger);
+}
+
+.mk-snackbar__message {
+  flex: 1 1 auto;
+  min-width: 0;
+  line-height: var(--mk-line-height-snug);
+}
+
+.mk-snackbar__action {
+  flex: none;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  margin: calc(-1 * var(--mk-space-1)) 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--mk-radius-sm);
+  color: color-mix(in srgb, var(--mk-primary) 65%, white);
+  font-family: inherit;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-semibold);
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-snackbar__action:hover {
+  background-color: color-mix(in srgb, transparent 88%, white);
+}
+.mk-snackbar__action:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-snackbar__close {
+  position: relative;
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  padding: 0;
+  background: transparent;
+  border: none;
+  border-radius: var(--mk-radius-circle);
+  color: inherit;
+  opacity: 0.7;
+  cursor: pointer;
+  transition:
+    opacity var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-snackbar__close:hover {
+  opacity: 1;
+  background-color: color-mix(in srgb, transparent 85%, white);
+}
+.mk-snackbar__close:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-snackbar__close::before,
+.mk-snackbar__close::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0.75rem;
+  height: 2px;
+  background-color: currentColor;
+  border-radius: var(--mk-radius-pill);
+}
+.mk-snackbar__close::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.mk-snackbar__close::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+@keyframes mk-snackbar-in {
+  from {
+    opacity: 0;
+    transform: translateY(0.75rem);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host {
+    animation: none;
+  }
+  .mk-snackbar__action,
+  .mk-snackbar__close {
+    transition: none;
+  }
+}
