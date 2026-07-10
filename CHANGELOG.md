@@ -8,6 +8,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-qr-code`** — a dependency-free QR code generator rendered as SVG. The
+  encoder (byte mode, Reed–Solomon ECC, data interleaving, all 8 masks with
+  penalty scoring, BCH format/version info) is implemented in-house; versions
+  1–10, ECC levels L/M/Q/H, theme-aware colors.
 - **`mk-funnel-chart`** — a funnel/conversion chart: stacked trapezoids whose
   width tracks each stage's value, with per-stage conversion %.
 - **`mk-treemap`** — a squarified treemap of value-sized rectangles, with a

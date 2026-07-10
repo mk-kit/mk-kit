@@ -67,7 +67,9 @@ live-announcer core.
 - ✅ **Avatar group** (`mk-avatar-group`) — overlapped avatars with "+N" overflow (shipped).
 - ✅ **Code block** (`mk-code`) — themed read-only block, highlight + copy (shipped).
 - ✅ **Carousel** (`mk-carousel`) — accessible slides/gallery (shipped).
-- ✅ **Comparison / diff view** (`mk-diff`) — LCS line diff + word highlighting, unified/split (shipped). **P3 QR/barcode** remaining.
+- ✅ **Comparison / diff view** (`mk-diff`) — LCS line diff + word highlighting, unified/split (shipped).
+- ✅ **QR code** (`mk-qr-code`) — dependency-free generator (in-house byte-mode
+  encoder + Reed–Solomon ECC + masking, versions 1–10, L/M/Q/H), SVG output (shipped).
 
 ### Charts (extend the module)
 - ✅ **Horizontal bar** (`mk-bar-chart orientation="horizontal"`) + **stacked
@@ -163,8 +165,8 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left of Round 1 is P2/P3:
 
-1. **QR code** (`mk-qr-code`) — dependency-free generator (in progress).
-2. RTL audit + density mode; high-contrast / forced-colors theme (remaining P2/P3).
+1. RTL audit + density mode; high-contrast / forced-colors theme (remaining P2/P3).
+2. **Round 1 + Round 2 gap analyses are effectively complete** — nearly every listed control has shipped.
 
 ---
 

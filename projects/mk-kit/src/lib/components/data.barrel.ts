@@ -28,3 +28,4 @@ export * from './virtual-scroll';
 export * from './carousel';
 export * from './diff';
 export * from './kanban';
+export * from './qr-code';

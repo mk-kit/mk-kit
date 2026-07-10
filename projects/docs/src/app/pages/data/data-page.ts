@@ -8,7 +8,9 @@ import {
   MkCode,
   MkCountdown,
   MkDiff,
+  MkInput,
   MkKanban,
+  MkQrCode,
   type MkKanbanColumn,
   MkSkeletonPreset,
   MkVirtualScroll,
@@ -59,7 +61,9 @@ interface DemoUser {
     MkDescItem,
     MkCode,
     MkCountdown,
+    MkInput,
     MkKanban,
+    MkQrCode,
     MkVirtualScroll,
     MkCarousel,
     MkCarouselSlide,
@@ -945,6 +949,25 @@ interface DemoUser {
         </div>
       </docs-example>
 
+      <!-- =========================== QR CODE ========================= -->
+      <h2>QR code</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-qr-code&gt;</code> renders a QR code as
+        crisp SVG — no dependencies (the encoder, Reed–Solomon ECC and masking are
+        implemented in-house). Set <code class="docs-inline">value</code>,
+        <code class="docs-inline">ecc</code> (L/M/Q/H) and
+        <code class="docs-inline">size</code>; it's theme-aware by default.
+      </p>
+      <docs-example [code]="qrCode" [column]="true">
+        <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: flex-start;">
+          <mk-qr-code [value]="qrValue()" [size]="160" />
+          <div style="display: grid; gap: var(--mk-space-2); max-width: 22rem; width: 100%;">
+            <input mkInput [value]="qrValue()" (input)="qrValue.set($any($event.target).value)" />
+            <p class="echo">Encodes the text above — try editing it.</p>
+          </div>
+        </div>
+      </docs-example>
+
       <!-- =========================== KANBAN ========================== -->
       <h2>Kanban</h2>
       <p>
@@ -1152,6 +1175,10 @@ published: true`;
   ];
   protected readonly gridRows = signal<DemoUser[]>(this.users.slice(0, 5));
   protected readonly gridStatus = signal('—');
+
+  // ----- QR code -------------------------------------------------------
+  protected readonly qrValue = signal('https://github.com/mkornas/mk-kit');
+  protected readonly qrCode = `<mk-qr-code value="https://example.com" ecc="M" [size]="160" />`;
 
   protected onCellEdit(e: { row: DemoUser; key: string; value: string }): void {
     this.gridRows.update((rows) =>
