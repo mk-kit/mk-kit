@@ -12,6 +12,11 @@ import type { MkResolvedTheme, MkThemePreference } from '../types';
 
 const STORAGE_KEY = 'mk-kit-theme';
 const THEME_ATTR = 'data-mk-theme';
+const DENSITY_STORAGE_KEY = 'mk-kit-density';
+const DENSITY_ATTR = 'data-mk-density';
+
+/** Global control-density mode. */
+export type MkDensity = 'comfortable' | 'compact';
 
 /**
  * Reactive theme controller for mk-kit.
@@ -47,6 +52,14 @@ export class MkThemeService {
   /** Convenience boolean for template bindings. */
   readonly isDark = computed(() => this.resolvedTheme() === 'dark');
 
+  private readonly _density = signal<MkDensity>(this.readInitialDensity());
+  /**
+   * The global density mode. `compact` tightens control heights and the core
+   * spacing steps via the `data-mk-density` attribute — every component
+   * follows automatically because they read the same tokens.
+   */
+  readonly density = this._density.asReadonly();
+
   constructor() {
     if (this.isBrowser) {
       this.watchSystemPreference();
@@ -69,6 +82,44 @@ export class MkThemeService {
         /* storage may be unavailable (private mode) — ignore */
       }
     });
+
+    // Keep the density attribute + storage in sync.
+    effect(() => {
+      const density = this._density();
+      if (!this.isBrowser) return;
+      const root = this.document.documentElement;
+      if (density === 'compact') {
+        root.setAttribute(DENSITY_ATTR, density);
+      } else {
+        root.removeAttribute(DENSITY_ATTR);
+      }
+      try {
+        localStorage.setItem(DENSITY_STORAGE_KEY, density);
+      } catch {
+        /* ignore */
+      }
+    });
+  }
+
+  /** Set the global density mode. */
+  setDensity(density: MkDensity): void {
+    this._density.set(density);
+  }
+
+  /** Toggle between comfortable and compact density. */
+  toggleDensity(): void {
+    this._density.update((d) => (d === 'compact' ? 'comfortable' : 'compact'));
+  }
+
+  private readInitialDensity(): MkDensity {
+    if (!this.isBrowser) return 'comfortable';
+    try {
+      const stored = localStorage.getItem(DENSITY_STORAGE_KEY);
+      if (stored === 'compact' || stored === 'comfortable') return stored;
+    } catch {
+      /* ignore */
+    }
+    return 'comfortable';
   }
 
   /** Set the theme preference explicitly. */

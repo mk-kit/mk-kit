@@ -54,6 +54,17 @@
         variant="outline"
         tone="neutral"
         size="sm"
+        (click)="theme.toggleDensity()"
+        [attr.aria-label]="'Density: ' + theme.density() + '. Click to toggle.'"
+      >
+        <span aria-hidden="true">{{ theme.density() === 'compact' ? '▤' : '☰' }}</span>
+        {{ theme.density() === 'compact' ? 'Compact' : 'Comfortable' }}
+      </button>
+      <button
+        mkButton
+        variant="outline"
+        tone="neutral"
+        size="sm"
         (click)="cycleTheme()"
         [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
       >

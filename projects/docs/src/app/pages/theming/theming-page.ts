@@ -36,6 +36,17 @@ interface TokenGroup {
         subtree — and every component updates instantly. No recompilation.
       </p>
 
+      <h2>Density</h2>
+      <p>
+        The kit ships a global <strong>density</strong> mode: setting
+        <code class="docs-inline">data-mk-density="compact"</code> on
+        <code class="docs-inline">&lt;html&gt;</code> tightens control heights and
+        the two spacing tokens most components use for padding — every control,
+        table and picker follows automatically. Toggle it programmatically via
+        <code class="docs-inline">MkThemeService.setDensity('compact')</code>
+        (persisted, SSR-safe), or try the density button in this site's header.
+      </p>
+
       <h2>Live playground</h2>
       <p>
         Adjust the tokens below. They're applied as inline
