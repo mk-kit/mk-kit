@@ -6,6 +6,8 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+## [0.3.0] — 2026-07-10
+
 ### Added
 
 - **Density mode** — a global `data-mk-density="compact"` attribute remaps the
