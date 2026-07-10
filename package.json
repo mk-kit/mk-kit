@@ -29,6 +29,8 @@
     "@angular/build": "^22.0.5",
     "@angular/cli": "^22.0.5",
     "@angular/compiler-cli": "^22.0.0",
+    "@angular/platform-server": "^22.0.5",
+    "axe-core": "^4.12.1",
     "jsdom": "^28.0.0",
     "ng-packagr": "^22.0.0",
     "prettier": "^3.8.1",

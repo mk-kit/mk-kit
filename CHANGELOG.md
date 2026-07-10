@@ -6,6 +6,31 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **Grouped table rows** — `mk-table` gained `groupBy` (column key or accessor):
+  rows render under collapsible group headers with a row count, sticky below
+  the (optionally sticky) column header. `groupLabel` formats the header,
+  `(groupToggle)` reports collapses, and `collapseAllGroups()` /
+  `expandAllGroups()` are available on the component. Sorting applies within
+  groups; group order follows each group's first sorted row.
+- **i18n complete** — the block editor's entire chrome (toolbar tools,
+  inserter palette, per-block captions/prompts, announcements) is now keyed
+  under `MK_I18N.blockEditor` (~90 keys), plus `qrCodeLabel` and `moreEvents`
+  (event-calendar overflow pill). No user-facing string in the library
+  bypasses `MK_I18N` anymore.
+- **CI quality gates** — an axe-core accessibility smoke test (17 rendered
+  component fixtures, zero-violation assertion) and an SSR render smoke test
+  (`renderApplication` over a 21-component gallery, catching unguarded
+  `window`/`document` access) now run as part of the normal test suite.
+
+### Fixed
+
+- `mk-breadcrumb-item` rendered link crumbs with no text: the projected label
+  was assigned to only one of the two `ng-content` branches, so any crumb
+  with `href` set was blank (and an axe `link-name` violation). Found by the
+  new a11y smoke test.
+
 ## [0.3.0] — 2026-07-10
 
 ### Added
