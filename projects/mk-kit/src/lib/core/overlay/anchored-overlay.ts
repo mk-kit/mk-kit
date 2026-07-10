@@ -166,7 +166,16 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
 
   private popover = false;
 
-  private readonly onReposition = () => this.position();
+  private repositionRaf: number | null = null;
+  /** rAF-coalesced repositioning — at most one layout pass per frame. */
+  private readonly onReposition = () => {
+    if (this.repositionRaf != null) return;
+    this.repositionRaf =
+      this.document.defaultView?.requestAnimationFrame(() => {
+        this.repositionRaf = null;
+        this.position();
+      }) ?? null;
+  };
   private readonly onDocPointerdown = (e: Event) => {
     const target = e.target as Node;
     if (this.host.nativeElement.contains(target)) return;
@@ -276,6 +285,10 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     if (!this.isBrowser) return;
     const el = this.host.nativeElement;
     const view = this.document.defaultView;
+    if (this.repositionRaf != null) {
+      view?.cancelAnimationFrame(this.repositionRaf);
+      this.repositionRaf = null;
+    }
     view?.removeEventListener('scroll', this.onReposition, true);
     view?.removeEventListener('resize', this.onReposition);
     view?.removeEventListener('blur', this.onWindowBlur);

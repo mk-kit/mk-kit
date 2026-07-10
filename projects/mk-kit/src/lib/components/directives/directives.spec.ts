@@ -122,6 +122,11 @@ describe('MkScrollspy', () => {
   let fixture: ComponentFixture<ScrollspyHost>;
   let body: HTMLElement;
 
+  /** Scroll computation is rAF-coalesced — wait one frame for it to land. */
+  function frame(): Promise<void> {
+    return new Promise((resolve) => requestAnimationFrame(() => resolve()));
+  }
+
   /** Stub each section's top edge (jsdom has no layout). */
   function setTops(tops: Record<string, number>): void {
     for (const [id, top] of Object.entries(tops)) {
@@ -155,34 +160,38 @@ describe('MkScrollspy', () => {
     fixture.destroy();
   });
 
-  it('activates the last section whose top has crossed the offset line', () => {
+  it('activates the last section whose top has crossed the offset line', async () => {
     // line = 0 + offset(10). a and b are above/at it, c is below.
     setTops({ 's-a': -100, 's-b': 5, 's-c': 300 });
     body.dispatchEvent(new Event('scroll'));
+    await frame();
     expect(fixture.componentInstance.active()).toBe('s-b');
   });
 
-  it('updates as the container scrolls further down', () => {
+  it('updates as the container scrolls further down', async () => {
     setTops({ 's-a': -400, 's-b': -200, 's-c': -5 });
     body.dispatchEvent(new Event('scroll'));
+    await frame();
     expect(fixture.componentInstance.active()).toBe('s-c');
   });
 
-  it('falls back to the first section when none has crossed yet', () => {
+  it('falls back to the first section when none has crossed yet', async () => {
     setTops({ 's-a': 100, 's-b': 300, 's-c': 500 });
     body.dispatchEvent(new Event('scroll'));
+    await frame();
     expect(fixture.componentInstance.active()).toBe('s-a');
   });
 
-  it('activates the last section when scrolled to the bottom', () => {
+  it('activates the last section when scrolled to the bottom', async () => {
     // The last section is too short to reach the line, but we are at the bottom.
     setTops({ 's-a': -400, 's-b': -300, 's-c': 60 });
     setRootMetrics(800); // 800 + 200 >= 1000 → at bottom
     body.dispatchEvent(new Event('scroll'));
+    await frame();
     expect(fixture.componentInstance.active()).toBe('s-c');
   });
 
-  it('exposes the active id as a signal and emits only on change', () => {
+  it('exposes the active id as a signal and emits only on change', async () => {
     const dir = fixture.debugElement
       .query((n) => n.name === 'nav')
       .injector.get(MkScrollspy);
@@ -191,7 +200,8 @@ describe('MkScrollspy', () => {
 
     setTops({ 's-a': -50, 's-b': 5, 's-c': 300 });
     body.dispatchEvent(new Event('scroll'));
-    body.dispatchEvent(new Event('scroll')); // no change → no second emit
+    body.dispatchEvent(new Event('scroll')); // coalesced → single compute
+    await frame();
     expect(dir.activeId()).toBe('s-b');
     expect(emits).toEqual(['s-b']);
   });

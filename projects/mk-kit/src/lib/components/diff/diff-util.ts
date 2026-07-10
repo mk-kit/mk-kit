@@ -47,10 +47,58 @@ interface Op<T> {
   b?: T;
 }
 
+/**
+ * The largest DP matrix lcsOps will allocate (cells). Above this the diff
+ * falls back to a plain delete-all/insert-all block instead of freezing the
+ * tab on huge inputs (an n×m matrix of two 10k-line files is 100M cells).
+ */
+const MAX_LCS_CELLS = 4_000_000;
+
 /** LCS diff of two sequences (dynamic programming + backtrack). */
 function lcsOps<T>(a: T[], b: T[], eq: (x: T, y: T) => boolean): Op<T>[] {
+  // Trim the common prefix/suffix first — the usual case for revisions is a
+  // small edit inside a large document, which shrinks the matrix massively.
+  let lead = 0;
+  const maxLead = Math.min(a.length, b.length);
+  while (lead < maxLead && eq(a[lead], b[lead])) lead++;
+  let trail = 0;
+  while (
+    trail < maxLead - lead &&
+    eq(a[a.length - 1 - trail], b[b.length - 1 - trail])
+  ) {
+    trail++;
+  }
+  if (lead > 0 || trail > 0) {
+    const head: Op<T>[] = a.slice(0, lead).map((x, k) => ({
+      op: 'equal' as const,
+      a: x,
+      b: b[k],
+    }));
+    const tail: Op<T>[] = a.slice(a.length - trail).map((x, k) => ({
+      op: 'equal' as const,
+      a: x,
+      b: b[b.length - trail + k],
+    }));
+    return [
+      ...head,
+      ...lcsCore(a.slice(lead, a.length - trail), b.slice(lead, b.length - trail), eq),
+      ...tail,
+    ];
+  }
+  return lcsCore(a, b, eq);
+}
+
+function lcsCore<T>(a: T[], b: T[], eq: (x: T, y: T) => boolean): Op<T>[] {
   const n = a.length;
   const m = b.length;
+  if (n === 0 && m === 0) return [];
+  // Guard against quadratic blow-up on huge, mostly-different inputs.
+  if ((n + 1) * (m + 1) > MAX_LCS_CELLS) {
+    return [
+      ...a.map((x) => ({ op: 'delete' as const, a: x })),
+      ...b.map((x) => ({ op: 'insert' as const, b: x })),
+    ];
+  }
   // dp[i][j] = LCS length of a[i:] and b[j:].
   const dp: number[][] = Array.from({ length: n + 1 }, () =>
     new Array<number>(m + 1).fill(0),

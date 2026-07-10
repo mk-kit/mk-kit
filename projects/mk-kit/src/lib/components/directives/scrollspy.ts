@@ -84,7 +84,16 @@ export class MkScrollspy {
     return Array.from(rootEl.querySelectorAll<HTMLElement>(this.sections()));
   }
 
-  private readonly onScroll = (): void => this.compute();
+  private computeRaf: number | null = null;
+  /** rAF-coalesced — several scroll ticks per frame trigger one layout read. */
+  private readonly onScroll = (): void => {
+    if (this.computeRaf != null) return;
+    this.computeRaf =
+      this.document.defaultView?.requestAnimationFrame(() => {
+        this.computeRaf = null;
+        this.compute();
+      }) ?? null;
+  };
 
   private compute(): void {
     const sections = this.querySections();
@@ -130,6 +139,10 @@ export class MkScrollspy {
   }
 
   ngOnDestroy(): void {
+    if (this.computeRaf != null) {
+      this.document.defaultView?.cancelAnimationFrame(this.computeRaf);
+      this.computeRaf = null;
+    }
     this.scrollSource?.removeEventListener('scroll', this.onScroll);
     this.document.defaultView?.removeEventListener('resize', this.onScroll);
   }

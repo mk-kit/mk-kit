@@ -57,15 +57,21 @@ export class MkVirtualScroll {
     () => this.items().length * this.itemHeight(),
   );
 
-  /** The [start, end) index window currently rendered. */
-  private readonly range = computed(() => {
-    const ih = this.itemHeight() || 1;
-    const count = this.items().length;
-    const visible = Math.ceil(this.viewportHeight() / ih);
-    const start = Math.max(0, Math.floor(this.scrollTop() / ih) - this.overscan());
-    const end = Math.min(count, start + visible + this.overscan() * 2);
-    return { start, end };
-  });
+  /**
+   * The [start, end) index window currently rendered. Custom equality means
+   * per-pixel scrolling only re-renders when the window actually shifts.
+   */
+  private readonly range = computed(
+    () => {
+      const ih = this.itemHeight() || 1;
+      const count = this.items().length;
+      const visible = Math.ceil(this.viewportHeight() / ih);
+      const start = Math.max(0, Math.floor(this.scrollTop() / ih) - this.overscan());
+      const end = Math.min(count, start + visible + this.overscan() * 2);
+      return { start, end };
+    },
+    { equal: (a, b) => a.start === b.start && a.end === b.end },
+  );
 
   /** Offset of the first rendered row from the top. */
   protected readonly offset = computed(() => this.range().start * this.itemHeight());
