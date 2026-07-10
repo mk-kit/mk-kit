@@ -76,7 +76,10 @@ export class App {
       collapsible: true,
       links: [
         { label: 'Buttons', path: '/components/buttons', icon: '⬡' },
-        { label: 'Forms', path: '/components/forms', icon: '☑' },
+        { label: 'Form fields', path: '/components/forms', icon: '☑' },
+        { label: 'Text inputs', path: '/components/text-inputs', icon: '⌨' },
+        { label: 'Toggles', path: '/components/toggles', icon: '◉' },
+        { label: 'Sliders & rating', path: '/components/sliders', icon: '⭒' },
         { label: 'Selection', path: '/components/selection', icon: '⊟' },
         { label: 'Date & time', path: '/components/date-time', icon: '◷' },
       ],
@@ -85,12 +88,28 @@ export class App {
       title: 'Data display',
       collapsible: true,
       links: [
+        { label: 'Badges & labels', path: '/components/badges-avatars', icon: '◈' },
+        { label: 'Cards & lists', path: '/components/cards-lists', icon: '▤' },
         { label: 'Data display', path: '/components/data', icon: '▦' },
-        { label: 'Charts', path: '/components/charts', icon: '▚' },
-        { label: 'Sort', path: '/components/sort', icon: '⇅' },
-        { label: 'Tree', path: '/components/tree', icon: '⑃' },
         { label: 'Icon', path: '/components/icon', icon: '❖' },
+        { label: 'Tree', path: '/components/tree', icon: '⑃' },
         { label: 'Empty & timeline', path: '/components/empty-timeline', icon: '☰' },
+      ],
+    },
+    {
+      title: 'Tables & grids',
+      collapsible: true,
+      links: [
+        { label: 'Table & data grid', path: '/components/table', icon: '▦' },
+        { label: 'Sort', path: '/components/sort', icon: '⇅' },
+      ],
+    },
+    {
+      title: 'Charts',
+      collapsible: true,
+      links: [
+        { label: 'Trend charts', path: '/components/charts', icon: '▚' },
+        { label: 'Proportion & KPI', path: '/components/proportion-charts', icon: '◔' },
       ],
     },
     {
@@ -109,6 +128,10 @@ export class App {
       collapsible: true,
       links: [
         { label: 'Feedback', path: '/components/feedback', icon: '✦' },
+        { label: 'Dialogs', path: '/components/dialogs', icon: '❐' },
+        { label: 'Tooltips & popovers', path: '/components/popovers', icon: '◹' },
+        { label: 'Status & notifications', path: '/components/status', icon: '🔔' },
+        { label: 'Loading & progress', path: '/components/loading', icon: '◐' },
         { label: 'Snackbar', path: '/components/snackbar', icon: '▭' },
         { label: 'Bottom sheet', path: '/components/bottom-sheet', icon: '▟' },
       ],

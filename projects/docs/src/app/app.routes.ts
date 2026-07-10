@@ -1,6 +1,76 @@
 import { Routes } from '@angular/router';
 
 export const routes: Routes = [
+  {
+    path: 'components/badges-avatars',
+    title: 'Badges & labels — mk-kit',
+    loadComponent: () =>
+      import('./pages/badges-avatars/badges-avatars-page').then(
+        (m) => m.BadgesAvatarsPage,
+      ),
+  },
+  {
+    path: 'components/cards-lists',
+    title: 'Cards & lists — mk-kit',
+    loadComponent: () =>
+      import('./pages/cards-lists/cards-lists-page').then((m) => m.CardsListsPage),
+  },
+  {
+    path: 'components/table',
+    title: 'Table & data grid — mk-kit',
+    loadComponent: () =>
+      import('./pages/table/table-page').then((m) => m.TablePage),
+  },
+  {
+    path: 'components/loading',
+    title: 'Loading & progress — mk-kit',
+    loadComponent: () =>
+      import('./pages/loading/loading-page').then((m) => m.LoadingPage),
+  },
+  {
+    path: 'components/text-inputs',
+    title: 'Text inputs — mk-kit',
+    loadComponent: () =>
+      import('./pages/text-inputs/text-inputs-page').then((m) => m.TextInputsPage),
+  },
+  {
+    path: 'components/toggles',
+    title: 'Toggles & switches — mk-kit',
+    loadComponent: () =>
+      import('./pages/toggles/toggles-page').then((m) => m.TogglesPage),
+  },
+  {
+    path: 'components/sliders',
+    title: 'Sliders & rating — mk-kit',
+    loadComponent: () =>
+      import('./pages/sliders/sliders-page').then((m) => m.SlidersPage),
+  },
+  {
+    path: 'components/popovers',
+    title: 'Tooltips & popovers — mk-kit',
+    loadComponent: () =>
+      import('./pages/popovers/popovers-page').then((m) => m.PopoversPage),
+  },
+  {
+    path: 'components/dialogs',
+    title: 'Dialogs — mk-kit',
+    loadComponent: () =>
+      import('./pages/dialogs/dialogs-page').then((m) => m.DialogsPage),
+  },
+  {
+    path: 'components/status',
+    title: 'Status & notifications — mk-kit',
+    loadComponent: () =>
+      import('./pages/status/status-page').then((m) => m.StatusPage),
+  },
+  {
+    path: 'components/proportion-charts',
+    title: 'Proportion & KPI charts — mk-kit',
+    loadComponent: () =>
+      import('./pages/proportion-charts/proportion-charts-page').then(
+        (m) => m.ProportionChartsPage,
+      ),
+  },
   { path: '', pathMatch: 'full', redirectTo: 'introduction' },
   {
     path: 'introduction',
@@ -130,7 +200,7 @@ export const routes: Routes = [
   },
   {
     path: 'components/charts',
-    title: 'Charts — mk-kit',
+    title: 'Trend charts — mk-kit',
     loadComponent: () =>
       import('./pages/charts/charts-page').then((m) => m.ChartsPage),
   },
