@@ -56,6 +56,10 @@
 :host(.mk-nav-group--closed) .mk-nav-group__chevron {
   transform: rotate(-45deg);
 }
+/* RTL: the closed chevron points towards inline-end, i.e. left. */
+:host(.mk-nav-group--closed:dir(rtl)) .mk-nav-group__chevron {
+  transform: rotate(135deg);
+}
 
 .mk-nav-group__items {
   display: flex;

@@ -21,7 +21,7 @@
   width: 100%;
   height: var(--mk-control-height-md);
   padding: 0 var(--mk-space-3);
-  text-align: left;
+  text-align: start;
   font: inherit;
   font-size: var(--mk-font-size-md);
   color: var(--mk-text);
@@ -83,7 +83,7 @@
 
 .mk-tree-select__clear {
   position: absolute;
-  right: var(--mk-space-8);
+  inset-inline-end: var(--mk-space-8);
   display: grid;
   place-items: center;
   width: 1.25rem;

@@ -6,14 +6,15 @@
 
 .mk-block {
   position: relative;
-  padding: var(--mk-space-2) var(--mk-space-2) var(--mk-space-2) var(--mk-space-8);
+  padding: var(--mk-space-2);
+  padding-inline-start: var(--mk-space-8);
   border: var(--mk-border-width) solid transparent;
   border-radius: var(--mk-radius-md);
   transition: border-color var(--mk-duration-fast) var(--mk-ease-standard),
     background-color var(--mk-duration-fast) var(--mk-ease-standard);
 }
 .mk-block--readonly {
-  padding-left: var(--mk-space-2);
+  padding-inline-start: var(--mk-space-2);
 }
 .mk-block:hover,
 .mk-block:focus-within {
@@ -25,7 +26,7 @@
 .mk-block__gutter {
   position: absolute;
   top: var(--mk-space-2);
-  left: 0;
+  inset-inline-start: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -109,7 +110,7 @@
   position: absolute;
   z-index: var(--mk-z-menu);
   top: calc(100% + var(--mk-space-1));
-  right: 0;
+  inset-inline-end: 0;
   display: flex;
   flex-direction: column;
   min-width: 180px;
@@ -127,7 +128,7 @@
   color: var(--mk-text);
   font: inherit;
   font-size: var(--mk-font-size-sm);
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 .mk-block__menu button:hover {

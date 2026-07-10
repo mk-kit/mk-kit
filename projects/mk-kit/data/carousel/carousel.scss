@@ -49,10 +49,15 @@
   @include mk.focus-ring;
 }
 .mk-carousel__arrow--prev {
-  left: var(--mk-space-2);
+  inset-inline-start: var(--mk-space-2);
 }
 .mk-carousel__arrow--next {
-  right: var(--mk-space-2);
+  inset-inline-end: var(--mk-space-2);
+}
+/* The chevron glyphs are directional — mirror them in RTL. */
+.mk-carousel__arrow:dir(rtl) span {
+  display: inline-block;
+  transform: scaleX(-1);
 }
 
 .mk-carousel__dots {

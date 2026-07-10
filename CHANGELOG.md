@@ -6,6 +6,42 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **Density mode** — a global `data-mk-density="compact"` attribute remaps the
+  control-height and spacing tokens for dense admin screens.
+  `MkThemeService` gained a persisted `density` signal plus
+  `setDensity()` / `toggleDensity()`; the docs header dogfoods the toggle.
+- **RTL support** — the whole library now lays out correctly under
+  `dir="rtl"`: logical CSS properties across every component (drawer/app-shell
+  slide side, switch knob, sliders, tree indent, calendar range pill, pinned
+  table columns via `inset-inline-*`, accent stripes, adornments), direction-
+  aware pointer math (sliders, column resize, carousel), and RTL-aware
+  `-start`/`-end` alignment in the anchored-overlay primitive and tooltip.
+  Code surfaces (code block, diff, code editor) intentionally stay LTR.
+- **Forced-colors support** — a dedicated `@media (forced-colors: active)`
+  layer keeps selection, checked toggles, slider/progress fills, the tabs ink
+  bar and overlay boundaries visible in Windows High Contrast using system
+  colors.
+- `mk-calendar` now implements `ControlValueAccessor` — usable directly with
+  `ngModel` / `formControl`, including `setDisabledState` support.
+- i18n: drag-and-drop announcements (`dndPickedUp`, `dndMoved`,
+  `dndMovedToList`, `dndDropped`, `dndCancelled`) and file-upload rejection
+  reasons (`fileRejectedType`, `fileRejectedSize`, `fileRejectedCount`) are
+  now `MK_I18N` keys.
+- Docs: new **Core & services** page (overlay service, anchored panel, focus
+  trap, live announcer, theme service, i18n, hotkeys); API props tables and
+  keyboard-interaction tables across the remaining component pages
+  (selection, utilities, structure, stepper, tree, icon, snackbar,
+  empty-timeline, command-nav, navigation, date-time, dialogs, table,
+  drag-drop).
+
+### Changed
+
+- **Breaking (pre-1.0):** `mk-splitter`'s two-way model was renamed
+  `size` → `position` (`[(position)]="pct"`), freeing `size` for the
+  library-wide control-size convention.
+
 ## [0.2.0] — 2026-07-10
 
 ### Added

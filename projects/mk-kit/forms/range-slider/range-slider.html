@@ -2,7 +2,7 @@
   <div #track class="mk-range-slider__track">
     <div
       class="mk-range-slider__fill"
-      [style.left.%]="lowPercent()"
+      [style.inset-inline-start.%]="lowPercent()"
       [style.width.%]="highPercent() - lowPercent()"
     ></div>
   </div>
@@ -12,7 +12,7 @@
     class="mk-range-slider__thumb"
     role="slider"
     [attr.tabindex]="isDisabled() ? null : 0"
-    [style.left.%]="lowPercent()"
+    [style.inset-inline-start.%]="lowPercent()"
     [attr.aria-label]="minLabel()"
     [attr.aria-labelledby]="labelledBy()"
     [attr.aria-valuemin]="min()"
@@ -27,7 +27,7 @@
     class="mk-range-slider__thumb"
     role="slider"
     [attr.tabindex]="isDisabled() ? null : 0"
-    [style.left.%]="highPercent()"
+    [style.inset-inline-start.%]="highPercent()"
     [attr.aria-label]="maxLabel()"
     [attr.aria-valuemin]="low()"
     [attr.aria-valuemax]="max()"

@@ -17,7 +17,7 @@
   flex: 0 0 auto;
   width: var(--_size);
   height: var(--_size);
-  margin-left: calc(var(--_size) * -0.35);
+  margin-inline-start: calc(var(--_size) * -0.35);
   border-radius: var(--mk-radius-circle);
   background-color: var(--mk-surface-3);
   color: var(--mk-text-muted);

@@ -38,19 +38,27 @@
 /* Side placement + closed transform (open state resets transform below). */
 :host([data-side='end']) .mk-drawer__panel {
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   width: var(--_size, 20rem);
-  border-left: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-inline-start: var(--mk-border-width) solid var(--mk-border-subtle);
   transform: translateX(100%);
 }
 :host([data-side='start']) .mk-drawer__panel {
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   bottom: 0;
   width: var(--_size, 20rem);
-  border-right: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-inline-end: var(--mk-border-width) solid var(--mk-border-subtle);
   transform: translateX(-100%);
+}
+/* RTL: the inline edges swap sides, so the closed panel slides from the other way.
+   Scoped to the closed state so the `--open` reset below still wins. */
+:host([data-side='end']:dir(rtl):not(.mk-drawer--open)) .mk-drawer__panel {
+  transform: translateX(-100%);
+}
+:host([data-side='start']:dir(rtl):not(.mk-drawer--open)) .mk-drawer__panel {
+  transform: translateX(100%);
 }
 :host([data-side='top']) .mk-drawer__panel {
   top: 0;

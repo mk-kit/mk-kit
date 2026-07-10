@@ -67,10 +67,10 @@
     color var(--mk-duration-fast) var(--mk-ease-standard);
 }
 .mk-number-input__btn--dec {
-  border-right: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-inline-end: var(--mk-border-width) solid var(--mk-border-subtle);
 }
 .mk-number-input__btn--inc {
-  border-left: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-inline-start: var(--mk-border-width) solid var(--mk-border-subtle);
 }
 .mk-number-input__btn:not(:disabled):hover {
   background-color: var(--mk-hover-overlay);

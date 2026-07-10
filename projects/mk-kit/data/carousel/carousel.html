@@ -12,7 +12,7 @@
 >
   <div
     class="mk-carousel__track"
-    [style.transform]="'translateX(' + -index() * 100 + '%)'"
+    [style.transform]="trackTransform()"
   >
     <ng-content />
   </div>

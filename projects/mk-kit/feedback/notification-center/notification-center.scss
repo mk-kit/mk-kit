@@ -29,13 +29,16 @@
   @include mk.focus-ring;
 }
 
-// Count badge overlaid on the top-right of the bell.
+// Count badge overlaid on the top inline-end corner of the bell.
 .mk-notification-center__count {
   position: absolute;
   top: 0.125rem;
-  right: 0.125rem;
+  inset-inline-end: 0.125rem;
   pointer-events: none;
   transform: translate(35%, -35%);
+}
+.mk-notification-center__count:dir(rtl) {
+  transform: translate(-35%, -35%);
 }
 
 .mk-notification-center__panel {
@@ -123,7 +126,7 @@
   border: none;
   cursor: pointer;
   font: inherit;
-  text-align: left;
+  text-align: start;
 }
 
 .mk-notification-center__item:hover {

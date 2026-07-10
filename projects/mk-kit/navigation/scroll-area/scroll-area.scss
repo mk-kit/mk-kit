@@ -55,7 +55,7 @@
 
 .mk-scroll-area__scrollbar--vertical {
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   bottom: 0;
   width: var(--_bar-size);
 }
@@ -70,7 +70,7 @@
   bottom: var(--_bar-size);
 }
 .mk-scroll-area__scrollbar--horizontal {
-  right: var(--_bar-size);
+  inset-inline-end: var(--_bar-size);
 }
 
 .mk-scroll-area__thumb {

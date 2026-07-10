@@ -13,6 +13,8 @@
 .mk-code-editor__frame {
   display: flex;
   align-items: stretch;
+  /* Code is always LTR, even when the surrounding page is RTL. */
+  direction: ltr;
   overflow: hidden;
   background-color: var(--mk-surface);
   border: var(--mk-border-width) solid var(--mk-border);

@@ -29,17 +29,17 @@
 
 /* Collapse the shared border between adjacent segments. */
 :host(:not(:first-child)) .mk-button-toggle__btn {
-  margin-left: calc(-1 * var(--mk-border-width));
+  margin-inline-start: calc(-1 * var(--mk-border-width));
 }
 
 /* Round only the outer ends of the group. */
 :host(:first-child) .mk-button-toggle__btn {
-  border-top-left-radius: var(--_radius, var(--mk-radius-md));
-  border-bottom-left-radius: var(--_radius, var(--mk-radius-md));
+  border-start-start-radius: var(--_radius, var(--mk-radius-md));
+  border-end-start-radius: var(--_radius, var(--mk-radius-md));
 }
 :host(:last-child) .mk-button-toggle__btn {
-  border-top-right-radius: var(--_radius, var(--mk-radius-md));
-  border-bottom-right-radius: var(--_radius, var(--mk-radius-md));
+  border-start-end-radius: var(--_radius, var(--mk-radius-md));
+  border-end-end-radius: var(--_radius, var(--mk-radius-md));
 }
 
 .mk-button-toggle__btn:hover:not(:disabled) {

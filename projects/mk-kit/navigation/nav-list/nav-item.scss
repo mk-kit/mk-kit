@@ -93,14 +93,25 @@
   transform: rotate(90deg);
 }
 
+/* RTL: the SVG chevron points right, so mirror it; keep the mirror on the
+   expanded state too so the rotation animates cleanly (still ends pointing down). */
+:host(:dir(rtl)) .mk-nav-item__chevron {
+  transform: scaleX(-1);
+}
+:host(.mk-nav-item--has-children:dir(rtl)) > .mk-nav-item__link[aria-expanded='true'] .mk-nav-item__chevron {
+  transform: rotate(-90deg) scaleX(-1);
+}
+
 /* Nested sub-list */
 .mk-nav-item__sub {
   display: flex;
   flex-direction: column;
   gap: var(--mk-space-1);
-  margin: var(--mk-space-1) 0 var(--mk-space-1) var(--mk-space-5);
-  padding: 0 0 0 var(--mk-space-2);
-  border-left: var(--mk-border-width) solid var(--mk-border);
+  margin-block: var(--mk-space-1);
+  margin-inline: var(--mk-space-5) 0;
+  padding-block: 0;
+  padding-inline: var(--mk-space-2) 0;
+  border-inline-start: var(--mk-border-width) solid var(--mk-border);
   list-style: none;
 }
 

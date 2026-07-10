@@ -40,7 +40,7 @@ h4.mk-r-heading { font-size: var(--mk-font-size-lg); font-weight: var(--mk-font-
 
 .mk-r-list {
   margin: 0 0 var(--mk-space-4);
-  padding-left: var(--mk-space-6);
+  padding-inline-start: var(--mk-space-6);
 }
 .mk-r-list li {
   margin: var(--mk-space-1) 0;
@@ -48,8 +48,8 @@ h4.mk-r-heading { font-size: var(--mk-font-size-lg); font-weight: var(--mk-font-
 
 .mk-r-quote {
   margin: 0 0 var(--mk-space-4);
-  padding-left: var(--mk-space-4);
-  border-left: 4px solid var(--mk-primary);
+  padding-inline-start: var(--mk-space-4);
+  border-inline-start: 4px solid var(--mk-primary);
   font-size: var(--mk-font-size-lg);
   font-style: italic;
 }
@@ -100,7 +100,7 @@ h4.mk-r-heading { font-size: var(--mk-font-size-lg); font-weight: var(--mk-font-
 }
 
 /* CTA (mirrors button-block styling) */
-.mk-r-cta-wrap { margin: 0 0 var(--mk-space-4); text-align: left; }
+.mk-r-cta-wrap { margin: 0 0 var(--mk-space-4); text-align: start; }
 .mk-r-cta-wrap--center { text-align: center; }
 .mk-r-cta-wrap--right { text-align: right; }
 

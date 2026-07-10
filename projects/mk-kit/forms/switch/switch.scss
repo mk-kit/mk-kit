@@ -43,7 +43,7 @@
 .mk-switch__thumb {
   position: absolute;
   top: var(--_gap);
-  left: var(--_gap);
+  inset-inline-start: var(--_gap);
   width: calc(var(--_track-h) - 2 * var(--_gap));
   height: calc(var(--_track-h) - 2 * var(--_gap));
   background-color: var(--mk-surface);
@@ -57,6 +57,9 @@
 }
 :host(.mk-switch--checked) .mk-switch__thumb {
   transform: translateX(calc(var(--_track-w) - var(--_track-h)));
+}
+:host(.mk-switch--checked:dir(rtl)) .mk-switch__thumb {
+  transform: translateX(calc(-1 * (var(--_track-w) - var(--_track-h))));
 }
 
 .mk-switch__control:focus-visible .mk-switch__track {

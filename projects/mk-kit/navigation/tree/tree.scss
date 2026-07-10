@@ -15,7 +15,7 @@
   align-items: center;
   gap: var(--mk-space-1);
   min-height: 2rem;
-  padding-right: var(--mk-space-2);
+  padding-inline-end: var(--mk-space-2);
   border-radius: var(--mk-radius-sm);
   color: var(--mk-text);
   font-size: var(--mk-font-size-md);
@@ -67,6 +67,10 @@
 }
 .mk-tree__caret--open {
   transform: rotate(45deg);
+}
+/* RTL: the collapsed caret points towards inline-end, i.e. left. */
+:host(:dir(rtl)) .mk-tree__caret:not(.mk-tree__caret--open) {
+  transform: rotate(135deg);
 }
 
 .mk-tree__icon {

@@ -1,7 +1,7 @@
 :host {
   position: fixed;
   bottom: var(--mk-space-4);
-  right: var(--mk-space-4);
+  inset-inline-end: var(--mk-space-4);
   z-index: var(--mk-z-toast);
   display: flex;
   flex-direction: column;

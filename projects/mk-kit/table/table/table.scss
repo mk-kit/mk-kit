@@ -34,7 +34,7 @@
   background-color: var(--mk-surface-2);
   color: var(--mk-text-muted);
   font-weight: var(--mk-font-weight-semibold);
-  text-align: left;
+  text-align: start;
   white-space: nowrap;
   border-bottom: var(--mk-border-width) solid var(--mk-border);
   vertical-align: middle;
@@ -213,7 +213,7 @@
 .mk-table__resize {
   position: absolute;
   top: 0;
-  right: 0;
+  inset-inline-end: 0;
   width: 8px;
   height: 100%;
   cursor: col-resize;
@@ -224,7 +224,7 @@
   content: '';
   position: absolute;
   top: 25%;
-  right: 3px;
+  inset-inline-end: 3px;
   width: 2px;
   height: 50%;
   background-color: var(--mk-border);
@@ -264,6 +264,16 @@
 .mk-table__th--pinned-right,
 .mk-table__td--pinned-right {
   box-shadow: -2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+/* In RTL the scrolled-under content sits on the other physical side, so the
+   inner-edge shadows swap their x-direction. */
+:host(:dir(rtl)) .mk-table__th--pinned:not(.mk-table__th--pinned-right),
+:host(:dir(rtl)) .mk-table__td--pinned:not(.mk-table__td--pinned-right) {
+  box-shadow: -2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
+}
+:host(:dir(rtl)) .mk-table__th--pinned-right,
+:host(:dir(rtl)) .mk-table__td--pinned-right {
+  box-shadow: 2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
 }
 /* Keep zebra/selected backgrounds on pinned body cells opaque. */
 :host(.mk-table--zebra)

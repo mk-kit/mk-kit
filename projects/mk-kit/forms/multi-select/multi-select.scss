@@ -13,7 +13,8 @@
   align-items: center;
   gap: var(--mk-space-1);
   min-height: var(--mk-control-height-md);
-  padding: var(--mk-space-1) var(--mk-space-8) var(--mk-space-1) var(--mk-space-2);
+  padding-block: var(--mk-space-1);
+  padding-inline: var(--mk-space-2) var(--mk-space-8);
   position: relative;
   background-color: var(--mk-surface);
   border: var(--mk-border-width) solid var(--mk-border);
@@ -83,7 +84,7 @@
 .mk-multi-select__arrow {
   position: absolute;
   top: 50%;
-  right: var(--mk-space-3);
+  inset-inline-end: var(--mk-space-3);
   flex: none;
   width: 0.5rem;
   height: 0.5rem;

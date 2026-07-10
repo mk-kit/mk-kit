@@ -59,7 +59,7 @@ export class MkAvatarGroup {
       const max = this.max();
       items.forEach((ref, i) => {
         const el = ref.nativeElement as HTMLElement;
-        el.style.marginLeft = i === 0 ? '0' : 'calc(var(--_size) * -0.35)';
+        el.style.marginInlineStart = i === 0 ? '0' : 'calc(var(--_size) * -0.35)';
         el.style.boxShadow =
           '0 0 0 var(--mk-border-width-strong) var(--mk-surface)';
         el.style.zIndex = String(items.length - i);

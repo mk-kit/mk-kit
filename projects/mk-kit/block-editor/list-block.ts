@@ -104,7 +104,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
       }
       .mk-list-block__list {
         margin: 0;
-        padding-left: var(--mk-space-6);
+        padding-inline-start: var(--mk-space-6);
         color: var(--mk-text);
       }
       .mk-list-block__item {

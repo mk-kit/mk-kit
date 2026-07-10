@@ -39,15 +39,15 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
       }
       .mk-quote-block__quote {
         margin: 0;
-        padding-left: var(--mk-space-4);
-        border-left: 4px solid var(--mk-primary);
+        padding-inline-start: var(--mk-space-4);
+        border-inline-start: 4px solid var(--mk-primary);
         font-size: var(--mk-font-size-lg);
         font-style: italic;
         color: var(--mk-text);
       }
       .mk-quote-block__cite {
         margin-top: var(--mk-space-2);
-        margin-left: var(--mk-space-4);
+        margin-inline-start: var(--mk-space-4);
         width: calc(100% - var(--mk-space-4));
         border: none;
         background: transparent;

@@ -19,16 +19,16 @@
 
 /* Tone accent — a coloured leading stripe on the dark bar. */
 :host([data-tone='info']) {
-  border-left: 3px solid var(--mk-info);
+  border-inline-start: 3px solid var(--mk-info);
 }
 :host([data-tone='success']) {
-  border-left: 3px solid var(--mk-success);
+  border-inline-start: 3px solid var(--mk-success);
 }
 :host([data-tone='warning']) {
-  border-left: 3px solid var(--mk-warning);
+  border-inline-start: 3px solid var(--mk-warning);
 }
 :host([data-tone='danger']) {
-  border-left: 3px solid var(--mk-danger);
+  border-inline-start: 3px solid var(--mk-danger);
 }
 
 .mk-snackbar__message {

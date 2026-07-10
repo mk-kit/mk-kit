@@ -53,6 +53,11 @@
   color: var(--mk-text-muted);
 }
 
+/* Prev/next chevrons point toward the adjacent page; mirror them in RTL. */
+:host(:dir(rtl)) .mk-pagination__btn--nav svg {
+  transform: scaleX(-1);
+}
+
 .mk-pagination__btn--active {
   background: var(--mk-primary);
   color: var(--mk-primary-contrast);

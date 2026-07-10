@@ -29,7 +29,7 @@
   flex: none;
   width: var(--mk-sidebar-width);
   background: var(--mk-surface);
-  border-right: var(--mk-border-width) solid var(--mk-border);
+  border-inline-end: var(--mk-border-width) solid var(--mk-border);
   /* Pin the sidebar in view and let it scroll independently of the page. */
   align-self: flex-start;
   position: sticky;
@@ -70,7 +70,7 @@
 .mk-app-shell__skip {
   position: fixed;
   top: var(--mk-space-2);
-  left: var(--mk-space-2);
+  inset-inline-start: var(--mk-space-2);
   z-index: var(--mk-z-toast);
   padding: var(--mk-space-2) var(--mk-space-4);
   background: var(--mk-surface);
@@ -91,12 +91,17 @@
   position: fixed;
   top: var(--mk-header-height);
   bottom: 0;
-  left: 0;
+  inset-inline-start: 0;
   z-index: var(--mk-z-drawer);
   width: var(--mk-sidebar-width);
   transform: translateX(-100%);
   box-shadow: var(--mk-shadow-xl);
   transition: transform var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+/* RTL: inline-start is the right edge, so the closed drawer slides the other way. */
+:host(.mk-app-shell--mobile:dir(rtl)) .mk-app-shell__sidebar {
+  transform: translateX(100%);
 }
 
 :host(.mk-app-shell--mobile.mk-app-shell--drawer-open) .mk-app-shell__sidebar {

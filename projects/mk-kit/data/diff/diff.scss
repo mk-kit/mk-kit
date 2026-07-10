@@ -40,6 +40,8 @@
 }
 
 .mk-diff__body {
+  /* Code is inherently LTR content, even in an RTL document. */
+  direction: ltr;
   overflow-x: auto;
   font-family: var(--mk-font-mono);
   font-size: var(--mk-font-size-sm);

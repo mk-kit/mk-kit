@@ -28,7 +28,7 @@
 .mk-slider__fill {
   position: absolute;
   top: 0;
-  left: 0;
+  inset-inline-start: 0;
   height: 100%;
   background-color: var(--_main);
   border-radius: var(--mk-radius-pill);
@@ -39,7 +39,7 @@
   top: 50%;
   width: var(--_thumb);
   height: var(--_thumb);
-  margin-left: calc(var(--_thumb) / -2);
+  margin-inline-start: calc(var(--_thumb) / -2);
   background-color: var(--mk-surface);
   border: var(--mk-border-width-strong) solid var(--_main);
   border-radius: var(--mk-radius-circle);

@@ -191,7 +191,15 @@ export class MkTooltip {
       },
       // Clamp back on-screen but keep the requested side (no flip) so the
       // panel's `data-placement` styling stays correct.
-      { placement: this.mkTooltipPlacement(), gap: 8, flip: false, clamp: true },
+      {
+        placement: this.mkTooltipPlacement(),
+        gap: 8,
+        flip: false,
+        clamp: true,
+        rtl:
+          this.document.defaultView?.getComputedStyle(this.host.nativeElement)
+            .direction === 'rtl',
+      },
     );
     panel.style.position = 'fixed';
     panel.style.margin = '0';

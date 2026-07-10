@@ -10,21 +10,21 @@
 }
 :host([data-position='bottom-end']) {
   bottom: var(--mk-space-5);
-  right: var(--mk-space-5);
+  inset-inline-end: var(--mk-space-5);
 }
 :host([data-position='bottom-start']) {
   bottom: var(--mk-space-5);
-  left: var(--mk-space-5);
+  inset-inline-start: var(--mk-space-5);
   align-items: flex-start;
 }
 :host([data-position='top-end']) {
   top: var(--mk-space-5);
-  right: var(--mk-space-5);
+  inset-inline-end: var(--mk-space-5);
   flex-direction: column-reverse;
 }
 :host([data-position='top-start']) {
   top: var(--mk-space-5);
-  left: var(--mk-space-5);
+  inset-inline-start: var(--mk-space-5);
   align-items: flex-start;
   flex-direction: column-reverse;
 }

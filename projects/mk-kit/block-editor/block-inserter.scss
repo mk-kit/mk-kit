@@ -83,7 +83,7 @@
   position: absolute;
   z-index: var(--mk-z-menu);
   top: calc(100% + var(--mk-space-2));
-  left: 0;
+  inset-inline-start: 0;
   width: min(320px, 90vw);
   max-height: 380px;
   display: flex;
@@ -134,7 +134,7 @@
   background: transparent;
   color: var(--mk-text);
   font: inherit;
-  text-align: left;
+  text-align: start;
   cursor: pointer;
 }
 .mk-block-inserter__option--active {

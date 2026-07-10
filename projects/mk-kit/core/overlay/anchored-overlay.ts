@@ -18,6 +18,8 @@ export interface MkAnchoredPositionOptions {
   gap: number;
   flip: boolean;
   clamp: boolean;
+  /** Resolve `-start`/`-end` alignment against a right-to-left anchor. */
+  rtl?: boolean;
 }
 
 interface MkRectLike {
@@ -97,9 +99,11 @@ export function mkComputeAnchoredPosition(
   else left = anchor.left - w - gap;
 
   if (side === 'top' || side === 'bottom') {
-    // Cross axis is horizontal.
-    if (align === 'start') left = anchor.left;
-    else if (align === 'end') left = anchor.right - w;
+    // Cross axis is horizontal; in RTL, inline-start is the anchor's right edge.
+    const startLeft = opts.rtl ? anchor.right - w : anchor.left;
+    const endLeft = opts.rtl ? anchor.left : anchor.right - w;
+    if (align === 'start') left = startLeft;
+    else if (align === 'end') left = endLeft;
     else left = anchor.left + anchor.width / 2 - w / 2;
   } else {
     // Left/right: centre on the cross (vertical) axis.
@@ -253,11 +257,20 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
         gap: this.gap(),
         flip: this.flip(),
         clamp: this.clamp(),
+        rtl: this.isAnchorRtl(),
       },
     );
     el.style.top = `${pos.top}px`;
     el.style.left = `${pos.left}px`;
     el.setAttribute('data-placement', pos.placement);
+  }
+
+  /** Whether the anchor renders in a right-to-left context. */
+  private isAnchorRtl(): boolean {
+    const el = this.resolveAnchorEl();
+    const view = this.document.defaultView;
+    if (!el || !view) return false;
+    return view.getComputedStyle(el).direction === 'rtl';
   }
 
   private resolveAnchorEl(): HTMLElement | null {

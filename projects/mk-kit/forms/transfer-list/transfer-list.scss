@@ -141,3 +141,9 @@
   align-self: center;
   gap: var(--mk-space-2);
 }
+
+/* Mirror the move-arrow glyphs when the lists mirror in RTL. */
+:host(:dir(rtl)) .mk-transfer-list__arrow {
+  display: inline-block;
+  transform: scaleX(-1);
+}

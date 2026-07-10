@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   booleanAttribute,
   computed,
   contentChild,
@@ -111,6 +112,7 @@ export class MkTable<T = Record<string, unknown>> {
   private readonly announcer = inject(MkLiveAnnouncer);
   protected readonly i18n = inject(MK_I18N);
   private readonly document = inject(DOCUMENT);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** Column definitions (order = display order). */
   readonly columns = input.required<MkTableColumn<T>[]>();
@@ -202,7 +204,7 @@ export class MkTable<T = Record<string, unknown>> {
     const map = new Map<string, number>();
     const cols = this.orderedColumns();
     const widths = this.colWidths();
-    // Account for the leading select / expander columns on the left.
+    // Account for the leading select / expander columns at the inline start.
     let left = (this.selectable() ? 44 : 0) + (this.expandable() ? 44 : 0);
     for (const c of cols) {
       if (c.pinned !== 'left') continue;
@@ -234,6 +236,15 @@ export class MkTable<T = Record<string, unknown>> {
   private resizeStartX = 0;
   private resizeStartW = 0;
   private resizeMin = 60;
+  /** +1 in LTR, -1 in RTL — dragging toward the inline-end always widens. */
+  private resizeSign: 1 | -1 = 1;
+
+  /** Whether the table currently renders right-to-left (SSR-safe). */
+  private isRtl(): boolean {
+    const view = this.document.defaultView;
+    if (!view) return false;
+    return view.getComputedStyle(this.host.nativeElement).direction === 'rtl';
+  }
 
   private resizeRaf: number | null = null;
   private pendingResizeX = 0;
@@ -246,6 +257,7 @@ export class MkTable<T = Record<string, unknown>> {
     const th = (event.target as HTMLElement).closest('th') as HTMLElement | null;
     this.resizeKey = col.key;
     this.resizeStartX = event.clientX;
+    this.resizeSign = this.isRtl() ? -1 : 1;
     this.resizeStartW =
       this.colWidths()[col.key] ?? th?.getBoundingClientRect().width ?? this.numericWidth(col);
     this.resizeMin = col.minWidth ?? 60;
@@ -269,7 +281,10 @@ export class MkTable<T = Record<string, unknown>> {
     if (!this.resizeKey) return;
     const width = Math.max(
       this.resizeMin,
-      Math.round(this.resizeStartW + (this.pendingResizeX - this.resizeStartX)),
+      Math.round(
+        this.resizeStartW +
+          this.resizeSign * (this.pendingResizeX - this.resizeStartX),
+      ),
     );
     this.colWidths.update((w) => ({ ...w, [this.resizeKey as string]: width }));
   }
@@ -302,6 +317,8 @@ export class MkTable<T = Record<string, unknown>> {
     if (event.key === 'ArrowLeft') delta = -step;
     else if (event.key === 'ArrowRight') delta = step;
     else return;
+    // Mirror in RTL so pressing toward the inline-end always grows the column.
+    if (this.isRtl()) delta = -delta;
     event.preventDefault();
     event.stopPropagation();
     const min = col.minWidth ?? 60;

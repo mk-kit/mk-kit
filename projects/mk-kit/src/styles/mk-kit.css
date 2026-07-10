@@ -437,3 +437,125 @@ body.mk-app {
     --mk-duration-slow: 0ms;
   }
 }
+/* ---------------------------------------------------------------------------
+ * Density — `data-mk-density="compact"` on <html> tightens control heights
+ * and the two spacing steps most controls use for padding. Components need no
+ * changes: everything reads these tokens. Toggle via MkThemeService.setDensity.
+ * ------------------------------------------------------------------------- */
+[data-mk-density=compact] {
+  --mk-control-height-sm: 26px;
+  --mk-control-height-md: 32px;
+  --mk-control-height-lg: 38px;
+  --mk-space-3: 0.5rem; /* 8  — was 12 */
+  --mk-space-4: 0.75rem; /* 12 — was 16 */
+}
+
+/* ==========================================================================
+   Forced colors (Windows High Contrast / forced-colors: active)
+   --------------------------------------------------------------------------
+   In forced-colors mode the browser overrides author colors with the system
+   palette, which erases background-only state indicators (selection, checked
+   toggles, slider fills, ink bars). The rules below re-express those states
+   with system colors (`Highlight` / `HighlightText`, etc.) — opting out of
+   forcing only where a background IS the state — and add borders where a
+   surface would otherwise vanish. Everything else (text, borders, focus
+   outlines) is left to the system palette on purpose.
+   ========================================================================== */
+@media (forced-colors: active) {
+  /* --- Selection & active states: Highlight on HighlightText -------------- */
+  .mk-select__option--selected,
+  .mk-cmdk__option--active,
+  .mk-pagination__btn--active,
+  .mk-tabs__tab--active,
+  .mk-chip--selected,
+  .mk-button-toggle__btn[aria-pressed=true],
+  .mk-nav-item--active > .mk-nav-item__link,
+  .mk-calendar__day--selected,
+  .mk-calendar__day--range-start,
+  .mk-calendar__day--range-end,
+  .mk-tree__item--selected,
+  .mk-table__row--selected .mk-table__td {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+  }
+  .mk-calendar__day--in-range {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+    opacity: 0.7;
+  }
+  /* Hover/keyboard-active rows where selection is transient: use an outline
+     instead of a background so the underlying text keeps system colors. */
+  .mk-select__option--active,
+  mk-menu-item:hover,
+  mk-menu-item:focus,
+  .mk-tree__item:hover {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+  /* --- Toggles: checked state must survive without author backgrounds ----- */
+  .mk-switch__track {
+    border: 1px solid ButtonText;
+  }
+  .mk-switch__thumb {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+  }
+  .mk-switch--checked .mk-switch__track {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    border-color: Highlight;
+  }
+  .mk-switch--checked .mk-switch__thumb {
+    background-color: HighlightText;
+  }
+  .mk-checkbox--checked .mk-checkbox__box,
+  .mk-checkbox--indeterminate .mk-checkbox__box {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    border-color: Highlight !important;
+  }
+  .mk-checkbox--checked .mk-checkbox__check {
+    border-color: HighlightText !important;
+  }
+  .mk-checkbox--indeterminate .mk-checkbox__dash {
+    border-color: HighlightText !important;
+  }
+  .mk-radio--checked .mk-radio__control {
+    forced-color-adjust: none;
+    border-color: Highlight !important;
+    background-color: Canvas;
+  }
+  .mk-radio--checked .mk-radio__dot {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+  }
+  /* --- Value fills: sliders, progress, loading, tabs ink bar --------------- */
+  .mk-slider__fill,
+  .mk-range-slider__fill,
+  .mk-progress-bar__fill,
+  .mk-loading-bar__fill,
+  .mk-tabs__indicator {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+  }
+  .mk-slider__track,
+  .mk-range-slider__track,
+  .mk-progress-bar__track {
+    border: 1px solid ButtonText;
+  }
+  .mk-slider__thumb,
+  .mk-range-slider__thumb {
+    forced-color-adjust: none;
+    background-color: ButtonText;
+    border: 1px solid Canvas;
+  }
+  /* --- Surfaces that rely on shadow/background to read as raised ---------- */
+  .mk-menu__panel,
+  .mk-cmdk__panel,
+  .mk-select__list,
+  .mk-autocomplete__list {
+    border: 1px solid CanvasText;
+  }
+}

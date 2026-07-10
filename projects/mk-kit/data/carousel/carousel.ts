@@ -4,6 +4,7 @@ import {
   Directive,
   ElementRef,
   PLATFORM_ID,
+  afterNextRender,
   booleanAttribute,
   computed,
   contentChildren,
@@ -55,6 +56,7 @@ export class MkCarouselSlide {
 })
 export class MkCarousel {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly slides = contentChildren(MkCarouselSlide);
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -85,7 +87,22 @@ export class MkCarousel {
     this.count() ? `Slide ${this.index() + 1} of ${this.count()}` : '',
   );
 
+  /** Resolved text direction ('ltr' until measured in the browser). */
+  private readonly dir = signal<'ltr' | 'rtl'>('ltr');
+  /**
+   * Track offset — in RTL the flex track lays out right-to-left, so moving to
+   * the next slide means translating in the positive X direction.
+   */
+  protected readonly trackTransform = computed(() => {
+    const sign = this.dir() === 'rtl' ? 1 : -1;
+    return `translateX(${sign * this.index() * 100}%)`;
+  });
+
   constructor() {
+    afterNextRender(() => {
+      const { direction } = getComputedStyle(this.host.nativeElement);
+      this.dir.set(direction === 'rtl' ? 'rtl' : 'ltr');
+    });
     // Reflect the active slide onto each slide element (visibility + a11y).
     effect(() => {
       const active = this.index();

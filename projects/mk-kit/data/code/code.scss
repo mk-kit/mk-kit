@@ -54,6 +54,8 @@
 }
 
 .mk-code__scroll {
+  /* Code is inherently LTR content, even in an RTL document. */
+  direction: ltr;
   display: flex;
   overflow: auto;
 }

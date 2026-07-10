@@ -3,7 +3,7 @@
 :host {
   position: fixed;
   bottom: var(--mk-space-5);
-  right: var(--mk-space-5);
+  inset-inline-end: var(--mk-space-5);
   z-index: var(--mk-z-sticky, 100);
 }
 

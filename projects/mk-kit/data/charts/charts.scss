@@ -154,7 +154,7 @@
   color: var(--mk-text-muted);
 }
 .mk-chart__tooltip-value {
-  margin-left: auto;
+  margin-inline-start: auto;
   font-variant-numeric: tabular-nums;
   font-weight: var(--mk-font-weight-medium);
 }
@@ -173,7 +173,8 @@
   flex-wrap: wrap;
   gap: var(--mk-space-2) var(--mk-space-4);
   margin: var(--mk-space-3) 0 0;
-  padding: 0 0 0 var(--mk-space-2);
+  padding: 0;
+  padding-inline-start: var(--mk-space-2);
   list-style: none;
 }
 .mk-chart__legend-item {
@@ -223,7 +224,7 @@
   color: var(--mk-text);
 }
 .mk-donut__legend-value {
-  margin-left: auto;
+  margin-inline-start: auto;
   color: var(--mk-text-muted);
   font-variant-numeric: tabular-nums;
 }

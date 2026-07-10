@@ -130,7 +130,7 @@
   white-space: nowrap;
 }
 .mk-cmdk__option-hint {
-  margin-left: var(--mk-space-2);
+  margin-inline-start: var(--mk-space-2);
   color: var(--mk-text-subtle);
   font-size: var(--mk-font-size-sm);
 }

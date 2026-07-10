@@ -167,7 +167,11 @@ export class MkRangeSlider implements ControlValueAccessor {
     if (!track) return null;
     const rect = track.getBoundingClientRect();
     if (rect.width <= 0) return null;
-    const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width));
+    const rtl =
+      typeof getComputedStyle === 'function' &&
+      getComputedStyle(track).direction === 'rtl';
+    const offset = rtl ? rect.right - clientX : clientX - rect.left;
+    const ratio = Math.min(1, Math.max(0, offset / rect.width));
     return this.min() + ratio * (this.max() - this.min());
   }
 

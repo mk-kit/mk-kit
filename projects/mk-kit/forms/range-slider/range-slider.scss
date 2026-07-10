@@ -31,8 +31,7 @@
 .mk-range-slider__track {
   position: absolute;
   top: 50%;
-  left: 0;
-  right: 0;
+  inset-inline: 0;
   height: var(--_track-h);
   transform: translateY(-50%);
   background-color: var(--mk-border-subtle);
@@ -58,6 +57,9 @@
   box-shadow: var(--mk-shadow-sm);
   cursor: grab;
   transition: box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(:dir(rtl)) .mk-range-slider__thumb {
+  transform: translate(50%, -50%);
 }
 .mk-range-slider__thumb:hover {
   box-shadow: var(--mk-shadow-md);
