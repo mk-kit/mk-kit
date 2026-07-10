@@ -72,14 +72,45 @@
       </tr>
     </thead>
     <tbody class="mk-table__body">
-      @for (row of sortedData(); track trackRow(row); let i = $index) {
+      @for (item of displayItems(); track trackItem(item); let i = $index) {
+        @if (item.kind === 'group') {
+          <tr class="mk-table__group-row">
+            <th
+              class="mk-table__group"
+              scope="colgroup"
+              [attr.colspan]="totalColumns()"
+            >
+              <button
+                type="button"
+                class="mk-table__group-toggle"
+                [attr.aria-expanded]="!isGroupCollapsed(item.group.key)"
+                (click)="onGroupToggle(item.group)"
+              >
+                <span
+                  class="mk-table__expander-icon"
+                  [class.mk-table__expander-icon--open]="!isGroupCollapsed(item.group.key)"
+                  aria-hidden="true"
+                  >›</span
+                >
+                <span class="mk-visually-hidden">{{
+                  isGroupCollapsed(item.group.key) ? i18n.expandGroup : i18n.collapseGroup
+                }}</span>
+                <span class="mk-table__group-label">{{ item.group.label }}</span>
+                <span class="mk-table__group-count">{{
+                  i18n.groupCount(item.group.rows.length)
+                }}</span>
+              </button>
+            </th>
+          </tr>
+        } @else {
+        <ng-container>
         <tr
           class="mk-table__row"
-          [class.mk-table__row--selected]="selectable() && isSelected(row)"
-          [class.mk-table__row--expanded]="expandable() && isExpanded(row)"
+          [class.mk-table__row--selected]="selectable() && isSelected(item.row)"
+          [class.mk-table__row--expanded]="expandable() && isExpanded(item.row)"
           [attr.tabindex]="clickableRows() ? 0 : null"
-          (click)="onRowClick(row)"
-          (keydown)="onRowKeydown($event, row)"
+          (click)="onRowClick(item.row)"
+          (keydown)="onRowKeydown($event, item.row)"
         >
           @if (expandable()) {
             <td
@@ -89,11 +120,11 @@
               <button
                 type="button"
                 class="mk-table__expander"
-                [class.mk-table__expander--open]="isExpanded(row)"
-                [attr.aria-expanded]="isExpanded(row)"
+                [class.mk-table__expander--open]="isExpanded(item.row)"
+                [attr.aria-expanded]="isExpanded(item.row)"
                 [attr.aria-controls]="detailId(i)"
-                [attr.aria-label]="isExpanded(row) ? i18n.collapseRow : i18n.expandRow"
-                (click)="toggleExpand(row, $event)"
+                [attr.aria-label]="isExpanded(item.row) ? i18n.collapseRow : i18n.expandRow"
+                (click)="toggleExpand(item.row, $event)"
               >
                 <span class="mk-table__expander-icon" aria-hidden="true">›</span>
               </button>
@@ -105,9 +136,9 @@
               (click)="$event.stopPropagation()"
             >
               <mk-checkbox
-                [aria-label]="i18n.selectRow(rowLabel(row))"
-                [checked]="isSelected(row)"
-                (checkedChange)="toggleRow(row)"
+                [aria-label]="i18n.selectRow(rowLabel(item.row))"
+                [checked]="isSelected(item.row)"
+                (checkedChange)="toggleRow(item.row)"
               />
             </td>
           }
@@ -128,14 +159,14 @@
               @if (isEditing(i, col)) {
                 <input
                   class="mk-table__cell-input"
-                  [value]="cellText(row, col)"
+                  [value]="cellText(item.row, col)"
                   (click)="$event.stopPropagation()"
-                  (keydown)="onEditKeydown($event, row, col)"
-                  (blur)="commitEdit(row, col, $any($event.target).value)"
+                  (keydown)="onEditKeydown($event, item.row, col)"
+                  (blur)="commitEdit(item.row, col, $any($event.target).value)"
                   autofocus
                 />
               } @else {
-                {{ cellText(row, col) }}
+                {{ cellText(item.row, col) }}
                 @if (col.editable) {
                   <span class="mk-visually-hidden">{{ i18n.editCell }}</span>
                 }
@@ -143,17 +174,19 @@
             </td>
           }
         </tr>
-        @if (expandable() && isExpanded(row) && rowDetail()) {
+        @if (expandable() && isExpanded(item.row) && rowDetail()) {
           <tr class="mk-table__detail-row">
             <td class="mk-table__detail" [id]="detailId(i)" [attr.colspan]="totalColumns()">
               <div class="mk-table__detail-inner">
                 <ng-container
                   [ngTemplateOutlet]="rowDetail()!.template"
-                  [ngTemplateOutletContext]="{ $implicit: row }"
+                  [ngTemplateOutletContext]="{ $implicit: item.row }"
                 />
               </div>
             </td>
           </tr>
+        }
+        </ng-container>
         }
       } @empty {
         <tr class="mk-table__row mk-table__row--empty">

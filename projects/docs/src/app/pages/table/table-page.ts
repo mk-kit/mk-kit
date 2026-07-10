@@ -134,6 +134,24 @@ interface DemoUser {
             <td>—</td>
             <td>Emitted when a row is clicked.</td>
           </tr>
+          <tr>
+            <td><code class="docs-inline">groupBy</code></td>
+            <td><code class="docs-inline">string | ((row: T) =&gt; unknown) | null</code></td>
+            <td><code class="docs-inline">null</code></td>
+            <td>Group rows under sticky, collapsible headers.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">groupLabel</code></td>
+            <td><code class="docs-inline">(value, rows) =&gt; string</code></td>
+            <td><code class="docs-inline">String(value)</code></td>
+            <td>Formats a group header's label.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">groupToggle</code></td>
+            <td><code class="docs-inline">output&lt;MkGroupToggle&gt;</code></td>
+            <td>—</td>
+            <td><code class="docs-inline">{{ '{' }} key, collapsed {{ '}' }}</code> per header toggle.</td>
+          </tr>
         </tbody>
       </table>
       <p>
@@ -173,6 +191,30 @@ interface DemoUser {
             </mk-description-list>
           </ng-template>
         </mk-table>
+      </docs-example>
+
+      <h2>Grouped rows</h2>
+      <p>
+        Set <code class="docs-inline">groupBy</code> to a column key (or an
+        accessor function) to render rows under collapsible group headers with
+        a row count. Headers stay sticky below the column header, sorting
+        applies within each group, and
+        <code class="docs-inline">groupLabel</code> customises the header text.
+        Listen to <code class="docs-inline">(groupToggle)</code> or call
+        <code class="docs-inline">collapseAllGroups()</code> /
+        <code class="docs-inline">expandAllGroups()</code>.
+      </p>
+      <docs-example [code]="groupedCode" column>
+        <mk-table
+          [columns]="columns"
+          [data]="users"
+          groupBy="role"
+          hover
+          trackKey="email"
+          (groupToggle)="onGroupToggle($event)"
+          style="width: 100%"
+        />
+        <p class="echo">Last toggle: {{ groupStatus() }}</p>
       </docs-example>
 
       <h2>Inline edit</h2>
@@ -233,6 +275,7 @@ interface DemoUser {
           <tr><td><kbd>Enter</kbd> (while editing)</td><td>Save the new value and restore focus to the cell. Blurring the input also saves.</td></tr>
           <tr><td><kbd>Escape</kbd> (while editing)</td><td>Cancel the edit and restore focus to the cell.</td></tr>
           <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (on a focused row, with <code class="docs-inline">clickableRows</code>)</td><td>Activate the row — emits <code class="docs-inline">rowClick</code>.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (on a group header)</td><td>Collapse / expand the group (the header is a real button).</td></tr>
         </tbody>
       </table>
     </div>
@@ -354,6 +397,18 @@ export class TablePage {
   resizableColumns reorderableColumns
   (cellEdit)="onCellEdit($event)" />
 // Drag header edges to resize · drag headers to reorder · double-click a cell to edit`;
+
+  protected readonly groupStatus = signal('—');
+  protected onGroupToggle(e: { key: unknown; collapsed: boolean }): void {
+    this.groupStatus.set(`${e.key} ${e.collapsed ? 'collapsed' : 'expanded'}`);
+  }
+
+  protected readonly groupedCode = `<mk-table
+  [columns]="columns"
+  [data]="users"
+  groupBy="role"
+  [groupLabel]="labelFn"
+  (groupToggle)="onGroupToggle($event)" />`;
 
   protected readonly expandableCode = `<mk-table
   [columns]="columns"

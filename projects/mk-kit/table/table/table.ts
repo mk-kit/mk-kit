@@ -2,9 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Injector,
+  afterNextRender,
   booleanAttribute,
   computed,
   contentChild,
+  effect,
   inject,
   input,
   model,
@@ -75,6 +78,29 @@ export interface MkCellEdit<T = Record<string, unknown>> {
   value: string;
 }
 
+/** A group of rows produced by {@link MkTable.groupBy}. */
+export interface MkTableGroup<T = Record<string, unknown>> {
+  /** The shared group value. */
+  key: unknown;
+  /** Display label for the group header. */
+  label: string;
+  /** The rows in this group, in display (sorted) order. */
+  rows: T[];
+}
+
+/** Payload emitted by {@link MkTable.groupToggle}. */
+export interface MkGroupToggle {
+  /** The toggled group's value. */
+  key: unknown;
+  /** Whether the group is now collapsed. */
+  collapsed: boolean;
+}
+
+/** One rendered tbody entry: either a group header or a data row. */
+type MkTableItem<T> =
+  | { kind: 'group'; group: MkTableGroup<T> }
+  | { kind: 'row'; row: T };
+
 /**
  * Table — a themed data table built on a native `<table>` for accessibility.
  * Supply `columns` and `data`; opt into sortable columns, sticky header,
@@ -106,6 +132,7 @@ export interface MkCellEdit<T = Record<string, unknown>> {
     '[class.mk-table--clickable]': 'clickableRows()',
     '[class.mk-table--selectable]': 'selectable()',
     '[class.mk-table--expandable]': 'expandable()',
+    '[class.mk-table--grouped]': 'groupBy() !== null',
   },
 })
 export class MkTable<T = Record<string, unknown>> {
@@ -113,6 +140,33 @@ export class MkTable<T = Record<string, unknown>> {
   protected readonly i18n = inject(MK_I18N);
   private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
+
+  constructor() {
+    // Keep the sticky group-header offset in sync with the rendered thead
+    // height (it shifts with density, sticky mode and grouping itself).
+    effect(() => {
+      this.stickyHeader();
+      this.density();
+      this.groupBy();
+      afterNextRender(
+        { read: () => this.applyGroupTop() },
+        { injector: this.injector },
+      );
+    });
+  }
+
+  /** Measures the thead and exposes it as the group rows' sticky offset. */
+  private applyGroupTop(): void {
+    if (this.groupBy() == null) return;
+    const thead = this.host.nativeElement.querySelector('thead');
+    const h =
+      this.stickyHeader() && thead ? thead.getBoundingClientRect().height : 0;
+    this.host.nativeElement.style.setProperty(
+      '--_group-top',
+      `${Math.round(h)}px`,
+    );
+  }
 
   /** Column definitions (order = display order). */
   readonly columns = input.required<MkTableColumn<T>[]>();
@@ -154,6 +208,16 @@ export class MkTable<T = Record<string, unknown>> {
   readonly resizableColumns = input(false, { transform: booleanAttribute });
   /** Enable drag-to-reorder of column headers (data-grid pro). */
   readonly reorderableColumns = input(false, { transform: booleanAttribute });
+  /**
+   * Group rows by a column key or an accessor. Renders a collapsible group
+   * header row (sticky, with a row count) above each group. Sorting still
+   * applies within groups; groups follow their first row's sorted position.
+   */
+  readonly groupBy = input<string | ((row: T) => unknown) | null>(null);
+  /** Formats a group header label; defaults to `String(value)`. */
+  readonly groupLabel = input<
+    ((value: unknown, rows: T[]) => string) | null
+  >(null);
 
   /** Emitted when the sort column/direction changes. */
   readonly sortChange = output<MkSortChange>();
@@ -169,6 +233,8 @@ export class MkTable<T = Record<string, unknown>> {
   readonly columnReorder = output<string[]>();
   /** Emitted when an inline-editable cell is saved. */
   readonly cellEdit = output<MkCellEdit<T>>();
+  /** Emitted when a group header is expanded or collapsed. */
+  readonly groupToggle = output<MkGroupToggle>();
 
   /** User-set column widths (px), keyed by column key. */
   private readonly colWidths = signal<Record<string, number>>({});
@@ -640,6 +706,83 @@ export class MkTable<T = Record<string, unknown>> {
         ...rows.filter((r) => !has.has(this.rowKey(r))),
       ]);
     }
+  }
+
+  // --- Grouping ---------------------------------------------------------------
+  /** Group values currently collapsed. */
+  private readonly collapsedGroups = signal<Set<unknown>>(new Set());
+
+  /** Rows grouped by {@link groupBy}, or `null` when grouping is off. */
+  protected readonly groups = computed<MkTableGroup<T>[] | null>(() => {
+    const by = this.groupBy();
+    if (by == null) return null;
+    const accessor =
+      typeof by === 'function'
+        ? by
+        : (row: T) => (row as Record<string, unknown>)[by];
+    const map = new Map<unknown, T[]>();
+    for (const row of this.sortedData()) {
+      const key = accessor(row);
+      const bucket = map.get(key);
+      if (bucket) bucket.push(row);
+      else map.set(key, [row]);
+    }
+    const label = this.groupLabel();
+    return [...map.entries()].map(([key, rows]) => ({
+      key,
+      label: label ? label(key, rows) : String(key),
+      rows,
+    }));
+  });
+
+  /**
+   * The tbody render list: group headers interleaved with their (expanded)
+   * rows when grouping is on, else just the sorted rows.
+   */
+  protected readonly displayItems = computed<MkTableItem<T>[]>(() => {
+    const groups = this.groups();
+    if (!groups) {
+      return this.sortedData().map((row) => ({ kind: 'row' as const, row }));
+    }
+    const collapsed = this.collapsedGroups();
+    const items: MkTableItem<T>[] = [];
+    for (const group of groups) {
+      items.push({ kind: 'group', group });
+      if (!collapsed.has(group.key)) {
+        for (const row of group.rows) items.push({ kind: 'row', row });
+      }
+    }
+    return items;
+  });
+
+  /** `@for` identity: group headers by value, rows by {@link trackRow}. */
+  protected trackItem = (item: MkTableItem<T>): unknown =>
+    item.kind === 'group' ? `mk-group:${String(item.group.key)}` : this.rowKey(item.row);
+
+  /** Whether a group is currently collapsed. */
+  protected isGroupCollapsed(key: unknown): boolean {
+    return this.collapsedGroups().has(key);
+  }
+
+  /** Collapse or expand a group header. */
+  protected onGroupToggle(group: MkTableGroup<T>): void {
+    const next = new Set(this.collapsedGroups());
+    const collapsed = !next.has(group.key);
+    if (collapsed) next.add(group.key);
+    else next.delete(group.key);
+    this.collapsedGroups.set(next);
+    this.groupToggle.emit({ key: group.key, collapsed });
+  }
+
+  /** Collapse every group. */
+  collapseAllGroups(): void {
+    const groups = this.groups();
+    if (groups) this.collapsedGroups.set(new Set(groups.map((g) => g.key)));
+  }
+
+  /** Expand every group. */
+  expandAllGroups(): void {
+    this.collapsedGroups.set(new Set());
   }
 
   // --- Expansion ------------------------------------------------------------

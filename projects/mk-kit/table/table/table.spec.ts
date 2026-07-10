@@ -290,3 +290,146 @@ describe('MkTable — data-grid pro', () => {
     expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([2, 3, 1]);
   });
 });
+
+// --- Grouping ---------------------------------------------------------------
+interface GroupedRow {
+  id: number;
+  name: string;
+  team: string;
+}
+
+@Component({
+  selector: 'mk-table-group-host',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkTable],
+  template: `
+    <mk-table
+      [columns]="columns"
+      [data]="data()"
+      [groupBy]="groupBy()"
+      [groupLabel]="groupLabel()"
+      (groupToggle)="lastToggle.set($event)"
+    />
+  `,
+})
+class GroupHost {
+  readonly columns: MkTableColumn<GroupedRow>[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'team', header: 'Team' },
+  ];
+  readonly data = signal<GroupedRow[]>([
+    { id: 1, name: 'Ada', team: 'Core' },
+    { id: 2, name: 'Grace', team: 'Infra' },
+    { id: 3, name: 'Alan', team: 'Core' },
+  ]);
+  readonly groupBy = signal<string | ((row: GroupedRow) => unknown) | null>(
+    'team',
+  );
+  readonly groupLabel = signal<
+    ((value: unknown, rows: GroupedRow[]) => string) | null
+  >(null);
+  readonly lastToggle = signal<{ key: unknown; collapsed: boolean } | null>(
+    null,
+  );
+}
+
+describe('MkTable — grouped rows', () => {
+  let fixture: ComponentFixture<GroupHost>;
+
+  beforeEach(async () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(GroupHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+  });
+
+  afterEach(() => fixture.destroy());
+
+  function groupHeaders(): HTMLElement[] {
+    return Array.from(
+      fixture.nativeElement.querySelectorAll('.mk-table__group-toggle'),
+    );
+  }
+  function dataRows(): HTMLElement[] {
+    return Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.mk-table__body .mk-table__row:not(.mk-table__row--empty)',
+      ),
+    );
+  }
+  function bodyRowsInOrder(): string[] {
+    return Array.from(
+      fixture.nativeElement.querySelectorAll(
+        '.mk-table__body tr',
+      ) as NodeListOf<HTMLElement>,
+    ).map((tr) =>
+      tr.classList.contains('mk-table__group-row')
+        ? `G:${tr.querySelector('.mk-table__group-label')!.textContent!.trim()}`
+        : tr.querySelector('.mk-table__td')!.textContent!.trim(),
+    );
+  }
+
+  it('renders a header per group with a count, rows kept contiguous', () => {
+    expect(groupHeaders()).toHaveLength(2);
+    expect(bodyRowsInOrder()).toEqual(['G:Core', 'Ada', 'Alan', 'G:Infra', 'Grace']);
+    const counts = Array.from(
+      fixture.nativeElement.querySelectorAll('.mk-table__group-count'),
+    ).map((el: any) => el.textContent.trim());
+    expect(counts).toEqual(['2 items', '1 item']);
+  });
+
+  it('collapses and re-expands a group, emitting groupToggle', async () => {
+    groupHeaders()[0].click();
+    await fixture.whenStable();
+    expect(bodyRowsInOrder()).toEqual(['G:Core', 'G:Infra', 'Grace']);
+    expect(groupHeaders()[0].getAttribute('aria-expanded')).toBe('false');
+    expect(fixture.componentInstance.lastToggle()).toEqual({
+      key: 'Core',
+      collapsed: true,
+    });
+
+    groupHeaders()[0].click();
+    await fixture.whenStable();
+    expect(dataRows()).toHaveLength(3);
+    expect(fixture.componentInstance.lastToggle()).toEqual({
+      key: 'Core',
+      collapsed: false,
+    });
+  });
+
+  it('sorts within groups; group order follows the first sorted row', async () => {
+    const sortBtn = fixture.nativeElement.querySelector(
+      '.mk-table__th-button',
+    ) as HTMLButtonElement;
+    sortBtn.click(); // name asc
+    await fixture.whenStable();
+    expect(bodyRowsInOrder()).toEqual(['G:Core', 'Ada', 'Alan', 'G:Infra', 'Grace']);
+    sortBtn.click(); // name desc — Grace first, so Infra group leads
+    await fixture.whenStable();
+    expect(bodyRowsInOrder()).toEqual(['G:Infra', 'Grace', 'G:Core', 'Alan', 'Ada']);
+  });
+
+  it('applies a custom groupLabel and supports accessor functions', async () => {
+    fixture.componentInstance.groupLabel.set(
+      (value, rows) => `${value} team (${rows.length})`,
+    );
+    await fixture.whenStable();
+    expect(bodyRowsInOrder()[0]).toBe('G:Core team (2)');
+
+    fixture.componentInstance.groupLabel.set(null);
+    fixture.componentInstance.groupBy.set((row) =>
+      row.name.startsWith('A') ? 'A-names' : 'Other',
+    );
+    await fixture.whenStable();
+    expect(bodyRowsInOrder()).toEqual(['G:A-names', 'Ada', 'Alan', 'G:Other', 'Grace']);
+  });
+
+  it('renders plain rows with no group headers when groupBy is null', async () => {
+    fixture.componentInstance.groupBy.set(null);
+    await fixture.whenStable();
+    expect(groupHeaders()).toHaveLength(0);
+    expect(dataRows()).toHaveLength(3);
+  });
+});

@@ -188,8 +188,16 @@
   line-height: 1;
   transition: transform var(--mk-transition-fast, 120ms) ease;
 }
-.mk-table__expander--open .mk-table__expander-icon {
+.mk-table__expander--open .mk-table__expander-icon,
+.mk-table__expander-icon--open {
   transform: rotate(90deg);
+}
+:host(:dir(rtl)) .mk-table__expander-icon {
+  transform: scaleX(-1);
+}
+:host(:dir(rtl)) .mk-table__expander--open .mk-table__expander-icon,
+:host(:dir(rtl)) .mk-table__expander-icon--open {
+  transform: scaleX(-1) rotate(-90deg);
 }
 
 /* Detail row */
@@ -310,4 +318,47 @@
   padding: var(--mk-space-8) var(--_cell-pad-x);
   text-align: center;
   color: var(--mk-text-subtle);
+}
+
+/* Group headers (groupBy) */
+.mk-table__group {
+  padding: 0;
+  background-color: var(--mk-surface-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+  text-align: start;
+}
+/* Sticky under the (possibly sticky) column header; --_group-top is measured
+   from the rendered thead height by the component. */
+:host(.mk-table--grouped) .mk-table__group {
+  position: sticky;
+  top: var(--_group-top, 0px);
+  z-index: calc(var(--mk-z-sticky) - 1);
+}
+.mk-table__group-toggle {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  width: 100%;
+  padding: var(--mk-space-2) var(--mk-space-3);
+  border: none;
+  background: none;
+  color: var(--mk-text);
+  font: inherit;
+  font-weight: var(--mk-font-weight-semibold);
+  cursor: pointer;
+}
+.mk-table__group-toggle:hover {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-table__group-toggle:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+}
+.mk-table__group-count {
+  padding: 0 var(--mk-space-2);
+  border-radius: var(--mk-radius-full);
+  background-color: var(--mk-surface-3);
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-regular);
 }
