@@ -188,19 +188,19 @@ export class MkFileUpload {
 
     for (const file of incoming) {
       if (!this.matchesAccept(file)) {
-        rejections.push({ file, reason: 'type', message: `${file.name}: unsupported type` });
+        rejections.push({ file, reason: 'type', message: this.i18n.fileRejectedType(file.name) });
         continue;
       }
       if (this.maxSize() > 0 && file.size > this.maxSize()) {
         rejections.push({
           file,
           reason: 'size',
-          message: `${file.name}: exceeds ${this.formatBytes(this.maxSize())}`,
+          message: this.i18n.fileRejectedSize(file.name, this.formatBytes(this.maxSize())),
         });
         continue;
       }
       if (max > 0 && count >= max) {
-        rejections.push({ file, reason: 'maxFiles', message: `${file.name}: over the ${max}-file limit` });
+        rejections.push({ file, reason: 'maxFiles', message: this.i18n.fileRejectedCount(file.name, max) });
         continue;
       }
       accepted.push(this.toItem(file));

@@ -12,7 +12,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkDragDropRegistry } from './drag-drop-registry';
 import { MkDragHandle } from './drag-handle';
 import { MkDropList } from './drop-list';
@@ -69,6 +69,7 @@ export class MkDrag<T = unknown> {
   private readonly doc = inject(DOCUMENT);
   private readonly registry = inject(MkDragDropRegistry);
   private readonly announcer = inject(MkLiveAnnouncer);
+  private readonly i18n = inject(MK_I18N);
   private readonly home = inject(MkDropList, { optional: true }) as
     | MkDropList<any>
     | null;
@@ -384,17 +385,12 @@ export class MkDrag<T = unknown> {
   // ===================================================================
   // Screen-reader announcements
   //
-  // All user-facing strings live in these methods (and nowhere else) so a
-  // future i18n pass only has to swap their bodies for MK_I18N lookups.
+  // All user-facing strings come from MK_I18N so consumers can localize them.
   // ===================================================================
 
   /** "Picked up…" instructions when a keyboard drag starts. */
   private announcePickedUp(index: number, total: number): void {
-    this.announcer.announce(
-      `Picked up. Item ${index + 1} of ${total}. ` +
-        `Use the arrow keys to move, space or enter to drop, escape to cancel.`,
-      'assertive',
-    );
+    this.announcer.announce(this.i18n.dndPickedUp(index + 1, total), 'assertive');
   }
 
   /** Position update after each keyboard step (names the list when crossing). */
@@ -402,24 +398,22 @@ export class MkDrag<T = unknown> {
     const list = this.targetList;
     if (!list) return;
     const total = list === this.home ? list.size() : list.size() + 1;
-    const pos = `position ${this.targetIndex + 1} of ${total}`;
     this.announcer.announce(
-      crossed ? `Moved to ${list.label()}, ${pos}.` : `Moved to ${pos}.`,
+      crossed
+        ? this.i18n.dndMovedToList(list.label(), this.targetIndex + 1, total)
+        : this.i18n.dndMoved(this.targetIndex + 1, total),
       'assertive',
     );
   }
 
   /** Confirmation after a successful drop (pointer: polite; keyboard: assertive). */
   private announceDropped(index: number, politeness: 'polite' | 'assertive'): void {
-    this.announcer.announce(`Dropped at position ${index + 1}.`, politeness);
+    this.announcer.announce(this.i18n.dndDropped(index + 1), politeness);
   }
 
   /** The drag was cancelled and the item snapped back. */
   private announceCancelled(politeness: 'polite' | 'assertive'): void {
-    this.announcer.announce(
-      'Movement cancelled. Item returned to its starting position.',
-      politeness,
-    );
+    this.announcer.announce(this.i18n.dndCancelled, politeness);
   }
 
   // ===================================================================

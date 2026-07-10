@@ -4,6 +4,7 @@ import {
   ElementRef,
   Injector,
   afterNextRender,
+  forwardRef,
   booleanAttribute,
   computed,
   effect,
@@ -15,6 +16,10 @@ import {
   signal,
   untracked,
 } from '@angular/core';
+import {
+  ControlValueAccessor,
+  NG_VALUE_ACCESSOR,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
@@ -51,7 +56,9 @@ interface MkWeekdayHeader {
  * Enter/Space selects the focused day. A roving tabindex keeps a single tab
  * stop. Month changes are announced via {@link MkLiveAnnouncer}.
  *
- * Exposes a two-way `value` model. Additive range inputs (`rangeMode`,
+ * Exposes a two-way `value` model and implements `ControlValueAccessor`, so it
+ * also works directly with `ngModel` / `formControl` (single-date mode).
+ * Additive range inputs (`rangeMode`,
  * `rangeStart`, `rangeEnd`) let it highlight an in-progress selection without
  * affecting single-date use; range hosts listen to `dateSelected`.
  *
@@ -64,15 +71,24 @@ interface MkWeekdayHeader {
   templateUrl: './calendar.html',
   styleUrl: './calendar.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => MkCalendar),
+      multi: true,
+    },
+  ],
   host: {
     class: 'mk-calendar',
+    '[class.mk-calendar--disabled]': 'cvaDisabled()',
+    '(focusout)': 'onFocusout($event)',
     '[class.mk-calendar--sm]': "size() === 'sm'",
     '[class.mk-calendar--md]': "size() === 'md'",
     '[class.mk-calendar--lg]': "size() === 'lg'",
     '[class.mk-calendar--range]': 'rangeMode()',
   },
 })
-export class MkCalendar {
+export class MkCalendar implements ControlValueAccessor {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   protected readonly i18n = inject(MK_I18N);
   private readonly injector = inject(Injector);
@@ -110,6 +126,9 @@ export class MkCalendar {
 
   /** id of the visible month/year label — wire as the grid's label. */
   readonly labelId = mkUniqueId('mk-calendar-label');
+
+  /** Disabled state driven by forms (`setDisabledState`). */
+  protected readonly cvaDisabled = signal(false);
 
   /** The day that currently owns the roving tabindex; also drives the view. */
   protected readonly focusedDate = signal<Date>(this.initialFocus());
@@ -158,6 +177,32 @@ export class MkCalendar {
     });
   }
 
+  // --- ControlValueAccessor ---------------------------------------------------
+  private onChange: (value: Date | null) => void = () => {};
+  private onTouched: () => void = () => {};
+
+  writeValue(value: Date | null): void {
+    this.value.set(value instanceof Date ? startOfDay(value) : null);
+  }
+
+  registerOnChange(fn: (value: Date | null) => void): void {
+    this.onChange = fn;
+  }
+
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+
+  setDisabledState(isDisabled: boolean): void {
+    this.cvaDisabled.set(isDisabled);
+  }
+
+  /** Marks the control touched when focus leaves the calendar entirely. */
+  protected onFocusout(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (!next || !this.host.nativeElement.contains(next)) this.onTouched();
+  }
+
   private initialFocus(): Date {
     const base = this.value() ?? new Date();
     return startOfDay(clampDate(startOfDay(base), this.min(), this.max()));
@@ -169,6 +214,7 @@ export class MkCalendar {
   }
 
   protected isDisabled(d: Date): boolean {
+    if (this.cvaDisabled()) return true;
     const day = startOfDay(d);
     const min = this.min();
     const max = this.max();
@@ -225,7 +271,10 @@ export class MkCalendar {
     if (this.isDisabled(d)) return;
     const day = startOfDay(d);
     this.focusedDate.set(day);
-    if (!this.rangeMode()) this.value.set(day);
+    if (!this.rangeMode()) {
+      this.value.set(day);
+      this.onChange(day);
+    }
     this.dateSelected.emit(day);
     this.focusActiveCell();
   }

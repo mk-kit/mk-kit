@@ -18,11 +18,11 @@ export type MkSplitterOrientation = 'horizontal' | 'vertical';
  * Splitter — two resizable panes with a draggable, keyboard-operable separator
  * (ARIA `separator` with `aria-valuenow`). `horizontal` places the panes
  * side-by-side (a vertical handle); `vertical` stacks them (a horizontal
- * handle). The start pane's size is a two-way `size` model (percent).
+ * handle). The start pane's size is a two-way `position` model (percent).
  *
  * Project the panes with `mkSplitterStart` / `mkSplitterEnd`:
  * ```html
- * <mk-splitter [(size)]="split" [min]="20">
+ * <mk-splitter [(position)]="split" [min]="20">
  *   <nav mkSplitterStart>…</nav>
  *   <main mkSplitterEnd>…</main>
  * </mk-splitter>
@@ -46,8 +46,8 @@ export class MkSplitter {
 
   /** `horizontal` = side-by-side; `vertical` = stacked. */
   readonly orientation = input<MkSplitterOrientation>('horizontal');
-  /** Two-way size of the start pane, in percent (0–100). */
-  readonly size = model(50);
+  /** Two-way position of the separator = start-pane size, in percent (0–100). */
+  readonly position = model(50);
   /** Minimum start-pane size (percent). */
   readonly min = input(10, { transform: numberAttribute });
   /** Maximum start-pane size (percent). */
@@ -63,7 +63,7 @@ export class MkSplitter {
 
   /** Clamped size actually applied (defends against out-of-range inputs). */
   protected readonly clampedSize = computed(() =>
-    Math.min(this.max(), Math.max(this.min(), this.size())),
+    Math.min(this.max(), Math.max(this.min(), this.position())),
   );
 
   protected onPointerdown(event: PointerEvent): void {
@@ -116,6 +116,6 @@ export class MkSplitter {
 
   private setSize(pct: number): void {
     const next = Math.round(Math.min(this.max(), Math.max(this.min(), pct)));
-    if (next !== this.size()) this.size.set(next);
+    if (next !== this.position()) this.position.set(next);
   }
 }

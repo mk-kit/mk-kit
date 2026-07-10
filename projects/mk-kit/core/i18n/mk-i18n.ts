@@ -265,6 +265,23 @@ export interface MkI18nStrings {
   skipToContent: string;
   primaryNav: string;
 
+  // --- Drag & drop announcements --------------------------------------------------
+  /** Announced when an item is lifted for keyboard dragging. */
+  dndPickedUp: (position: number, total: number) => string;
+  /** Announced as the item moves within its list. */
+  dndMoved: (position: number, total: number) => string;
+  /** Announced as the item moves into another list. */
+  dndMovedToList: (list: string, position: number, total: number) => string;
+  /** Announced when the item is dropped. */
+  dndDropped: (position: number) => string;
+  /** Announced when the drag is cancelled. */
+  dndCancelled: string;
+
+  // --- File upload rejection reasons ------------------------------------------------
+  fileRejectedType: (name: string) => string;
+  fileRejectedSize: (name: string, limit: string) => string;
+  fileRejectedCount: (name: string, max: number) => string;
+
   // --- Chart screen-reader table headers ---------------------------------------
   chartCategory: string;
   chartValue: string;
@@ -433,6 +450,19 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   diffChanges: 'Changes',
   skipToContent: 'Skip to content',
   primaryNav: 'Primary',
+
+  dndPickedUp: (position, total) =>
+    `Picked up. Item ${position} of ${total}. ` +
+    'Use the arrow keys to move, space or enter to drop, escape to cancel.',
+  dndMoved: (position, total) => `Moved to position ${position} of ${total}.`,
+  dndMovedToList: (list, position, total) =>
+    `Moved to ${list}, position ${position} of ${total}.`,
+  dndDropped: (position) => `Dropped at position ${position}.`,
+  dndCancelled: 'Movement cancelled. Item returned to its starting position.',
+
+  fileRejectedType: (name) => `${name}: unsupported type`,
+  fileRejectedSize: (name, limit) => `${name}: exceeds ${limit}`,
+  fileRejectedCount: (name, max) => `${name}: over the ${max}-file limit`,
 
   chartCategory: 'Category',
   chartValue: 'Value',
