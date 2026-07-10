@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
 
 /**
@@ -14,8 +22,8 @@ import type { MkBlock } from './block-model';
         class="mk-code-block__lang"
         type="text"
         [value]="block().data['language'] ?? ''"
-        placeholder="language (optional)"
-        aria-label="Code language"
+        [placeholder]="i18n.blockEditor.codeLanguagePlaceholder"
+        [attr.aria-label]="i18n.blockEditor.codeLanguage"
         (input)="onLang($event)"
       />
     }
@@ -28,8 +36,8 @@ import type { MkBlock } from './block-model';
       [value]="block().data['code'] ?? ''"
       [readOnly]="readonly()"
       [rows]="rows()"
-      placeholder="Enter code…"
-      aria-label="Code"
+      [placeholder]="i18n.blockEditor.enterCode"
+      [attr.aria-label]="i18n.blockEditor.blockCode"
       (input)="onCode($event)"
     ></textarea>
   `,
@@ -73,6 +81,8 @@ import type { MkBlock } from './block-model';
   ],
 })
 export class MkCodeBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
   readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();

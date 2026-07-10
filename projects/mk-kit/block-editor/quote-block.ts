@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -11,9 +19,9 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
     <blockquote class="mk-quote-block__quote">
       <mk-rich-text
         [html]="block().data['html'] ?? ''"
-        placeholder="Quote"
+        [placeholder]="i18n.blockEditor.blockQuote"
         [disabled]="readonly()"
-        ariaLabel="Quote text"
+        [ariaLabel]="i18n.blockEditor.quoteText"
         (contentChange)="onContent($event)"
         (splitAt)="splitAt.emit($event)"
         (removeEmpty)="removeEmpty.emit()"
@@ -26,8 +34,8 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
         type="text"
         [value]="block().data['citation'] ?? ''"
         [disabled]="readonly()"
-        placeholder="— Add a citation"
-        aria-label="Citation"
+        [placeholder]="i18n.blockEditor.addCitation"
+        [attr.aria-label]="i18n.blockEditor.citation"
         (input)="onCite($event)"
       />
     }
@@ -64,6 +72,8 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
   ],
 })
 export class MkQuoteBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
   readonly readonly = input(false, { transform: booleanAttribute });
 

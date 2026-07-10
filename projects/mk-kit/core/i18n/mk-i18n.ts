@@ -49,6 +49,124 @@ export interface MkBlockEditorStrings {
   align: string;
   justify: string;
   headingLevel: (level: number) => string;
+  /** Editor region label + empty-block placeholder defaults. */
+  editorLabel: string;
+  emptyBlockPlaceholder: string;
+  /** Drag handle tooltip. */
+  dragHandle: string;
+  /** "Turn into …" transform menu item; receives the target block's label. */
+  turnInto: (label: string) => string;
+  /** Shown for a block whose type has no registered definition. */
+  unknownBlock: (type: string) => string;
+  /** Structural-change screen-reader announcements. */
+  blockAdded: (label: string) => string;
+  blockDuplicated: string;
+  blockDeleted: (label: string) => string;
+  blockMovedUp: string;
+  blockMovedDown: string;
+  turnedInto: (label: string) => string;
+  /** Inserter empty state; receives the search query. */
+  noBlocksMatch: (query: string) => string;
+  /** Built-in palette group headings. */
+  groupText: string;
+  groupMedia: string;
+  groupLayout: string;
+  /** Built-in block labels + inserter descriptions. */
+  blockParagraph: string;
+  blockParagraphDesc: string;
+  blockHeading: string;
+  blockHeadingDesc: string;
+  blockList: string;
+  blockListDesc: string;
+  blockQuote: string;
+  blockQuoteDesc: string;
+  blockCode: string;
+  blockCodeDesc: string;
+  blockImage: string;
+  blockImageDesc: string;
+  blockEmbed: string;
+  blockEmbedDesc: string;
+  blockButton: string;
+  blockButtonDesc: string;
+  blockDivider: string;
+  blockDividerDesc: string;
+  blockColumns: string;
+  blockColumnsDesc: string;
+  /** Rich-text inline toolbar. */
+  bold: string;
+  italic: string;
+  underline: string;
+  strikethrough: string;
+  inlineCode: string;
+  link: string;
+  clearFormatting: string;
+  /** Prompt asking for a link URL. */
+  linkUrlPrompt: string;
+  /** Default label of the editable rich-text region. */
+  editableText: string;
+  /** Heading block. */
+  headingPlaceholder: (level: number) => string;
+  headingLevelGroup: string;
+  /** List block. */
+  listStyle: string;
+  bulleted: string;
+  numbered: string;
+  listItem: string;
+  /** Quote block. */
+  quoteText: string;
+  citation: string;
+  addCitation: string;
+  /** Code block. */
+  codeLanguage: string;
+  codeLanguagePlaceholder: string;
+  enterCode: string;
+  /** Image block. */
+  imageWidth: (percent: number) => string;
+  uploading: string;
+  dropImagePrompt: string;
+  chooseFile: string;
+  pasteImageUrl: string;
+  notAnImage: string;
+  uploadFailed: string;
+  imageAdded: string;
+  /** Embed block. */
+  pasteEmbedUrl: string;
+  embedFallbackNote: string;
+  embedTitle: (provider: string) => string;
+  embedAdded: (provider: string) => string;
+  embeddedContent: string;
+  /** Button block settings. */
+  buttonLabel: string;
+  buttonLink: string;
+  buttonTone: string;
+  buttonVariant: string;
+  /** Label a freshly inserted Button block starts with. */
+  buttonDefaultLabel: string;
+  /** Alignment option captions (image + button blocks). */
+  alignLeft: string;
+  alignCenter: string;
+  alignRight: string;
+  /** Tone option captions (button block swatches). */
+  tonePrimary: string;
+  toneNeutral: string;
+  toneSuccess: string;
+  toneWarning: string;
+  toneDanger: string;
+  toneInfo: string;
+  /** Variant option captions (button block). */
+  variantSolid: string;
+  variantSoft: string;
+  variantOutline: string;
+  /** Columns settings option captions. */
+  ratioEqual: string;
+  alignStretch: string;
+  alignTop: string;
+  alignMiddle: string;
+  alignBottom: string;
+  justifyStart: string;
+  justifyCenter: string;
+  justifyEnd: string;
+  justifyBetween: string;
 }
 
 /**
@@ -162,6 +280,8 @@ export interface MkI18nStrings {
   countdownFinished: string;
   /** Event-calendar day label suffix, e.g. `2 events: Standup, Demo`. */
   dayEvents: (count: number, titles: string) => string;
+  /** Event-calendar overflow pill for events beyond `maxPerDay`, e.g. `+2 more`. */
+  moreEvents: (count: number) => string;
 
   // --- Table / data grid ---------------------------------------------------------
   /** Select-all header checkbox. */
@@ -173,6 +293,12 @@ export interface MkI18nStrings {
   /** Row expander toggle labels. */
   expandRow: string;
   collapseRow: string;
+  /** aria-label of a group header's toggle when the group is collapsed. */
+  expandGroup: string;
+  /** aria-label of a group header's toggle when the group is expanded. */
+  collapseGroup: string;
+  /** Row count shown on a group header, e.g. "4 items". */
+  groupCount: (count: number) => string;
   /** Column resize separator label. */
   resizeColumn: string;
   /** Announced while a column is resized by keyboard. */
@@ -293,6 +419,10 @@ export interface MkI18nStrings {
   chartShare: string;
   chartLabel: string;
 
+  // --- QR code -------------------------------------------------------------------
+  /** Default accessible label of a QR code, carrying its encoded content. */
+  qrCodeLabel: (text: string) => string;
+
   // --- Block editor -------------------------------------------------------------
   /** Block editor chrome (deep-merged by provideMkI18n). */
   blockEditor: MkBlockEditorStrings;
@@ -381,12 +511,16 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   countdownFinished: 'Finished',
   dayEvents: (count, titles) =>
     `${count} ${count === 1 ? 'event' : 'events'}${titles ? `: ${titles}` : ''}`,
+  moreEvents: (count) => `+${count} more`,
 
   selectAllRows: 'Select all rows',
   selectRow: (row) => (row ? `Select row ${row}` : 'Select row'),
   expandHeader: 'Expand',
   expandRow: 'Expand row',
   collapseRow: 'Collapse row',
+  expandGroup: 'Expand group',
+  collapseGroup: 'Collapse group',
+  groupCount: (count) => `${count} item${count === 1 ? '' : 's'}`,
   resizeColumn: 'Resize column',
   columnWidth: (column, width) => `${column} column width ${width} pixels`,
   columnMoved: (column, position, total) =>
@@ -474,6 +608,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chartShare: 'Share',
   chartLabel: 'Label',
 
+  qrCodeLabel: (text) => `QR code: ${text}`,
+
   blockEditor: {
     addBlock: 'Add block',
     addFirstBlock: 'Add your first block',
@@ -501,6 +637,101 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
     align: 'Align',
     justify: 'Justify',
     headingLevel: (level) => `Heading level ${level}`,
+    editorLabel: 'Block content editor',
+    emptyBlockPlaceholder: 'Type / to choose a block, or start writing…',
+    dragHandle: 'Drag handle',
+    turnInto: (label) => `Turn into ${label}`,
+    unknownBlock: (type) => `Unknown block: ${type}`,
+    blockAdded: (label) => `${label} added`,
+    blockDuplicated: 'Block duplicated',
+    blockDeleted: (label) => `${label} deleted`,
+    blockMovedUp: 'Block moved up',
+    blockMovedDown: 'Block moved down',
+    turnedInto: (label) => `Turned into ${label}`,
+    noBlocksMatch: (query) => `No blocks match “${query}”.`,
+    groupText: 'Text',
+    groupMedia: 'Media',
+    groupLayout: 'Layout',
+    blockParagraph: 'Paragraph',
+    blockParagraphDesc: 'Rich text with inline formatting.',
+    blockHeading: 'Heading',
+    blockHeadingDesc: 'A section title (H1–H4).',
+    blockList: 'List',
+    blockListDesc: 'Bulleted or numbered list.',
+    blockQuote: 'Quote',
+    blockQuoteDesc: 'A blockquote with optional citation.',
+    blockCode: 'Code',
+    blockCodeDesc: 'Preformatted, monospace code.',
+    blockImage: 'Image',
+    blockImageDesc: 'Upload or link an image.',
+    blockEmbed: 'Embed',
+    blockEmbedDesc: 'YouTube, Vimeo or any URL.',
+    blockButton: 'Button',
+    blockButtonDesc: 'A call-to-action link button.',
+    blockDivider: 'Divider',
+    blockDividerDesc: 'A horizontal separator.',
+    blockColumns: 'Columns',
+    blockColumnsDesc: 'A responsive multi-column layout.',
+    bold: 'Bold',
+    italic: 'Italic',
+    underline: 'Underline',
+    strikethrough: 'Strikethrough',
+    inlineCode: 'Inline code',
+    link: 'Link',
+    clearFormatting: 'Clear formatting',
+    linkUrlPrompt: 'Link URL',
+    editableText: 'Editable text',
+    headingPlaceholder: (level) => `Heading ${level}`,
+    headingLevelGroup: 'Heading level',
+    listStyle: 'List style',
+    bulleted: 'Bulleted',
+    numbered: 'Numbered',
+    listItem: 'List item',
+    quoteText: 'Quote text',
+    citation: 'Citation',
+    addCitation: '— Add a citation',
+    codeLanguage: 'Code language',
+    codeLanguagePlaceholder: 'language (optional)',
+    enterCode: 'Enter code…',
+    imageWidth: (percent) => `Width: ${percent}%`,
+    uploading: 'Uploading…',
+    dropImagePrompt: 'Drag & drop an image, or',
+    chooseFile: 'Choose file',
+    pasteImageUrl: '…or paste an image URL',
+    notAnImage: 'Please choose an image file.',
+    uploadFailed: 'Upload failed. Try again or paste a URL.',
+    imageAdded: 'Image added',
+    pasteEmbedUrl: 'Paste a YouTube, Vimeo or other URL…',
+    embedFallbackNote: 'That URL can’t be embedded, but it will render as a link.',
+    embedTitle: (provider) => `${provider} embed`,
+    embedAdded: (provider) => `${provider} embed added`,
+    embeddedContent: 'Embedded content',
+    buttonLabel: 'Label',
+    buttonLink: 'Link (href)',
+    buttonTone: 'Tone',
+    buttonVariant: 'Variant',
+    buttonDefaultLabel: 'Click me',
+    alignLeft: 'Left',
+    alignCenter: 'Center',
+    alignRight: 'Right',
+    tonePrimary: 'Primary',
+    toneNeutral: 'Neutral',
+    toneSuccess: 'Success',
+    toneWarning: 'Warning',
+    toneDanger: 'Danger',
+    toneInfo: 'Info',
+    variantSolid: 'Solid',
+    variantSoft: 'Soft',
+    variantOutline: 'Outline',
+    ratioEqual: 'Equal',
+    alignStretch: 'Stretch',
+    alignTop: 'Top',
+    alignMiddle: 'Middle',
+    alignBottom: 'Bottom',
+    justifyStart: 'Start',
+    justifyCenter: 'Center',
+    justifyEnd: 'End',
+    justifyBetween: 'Space between',
   },
 };
 

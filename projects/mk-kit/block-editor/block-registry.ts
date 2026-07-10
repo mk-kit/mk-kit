@@ -37,6 +37,10 @@ function block(type: string, data: Record<string, any> = {}, children?: MkBlock[
 /**
  * The default palette of built-in block definitions. Grouped for the inserter.
  * Consumers can spread this and append custom definitions, or replace it.
+ *
+ * The English `label`/`group`/`description` text here is only a base: the
+ * editor resolves the built-in types' display text from the `blockEditor`
+ * i18n strings (see `provideMkI18n`) before merging custom definitions.
  */
 export const MK_DEFAULT_BLOCKS: MkBlockDefinition[] = [
   {

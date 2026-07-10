@@ -46,6 +46,12 @@ export class MkImageBlock {
     return this.block().data['src'] ?? '';
   }
 
+  /** Localised caption for an alignment option. */
+  protected alignLabel(align: ImageAlign): string {
+    const s = this.i18n.blockEditor;
+    return { left: s.alignLeft, center: s.alignCenter, right: s.alignRight }[align];
+  }
+
   protected openPicker(): void {
     this.fileInput()?.nativeElement.click();
   }
@@ -102,7 +108,7 @@ export class MkImageBlock {
 
   private async handleFile(file: File): Promise<void> {
     if (!file.type.startsWith('image/')) {
-      this.error.set('Please choose an image file.');
+      this.error.set(this.i18n.blockEditor.notAnImage);
       return;
     }
     this.error.set(null);
@@ -111,9 +117,9 @@ export class MkImageBlock {
       const handler = this.ctx.uploadHandler();
       const url = handler ? await handler(file) : await this.readAsDataUrl(file);
       this.patch({ src: url, alt: this.block().data['alt'] || file.name });
-      this.ctx.announce('Image added');
+      this.ctx.announce(this.i18n.blockEditor.imageAdded);
     } catch {
-      this.error.set('Upload failed. Try again or paste a URL.');
+      this.error.set(this.i18n.blockEditor.uploadFailed);
     } finally {
       this.uploading.set(false);
     }

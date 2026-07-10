@@ -68,7 +68,7 @@
         </div>
       }
       @if (!filtered().length) {
-        <p class="mk-block-inserter__empty">No blocks match “{{ query() }}”.</p>
+        <p class="mk-block-inserter__empty">{{ i18n.blockEditor.noBlocksMatch(query()) }}</p>
       }
     </div>
   </div>

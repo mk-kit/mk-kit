@@ -60,7 +60,7 @@ export class MkRichText {
   /** Allow soft line breaks (Shift+Enter). Plain Enter always splits. */
   readonly multiline = input(true, { transform: booleanAttribute });
   /** Accessible label for the editable region. */
-  readonly ariaLabel = input<string>('Editable text');
+  readonly ariaLabel = input<string>(this.i18n.blockEditor.editableText);
 
   /** Fired on every edit with the sanitised-by-construction HTML. */
   readonly contentChange = output<string>();
@@ -82,13 +82,13 @@ export class MkRichText {
   protected readonly activeFormats = signal<Set<string>>(new Set());
 
   protected readonly tools: MkInlineTool[] = [
-    { id: 'bold', label: 'Bold', icon: 'B', shortcut: 'Ctrl+B' },
-    { id: 'italic', label: 'Italic', icon: 'I', shortcut: 'Ctrl+I' },
-    { id: 'underline', label: 'Underline', icon: 'U', shortcut: 'Ctrl+U' },
-    { id: 'strikeThrough', label: 'Strikethrough', icon: 'S' },
-    { id: 'code', label: 'Inline code', icon: '</>' },
-    { id: 'link', label: 'Link', icon: '🔗' },
-    { id: 'clear', label: 'Clear formatting', icon: '⌫' },
+    { id: 'bold', label: this.i18n.blockEditor.bold, icon: 'B', shortcut: 'Ctrl+B' },
+    { id: 'italic', label: this.i18n.blockEditor.italic, icon: 'I', shortcut: 'Ctrl+I' },
+    { id: 'underline', label: this.i18n.blockEditor.underline, icon: 'U', shortcut: 'Ctrl+U' },
+    { id: 'strikeThrough', label: this.i18n.blockEditor.strikethrough, icon: 'S' },
+    { id: 'code', label: this.i18n.blockEditor.inlineCode, icon: '</>' },
+    { id: 'link', label: this.i18n.blockEditor.link, icon: '🔗' },
+    { id: 'clear', label: this.i18n.blockEditor.clearFormatting, icon: '⌫' },
   ];
 
   protected readonly showPlaceholder = computed(() => this.isEmpty());
@@ -245,7 +245,10 @@ export class MkRichText {
   private applyLink(): void {
     const selection = this.document.defaultView?.getSelection();
     if (!selection || selection.isCollapsed) return;
-    const url = this.document.defaultView?.prompt('Link URL', 'https://');
+    const url = this.document.defaultView?.prompt(
+      this.i18n.blockEditor.linkUrlPrompt,
+      'https://',
+    );
     if (url == null) return;
     const trimmed = url.trim();
     if (trimmed === '') {

@@ -39,6 +39,33 @@ export class MkButtonBlock {
     return this.block().data[key];
   }
 
+  /** Localised captions for the tone / variant / alignment option buttons. */
+  protected toneLabel(tone: MkTone): string {
+    const s = this.i18n.blockEditor;
+    const map: Record<MkTone, string> = {
+      primary: s.tonePrimary,
+      neutral: s.toneNeutral,
+      success: s.toneSuccess,
+      warning: s.toneWarning,
+      danger: s.toneDanger,
+      info: s.toneInfo,
+    };
+    return map[tone];
+  }
+  protected variantLabel(variant: MkVariant): string {
+    const s = this.i18n.blockEditor;
+    const map: Partial<Record<MkVariant, string>> = {
+      solid: s.variantSolid,
+      soft: s.variantSoft,
+      outline: s.variantOutline,
+    };
+    return map[variant] ?? variant;
+  }
+  protected alignLabel(align: Align): string {
+    const s = this.i18n.blockEditor;
+    return { left: s.alignLeft, center: s.alignCenter, right: s.alignRight }[align];
+  }
+
   protected onLabel(event: Event): void {
     this.patch({ label: (event.target as HTMLInputElement).value });
   }

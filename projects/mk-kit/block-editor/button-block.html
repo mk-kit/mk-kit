@@ -13,23 +13,23 @@
     rel="noopener noreferrer"
     data-mk-focus
   >
-    {{ data('label') || 'Button' }}
+    {{ data('label') || i18n.blockEditor.blockButton }}
   </a>
 </div>
 
 @if (!readonly()) {
   <div class="mk-button-block__settings">
     <label class="mk-button-block__field">
-      <span>Label</span>
+      <span>{{ i18n.blockEditor.buttonLabel }}</span>
       <input type="text" [value]="data('label') ?? ''" (input)="onLabel($event)" />
     </label>
     <label class="mk-button-block__field">
-      <span>Link (href)</span>
+      <span>{{ i18n.blockEditor.buttonLink }}</span>
       <input type="url" [value]="data('href') ?? ''" placeholder="https://…" (input)="onHref($event)" />
     </label>
 
     <div class="mk-button-block__field">
-      <span id="mk-cta-tone">Tone</span>
+      <span id="mk-cta-tone">{{ i18n.blockEditor.buttonTone }}</span>
       <div class="mk-button-block__row" role="group" aria-labelledby="mk-cta-tone">
         @for (t of tones; track t) {
           <button
@@ -38,8 +38,8 @@
             [attr.data-tone]="t"
             [class.mk-button-block__swatch--active]="(data('tone') ?? 'primary') === t"
             [attr.aria-pressed]="(data('tone') ?? 'primary') === t"
-            [attr.aria-label]="t"
-            [title]="t"
+            [attr.aria-label]="toneLabel(t)"
+            [title]="toneLabel(t)"
             (click)="setTone(t)"
           ></button>
         }
@@ -47,7 +47,7 @@
     </div>
 
     <div class="mk-button-block__field">
-      <span id="mk-cta-variant">Variant</span>
+      <span id="mk-cta-variant">{{ i18n.blockEditor.buttonVariant }}</span>
       <div class="mk-button-block__row" role="group" aria-labelledby="mk-cta-variant">
         @for (v of variants; track v) {
           <button
@@ -57,7 +57,7 @@
             [attr.aria-pressed]="(data('variant') ?? 'solid') === v"
             (click)="setVariant(v)"
           >
-            {{ v }}
+            {{ variantLabel(v) }}
           </button>
         }
       </div>
@@ -74,7 +74,7 @@
             [attr.aria-pressed]="(data('align') ?? 'left') === a"
             (click)="setAlign(a)"
           >
-            {{ a }}
+            {{ alignLabel(a) }}
           </button>
         }
       </div>

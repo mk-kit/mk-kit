@@ -13,6 +13,7 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { MK_I18N, type MkBlockEditorStrings } from '@mkornas/ui/core';
 import {
   MK_BLOCK_DOCUMENT_VERSION,
   type MkBlock,
@@ -78,6 +79,7 @@ export type MkBlockValueFormat = 'document' | 'html';
   ],
 })
 export class MkBlockEditor implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly ctx = inject(MkBlockEditorContext);
   private readonly hostRef = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly tokenDefinitions = inject(MK_BLOCK_DEFINITIONS, { optional: true });
@@ -96,9 +98,9 @@ export class MkBlockEditor implements ControlValueAccessor {
   /** Custom / extended block definitions (merged over the defaults + token). */
   readonly blocks = input<MkBlockDefinition[] | null>(null);
   /** Placeholder for empty text blocks. */
-  readonly placeholder = input<string>('Type / to choose a block, or start writing…');
+  readonly placeholder = input<string>(this.i18n.blockEditor.emptyBlockPlaceholder);
   /** Accessible label for the editor region. */
-  readonly ariaLabel = input<string>('Block content editor');
+  readonly ariaLabel = input<string>(this.i18n.blockEditor.editorLabel);
   /** Read-only: renders content without editing chrome. */
   readonly readonly = input(false, { transform: booleanAttribute });
   /** Disabled (form-level). */
@@ -118,10 +120,10 @@ export class MkBlockEditor implements ControlValueAccessor {
   private onChange: (value: MkBlockDocument | string) => void = () => {};
   private onTouched: () => void = () => {};
 
-  /** Effective, merged block definitions. */
+  /** Effective, merged block definitions (defaults localised via MK_I18N). */
   private readonly definitions = computed<MkBlockDefinition[]>(() =>
     mkMergeBlockDefinitions(
-      MK_DEFAULT_BLOCKS,
+      localizeDefaultBlocks(this.i18n.blockEditor),
       ...(this.tokenDefinitions ?? []),
       this.blocks(),
     ),
@@ -183,4 +185,46 @@ export class MkBlockEditor implements ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
   }
+}
+
+/**
+ * Returns {@link MK_DEFAULT_BLOCKS} with the built-in labels, descriptions and
+ * group headings resolved from the active i18n strings (custom definitions
+ * merged on top keep their own text). The Button block's `create()` is wrapped
+ * so a fresh block starts with the localised default label.
+ */
+function localizeDefaultBlocks(s: MkBlockEditorStrings): MkBlockDefinition[] {
+  const text: Record<string, { label: string; description: string }> = {
+    paragraph: { label: s.blockParagraph, description: s.blockParagraphDesc },
+    heading: { label: s.blockHeading, description: s.blockHeadingDesc },
+    list: { label: s.blockList, description: s.blockListDesc },
+    quote: { label: s.blockQuote, description: s.blockQuoteDesc },
+    code: { label: s.blockCode, description: s.blockCodeDesc },
+    image: { label: s.blockImage, description: s.blockImageDesc },
+    embed: { label: s.blockEmbed, description: s.blockEmbedDesc },
+    button: { label: s.blockButton, description: s.blockButtonDesc },
+    divider: { label: s.blockDivider, description: s.blockDividerDesc },
+    columns: { label: s.blockColumns, description: s.blockColumnsDesc },
+  };
+  const groups: Record<string, string> = {
+    Text: s.groupText,
+    Media: s.groupMedia,
+    Layout: s.groupLayout,
+  };
+  return MK_DEFAULT_BLOCKS.map((def) => {
+    const t = text[def.type];
+    const localized: MkBlockDefinition = {
+      ...def,
+      label: t?.label ?? def.label,
+      description: t?.description ?? def.description,
+      group: groups[def.group ?? ''] ?? def.group,
+    };
+    if (def.type === 'button') {
+      localized.create = () => {
+        const b = def.create();
+        return { ...b, data: { ...b.data, label: s.buttonDefaultLabel } };
+      };
+    }
+    return localized;
+  });
 }

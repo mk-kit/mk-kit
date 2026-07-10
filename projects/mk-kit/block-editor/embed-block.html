@@ -3,7 +3,7 @@
     <iframe
       class="mk-embed-block__iframe"
       [src]="safeSrc()"
-      [title]="providerName() + ' embed'"
+      [title]="i18n.blockEditor.embedTitle(providerName())"
       loading="lazy"
       referrerpolicy="strict-origin-when-cross-origin"
       sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"
@@ -27,11 +27,11 @@
       type="url"
       data-mk-focus
       [value]="url()"
-      placeholder="Paste a YouTube, Vimeo or other URL…"
+      [placeholder]="i18n.blockEditor.pasteEmbedUrl"
       (change)="onUrl($event)"
     />
   </label>
   @if (url() && !safeSrc() && !hasFallback()) {
-    <p class="mk-embed-block__note">That URL can’t be embedded, but it will render as a link.</p>
+    <p class="mk-embed-block__note">{{ i18n.blockEditor.embedFallbackNote }}</p>
   }
 }

@@ -77,7 +77,7 @@ export class MkEmbedBlock {
               aspectRatio: provider.aspectRatio ?? 16 / 9,
             },
           });
-          this.ctx.announce(`${provider.name} embed added`);
+          this.ctx.announce(this.i18n.blockEditor.embedAdded(provider.name));
           return;
         }
       }

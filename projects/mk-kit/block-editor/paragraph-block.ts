@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -15,7 +23,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
       [html]="block().data['html'] ?? ''"
       [placeholder]="placeholder()"
       [disabled]="readonly()"
-      ariaLabel="Paragraph"
+      [ariaLabel]="i18n.blockEditor.blockParagraph"
       (contentChange)="onContent($event)"
       (splitAt)="splitAt.emit($event)"
       (removeEmpty)="removeEmpty.emit()"
@@ -24,9 +32,11 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
   `,
 })
 export class MkParagraphBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
   readonly readonly = input(false, { transform: booleanAttribute });
-  readonly placeholder = input('Type / to choose a block, or start writing…');
+  readonly placeholder = input(this.i18n.blockEditor.emptyBlockPlaceholder);
 
   readonly blockChange = output<MkBlock>();
   readonly splitAt = output<MkRichTextSplit>();

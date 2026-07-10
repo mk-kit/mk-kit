@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import { mkEncodeQr, MkQrEcc } from './qr-encode';
 
 /**
@@ -34,6 +36,8 @@ import { mkEncodeQr, MkQrEcc } from './qr-encode';
   },
 })
 export class MkQrCode {
+  protected readonly i18n = inject(MK_I18N);
+
   /** The text to encode (UTF-8, byte mode). */
   readonly value = input.required<string>();
   /** Error-correction level: `L` (~7%), `M` (~15%), `Q` (~25%), `H` (~30%). */
@@ -54,7 +58,7 @@ export class MkQrCode {
 
   /** The label actually exposed on the host: `label`, or a generated default. */
   protected readonly effectiveLabel = computed(
-    () => this.label() || `QR code: ${this.value()}`,
+    () => this.label() || this.i18n.qrCodeLabel(this.value()),
   );
 
   /** The module matrix (`true` = dark); empty if encoding fails (e.g. too long). */

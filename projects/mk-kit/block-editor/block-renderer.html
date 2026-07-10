@@ -71,7 +71,7 @@
           target="_blank"
           rel="noopener noreferrer"
         >
-          {{ block.data['label'] || 'Button' }}
+          {{ block.data['label'] || i18n.blockEditor.blockButton }}
         </a>
       </div>
     }
@@ -83,7 +83,7 @@
         <div class="mk-r-embed" [style.padding-top]="paddingTop(block)">
           <iframe
             [src]="src"
-            title="Embedded content"
+            [title]="i18n.blockEditor.embeddedContent"
             loading="lazy"
             referrerpolicy="strict-origin-when-cross-origin"
             sandbox="allow-scripts allow-same-origin allow-presentation allow-popups"

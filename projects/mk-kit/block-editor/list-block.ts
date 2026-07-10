@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  computed,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -9,7 +18,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!readonly()) {
-      <div class="mk-list-block__opts" role="group" aria-label="List style">
+      <div class="mk-list-block__opts" role="group" [attr.aria-label]="i18n.blockEditor.listStyle">
         <button
           type="button"
           class="mk-list-block__opt"
@@ -17,7 +26,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
           [attr.aria-pressed]="!ordered()"
           (click)="setOrdered(false)"
         >
-          • Bulleted
+          • {{ i18n.blockEditor.bulleted }}
         </button>
         <button
           type="button"
@@ -26,7 +35,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
           [attr.aria-pressed]="ordered()"
           (click)="setOrdered(true)"
         >
-          1. Numbered
+          1. {{ i18n.blockEditor.numbered }}
         </button>
       </div>
     }
@@ -36,10 +45,10 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
           <li class="mk-list-block__item">
             <mk-rich-text
               [html]="item"
-              placeholder="List item"
+              [placeholder]="i18n.blockEditor.listItem"
               [disabled]="readonly()"
               [multiline]="false"
-              ariaLabel="List item"
+              [ariaLabel]="i18n.blockEditor.listItem"
               (contentChange)="onItem($index, $event)"
               (splitAt)="onSplit($index, $event)"
               (removeEmpty)="onRemove($index)"
@@ -53,10 +62,10 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
           <li class="mk-list-block__item">
             <mk-rich-text
               [html]="item"
-              placeholder="List item"
+              [placeholder]="i18n.blockEditor.listItem"
               [disabled]="readonly()"
               [multiline]="false"
-              ariaLabel="List item"
+              [ariaLabel]="i18n.blockEditor.listItem"
               (contentChange)="onItem($index, $event)"
               (splitAt)="onSplit($index, $event)"
               (removeEmpty)="onRemove($index)"
@@ -114,6 +123,8 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
   ],
 })
 export class MkListBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
   readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();

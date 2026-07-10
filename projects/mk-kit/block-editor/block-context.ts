@@ -1,5 +1,5 @@
-import { ElementRef, Injectable, signal } from '@angular/core';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
+import { ElementRef, Injectable, inject, signal } from '@angular/core';
+import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
 import type { MkBlockDefinition, MkBlockUploadHandler, MkEmbedProvider } from './block-registry';
 
 /**
@@ -10,6 +10,8 @@ import type { MkBlockDefinition, MkBlockUploadHandler, MkEmbedProvider } from '.
  */
 @Injectable()
 export class MkBlockEditorContext {
+  private readonly i18n = inject(MK_I18N);
+
   /** Active block palette (defaults merged with app/editor definitions). */
   readonly definitions = signal<MkBlockDefinition[]>([]);
   /** Read-only mode: content visible, editing chrome hidden. */
@@ -17,7 +19,7 @@ export class MkBlockEditorContext {
   /** Disabled mode (form-level). */
   readonly disabled = signal(false);
   /** Placeholder for empty text blocks. */
-  readonly placeholder = signal('Type / to choose a block, or start writing…');
+  readonly placeholder = signal(this.i18n.blockEditor.emptyBlockPlaceholder);
   /** Effective upload handler (input beats token beats data-URL fallback). */
   readonly uploadHandler = signal<MkBlockUploadHandler | null>(null);
   /** Effective embed providers (defaults + token + input). */

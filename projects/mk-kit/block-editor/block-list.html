@@ -22,7 +22,7 @@
         >
           ▲
         </button>
-        <span class="mk-block__handle" title="Drag handle" aria-hidden="true">⠿</span>
+        <span class="mk-block__handle" [title]="i18n.blockEditor.dragHandle" aria-hidden="true">⠿</span>
         <button
           type="button"
           class="mk-block__move"
@@ -55,7 +55,7 @@
               <button type="button" role="menuitem" (click)="duplicate(i)">{{ i18n.blockEditor.duplicate }}</button>
               @for (t of transformsFor(block.type); track t) {
                 <button type="button" role="menuitem" (click)="transform(i, t)">
-                  Turn into {{ definition(t)?.label ?? t }}
+                  {{ i18n.blockEditor.turnInto(definition(t)?.label ?? t) }}
                 </button>
               }
               <button type="button" role="menuitem" class="mk-block__menu-danger" (click)="remove(i)">
@@ -140,7 +140,7 @@
                 <span>{{ i18n.blockEditor.ratio }}</span>
                 <select [value]="block.data['ratio']" (change)="onRatioChange(i, $event)">
                   @for (preset of ratioPresets[block.data['count'] || 2]; track preset.value) {
-                    <option [value]="preset.value">{{ preset.label }}</option>
+                    <option [value]="preset.value">{{ preset.label || i18n.blockEditor.ratioEqual }}</option>
                   }
                 </select>
               </label>
@@ -157,19 +157,19 @@
               <label>
                 <span>{{ i18n.blockEditor.align }}</span>
                 <select [value]="block.data['align'] ?? 'stretch'" (change)="onAlignChange(i, $event)">
-                  <option value="stretch">Stretch</option>
-                  <option value="start">Top</option>
-                  <option value="center">Middle</option>
-                  <option value="end">Bottom</option>
+                  <option value="stretch">{{ i18n.blockEditor.alignStretch }}</option>
+                  <option value="start">{{ i18n.blockEditor.alignTop }}</option>
+                  <option value="center">{{ i18n.blockEditor.alignMiddle }}</option>
+                  <option value="end">{{ i18n.blockEditor.alignBottom }}</option>
                 </select>
               </label>
               <label>
                 <span>{{ i18n.blockEditor.justify }}</span>
                 <select [value]="block.data['justify'] ?? 'start'" (change)="onJustifyChange(i, $event)">
-                  <option value="start">Start</option>
-                  <option value="center">Center</option>
-                  <option value="end">End</option>
-                  <option value="between">Space between</option>
+                  <option value="start">{{ i18n.blockEditor.justifyStart }}</option>
+                  <option value="center">{{ i18n.blockEditor.justifyCenter }}</option>
+                  <option value="end">{{ i18n.blockEditor.justifyEnd }}</option>
+                  <option value="between">{{ i18n.blockEditor.justifyBetween }}</option>
                 </select>
               </label>
             </div>
@@ -194,7 +194,7 @@
           </div>
         }
         @default {
-          <p class="mk-block__unknown">Unknown block: {{ block.type }}</p>
+          <p class="mk-block__unknown">{{ i18n.blockEditor.unknownBlock(block.type) }}</p>
         }
       }
     </div>

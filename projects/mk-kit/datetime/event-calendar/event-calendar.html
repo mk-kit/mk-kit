@@ -87,9 +87,9 @@
               </span>
             }
             @if (cell.overflow > 0) {
-              <span class="mk-event-calendar__more"
-                >+{{ cell.overflow }} more</span
-              >
+              <span class="mk-event-calendar__more">{{
+                i18n.moreEvents(cell.overflow)
+              }}</span>
             }
           </span>
         </button>

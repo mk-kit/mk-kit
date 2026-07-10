@@ -23,7 +23,7 @@ const LEVELS = [1, 2, 3, 4] as const;
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!readonly()) {
-      <div class="mk-heading-block__levels" role="group" aria-label="Heading level">
+      <div class="mk-heading-block__levels" role="group" [attr.aria-label]="i18n.blockEditor.headingLevelGroup">
         @for (lvl of levels; track lvl) {
           <button
             type="button"
@@ -41,7 +41,7 @@ const LEVELS = [1, 2, 3, 4] as const;
       class="mk-heading-block__text"
       [class]="'mk-heading-block__text--h' + level()"
       [html]="block().data['html'] ?? ''"
-      [placeholder]="'Heading ' + level()"
+      [placeholder]="i18n.blockEditor.headingPlaceholder(level())"
       [disabled]="readonly()"
       [multiline]="false"
       [ariaLabel]="i18n.blockEditor.headingLevel(level())"

@@ -45,13 +45,13 @@
               [attr.aria-pressed]="(block().data['align'] ?? 'center') === a"
               (click)="setAlign(a)"
             >
-              {{ a }}
+              {{ alignLabel(a) }}
             </button>
           }
         </div>
       </div>
       <label class="mk-image-block__field">
-        <span>Width: {{ block().data['width'] || 100 }}%</span>
+        <span>{{ i18n.blockEditor.imageWidth(block().data['width'] || 100) }}</span>
         <input
           type="range"
           min="20"
@@ -75,10 +75,10 @@
     (dragleave)="onDragLeave()"
   >
     @if (uploading()) {
-      <p class="mk-image-block__hint">Uploading…</p>
+      <p class="mk-image-block__hint">{{ i18n.blockEditor.uploading }}</p>
     } @else {
       <p class="mk-image-block__icon" aria-hidden="true">🖼</p>
-      <p class="mk-image-block__hint">Drag &amp; drop an image, or</p>
+      <p class="mk-image-block__hint">{{ i18n.blockEditor.dropImagePrompt }}</p>
       <button
         type="button"
         class="mk-image-block__upload"
@@ -86,13 +86,13 @@
         [disabled]="readonly()"
         (click)="openPicker()"
       >
-        Choose file
+        {{ i18n.blockEditor.chooseFile }}
       </button>
       <label class="mk-image-block__url">
         <span class="mk-visually-hidden">{{ i18n.blockEditor.imageUrl }}</span>
         <input
           type="url"
-          placeholder="…or paste an image URL"
+          [placeholder]="i18n.blockEditor.pasteImageUrl"
           [disabled]="readonly()"
           (change)="onUrl($event)"
         />

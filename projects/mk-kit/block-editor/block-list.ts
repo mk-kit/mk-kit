@@ -22,7 +22,10 @@ import { MkEmbedBlock } from './embed-block';
 import { MkButtonBlock } from './button-block';
 import { MkBlockInserter } from './block-inserter';
 
-/** Column ratio presets offered per column count. */
+/**
+ * Column ratio presets offered per column count. An empty label means "equal
+ * widths" and is rendered with the localised `ratioEqual` caption.
+ */
 const RATIO_PRESETS: Record<number, { value: string; label: string }[]> = {
   2: [
     { value: '50-50', label: '50 / 50' },
@@ -32,11 +35,11 @@ const RATIO_PRESETS: Record<number, { value: string; label: string }[]> = {
     { value: '25-75', label: '25 / 75' },
   ],
   3: [
-    { value: '33-33-33', label: 'Equal' },
+    { value: '33-33-33', label: '' },
     { value: '50-25-25', label: '50 / 25 / 25' },
     { value: '25-50-25', label: '25 / 50 / 25' },
   ],
-  4: [{ value: '25-25-25-25', label: 'Equal' }],
+  4: [{ value: '25-25-25-25', label: '' }],
 };
 
 /**
@@ -109,7 +112,7 @@ export class MkBlockList {
     const next = [...this.blocks()];
     next.splice(index, 0, block);
     this.blocksChange.emit(next);
-    this.ctx.announce(`${def.label} added`);
+    this.ctx.announce(this.i18n.blockEditor.blockAdded(def.label));
     this.ctx.focusBlock(block.id, 'start');
   }
 
@@ -119,7 +122,7 @@ export class MkBlockList {
     next.splice(index + 1, 0, clone);
     this.blocksChange.emit(next);
     this.menuOpen.set(-1);
-    this.ctx.announce('Block duplicated');
+    this.ctx.announce(this.i18n.blockEditor.blockDuplicated);
   }
 
   protected remove(index: number): void {
@@ -127,7 +130,7 @@ export class MkBlockList {
     const next = this.blocks().filter((_, i) => i !== index);
     this.blocksChange.emit(next);
     this.menuOpen.set(-1);
-    this.ctx.announce(`${this.ctx.labelFor(removed.type)} deleted`);
+    this.ctx.announce(this.i18n.blockEditor.blockDeleted(this.ctx.labelFor(removed.type)));
     const focusTarget = next[index - 1] ?? next[index];
     if (focusTarget) this.ctx.focusBlock(focusTarget.id, 'end');
   }
@@ -138,7 +141,9 @@ export class MkBlockList {
     const next = [...this.blocks()];
     [next[index], next[target]] = [next[target], next[index]];
     this.blocksChange.emit(next);
-    this.ctx.announce(`Block moved ${delta < 0 ? 'up' : 'down'}`);
+    this.ctx.announce(
+      delta < 0 ? this.i18n.blockEditor.blockMovedUp : this.i18n.blockEditor.blockMovedDown,
+    );
   }
 
   protected transform(index: number, type: string): void {
@@ -153,7 +158,7 @@ export class MkBlockList {
     next[index] = { ...created, id: source.id, data };
     this.blocksChange.emit(next);
     this.menuOpen.set(-1);
-    this.ctx.announce(`Turned into ${def.label}`);
+    this.ctx.announce(this.i18n.blockEditor.turnedInto(def.label));
   }
 
   // --- text-block keyboard intents -----------------------------------------
