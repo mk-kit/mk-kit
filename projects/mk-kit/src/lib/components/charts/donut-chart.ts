@@ -3,10 +3,12 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
   signal,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   MkChartSlice,
   mkArcPath,
@@ -47,6 +49,8 @@ interface SliceGeom {
   },
 })
 export class MkDonutChart {
+  protected readonly i18n = inject(MK_I18N);
+
   /** The slices; each `value` contributes to the whole. */
   readonly slices = input<readonly MkChartSlice[]>([]);
   /** Diameter in viewBox units (the SVG scales to its container). */

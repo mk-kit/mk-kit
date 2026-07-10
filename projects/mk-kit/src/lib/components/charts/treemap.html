@@ -65,11 +65,11 @@
         {{ t.title }}
       </span>
       <span class="mk-chart__tooltip-row">
-        <span class="mk-chart__tooltip-name">Value</span>
+        <span class="mk-chart__tooltip-name">{{ i18n.chartValue }}</span>
         <span class="mk-chart__tooltip-value">{{ t.value }}</span>
       </span>
       <span class="mk-chart__tooltip-row">
-        <span class="mk-chart__tooltip-name">Share</span>
+        <span class="mk-chart__tooltip-name">{{ i18n.chartShare }}</span>
         <span class="mk-chart__tooltip-value">{{ t.pct }}</span>
       </span>
     </div>
@@ -80,8 +80,9 @@
   <caption>{{ resolvedLabel() }}</caption>
   <thead>
     <tr>
-      <th scope="col">Label</th>
-      <th scope="col">Value</th>
+      <th scope="col">{{ i18n.chartLabel }}</th>
+      <th scope="col">{{ i18n.chartValue }}</th>
+      <th scope="col">{{ i18n.chartShare }}</th>
     </tr>
   </thead>
   <tbody>
@@ -89,6 +90,7 @@
       <tr>
         <th scope="row">{{ item.label }}</th>
         <td>{{ item.value }}</td>
+        <td>{{ shareOf(item.value) }}</td>
       </tr>
     }
   </tbody>

@@ -1,7 +1,7 @@
 @if (showStats()) {
   <div class="mk-diff__header">
     <span class="mk-diff__label">{{ beforeLabel() }} → {{ afterLabel() }}</span>
-    <span class="mk-diff__stats" aria-label="Changes">
+    <span class="mk-diff__stats" [attr.aria-label]="i18n.diffChanges">
       <span class="mk-diff__stat mk-diff__stat--add">+{{ stats().added }}</span>
       <span class="mk-diff__stat mk-diff__stat--del">−{{ stats().removed }}</span>
     </span>

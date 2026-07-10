@@ -247,12 +247,12 @@ export class MkDrag<T = unknown> {
     this.dragging.set(false);
 
     if (cancel || !container || !previousContainer) {
-      this.announcer.announce('Movement cancelled. Item returned to its starting position.');
+      this.announceCancelled('polite');
       return;
     }
 
     this.emit(previousContainer, container, previousIndex, currentIndex, true);
-    this.announcer.announce(`Dropped at position ${currentIndex + 1}.`);
+    this.announceDropped(currentIndex, 'polite');
   }
 
   // ===================================================================
@@ -321,12 +321,7 @@ export class MkDrag<T = unknown> {
     this.home.setReceiving(true);
     this.syncPlaceholder();
 
-    const total = this.home.size();
-    this.announcer.announce(
-      `Picked up. Item ${this.homeIndex + 1} of ${total}. ` +
-        `Use the arrow keys to move, space or enter to drop, escape to cancel.`,
-      'assertive',
-    );
+    this.announcePickedUp(this.homeIndex, this.home.size());
   }
 
   private stepPrimary(step: 1 | -1): void {
@@ -377,26 +372,53 @@ export class MkDrag<T = unknown> {
 
     if (!container || !previousContainer) return;
     this.emit(previousContainer, container, previousIndex, currentIndex, false);
-    this.announcer.announce(`Dropped at position ${currentIndex + 1}.`, 'assertive');
+    this.announceDropped(currentIndex, 'assertive');
   }
 
   private cancelKeyboard(): void {
     this.cleanupDom();
     this.lifted.set(false);
+    this.announceCancelled('assertive');
+  }
+
+  // ===================================================================
+  // Screen-reader announcements
+  //
+  // All user-facing strings live in these methods (and nowhere else) so a
+  // future i18n pass only has to swap their bodies for MK_I18N lookups.
+  // ===================================================================
+
+  /** "Picked up…" instructions when a keyboard drag starts. */
+  private announcePickedUp(index: number, total: number): void {
     this.announcer.announce(
-      'Movement cancelled. Item returned to its starting position.',
+      `Picked up. Item ${index + 1} of ${total}. ` +
+        `Use the arrow keys to move, space or enter to drop, escape to cancel.`,
       'assertive',
     );
   }
 
+  /** Position update after each keyboard step (names the list when crossing). */
   private announceMove(crossed: boolean): void {
     const list = this.targetList;
     if (!list) return;
     const total = list === this.home ? list.size() : list.size() + 1;
     const pos = `position ${this.targetIndex + 1} of ${total}`;
     this.announcer.announce(
-      crossed ? `Moved to list ${list.id()}, ${pos}.` : `Moved to ${pos}.`,
+      crossed ? `Moved to ${list.label()}, ${pos}.` : `Moved to ${pos}.`,
       'assertive',
+    );
+  }
+
+  /** Confirmation after a successful drop (pointer: polite; keyboard: assertive). */
+  private announceDropped(index: number, politeness: 'polite' | 'assertive'): void {
+    this.announcer.announce(`Dropped at position ${index + 1}.`, politeness);
+  }
+
+  /** The drag was cancelled and the item snapped back. */
+  private announceCancelled(politeness: 'polite' | 'assertive'): void {
+    this.announcer.announce(
+      'Movement cancelled. Item returned to its starting position.',
+      politeness,
     );
   }
 

@@ -1,4 +1,12 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkTone, MkVariant } from '../../core/types';
 import type { MkBlock } from './block-model';
 
@@ -17,8 +25,10 @@ const TONES: MkTone[] = ['primary', 'neutral', 'success', 'warning', 'danger', '
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class MkButtonBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();
 
   protected readonly tones = TONES;

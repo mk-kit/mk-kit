@@ -45,7 +45,7 @@
         class="mk-carousel__dot"
         [class.mk-carousel__dot--active]="dot === index()"
         [attr.aria-current]="dot === index() || null"
-        [attr.aria-label]="'Go to slide ' + (dot + 1)"
+        [attr.aria-label]="i18n.goToSlide(dot + 1)"
         (click)="goTo(dot)"
       ></button>
     }

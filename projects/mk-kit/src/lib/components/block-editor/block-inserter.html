@@ -5,7 +5,7 @@
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"
     [disabled]="disabled()"
-    aria-label="Insert a block here"
+    [attr.aria-label]="i18n.blockEditor.insertBlockHere"
     (click)="toggle()"
   >
     <span class="mk-block-inserter__plus" aria-hidden="true">＋</span>
@@ -25,7 +25,7 @@
 }
 
 @if (open()) {
-  <div class="mk-block-inserter__panel" [id]="panelId" role="dialog" aria-label="Block inserter">
+  <div class="mk-block-inserter__panel" [id]="panelId" role="dialog" [attr.aria-label]="i18n.blockEditor.blockInserter">
     <input
       #search
       type="text"
@@ -35,13 +35,13 @@
       [attr.aria-expanded]="true"
       [attr.aria-controls]="listId"
       [attr.aria-activedescendant]="filtered().length ? optionId(activeIndex()) : null"
-      placeholder="Search blocks…"
+      [placeholder]="i18n.blockEditor.searchBlocks"
       [value]="query()"
       (input)="onQuery($event)"
       (keydown)="onKeydown($event)"
     />
 
-    <div class="mk-block-inserter__list" [id]="listId" role="listbox" aria-label="Blocks">
+    <div class="mk-block-inserter__list" [id]="listId" role="listbox" [attr.aria-label]="i18n.blockEditor.blocks">
       @for (group of groups(); track group.name) {
         <div class="mk-block-inserter__group" role="group" [attr.aria-label]="group.name">
           <div class="mk-block-inserter__group-label">{{ group.name }}</div>

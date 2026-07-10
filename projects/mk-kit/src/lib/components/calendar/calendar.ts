@@ -122,7 +122,7 @@ export class MkCalendar {
   );
   /** Human label for the visible month, e.g. `July 2026`. */
   protected readonly monthLabel = computed(() =>
-    formatDate(this.viewMonth(), 'MMMM yyyy'),
+    formatDate(this.viewMonth(), 'MMMM yyyy', this.i18n.dateNames),
   );
   /** 6×7 grid of dates for the visible month. */
   protected readonly weeks = computed(() =>
@@ -131,8 +131,8 @@ export class MkCalendar {
   /** Weekday column headers ordered from `firstDayOfWeek`. */
   protected readonly weekdays = computed<MkWeekdayHeader[]>(() =>
     this.weeks()[0].map((d) => ({
-      short: formatDate(d, 'ddd'),
-      full: getWeekdayFullName(d),
+      short: formatDate(d, 'ddd', this.i18n.dateNames),
+      full: getWeekdayFullName(d, this.i18n.dateNames),
     })),
   );
 
@@ -217,7 +217,7 @@ export class MkCalendar {
   }
 
   protected dayLabel(d: Date): string {
-    return formatDate(d, 'MMMM d, yyyy');
+    return formatDate(d, 'MMMM d, yyyy', this.i18n.dateNames);
   }
 
   // --- Interaction ----------------------------------------------------------

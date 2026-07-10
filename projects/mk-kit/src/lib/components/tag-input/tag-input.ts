@@ -14,6 +14,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 import { MkFormField } from '../form-field/form-field';
@@ -54,6 +55,7 @@ import { MkChip } from '../chip/chip';
 })
 export class MkTagInput implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** Two-way list of tags. */

@@ -9,7 +9,7 @@
     maxlength="1"
     [value]="charAt(i)"
     [disabled]="isDisabled()"
-    [attr.aria-label]="'Digit ' + (i + 1)"
+    [attr.aria-label]="i18n.otpDigit(i + 1)"
     [attr.aria-invalid]="isInvalid() || null"
     (input)="onCellInput(i, $event)"
     (keydown)="onCellKeydown(i, $event)"

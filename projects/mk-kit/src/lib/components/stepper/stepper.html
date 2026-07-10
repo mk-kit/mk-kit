@@ -34,7 +34,7 @@
         <span class="mk-stepper__label">
           {{ step.label() }}
           @if (step.optional()) {
-            <span class="mk-stepper__optional">Optional</span>
+            <span class="mk-stepper__optional">{{ i18n.optional }}</span>
           }
         </span>
         @if (step.description()) {

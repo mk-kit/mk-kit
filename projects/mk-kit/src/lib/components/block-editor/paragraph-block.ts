@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -25,7 +25,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
 })
 export class MkParagraphBlock {
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly placeholder = input('Type / to choose a block, or start writing…');
 
   readonly blockChange = output<MkBlock>();

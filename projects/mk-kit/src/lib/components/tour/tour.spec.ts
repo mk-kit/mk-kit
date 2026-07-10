@@ -51,7 +51,24 @@ describe('MkTourService', () => {
     expect(el).toBeTruthy();
     expect(el!.textContent).toContain('This is the first step body.');
     expect(el!.textContent).toContain('Step 1 of 2');
+    expect(el!.getAttribute('aria-modal')).toBe('true');
     expect(targetA.classList.contains('mk-tour-target')).toBe(true);
+  });
+
+  it('end() restores focus to the element focused before start()', () => {
+    const btn = document.createElement('button');
+    document.body.appendChild(btn);
+    btn.focus();
+    expect(document.activeElement).toBe(btn);
+
+    const service = TestBed.inject(MkTourService);
+    const app = TestBed.inject(ApplicationRef);
+    service.start(steps);
+    app.tick();
+
+    service.end();
+    expect(document.activeElement).toBe(btn);
+    btn.remove();
   });
 
   it('next() advances the step index and updates the popup', () => {

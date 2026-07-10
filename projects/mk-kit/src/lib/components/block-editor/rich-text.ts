@@ -12,6 +12,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Payload for a split (Enter) event: text before/after the caret. */
 export interface MkRichTextSplit {
@@ -48,6 +49,7 @@ interface MkInlineTool {
 export class MkRichText {
   private readonly document = inject(DOCUMENT);
   private readonly editableRef = viewChild.required<ElementRef<HTMLElement>>('editable');
+  protected readonly i18n = inject(MK_I18N);
 
   /** Current HTML content. */
   readonly html = input<string>('');

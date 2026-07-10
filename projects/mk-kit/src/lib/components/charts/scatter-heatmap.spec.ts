@@ -110,4 +110,17 @@ describe('MkHeatmap', () => {
     expect(scale.max).toBe('10');
     expect(scale.swatches).toHaveLength(5);
   });
+
+  it('exposes cell values to AT even when showValues is off', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    // showValues defaults to false → values live in visually-hidden spans.
+    const hidden = el.querySelectorAll('.mk-heatmap__cell .mk-visually-hidden');
+    expect(hidden).toHaveLength(3); // 4 cells, one is null
+    expect(hidden[0].textContent?.trim()).toBe('0');
+
+    fixture.componentRef.setInput('showValues', true);
+    fixture.detectChanges();
+    expect(el.querySelectorAll('.mk-heatmap__cell .mk-visually-hidden')).toHaveLength(0);
+    expect(el.querySelectorAll('.mk-heatmap__value')).toHaveLength(3);
+  });
 });

@@ -3,6 +3,8 @@
   [id]="viewportId"
   class="mk-scroll-area__viewport"
   tabindex="0"
+  [attr.role]="ariaLabel() ? 'region' : null"
+  [attr.aria-label]="ariaLabel() || null"
   [style.max-height]="maxHeight() || null"
   (scroll)="onScroll()"
 >

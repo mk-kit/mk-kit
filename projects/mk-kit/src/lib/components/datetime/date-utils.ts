@@ -1,8 +1,10 @@
 /**
  * Dependency-free date helpers shared by the mk-kit DATE & TIME components.
- * All functions are pure, operate on native `Date`, and are locale-agnostic
- * (English month/day names). Dates are treated in the local time zone.
+ * All functions are pure and operate on native `Date`. Name-producing helpers
+ * default to English but accept an optional {@link MkDateNames} table (from
+ * `MK_I18N`) for localisation. Dates are treated in the local time zone.
  */
+import type { MkDateNames } from '../../core/i18n/mk-i18n';
 
 /** English full month names, January (index 0) → December (index 11). */
 const MONTH_NAMES = [
@@ -207,20 +209,25 @@ export function parseISODate(value: string | null | undefined): Date | null {
 }
 
 /**
- * Format `date` using a small locale-agnostic pattern set. Supported tokens:
+ * Format `date` using a small pattern set. Supported tokens:
  * `yyyy` (4-digit year), `MMMM` (full month), `MMM` (short month),
  * `MM` (2-digit month), `dd` (2-digit day), `d` (day), `ddd` (short weekday).
  * Longer tokens are matched first so `MMMM` wins over `MM`.
+ * Month/weekday names come from `names` when given, else English.
  */
-export function formatDate(date: Date, pattern: string): string {
+export function formatDate(
+  date: Date,
+  pattern: string,
+  names?: MkDateNames,
+): string {
   const tokens: [string, () => string][] = [
     ['yyyy', () => date.getFullYear().toString().padStart(4, '0')],
-    ['MMMM', () => MONTH_NAMES[date.getMonth()]],
-    ['MMM', () => MONTH_NAMES_SHORT[date.getMonth()]],
+    ['MMMM', () => (names?.months ?? MONTH_NAMES)[date.getMonth()]],
+    ['MMM', () => (names?.monthsShort ?? MONTH_NAMES_SHORT)[date.getMonth()]],
     ['MM', () => pad2(date.getMonth() + 1)],
     // Longest-first: 'ddd' (short weekday) must be matched before 'dd'/'d',
     // otherwise 'ddd' is consumed as 'dd' + 'd' and produces day numbers.
-    ['ddd', () => WEEKDAY_NAMES_SHORT[date.getDay()]],
+    ['ddd', () => (names?.weekdaysShort ?? WEEKDAY_NAMES_SHORT)[date.getDay()]],
     ['dd', () => pad2(date.getDate())],
     ['d', () => date.getDate().toString()],
   ];
@@ -267,30 +274,34 @@ export function buildMonthMatrix(
   return weeks;
 }
 
-/** Full English month names, index 0 = January. */
-export function getMonthNames(): readonly string[] {
-  return MONTH_NAMES;
+/** Full month names, index 0 = January (from `names`, else English). */
+export function getMonthNames(names?: MkDateNames): readonly string[] {
+  return names?.months ?? MONTH_NAMES;
 }
 
 /**
  * Weekday header labels ordered to start at `firstDayOfWeek`.
  * `format` selects `'short'` (e.g. `Mon`) or `'narrow'` (e.g. `M`).
+ * Labels come from `names` when given, else English.
  */
 export function getWeekdayNames(
   firstDayOfWeek: number = 0,
   format: 'short' | 'narrow' = 'short',
+  names?: MkDateNames,
 ): string[] {
   const source =
-    format === 'narrow' ? WEEKDAY_NAMES_NARROW : WEEKDAY_NAMES_SHORT;
+    format === 'narrow'
+      ? (names?.weekdaysNarrow ?? WEEKDAY_NAMES_NARROW)
+      : (names?.weekdaysShort ?? WEEKDAY_NAMES_SHORT);
   const start = ((firstDayOfWeek % 7) + 7) % 7;
-  const names: string[] = [];
+  const labels: string[] = [];
   for (let i = 0; i < 7; i++) {
-    names.push(source[(start + i) % 7]);
+    labels.push(source[(start + i) % 7]);
   }
-  return names;
+  return labels;
 }
 
-/** Full English weekday name for `date` (for screen-reader labels). */
-export function getWeekdayFullName(date: Date): string {
-  return WEEKDAY_NAMES[date.getDay()];
+/** Full weekday name for `date` (for screen-reader labels). */
+export function getWeekdayFullName(date: Date, names?: MkDateNames): string {
+  return (names?.weekdays ?? WEEKDAY_NAMES)[date.getDay()];
 }

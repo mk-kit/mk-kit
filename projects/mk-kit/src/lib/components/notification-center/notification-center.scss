@@ -85,7 +85,7 @@
   white-space: nowrap;
 }
 
-.mk-notification-center__mark-all:hover:not(:disabled) {
+.mk-notification-center__mark-all:hover:not([aria-disabled='true']) {
   text-decoration: underline;
 }
 
@@ -94,7 +94,9 @@
   border-radius: var(--mk-radius-sm);
 }
 
-.mk-notification-center__mark-all:disabled {
+// Disabled look for the aria-disabled state (the button stays focusable so
+// keyboard focus is not dropped when it disables itself after activation).
+.mk-notification-center__mark-all[aria-disabled='true'] {
   color: var(--mk-text-muted);
   cursor: default;
 }

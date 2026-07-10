@@ -16,6 +16,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 import { MkFormField } from '../form-field/form-field';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Whether `value` is a valid `#rgb` / `#rrggbb` hex color. */
 function isHex(value: string): boolean {
@@ -62,6 +63,7 @@ function toLongHex(value: string): string {
 })
 export class MkColorPicker implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly nativeRef =
     viewChild<ElementRef<HTMLInputElement>>('native');
 
@@ -78,7 +80,7 @@ export class MkColorPicker implements ControlValueAccessor {
   /** Control size. Ignored inside an `mk-form-field`. */
   readonly size = input<MkSize>('md');
   /** Accessible label for the swatch trigger. */
-  readonly ariaLabel = input('Choose color');
+  readonly ariaLabel = input(this.i18n.chooseColor);
 
   readonly inputId = this.field?.controlId ?? mkUniqueId('mk-color');
   /** Uncommitted text in the hex field (may be partial while typing). */

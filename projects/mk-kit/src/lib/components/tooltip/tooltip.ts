@@ -11,6 +11,7 @@ import {
   createComponent,
   inject,
   input,
+  booleanAttribute,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
@@ -45,7 +46,7 @@ export class MkTooltipPanel {
   /** Resolved placement relative to the trigger. */
   readonly placement = input<MkPlacement>('top');
   /** Drives the entrance/exit transition. */
-  readonly visible = input(false);
+  readonly visible = input(false, { transform: booleanAttribute });
 }
 
 /**

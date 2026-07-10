@@ -17,6 +17,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkCalendar } from '../calendar/calendar';
@@ -64,6 +65,7 @@ export interface MkDateRange {
   ],
 })
 export class MkDateRangePicker implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -81,7 +83,7 @@ export class MkDateRangePicker implements ControlValueAccessor {
   /** Predicate marking individual days as disabled. */
   readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Placeholder shown when no range is selected. */
-  readonly placeholder = input<string>('Select range…');
+  readonly placeholder = input(this.i18n.selectRange);
   /** Pattern used to render each endpoint. */
   readonly displayFormat = input<string>('MMM d, yyyy');
   /** Disable the control. */
@@ -131,8 +133,9 @@ export class MkDateRangePicker implements ControlValueAccessor {
     const { start, end } = this.value();
     const fmt = this.displayFormat();
     if (!start && !end) return '';
-    const s = start ? formatDate(start, fmt) : '…';
-    const e = end ? formatDate(end, fmt) : '…';
+    const names = this.i18n.dateNames;
+    const s = start ? formatDate(start, fmt, names) : '…';
+    const e = end ? formatDate(end, fmt, names) : '…';
     return `${s} – ${e}`;
   });
 

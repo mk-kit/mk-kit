@@ -1,7 +1,7 @@
 <button
   type="button"
   class="mk-number-input__btn mk-number-input__btn--dec"
-  aria-label="Decrease"
+  [attr.aria-label]="i18n.decrease"
   tabindex="-1"
   [disabled]="!canDecrement()"
   (click)="step_(-1)"
@@ -34,7 +34,7 @@
 <button
   type="button"
   class="mk-number-input__btn mk-number-input__btn--inc"
-  aria-label="Increase"
+  [attr.aria-label]="i18n.increase"
   tabindex="-1"
   [disabled]="!canIncrement()"
   (click)="step_(1)"

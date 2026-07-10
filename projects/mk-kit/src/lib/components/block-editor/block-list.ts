@@ -1,11 +1,13 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  booleanAttribute,
   inject,
   input,
   output,
   signal,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { type MkBlock, mkBlockId, mkCloneBlock } from './block-model';
 import type { MkBlockDefinition } from './block-registry';
 import { MkBlockEditorContext } from './block-context';
@@ -64,13 +66,14 @@ const RATIO_PRESETS: Record<number, { value: string; label: string }[]> = {
 })
 export class MkBlockList {
   protected readonly ctx = inject(MkBlockEditorContext);
+  protected readonly i18n = inject(MK_I18N);
 
   /** The blocks to render. */
   readonly blocks = input.required<MkBlock[]>();
   /** Nesting depth (0 = top level). Used to forbid columns-in-columns. */
   readonly depth = input(0);
   /** Restrict the inserter to column-safe blocks. */
-  readonly inColumn = input(false);
+  readonly inColumn = input(false, { transform: booleanAttribute });
 
   /** Emitted with the full, updated array on any structural or content change. */
   readonly blocksChange = output<MkBlock[]>();

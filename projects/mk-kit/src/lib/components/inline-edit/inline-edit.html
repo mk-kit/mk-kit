@@ -5,7 +5,10 @@
       class="mk-inline-edit__input mk-inline-edit__input--multiline"
       [id]="fieldId"
       [value]="draft()"
-      [attr.aria-label]="ariaLabel()"
+      [attr.aria-label]="labelledBy() ? null : ariaLabel()"
+      [attr.aria-labelledby]="labelledBy()"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="isInvalid() || null"
       rows="3"
       (input)="onInput($event)"
       (keydown)="onKeydown($event)"
@@ -18,7 +21,10 @@
       class="mk-inline-edit__input"
       [id]="fieldId"
       [value]="draft()"
-      [attr.aria-label]="ariaLabel()"
+      [attr.aria-label]="labelledBy() ? null : ariaLabel()"
+      [attr.aria-labelledby]="labelledBy()"
+      [attr.aria-describedby]="describedBy()"
+      [attr.aria-invalid]="isInvalid() || null"
       (input)="onInput($event)"
       (keydown)="onKeydown($event)"
       (blur)="onBlur()"
@@ -29,7 +35,7 @@
       <button
         type="button"
         class="mk-inline-edit__action"
-        aria-label="Save"
+        [attr.aria-label]="i18n.save"
         (mousedown)="$event.preventDefault()"
         (click)="save()"
       >
@@ -38,7 +44,7 @@
       <button
         type="button"
         class="mk-inline-edit__action"
-        aria-label="Cancel"
+        [attr.aria-label]="i18n.cancel"
         (mousedown)="$event.preventDefault()"
         (click)="cancel()"
       >
@@ -52,10 +58,10 @@
     type="button"
     class="mk-inline-edit__display"
     [class.mk-inline-edit__display--empty]="!displayText()"
-    [attr.aria-label]="ariaLabel()"
     [disabled]="isDisabled()"
     (click)="startEdit()"
   >
+    <span class="mk-visually-hidden">{{ ariaLabel() }}</span>
     <span class="mk-inline-edit__text">{{ displayText() || placeholder() }}</span>
     @if (!isDisabled()) {
       <svg

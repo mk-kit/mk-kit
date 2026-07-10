@@ -14,7 +14,7 @@
   <a class="mk-embed-block__card" [href]="url()" target="_blank" rel="noopener noreferrer">
     <span class="mk-embed-block__card-icon" aria-hidden="true">🔗</span>
     <span class="mk-embed-block__card-body">
-      <span class="mk-embed-block__card-title">External content</span>
+      <span class="mk-embed-block__card-title">{{ i18n.blockEditor.externalContent }}</span>
       <span class="mk-embed-block__card-url">{{ url() }}</span>
     </span>
   </a>
@@ -22,7 +22,7 @@
 
 @if (!readonly()) {
   <label class="mk-embed-block__input">
-    <span class="mk-visually-hidden">Embed URL</span>
+    <span class="mk-visually-hidden">{{ i18n.blockEditor.embedUrl }}</span>
     <input
       type="url"
       data-mk-focus

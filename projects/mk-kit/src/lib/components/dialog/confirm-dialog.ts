@@ -4,6 +4,7 @@ import {
   computed,
   inject,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MK_OVERLAY_DATA, MkOverlayRef } from '../../core/overlay/overlay-ref';
 import { MkButton } from '../button';
 import { MkDialog } from './dialog';
@@ -41,13 +42,14 @@ export class MkConfirmDialog {
   private readonly ref =
     inject<MkOverlayRef<boolean>>(MkOverlayRef);
   protected readonly data = inject<MkConfirmDialogData>(MK_OVERLAY_DATA);
+  protected readonly i18n = inject(MK_I18N);
 
   protected readonly confirmTone = computed(() => this.data.tone ?? 'primary');
   protected readonly confirmText = computed(
-    () => this.data.confirmText ?? 'Confirm',
+    () => this.data.confirmText ?? this.i18n.confirm,
   );
   protected readonly cancelText = computed(
-    () => this.data.cancelText ?? 'Cancel',
+    () => this.data.cancelText ?? this.i18n.cancel,
   );
 
   protected confirm(): void {

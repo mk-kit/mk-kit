@@ -15,6 +15,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single password rule with its current pass/fail state. */
@@ -57,6 +58,7 @@ export interface MkPasswordRule {
 })
 export class MkPasswordInput implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** Two-way value. */
@@ -106,14 +108,18 @@ export class MkPasswordInput implements ControlValueAccessor {
     return [
       {
         key: 'length',
-        label: `At least ${this.minLength()} characters`,
+        label: this.i18n.passwordRuleMinLength(this.minLength()),
         met: v.length >= this.minLength(),
       },
-      { key: 'uppercase', label: 'An uppercase letter', met: /[A-Z]/.test(v) },
-      { key: 'number', label: 'A number', met: /[0-9]/.test(v) },
+      {
+        key: 'uppercase',
+        label: this.i18n.passwordRuleUppercase,
+        met: /[A-Z]/.test(v),
+      },
+      { key: 'number', label: this.i18n.passwordRuleNumber, met: /[0-9]/.test(v) },
       {
         key: 'symbol',
-        label: 'A symbol',
+        label: this.i18n.passwordRuleSymbol,
         met: /[^A-Za-z0-9]/.test(v),
       },
     ];
@@ -136,18 +142,9 @@ export class MkPasswordInput implements ControlValueAccessor {
     return Math.min(4, score);
   });
 
-  protected readonly strengthLabel = computed(() => {
-    switch (this.strength()) {
-      case 4:
-        return 'Strong';
-      case 3:
-        return 'Good';
-      case 2:
-        return 'Fair';
-      default:
-        return 'Weak';
-    }
-  });
+  protected readonly strengthLabel = computed(() =>
+    this.i18n.passwordStrength(this.strength()),
+  );
 
   /** The 4 meter segments, marked filled up to the current score. */
   protected readonly segments = computed(() => {

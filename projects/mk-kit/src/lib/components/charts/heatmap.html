@@ -25,8 +25,13 @@
                   : row.label + ' · ' + cell.xLabel + ': ' + cell.display
               "
             >
-              @if (showValues() && cell.value !== null) {
-                <span class="mk-heatmap__value">{{ cell.display }}</span>
+              @if (cell.value !== null) {
+                @if (showValues()) {
+                  <span class="mk-heatmap__value">{{ cell.display }}</span>
+                } @else {
+                  <!-- Colour must not be the only signal: expose the value to AT. -->
+                  <span class="mk-visually-hidden">{{ cell.display }}</span>
+                }
               }
             </td>
           }

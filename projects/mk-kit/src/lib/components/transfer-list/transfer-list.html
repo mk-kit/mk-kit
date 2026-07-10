@@ -11,28 +11,33 @@
       type="text"
       [value]="availableQuery()"
       [disabled]="isDisabled()"
-      [attr.aria-label]="availableLabel() + ' filter'"
-      placeholder="Filter…"
+      [attr.aria-label]="availableLabel() + ' — ' + i18n.filter"
+      [placeholder]="i18n.filter"
       (input)="onQueryInput('available', $event)"
     />
   }
 
   <ul
+    #availableList
     class="mk-transfer-list__list"
     role="listbox"
     aria-multiselectable="true"
+    tabindex="-1"
     [id]="availableListId"
     [attr.aria-labelledby]="availableLabelId"
+    [attr.aria-invalid]="isInvalid() || null"
   >
     @for (item of filteredAvailable(); track item.value) {
       <li
+        #availableOpt
         class="mk-transfer-list__option"
         [class.mk-transfer-list__option--checked]="isChecked('available', item.value)"
         [class.mk-transfer-list__option--disabled]="item.disabled"
         role="option"
         [attr.aria-selected]="isChecked('available', item.value)"
         [attr.aria-disabled]="item.disabled || null"
-        [attr.tabindex]="isDisabled() || item.disabled ? null : 0"
+        [attr.tabindex]="$index === activeIdx('available') ? 0 : -1"
+        (focus)="setActive('available', $index)"
         (click)="toggleCheck('available', item)"
         (keydown)="onRowKeydown('available', item, $event)"
       >
@@ -40,7 +45,7 @@
         <span class="mk-transfer-list__label">{{ item.label }}</span>
       </li>
     } @empty {
-      <li class="mk-transfer-list__empty">No items</li>
+      <li class="mk-transfer-list__empty">{{ i18n.noData }}</li>
     }
   </ul>
 </div>
@@ -53,7 +58,7 @@
     size="sm"
     iconOnly
     type="button"
-    aria-label="Move selected to selected list"
+    [attr.aria-label]="i18n.transferSelected(selectedLabel())"
     [disabled]="isDisabled() || !canMoveRight()"
     (click)="moveRight()"
   >
@@ -65,7 +70,7 @@
     size="sm"
     iconOnly
     type="button"
-    aria-label="Move all to selected list"
+    [attr.aria-label]="i18n.transferAll(selectedLabel())"
     [disabled]="isDisabled() || !canMoveAllRight()"
     (click)="moveAllRight()"
   >
@@ -77,7 +82,7 @@
     size="sm"
     iconOnly
     type="button"
-    aria-label="Move all to available list"
+    [attr.aria-label]="i18n.transferAll(availableLabel())"
     [disabled]="isDisabled() || !canMoveAllLeft()"
     (click)="moveAllLeft()"
   >
@@ -89,7 +94,7 @@
     size="sm"
     iconOnly
     type="button"
-    aria-label="Move selected to available list"
+    [attr.aria-label]="i18n.transferSelected(availableLabel())"
     [disabled]="isDisabled() || !canMoveLeft()"
     (click)="moveLeft()"
   >
@@ -110,28 +115,33 @@
       type="text"
       [value]="selectedQuery()"
       [disabled]="isDisabled()"
-      [attr.aria-label]="selectedLabel() + ' filter'"
-      placeholder="Filter…"
+      [attr.aria-label]="selectedLabel() + ' — ' + i18n.filter"
+      [placeholder]="i18n.filter"
       (input)="onQueryInput('selected', $event)"
     />
   }
 
   <ul
+    #selectedList
     class="mk-transfer-list__list"
     role="listbox"
     aria-multiselectable="true"
+    tabindex="-1"
     [id]="selectedListId"
     [attr.aria-labelledby]="selectedLabelId"
+    [attr.aria-invalid]="isInvalid() || null"
   >
     @for (item of filteredSelected(); track item.value) {
       <li
+        #selectedOpt
         class="mk-transfer-list__option"
         [class.mk-transfer-list__option--checked]="isChecked('selected', item.value)"
         [class.mk-transfer-list__option--disabled]="item.disabled"
         role="option"
         [attr.aria-selected]="isChecked('selected', item.value)"
         [attr.aria-disabled]="item.disabled || null"
-        [attr.tabindex]="isDisabled() || item.disabled ? null : 0"
+        [attr.tabindex]="$index === activeIdx('selected') ? 0 : -1"
+        (focus)="setActive('selected', $index)"
         (click)="toggleCheck('selected', item)"
         (keydown)="onRowKeydown('selected', item, $event)"
       >
@@ -139,7 +149,7 @@
         <span class="mk-transfer-list__label">{{ item.label }}</span>
       </li>
     } @empty {
-      <li class="mk-transfer-list__empty">No items</li>
+      <li class="mk-transfer-list__empty">{{ i18n.noData }}</li>
     }
   </ul>
 </div>

@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  inject,
   input,
   output,
   viewChild,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkPlacement, MkTone } from '../../core/types';
 import { MkButton } from '../button/button';
 import { MkPopover } from './popover';
@@ -33,15 +35,16 @@ import { MkPopover } from './popover';
 })
 export class MkPopconfirm {
   private readonly popover = viewChild(MkPopover);
+  protected readonly i18n = inject(MK_I18N);
 
   /** Confirmation message. */
-  readonly message = input('Are you sure?');
+  readonly message = input(this.i18n.confirmMessage);
   /** Optional bold heading above the message. */
   readonly title = input<string>();
   /** Confirm button label. */
-  readonly confirmText = input('Confirm');
+  readonly confirmText = input(this.i18n.confirm);
   /** Cancel button label. */
-  readonly cancelText = input('Cancel');
+  readonly cancelText = input(this.i18n.cancel);
   /** Tone of the confirm button (destructive actions use `danger`). */
   readonly tone = input<MkTone>('danger');
   /** Preferred placement relative to the trigger. */

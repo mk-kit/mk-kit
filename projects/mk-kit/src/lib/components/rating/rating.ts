@@ -13,6 +13,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { MkFormField } from '../form-field/form-field';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /**
  * Rating — a star rating input (and read-only display). Implements the ARIA
@@ -58,6 +59,7 @@ import { MkFormField } from '../form-field/form-field';
 })
 export class MkRating implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
 
   /** Number of stars. */
   readonly max = input(5, { transform: numberAttribute });
@@ -70,7 +72,7 @@ export class MkRating implements ControlValueAccessor {
   /** Size scale. */
   readonly size = input<MkSize>('md');
   /** Accessible label. */
-  readonly ariaLabel = input('Rating');
+  readonly ariaLabel = input(this.i18n.ratingLabel);
 
   protected readonly hover = signal(-1);
   private readonly cvaDisabled = signal(false);
@@ -92,7 +94,7 @@ export class MkRating implements ControlValueAccessor {
   );
 
   protected readonly valueText = computed(
-    () => `${this.value()} of ${this.max()} stars`,
+    () => this.i18n.ratingValueText(this.value(), this.max()),
   );
 
   protected setValue(v: number): void {

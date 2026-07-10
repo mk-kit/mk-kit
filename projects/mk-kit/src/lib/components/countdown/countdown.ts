@@ -14,6 +14,7 @@ import {
   untracked,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** A duration split into whole day/hour/minute/second parts. */
 export interface MkDurationParts {
@@ -63,6 +64,7 @@ export function mkSplitDuration(ms: number): MkDurationParts {
 export class MkCountdown {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  protected readonly i18n = inject(MK_I18N);
 
   /** The target instant to count down to. */
   readonly to = input<Date | null>(null);
@@ -97,12 +99,24 @@ export class MkCountdown {
 
   protected readonly isDone = computed(() => !!this.to() && this.remaining() === 0);
 
-  protected readonly summary = computed(() => {
+  /**
+   * Text for the polite live region. Deliberately formatted WITHOUT the
+   * seconds segment so the string (and therefore the announcement) only
+   * changes when a minute rolls over, instead of chattering every second.
+   * When the countdown reaches zero it switches to a final "finished"
+   * announcement ({@link finishedText} when provided).
+   */
+  protected readonly liveText = computed(() => {
+    if (this.isDone()) return this.finishedText() || this.i18n.countdownFinished;
     const p = this.parts();
-    const segs = this.showDays() ? [`${p.days} days`] : [];
-    return [...segs, `${p.hours} hours`, `${p.minutes} minutes`, `${p.seconds} seconds`].join(
-      ', ',
-    );
+    const segs = this.showDays()
+      ? [`${p.days} ${this.i18n.countdownDays}`]
+      : [];
+    return [
+      ...segs,
+      `${p.hours} ${this.i18n.countdownHours}`,
+      `${p.minutes} ${this.i18n.countdownMinutes}`,
+    ].join(', ');
   });
 
   private hasFinished = false;

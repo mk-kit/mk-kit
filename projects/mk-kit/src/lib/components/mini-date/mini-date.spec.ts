@@ -98,6 +98,22 @@ describe('MkMiniDate', () => {
     expect(cmp.value()).toBeNull();
   });
 
+  it('Home/End jump a segment to its min/max', () => {
+    (cmp as any).setSegment('year', 2026);
+    (cmp as any).setSegment('month', 2); // February → 28 days
+    (cmp as any).setSegment('day', 10);
+
+    const event = (key: string) =>
+      Object.assign(new KeyboardEvent('keydown', { key }), {
+        preventDefault: () => {},
+      });
+    (cmp as any).onSegKeydown('day', 0, event('End'));
+    expect(cmp.value()!.getDate()).toBe(28);
+
+    (cmp as any).onSegKeydown('day', 0, event('Home'));
+    expect(cmp.value()!.getDate()).toBe(1);
+  });
+
   it('orders the rendered segments by the `order` input', () => {
     fixture.componentRef.setInput('order', 'ymd');
     fixture.detectChanges();

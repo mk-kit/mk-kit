@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, input, output } from '@angular/core';
 import type { MkBlock } from './block-model';
 
 /**
@@ -74,7 +74,7 @@ import type { MkBlock } from './block-model';
 })
 export class MkCodeBlock {
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();
 
   protected rows(): number {

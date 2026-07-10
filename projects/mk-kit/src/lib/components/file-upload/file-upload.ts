@@ -16,6 +16,7 @@ import {
   effect,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 
 /** Upload lifecycle state for a single file. */
@@ -90,6 +91,7 @@ let uploadSeq = 0;
   },
 })
 export class MkFileUpload {
+  protected readonly i18n = inject(MK_I18N);
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('fileInput');
@@ -107,7 +109,7 @@ export class MkFileUpload {
   /** Force invalid styling when used standalone. */
   readonly invalid = input(false, { transform: booleanAttribute });
   /** Primary dropzone prompt. */
-  readonly label = input('Drag files here or click to browse');
+  readonly label = input(this.i18n.dropzoneLabel);
   /** Secondary hint under the prompt (e.g. accepted types / size). */
   readonly hint = input('');
   /** Hide the built-in file list (render your own from `files`). */
@@ -245,7 +247,8 @@ export class MkFileUpload {
       const done = this.files().find((i) => i.id === item.id);
       if (done) this.uploaded.emit(done);
     } catch (err) {
-      const message = err instanceof Error ? err.message : 'Upload failed';
+      const message =
+        err instanceof Error ? err.message : this.i18n.uploadFailed;
       this.patch(item.id, { status: 'error', error: message });
     }
   }

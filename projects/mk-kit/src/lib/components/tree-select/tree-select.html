@@ -7,7 +7,7 @@
     aria-haspopup="tree"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"
-    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-labelledby]="labelledBy() ? labelledBy() + ' ' + valueId : null"
     [attr.aria-describedby]="describedBy()"
     [attr.aria-invalid]="isInvalid() || null"
     [attr.aria-required]="isRequired() || null"
@@ -16,11 +16,13 @@
     (keydown)="onTriggerKeydown($event)"
   >
     @if (selectedLabel()) {
-      <span class="mk-tree-select__value">{{ selectedLabel() }}</span>
+      <span class="mk-tree-select__value" [id]="valueId">{{ selectedLabel() }}</span>
     } @else {
-      <span class="mk-tree-select__value mk-tree-select__value--placeholder">{{
-        placeholder()
-      }}</span>
+      <span
+        class="mk-tree-select__value mk-tree-select__value--placeholder"
+        [id]="valueId"
+        >{{ placeholder() }}</span
+      >
     }
     <span class="mk-tree-select__icon" aria-hidden="true"></span>
   </button>
@@ -29,7 +31,7 @@
     <button
       type="button"
       class="mk-tree-select__clear"
-      aria-label="Clear"
+      [attr.aria-label]="i18n.clear"
       (click)="clear($event)"
     >
       <span class="mk-tree-select__clear-icon" aria-hidden="true"></span>

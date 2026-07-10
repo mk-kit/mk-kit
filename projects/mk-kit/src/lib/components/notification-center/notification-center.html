@@ -42,13 +42,17 @@
       <h2 [id]="titleId" class="mk-notification-center__title">
         {{ panelTitle() }}
       </h2>
+      <!--
+        aria-disabled (not [disabled]) so the button stays focusable when it
+        disables itself after activation; markAllRead() guards the no-op case.
+      -->
       <button
         type="button"
         class="mk-notification-center__mark-all"
-        [disabled]="unreadCount() === 0"
+        [attr.aria-disabled]="unreadCount() === 0"
         (click)="markAllRead()"
       >
-        Mark all read
+        {{ i18n.markAllRead }}
       </button>
     </header>
 
@@ -69,6 +73,9 @@
                 class="mk-notification-center__dot"
                 aria-hidden="true"
               ></span>
+              @if (!item.read) {
+                <span class="mk-visually-hidden">{{ i18n.unread }}</span>
+              }
               <span class="mk-notification-center__body">
                 <span class="mk-notification-center__item-title">
                   {{ item.title }}

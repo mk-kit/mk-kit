@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import type { MkPlacement } from '../../core/types';
 import { mkGetFocusable } from '../../core/a11y/focus-trap';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 
 /**
@@ -72,6 +73,7 @@ export const MK_TOUR_DATA = new InjectionToken<MkTourData>('MK_TOUR_DATA');
 export class MkTourPopup {
   private readonly injector = inject(Injector);
   private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
+  protected readonly i18n = inject(MK_I18N);
 
   /** The step + navigation data for this popup. */
   protected readonly data = inject(MK_TOUR_DATA);
@@ -110,6 +112,38 @@ export class MkTourPopup {
    */
   protected onDismiss(): void {
     /* intentionally inert */
+  }
+
+  /**
+   * Trap Tab inside the popup (the dialog is `aria-modal` over a scrim): wrap
+   * from the last tabbable back to the first and vice versa, and pull focus in
+   * if it somehow ended up outside.
+   */
+  protected onTab(event: Event): void {
+    const e = event as KeyboardEvent;
+    const panel = this.panelRef()?.nativeElement;
+    if (!panel) return;
+
+    const focusable = mkGetFocusable(panel);
+    if (focusable.length === 0) {
+      e.preventDefault();
+      panel.focus();
+      return;
+    }
+    const first = focusable[0];
+    const last = focusable[focusable.length - 1];
+    const active = panel.ownerDocument.activeElement;
+
+    if (!panel.contains(active)) {
+      e.preventDefault();
+      first.focus();
+    } else if (e.shiftKey && active === first) {
+      e.preventDefault();
+      last.focus();
+    } else if (!e.shiftKey && active === last) {
+      e.preventDefault();
+      first.focus();
+    }
   }
 
   private focusInitial(): void {

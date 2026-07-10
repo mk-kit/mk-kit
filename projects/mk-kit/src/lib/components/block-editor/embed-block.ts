@@ -1,5 +1,14 @@
-import { ChangeDetectionStrategy, Component, computed, inject, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  computed,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 import { DomSanitizer, type SafeResourceUrl } from '@angular/platform-browser';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkBlock } from './block-model';
 import { MkBlockEditorContext } from './block-context';
 import { mkIsSafeUrl } from './block-serializer';
@@ -20,9 +29,10 @@ import { mkIsSafeUrl } from './block-serializer';
 export class MkEmbedBlock {
   private readonly ctx = inject(MkBlockEditorContext);
   private readonly sanitizer = inject(DomSanitizer);
+  protected readonly i18n = inject(MK_I18N);
 
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();
 
   protected readonly embedUrl = computed<string>(() => this.block().data['embedUrl'] ?? '');

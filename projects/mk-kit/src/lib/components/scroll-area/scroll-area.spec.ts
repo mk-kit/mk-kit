@@ -73,4 +73,16 @@ describe('MkScrollArea', () => {
     fixture.componentRef.setInput('hideDelay', 0);
     expect((cmp as any).barsVisible()).toBe(true);
   });
+
+  it('exposes a labelled region only when ariaLabel is set', () => {
+    // Default: no role, no aria-label (but still focusable).
+    expect(viewport().getAttribute('role')).toBeNull();
+    expect(viewport().getAttribute('aria-label')).toBeNull();
+    expect(viewport().getAttribute('tabindex')).toBe('0');
+
+    fixture.componentRef.setInput('ariaLabel', 'Release notes');
+    fixture.detectChanges();
+    expect(viewport().getAttribute('role')).toBe('region');
+    expect(viewport().getAttribute('aria-label')).toBe('Release notes');
+  });
 });

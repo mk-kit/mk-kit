@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, input } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkSize, MkTone } from '../../core/types';
 
 /**
@@ -26,10 +27,12 @@ import type { MkSize, MkTone } from '../../core/types';
   },
 })
 export class MkSpinner {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Size scale. */
   readonly size = input<MkSize>('md');
   /** Semantic color tone. */
   readonly tone = input<MkTone>('primary');
   /** Visually-hidden status label announced to screen readers. */
-  readonly label = input('Loading');
+  readonly label = input(this.i18n.loading);
 }

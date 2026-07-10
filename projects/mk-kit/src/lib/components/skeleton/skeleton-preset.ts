@@ -2,9 +2,11 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkSkeleton } from './skeleton';
 
 /** Ready-made loading layouts for {@link MkSkeletonPreset}. */
@@ -37,6 +39,8 @@ export type MkSkeletonPresetKind = 'paragraph' | 'card' | 'list' | 'table';
   },
 })
 export class MkSkeletonPreset {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Which layout to render. */
   readonly preset = input<MkSkeletonPresetKind>('paragraph');
   /** Number of rows (paragraph lines / list items / table body rows). */
@@ -44,7 +48,7 @@ export class MkSkeletonPreset {
   /** Number of columns (table only). */
   readonly columns = input(4, { transform: numberAttribute });
   /** Accessible loading label. */
-  readonly loadingLabel = input('Loading');
+  readonly loadingLabel = input(this.i18n.loading);
 
   protected readonly rowRange = computed(() =>
     Array.from({ length: Math.max(1, this.rows()) }, (_, i) => i),

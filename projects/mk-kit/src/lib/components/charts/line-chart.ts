@@ -3,10 +3,12 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
   signal,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   MkChartSeries,
   MkPoint,
@@ -59,6 +61,8 @@ function stackedAreaPath(
   },
 })
 export class MkLineChart {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Ordered category labels along the x axis. */
   readonly categories = input<readonly string[]>([]);
   /** One or more data series (values align to `categories`). */

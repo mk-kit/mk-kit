@@ -15,6 +15,8 @@ import {
   viewChildren,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
+import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 import { MkFormField } from '../form-field/form-field';
 
@@ -37,6 +39,8 @@ import { MkFormField } from '../form-field/form-field';
     role: 'group',
     '[attr.aria-label]': 'ariaLabel()',
     '[attr.aria-labelledby]': 'labelledBy()',
+    '[class.mk-otp--sm]': "effectiveSize() === 'sm'",
+    '[class.mk-otp--lg]': "effectiveSize() === 'lg'",
     '[class.mk-otp--invalid]': 'isInvalid()',
     '[class.mk-otp--disabled]': 'isDisabled()',
   },
@@ -50,6 +54,7 @@ import { MkFormField } from '../form-field/form-field';
 })
 export class MkOtp implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly cells =
     viewChildren<ElementRef<HTMLInputElement>>('cell');
 
@@ -65,8 +70,10 @@ export class MkOtp implements ControlValueAccessor {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Force invalid styling when standalone. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Control size. Ignored inside an `mk-form-field`. */
+  readonly size = input<MkSize>('md');
   /** Accessible label for the group. */
-  readonly ariaLabel = input('One-time code');
+  readonly ariaLabel = input(this.i18n.oneTimeCode);
 
   readonly cellId = mkUniqueId('mk-otp');
   private readonly chars = signal<string[]>([]);
@@ -76,6 +83,9 @@ export class MkOtp implements ControlValueAccessor {
 
   protected readonly indexes = computed(() =>
     Array.from({ length: this.length() }, (_, i) => i),
+  );
+  protected readonly effectiveSize = computed<MkSize>(() =>
+    this.field ? this.field.size() : this.size(),
   );
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),

@@ -87,7 +87,7 @@ export class MkCommandPalette {
   /** The commands to search and run. */
   readonly commands = input<readonly MkCommand[]>([]);
   /** Search field placeholder. */
-  readonly placeholder = input('Type a command or search…');
+  readonly placeholder = input(this.i18n.commandPalettePlaceholder);
   /** Message shown when nothing matches. */
   readonly emptyMessage = input(this.i18n.noResults);
   /** Toggle open with ⌘K / Ctrl+K anywhere. */

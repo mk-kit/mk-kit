@@ -17,6 +17,7 @@
         class="mk-kanban__cards"
         [mkDropListData]="column.cards"
         [mkDropListId]="listIds()[colIndex]"
+        [mkDropListLabel]="column.title"
         [mkDropListConnectedTo]="connectedTo(colIndex)"
         [mkDropListDisabled]="disabled()"
         mkDropListOrientation="vertical"

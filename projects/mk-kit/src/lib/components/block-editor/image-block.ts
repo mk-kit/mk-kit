@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  booleanAttribute,
   inject,
   input,
   output,
   signal,
   viewChild,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkBlock } from './block-model';
 import { MkBlockEditorContext } from './block-context';
 
@@ -29,9 +31,10 @@ type ImageAlign = 'left' | 'center' | 'right';
 export class MkImageBlock {
   private readonly ctx = inject(MkBlockEditorContext);
   private readonly fileInput = viewChild<ElementRef<HTMLInputElement>>('fileInput');
+  protected readonly i18n = inject(MK_I18N);
 
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();
 
   protected readonly aligns: ImageAlign[] = ['left', 'center', 'right'];

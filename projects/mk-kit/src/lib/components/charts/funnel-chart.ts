@@ -3,9 +3,11 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { mkChartColor, mkFormatCompact } from './chart-utils';
 
 /** A single stage of the funnel (ordered largest → smallest conceptually). */
@@ -65,6 +67,8 @@ const MARGIN = { top: 10, right: 12, bottom: 10, left: 12 };
   },
 })
 export class MkFunnelChart {
+  protected readonly i18n = inject(MK_I18N);
+
   /** The funnel stages, ordered largest → smallest conceptually. */
   readonly segments = input<readonly MkFunnelSegment[]>([]);
   /** Intrinsic width (viewBox units; the SVG scales to its container). */

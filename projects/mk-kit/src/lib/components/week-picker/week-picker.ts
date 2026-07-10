@@ -17,6 +17,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkCalendar } from '../calendar/calendar';
@@ -68,6 +69,7 @@ export interface MkWeek {
   ],
 })
 export class MkWeekPicker implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -84,7 +86,7 @@ export class MkWeekPicker implements ControlValueAccessor {
   /** First column of the calendar week (0 = Sunday). Also anchors the week. */
   readonly firstDayOfWeek = input(0, { transform: numberAttribute });
   /** Placeholder shown when empty. */
-  readonly placeholder = input<string>('Select week…');
+  readonly placeholder = input(this.i18n.selectWeek);
   /** Pattern used to render each endpoint of the week range. */
   readonly displayFormat = input<string>('MMM d');
   /** Prefix the label with the ISO week number, e.g. `W28 · …`. */
@@ -136,9 +138,11 @@ export class MkWeekPicker implements ControlValueAccessor {
     const week = this.value();
     if (!week) return '';
     const fmt = this.displayFormat();
-    const range = `${formatDate(week.start, fmt)} – ${formatDate(
+    const names = this.i18n.dateNames;
+    const range = `${formatDate(week.start, fmt, names)} – ${formatDate(
       week.end,
       `${fmt}, yyyy`,
+      names,
     )}`;
     return this.showWeekNumber() ? `W${getISOWeek(week.start)} · ${range}` : range;
   });

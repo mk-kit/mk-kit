@@ -51,7 +51,7 @@ export class MkPagination {
   /** Number of page buttons pinned at each end. */
   readonly boundaryCount = input(1, { transform: numberAttribute });
   /** Accessible label for the navigation landmark. */
-  readonly label = input('Pagination');
+  readonly label = input(this.i18n.paginationLabel);
 
   /**
    * `pageChange` is emitted automatically by the two-way `page` model whenever

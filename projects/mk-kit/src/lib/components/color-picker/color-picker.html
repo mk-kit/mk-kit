@@ -30,7 +30,7 @@
       autocomplete="off"
       [value]="hexText()"
       [disabled]="isDisabled()"
-      [attr.aria-label]="'Hex value'"
+      [attr.aria-label]="i18n.hexValue"
       [attr.aria-required]="isRequired() || null"
       (input)="onHexInput($event)"
       (blur)="commitHex()"
@@ -40,7 +40,7 @@
 </div>
 
 @if (swatches().length) {
-  <div class="mk-color-picker__swatches" role="group" aria-label="Preset colors">
+  <div class="mk-color-picker__swatches" role="group" [attr.aria-label]="i18n.presetColors">
     @for (s of swatches(); track s) {
       <button
         type="button"

@@ -16,6 +16,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
 import { mkGetFocusable } from '../../core/a11y/focus-trap';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkBadge } from '../badge/badge';
 import { MkEmptyState } from '../empty-state/empty-state';
@@ -68,6 +69,7 @@ export class MkNotificationCenter {
   private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly triggerRef =
     viewChild<ElementRef<HTMLButtonElement>>('trigger');
+  protected readonly i18n = inject(MK_I18N);
 
   /** Stable id linking the trigger to the panel via `aria-controls`. */
   readonly panelId = mkUniqueId('mk-notification-center');
@@ -77,9 +79,9 @@ export class MkNotificationCenter {
   /** Two-way list of notifications rendered in the panel. */
   readonly notifications = model<MkNotification[]>([]);
   /** Heading shown at the top of the panel. */
-  readonly panelTitle = input('Notifications');
+  readonly panelTitle = input(this.i18n.notificationsTitle);
   /** Message shown by the empty state when there are no notifications. */
-  readonly emptyText = input("You're all caught up");
+  readonly emptyText = input(this.i18n.allCaughtUp);
   /** Max height of the scrollable list (any CSS length). */
   readonly maxHeight = input('24rem');
 
@@ -100,8 +102,8 @@ export class MkNotificationCenter {
   );
 
   /** Accessible label for the bell trigger. */
-  protected readonly triggerLabel = computed(
-    () => `Notifications, ${this.unreadCount()} unread`,
+  protected readonly triggerLabel = computed(() =>
+    this.i18n.notificationsUnread(this.unreadCount()),
   );
 
   /** Badge text, capped at "99+". */

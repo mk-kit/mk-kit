@@ -107,6 +107,29 @@ describe('MkTransferList', () => {
     expect(selected.map((i) => i.value)).toEqual(['editor']);
   });
 
+  it('ArrowDown/End/Home move the roving active index', () => {
+    const event = (key: string) => ({ key, preventDefault: vi.fn() }) as any;
+
+    (cmp as any).onRowKeydown('available', ITEMS[0], event('ArrowDown'));
+    expect((cmp as any).activeIdx('available')).toBe(1);
+
+    (cmp as any).onRowKeydown('available', ITEMS[1], event('End'));
+    expect((cmp as any).activeIdx('available')).toBe(ITEMS.length - 1);
+
+    (cmp as any).onRowKeydown('available', ITEMS[3], event('Home'));
+    expect((cmp as any).activeIdx('available')).toBe(0);
+  });
+
+  it('reflects the invalid input on the listboxes', () => {
+    fixture.componentRef.setInput('invalid', true);
+    fixture.detectChanges();
+    const list: HTMLElement = fixture.nativeElement.querySelector(
+      '.mk-transfer-list__list',
+    );
+    expect(list.getAttribute('aria-invalid')).toBe('true');
+    expect((cmp as any).isInvalid()).toBe(true);
+  });
+
   it('writeValue sets the selected values and normalises null to []', () => {
     cmp.writeValue(['viewer']);
     expect(cmp.value()).toEqual(['viewer']);

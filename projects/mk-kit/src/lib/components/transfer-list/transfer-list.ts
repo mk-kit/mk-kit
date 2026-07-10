@@ -1,6 +1,9 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
+  Injector,
+  afterNextRender,
   booleanAttribute,
   computed,
   forwardRef,
@@ -9,10 +12,14 @@ import {
   model,
   output,
   signal,
+  viewChild,
+  viewChildren,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MkLiveAnnouncer } from '../../core/a11y/live-announcer.service';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkButton } from '../button/button';
 import { MkFormField } from '../form-field/form-field';
 
@@ -40,8 +47,9 @@ type MkTransferSide = 'available' | 'selected';
  * `[(ngModel)]`, reactive forms and `[(value)]`. When nested in an
  * `mk-form-field` it inherits size and label wiring.
  *
- * Keyboard: each row is focusable; Space toggles its check, Enter moves it to
- * the opposite list.
+ * Keyboard: each listbox is a single tab stop (roving tabindex). Arrow Up/Down
+ * and Home/End move between rows, Space toggles a row's check and Enter moves
+ * it to the opposite list.
  *
  * ```html
  * <mk-transfer-list filterable
@@ -62,6 +70,7 @@ type MkTransferSide = 'available' | 'selected';
     '[class.mk-transfer-list--sm]': "effectiveSize() === 'sm'",
     '[class.mk-transfer-list--md]': "effectiveSize() === 'md'",
     '[class.mk-transfer-list--lg]': "effectiveSize() === 'lg'",
+    '[class.mk-transfer-list--invalid]': 'isInvalid()',
     '[class.mk-transfer-list--disabled]': 'isDisabled()',
   },
   providers: [
@@ -74,17 +83,30 @@ type MkTransferSide = 'available' | 'selected';
 })
 export class MkTransferList implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
+  private readonly announcer = inject(MkLiveAnnouncer);
+  private readonly injector = inject(Injector);
+  private readonly availableOptEls =
+    viewChildren<ElementRef<HTMLElement>>('availableOpt');
+  private readonly selectedOptEls =
+    viewChildren<ElementRef<HTMLElement>>('selectedOpt');
+  private readonly availableListEl =
+    viewChild<ElementRef<HTMLElement>>('availableList');
+  private readonly selectedListEl =
+    viewChild<ElementRef<HTMLElement>>('selectedList');
 
   /** The full set of items to shuttle between the two lists. */
   readonly items = input<readonly MkTransferItem[]>([]);
   /** Heading for the left (available) list. */
-  readonly availableLabel = input<string>('Available');
+  readonly availableLabel = input(this.i18n.available);
   /** Heading for the right (selected) list. */
-  readonly selectedLabel = input<string>('Selected');
+  readonly selectedLabel = input(this.i18n.selected);
   /** Show a search box over each list. */
   readonly filterable = input(false, { transform: booleanAttribute });
   /** Disable the whole control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force invalid styling + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
   readonly size = input<MkSize>('md');
 
@@ -101,6 +123,9 @@ export class MkTransferList implements ControlValueAccessor {
   /** Per-list search queries (only used when `filterable`). */
   protected readonly availableQuery = signal('');
   protected readonly selectedQuery = signal('');
+  /** Roving-tabindex active option index per list. */
+  private readonly activeAvailable = signal(0);
+  private readonly activeSelected = signal(0);
 
   private onChange: (value: unknown[]) => void = () => {};
   private onTouched: () => void = () => {};
@@ -116,6 +141,9 @@ export class MkTransferList implements ControlValueAccessor {
   );
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
+  );
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
   );
 
   /** Items keyed by value, for resolving the selected order. */
@@ -200,13 +228,97 @@ export class MkTransferList implements ControlValueAccessor {
     (side === 'available' ? this.availableQuery : this.selectedQuery).set(text);
   }
 
+  // --- Roving tabindex --------------------------------------------------------
+  private filteredFor(side: MkTransferSide): readonly MkTransferItem[] {
+    return side === 'available'
+      ? this.filteredAvailable()
+      : this.filteredSelected();
+  }
+
+  private activeSignalFor(side: MkTransferSide) {
+    return side === 'available' ? this.activeAvailable : this.activeSelected;
+  }
+
+  /** The active (tabbable) option index for a list, clamped to its length. */
+  protected activeIdx(side: MkTransferSide): number {
+    const max = Math.max(0, this.filteredFor(side).length - 1);
+    return Math.min(this.activeSignalFor(side)(), max);
+  }
+
+  /** Keep the roving index in sync when an option is focused (e.g. by click). */
+  protected setActive(side: MkTransferSide, index: number): void {
+    this.activeSignalFor(side).set(index);
+  }
+
+  /** Move the active index and focus that option. */
+  private moveActive(side: MkTransferSide, index: number): void {
+    const list = this.filteredFor(side);
+    if (!list.length) return;
+    const next = Math.max(0, Math.min(index, list.length - 1));
+    this.activeSignalFor(side).set(next);
+    this.focusOption(side, next);
+  }
+
+  private focusOption(side: MkTransferSide, index: number): void {
+    const els =
+      side === 'available' ? this.availableOptEls() : this.selectedOptEls();
+    els[index]?.nativeElement.focus();
+  }
+
+  /**
+   * After a move, keep focus useful: focus the source list's next remaining
+   * option, or the (empty) list element itself.
+   */
+  private focusAfterMove(side: MkTransferSide): void {
+    afterNextRender(
+      () => {
+        const list = this.filteredFor(side);
+        if (!list.length) {
+          this.activeSignalFor(side).set(0);
+          const listEl =
+            side === 'available' ? this.availableListEl() : this.selectedListEl();
+          listEl?.nativeElement.focus();
+          return;
+        }
+        this.moveActive(side, this.activeSignalFor(side)());
+      },
+      { injector: this.injector },
+    );
+  }
+
+  private announceMove(count: number, side: MkTransferSide): void {
+    const target =
+      side === 'available' ? this.selectedLabel() : this.availableLabel();
+    this.announcer.announce(this.i18n.itemsMoved(count, target));
+  }
+
   protected onRowKeydown(
     side: MkTransferSide,
     item: MkTransferItem,
     event: Event,
   ): void {
     const e = event as KeyboardEvent;
-    if (this.isDisabled() || item.disabled) return;
+    if (this.isDisabled()) return;
+    const index = this.filteredFor(side).indexOf(item);
+    switch (e.key) {
+      case 'ArrowDown':
+        e.preventDefault();
+        this.moveActive(side, index + 1);
+        return;
+      case 'ArrowUp':
+        e.preventDefault();
+        this.moveActive(side, index - 1);
+        return;
+      case 'Home':
+        e.preventDefault();
+        this.moveActive(side, 0);
+        return;
+      case 'End':
+        e.preventDefault();
+        this.moveActive(side, this.filteredFor(side).length - 1);
+        return;
+    }
+    if (item.disabled) return;
     if (e.key === ' ') {
       e.preventDefault();
       this.toggleCheck(side, item);
@@ -218,12 +330,16 @@ export class MkTransferList implements ControlValueAccessor {
 
   /** Move a single item to the opposite list (Enter on a row). */
   private moveOne(side: MkTransferSide, item: MkTransferItem): void {
+    const index = this.filteredFor(side).indexOf(item);
+    if (index >= 0) this.activeSignalFor(side).set(index);
     if (side === 'available') {
       this.commit([...this.value(), item.value]);
     } else {
       this.commit(this.value().filter((v) => v !== item.value));
     }
     this.uncheck(side, [item.value]);
+    this.announceMove(1, side);
+    this.focusAfterMove(side);
   }
 
   /** Move all checked available items into the selected list. */
@@ -236,6 +352,8 @@ export class MkTransferList implements ControlValueAccessor {
     if (!moving.length) return;
     this.commit([...this.value(), ...moving]);
     this.uncheck('available', moving);
+    this.announceMove(moving.length, 'available');
+    this.focusAfterMove('available');
   }
 
   /** Move all checked selected items back to the available list. */
@@ -250,6 +368,8 @@ export class MkTransferList implements ControlValueAccessor {
     if (!moving.size) return;
     this.commit(this.value().filter((v) => !moving.has(v)));
     this.uncheck('selected', [...moving]);
+    this.announceMove(moving.size, 'selected');
+    this.focusAfterMove('selected');
   }
 
   /** Move every movable available item into the selected list. */
@@ -261,6 +381,8 @@ export class MkTransferList implements ControlValueAccessor {
     if (!moving.length) return;
     this.commit([...this.value(), ...moving]);
     this.checkedAvailable.set(new Set());
+    this.announceMove(moving.length, 'available');
+    this.focusAfterMove('available');
   }
 
   /** Move every movable selected item back to the available list. */
@@ -274,6 +396,8 @@ export class MkTransferList implements ControlValueAccessor {
     if (!moving.size) return;
     this.commit(this.value().filter((v) => !moving.has(v)));
     this.checkedSelected.set(new Set());
+    this.announceMove(moving.size, 'selected');
+    this.focusAfterMove('selected');
   }
 
   private uncheck(side: MkTransferSide, values: readonly unknown[]): void {

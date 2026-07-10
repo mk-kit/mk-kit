@@ -30,7 +30,7 @@ import { mkEncodeQr, MkQrEcc } from './qr-encode';
   host: {
     class: 'mk-qr-code',
     role: 'img',
-    '[attr.aria-label]': 'label()',
+    '[attr.aria-label]': 'effectiveLabel()',
   },
 })
 export class MkQrCode {
@@ -46,8 +46,16 @@ export class MkQrCode {
   readonly color = input('var(--mk-text)');
   /** Background / quiet-zone colour. */
   readonly background = input('var(--mk-surface)');
-  /** Accessible label for the image. */
-  readonly label = input('QR code');
+  /**
+   * Accessible label for the image. When omitted, the label carries the
+   * encoded content (`QR code: <value>`) so AT users learn what the code says.
+   */
+  readonly label = input('');
+
+  /** The label actually exposed on the host: `label`, or a generated default. */
+  protected readonly effectiveLabel = computed(
+    () => this.label() || `QR code: ${this.value()}`,
+  );
 
   /** The module matrix (`true` = dark); empty if encoding fails (e.g. too long). */
   protected readonly matrix = computed<boolean[][]>(() => {

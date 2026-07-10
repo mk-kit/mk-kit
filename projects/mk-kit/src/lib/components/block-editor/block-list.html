@@ -17,7 +17,7 @@
           type="button"
           class="mk-block__move"
           [disabled]="i === 0"
-          aria-label="Move block up"
+          [attr.aria-label]="i18n.blockEditor.moveBlockUp"
           (click)="move(i, -1)"
         >
           ▲
@@ -27,7 +27,7 @@
           type="button"
           class="mk-block__move"
           [disabled]="last"
-          aria-label="Move block down"
+          [attr.aria-label]="i18n.blockEditor.moveBlockDown"
           (click)="move(i, 1)"
         >
           ▼
@@ -45,21 +45,21 @@
             class="mk-block__action"
             [attr.aria-expanded]="menuOpen() === i"
             aria-haspopup="menu"
-            aria-label="Block options"
+            [attr.aria-label]="i18n.blockEditor.blockOptions"
             (click)="toggleMenu(i)"
           >
             ⋯
           </button>
           @if (menuOpen() === i) {
-            <div class="mk-block__menu" role="menu" aria-label="Block options">
-              <button type="button" role="menuitem" (click)="duplicate(i)">Duplicate</button>
+            <div class="mk-block__menu" role="menu" [attr.aria-label]="i18n.blockEditor.blockOptions">
+              <button type="button" role="menuitem" (click)="duplicate(i)">{{ i18n.blockEditor.duplicate }}</button>
               @for (t of transformsFor(block.type); track t) {
                 <button type="button" role="menuitem" (click)="transform(i, t)">
                   Turn into {{ definition(t)?.label ?? t }}
                 </button>
               }
               <button type="button" role="menuitem" class="mk-block__menu-danger" (click)="remove(i)">
-                Delete
+                {{ i18n.blockEditor.remove }}
               </button>
             </div>
           }
@@ -120,9 +120,9 @@
         }
         @case ('columns') {
           @if (!readonly) {
-            <div class="mk-columns-settings" role="group" aria-label="Column settings">
+            <div class="mk-columns-settings" role="group" [attr.aria-label]="i18n.blockEditor.columnSettings">
               <label>
-                <span>Columns</span>
+                <span>{{ i18n.blockEditor.columns }}</span>
                 <span class="mk-columns-settings__counts">
                   @for (n of [2, 3, 4]; track n) {
                     <button
@@ -137,7 +137,7 @@
                 </span>
               </label>
               <label>
-                <span>Ratio</span>
+                <span>{{ i18n.blockEditor.ratio }}</span>
                 <select [value]="block.data['ratio']" (change)="onRatioChange(i, $event)">
                   @for (preset of ratioPresets[block.data['count'] || 2]; track preset.value) {
                     <option [value]="preset.value">{{ preset.label }}</option>
@@ -145,7 +145,7 @@
                 </select>
               </label>
               <label>
-                <span>Gap</span>
+                <span>{{ i18n.blockEditor.gap }}</span>
                 <input
                   type="range"
                   min="0"
@@ -155,7 +155,7 @@
                 />
               </label>
               <label>
-                <span>Align</span>
+                <span>{{ i18n.blockEditor.align }}</span>
                 <select [value]="block.data['align'] ?? 'stretch'" (change)="onAlignChange(i, $event)">
                   <option value="stretch">Stretch</option>
                   <option value="start">Top</option>
@@ -164,7 +164,7 @@
                 </select>
               </label>
               <label>
-                <span>Justify</span>
+                <span>{{ i18n.blockEditor.justify }}</span>
                 <select [value]="block.data['justify'] ?? 'start'" (change)="onJustifyChange(i, $event)">
                   <option value="start">Start</option>
                   <option value="center">Center</option>
@@ -206,7 +206,7 @@
     class="mk-block-list__add"
     [definitions]="ctx.definitions()"
     [columnsOnly]="inColumn()"
-    [label]="blocks().length ? 'Add block' : 'Add your first block'"
+    [label]="blocks().length ? i18n.blockEditor.addBlock : i18n.blockEditor.addFirstBlock"
     (pick)="insertAt(blocks().length, $event)"
   />
 }

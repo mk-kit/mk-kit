@@ -4,8 +4,10 @@ import {
   computed,
   contentChildren,
   effect,
+  inject,
   input,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkBreadcrumbItem } from './breadcrumb-item';
 
 /**
@@ -32,8 +34,10 @@ import { MkBreadcrumbItem } from './breadcrumb-item';
   },
 })
 export class MkBreadcrumb {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Accessible label for the navigation landmark. */
-  readonly label = input('Breadcrumb');
+  readonly label = input(this.i18n.breadcrumbLabel);
   /** Separator character rendered between crumbs. */
   readonly separator = input('/');
 

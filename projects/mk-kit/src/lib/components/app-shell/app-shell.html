@@ -1,4 +1,4 @@
-<a class="mk-app-shell__skip" href="#mk-app-main">Skip to content</a>
+<a class="mk-app-shell__skip" href="#mk-app-main">{{ i18n.skipToContent }}</a>
 
 <header class="mk-app-shell__header" role="banner">
   <ng-content select="[mkAppHeader]" />
@@ -14,7 +14,7 @@
     [attr.inert]="isMobile() && !sidebarOpen() ? '' : null"
     (keydown)="onSidebarKeydown($event)"
   >
-    <nav class="mk-app-shell__nav" aria-label="Primary">
+    <nav class="mk-app-shell__nav" [attr.aria-label]="i18n.primaryNav">
       <ng-content select="[mkAppSidebar]" />
     </nav>
   </aside>

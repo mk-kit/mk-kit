@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import { ChangeDetectionStrategy, Component, booleanAttribute, computed, input, output } from '@angular/core';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -115,7 +115,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
 })
 export class MkListBlock {
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
   readonly blockChange = output<MkBlock>();
 
   protected readonly ordered = computed(() => !!this.block().data['ordered']);

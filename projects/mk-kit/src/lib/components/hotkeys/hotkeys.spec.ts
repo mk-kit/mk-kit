@@ -189,4 +189,11 @@ describe('MkHotkey directive', () => {
     keydown({ key: 'b', ctrlKey: true });
     expect(fixture.componentInstance.clicks()).toBe(0);
   });
+
+  it('exposes the combo to AT via aria-keyshortcuts', () => {
+    const button: HTMLElement = fixture.nativeElement.querySelector('button');
+    const div: HTMLElement = fixture.nativeElement.querySelector('div[mkHotkey]');
+    expect(button.getAttribute('aria-keyshortcuts')).toBe('Control+B');
+    expect(div.getAttribute('aria-keyshortcuts')).toBe('?');
+  });
 });

@@ -25,7 +25,7 @@
             type="button"
             class="mk-pagination__btn"
             [class.mk-pagination__btn--active]="item === current()"
-            [attr.aria-label]="'Go to page ' + item"
+            [attr.aria-label]="i18n.goToPage(item)"
             [attr.aria-current]="item === current() ? 'page' : null"
             (click)="goTo(item)"
           >

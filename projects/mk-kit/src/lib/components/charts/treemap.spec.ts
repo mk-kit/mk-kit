@@ -94,4 +94,12 @@ describe('MkTreemap', () => {
     const rows = host.querySelectorAll('.mk-chart__sr-table tbody tr');
     expect(rows.length).toBe(items.length);
   });
+
+  it('exposes each item\'s rounded share of the total in the SR table', () => {
+    // Total = 90 → Ads 40/90 ≈ 44%, SEO 25/90 ≈ 28%.
+    const rows = host.querySelectorAll('.mk-chart__sr-table tbody tr');
+    const shareOf = (row: Element) => row.querySelectorAll('td')[1].textContent?.trim();
+    expect(shareOf(rows[0])).toBe('44%');
+    expect(shareOf(rows[1])).toBe('28%');
+  });
 });

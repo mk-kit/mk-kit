@@ -27,15 +27,15 @@
   @if (!readonly()) {
     <div class="mk-image-block__settings">
       <label class="mk-image-block__field">
-        <span>Alt text</span>
+        <span>{{ i18n.blockEditor.altText }}</span>
         <input type="text" [value]="block().data['alt'] ?? ''" (input)="onAlt($event)" />
       </label>
       <label class="mk-image-block__field">
-        <span>Caption</span>
+        <span>{{ i18n.blockEditor.caption }}</span>
         <input type="text" [value]="block().data['caption'] ?? ''" (input)="onCaption($event)" />
       </label>
       <div class="mk-image-block__field">
-        <span id="mk-img-align">Alignment</span>
+        <span id="mk-img-align">{{ i18n.blockEditor.alignment }}</span>
         <div class="mk-image-block__aligns" role="group" aria-labelledby="mk-img-align">
           @for (a of aligns; track a) {
             <button
@@ -61,7 +61,9 @@
           (input)="onWidth($event)"
         />
       </label>
-      <button type="button" class="mk-image-block__replace" (click)="clear()">Replace image</button>
+      <button type="button" class="mk-image-block__replace" (click)="clear()">
+        {{ i18n.blockEditor.replaceImage }}
+      </button>
     </div>
   }
 } @else {
@@ -87,7 +89,7 @@
         Choose file
       </button>
       <label class="mk-image-block__url">
-        <span class="mk-visually-hidden">Image URL</span>
+        <span class="mk-visually-hidden">{{ i18n.blockEditor.imageUrl }}</span>
         <input
           type="url"
           placeholder="…or paste an image URL"

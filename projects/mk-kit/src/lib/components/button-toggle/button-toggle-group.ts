@@ -8,9 +8,11 @@ import {
   input,
   model,
   signal,
+  inject,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize, MkTone } from '../../core/types';
+import { MkFormField } from '../form-field/form-field';
 import { MkButtonToggle } from './button-toggle';
 
 /**
@@ -42,6 +44,8 @@ import { MkButtonToggle } from './button-toggle';
     class: 'mk-button-toggle-group',
     '[attr.role]': "multiple() ? 'group' : 'radiogroup'",
     '[attr.aria-label]': 'ariaLabel() || null',
+    '[attr.aria-labelledby]': 'labelledBy()',
+    '[attr.aria-describedby]': 'describedBy()',
     '[attr.aria-disabled]': 'isDisabled() || null',
     '[attr.data-tone]': 'tone()',
     '[class.mk-button-toggle-group--sm]': "size() === 'sm'",
@@ -58,13 +62,27 @@ import { MkButtonToggle } from './button-toggle';
   ],
 })
 export class MkButtonToggleGroup implements ControlValueAccessor {
+  /** Optional surrounding form field — supplies label/hint/error wiring. */
+  private readonly field = inject(MkFormField, { optional: true });
+
   /** Live list of projected toggle items, in DOM order. */
   readonly toggles = contentChildren(MkButtonToggle);
 
   /** Allow selecting any number of items (toolbar of `aria-pressed` buttons). */
   readonly multiple = input(false, { transform: booleanAttribute });
-  /** Control size, applied to every item. */
+  /** Control size, applied to every item. Ignored inside an `mk-form-field`. */
   readonly size = input<MkSize>('md');
+  /** The size actually applied (the form field's when nested). */
+  readonly effectiveSize = computed<MkSize>(() =>
+    this.field ? this.field.size() : this.size(),
+  );
+  /** Label / description ids inherited from a surrounding form field. */
+  protected readonly labelledBy = computed(() =>
+    this.ariaLabel() ? null : (this.field?.labelId ?? null),
+  );
+  protected readonly describedBy = computed(
+    () => this.field?.describedBy() ?? null,
+  );
   /** Semantic color tone used for the selected fill. */
   readonly tone = input<MkTone>('primary');
   /** Disable the whole group. */

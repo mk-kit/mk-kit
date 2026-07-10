@@ -2,6 +2,7 @@
   #panel
   class="mk-tour__popup"
   role="dialog"
+  aria-modal="true"
   tabindex="-1"
   [attr.aria-label]="data.step.title ?? data.step.body"
   mkAnchoredPanel
@@ -10,6 +11,8 @@
   [gap]="12"
   (dismiss)="onDismiss()"
   (keydown.escape)="onEscape($event)"
+  (keydown.tab)="onTab($event)"
+  (keydown.shift.tab)="onTab($event)"
 >
   @if (data.step.title; as title) {
     <h3 class="mk-tour__title">{{ title }}</h3>
@@ -18,21 +21,23 @@
 
   <div class="mk-tour__footer">
     <span class="mk-tour__indicator">
-      Step {{ data.index + 1 }} of {{ data.total }}
+      {{ i18n.tourStepOf(data.index + 1, data.total) }}
     </span>
     <div class="mk-tour__actions">
       <button type="button" class="mk-tour__btn mk-tour__btn--ghost" (click)="skip()">
-        Skip
+        {{ i18n.tourSkip }}
       </button>
       @if (data.index > 0) {
-        <button type="button" class="mk-tour__btn" (click)="prev()">Prev</button>
+        <button type="button" class="mk-tour__btn" (click)="prev()">
+          {{ i18n.tourPrevious }}
+        </button>
       }
       <button
         type="button"
         class="mk-tour__btn mk-tour__btn--primary"
         (click)="next()"
       >
-        {{ isLast() ? 'Done' : 'Next' }}
+        {{ isLast() ? i18n.tourDone : i18n.tourNext }}
       </button>
     </div>
   </div>

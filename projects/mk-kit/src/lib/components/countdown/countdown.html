@@ -5,7 +5,7 @@
     <span class="mk-countdown__segment">
       <span class="mk-countdown__value">{{ format(parts().days) }}</span>
       @if (showLabels()) {
-        <span class="mk-countdown__label">days</span>
+        <span class="mk-countdown__label">{{ i18n.countdownDays }}</span>
       }
     </span>
     <span class="mk-countdown__sep" aria-hidden="true">:</span>
@@ -13,23 +13,24 @@
   <span class="mk-countdown__segment">
     <span class="mk-countdown__value">{{ format(parts().hours) }}</span>
     @if (showLabels()) {
-      <span class="mk-countdown__label">hrs</span>
+      <span class="mk-countdown__label">{{ i18n.countdownHours }}</span>
     }
   </span>
   <span class="mk-countdown__sep" aria-hidden="true">:</span>
   <span class="mk-countdown__segment">
     <span class="mk-countdown__value">{{ format(parts().minutes) }}</span>
     @if (showLabels()) {
-      <span class="mk-countdown__label">min</span>
+      <span class="mk-countdown__label">{{ i18n.countdownMinutes }}</span>
     }
   </span>
   <span class="mk-countdown__sep" aria-hidden="true">:</span>
   <span class="mk-countdown__segment">
     <span class="mk-countdown__value">{{ format(parts().seconds) }}</span>
     @if (showLabels()) {
-      <span class="mk-countdown__label">sec</span>
+      <span class="mk-countdown__label">{{ i18n.countdownSeconds }}</span>
     }
   </span>
 }
 
-<span class="mk-countdown__sr" aria-live="polite" aria-atomic="true">{{ summary() }}</span>
+<!-- Minute-granular so the polite region doesn't re-announce every second. -->
+<span class="mk-countdown__sr" aria-live="polite" aria-atomic="true">{{ liveText() }}</span>

@@ -49,7 +49,7 @@ const KEY_ALIASES: Record<string, string> = {
 const MODIFIER_KEYS = new Set(['control', 'shift', 'alt', 'meta', 'os', 'altgraph']);
 
 /** True on Apple platforms, where `mod` maps to the Command (meta) key. */
-function isMac(): boolean {
+export function mkIsMacPlatform(): boolean {
   return typeof navigator !== 'undefined' && (navigator.platform ?? '').includes('Mac');
 }
 
@@ -118,7 +118,7 @@ export function mkMatchesHotkey(event: KeyboardEvent, combo: string | MkParsedHo
 
   if (event.key.toLowerCase() !== parsed.key) return false;
 
-  const mac = isMac();
+  const mac = mkIsMacPlatform();
   const wantCtrl = parsed.ctrl || (parsed.mod && !mac);
   const wantMeta = parsed.meta || (parsed.mod && mac);
   if (event.ctrlKey !== wantCtrl) return false;

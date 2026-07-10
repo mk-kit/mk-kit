@@ -2,7 +2,7 @@
   <button
     type="button"
     class="mk-event-calendar__nav"
-    aria-label="Previous month"
+    [attr.aria-label]="i18n.previousMonth"
     (click)="prevMonth()"
   >
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -24,7 +24,7 @@
   <button
     type="button"
     class="mk-event-calendar__nav"
-    aria-label="Next month"
+    [attr.aria-label]="i18n.nextMonth"
     (click)="nextMonth()"
   >
     <svg viewBox="0 0 24 24" width="18" height="18" aria-hidden="true">
@@ -40,25 +40,28 @@
   </button>
 </div>
 
-<div class="mk-event-calendar__grid" role="grid" [attr.aria-labelledby]="labelId">
-  <div class="mk-event-calendar__weekdays" role="row">
+<!--
+  The days are a plain list of buttons (role="group"), not an ARIA grid — there
+  is no roving-tabindex arrow navigation here, so grid semantics would be wrong.
+-->
+<div class="mk-event-calendar__grid" role="group" [attr.aria-labelledby]="labelId">
+  <div class="mk-event-calendar__weekdays" aria-hidden="true">
     @for (wd of weekdays(); track $index) {
-      <span class="mk-event-calendar__weekday" role="columnheader">
+      <span class="mk-event-calendar__weekday">
         <abbr [title]="wd.full">{{ wd.short }}</abbr>
       </span>
     }
   </div>
 
   @for (week of weekCells(); track $index) {
-    <div class="mk-event-calendar__week" role="row">
+    <div class="mk-event-calendar__week">
       @for (cell of week; track cell.date.getTime()) {
         <button
           type="button"
           class="mk-event-calendar__cell"
-          role="gridcell"
           [class.mk-event-calendar__cell--outside]="cell.outside"
           [class.mk-event-calendar__cell--today]="cell.today"
-          [attr.aria-label]="dayLabel(cell.date)"
+          [attr.aria-label]="dayLabel(cell)"
           [attr.aria-current]="cell.today ? 'date' : null"
           (click)="onDayClick(cell.date)"
         >
@@ -66,7 +69,13 @@
             cell.date.getDate()
           }}</span>
 
-          <span class="mk-event-calendar__events">
+          <!--
+            Presentational for assistive tech: the day button's aria-label
+            already announces the events, and nested interactive content inside
+            a button is invalid. The pill (click) is a mouse-only shortcut to
+            `eventClick`; keyboard users activate the day (`dayClick`) instead.
+          -->
+          <span class="mk-event-calendar__events" aria-hidden="true">
             @for (event of cell.visible; track $index) {
               <span
                 class="mk-event-calendar__pill"

@@ -28,7 +28,7 @@
     <button
       type="button"
       class="mk-month-picker__clear"
-      aria-label="Clear"
+      [attr.aria-label]="i18n.clear"
       (click)="clear($event)"
     >
       <span class="mk-month-picker__clear-icon" aria-hidden="true"></span>
@@ -42,7 +42,7 @@
     class="mk-month-picker__panel"
     role="dialog"
     [id]="panelId"
-    [attr.aria-label]="mode() === 'year' ? 'Choose year' : 'Choose month'"
+    [attr.aria-label]="mode() === 'year' ? i18n.chooseYear : i18n.chooseMonth"
     mkAnchoredPanel
     [mkAnchoredPanelFor]="field"
     (dismiss)="close()"
@@ -51,7 +51,7 @@
       <button
         type="button"
         class="mk-month-picker__nav"
-        [attr.aria-label]="mode() === 'year' ? 'Previous years' : 'Previous year'"
+        [attr.aria-label]="mode() === 'year' ? i18n.previousYears : i18n.previousYear"
         (click)="shiftView(-1)"
       >
         ‹
@@ -60,7 +60,7 @@
       <button
         type="button"
         class="mk-month-picker__nav"
-        [attr.aria-label]="mode() === 'year' ? 'Next years' : 'Next year'"
+        [attr.aria-label]="mode() === 'year' ? i18n.nextYears : i18n.nextYear"
         (click)="shiftView(1)"
       >
         ›

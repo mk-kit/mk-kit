@@ -6,6 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { MkButton } from '../button';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkToastItem, MkToastService } from './toast.service';
 
 /**
@@ -32,6 +33,7 @@ import { MkToastItem, MkToastService } from './toast.service';
 })
 export class MkToast {
   private readonly service = inject(MkToastService);
+  protected readonly i18n = inject(MK_I18N);
 
   /** The toast model to render. */
   readonly item = input.required<MkToastItem>();

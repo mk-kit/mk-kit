@@ -158,6 +158,10 @@ export interface MkI18nStrings {
   countdownHours: string;
   countdownMinutes: string;
   countdownSeconds: string;
+  /** Announced when a countdown reaches zero. */
+  countdownFinished: string;
+  /** Event-calendar day label suffix, e.g. `2 events: Standup, Demo`. */
+  dayEvents: (count: number, titles: string) => string;
 
   // --- Table / data grid ---------------------------------------------------------
   /** Select-all header checkbox. */
@@ -194,6 +198,8 @@ export interface MkI18nStrings {
   passwordRuleSymbol: string;
   /** Password strength label for a 0–4 score. */
   passwordStrength: (score: number) => string;
+  /** Visible prefix before the strength label. */
+  passwordStrengthLabel: string;
   /** Rule-state prefixes announced to screen readers. */
   ruleMet: string;
   ruleNotMet: string;
@@ -355,6 +361,9 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   countdownHours: 'hrs',
   countdownMinutes: 'min',
   countdownSeconds: 'sec',
+  countdownFinished: 'Finished',
+  dayEvents: (count, titles) =>
+    `${count} ${count === 1 ? 'event' : 'events'}${titles ? `: ${titles}` : ''}`,
 
   selectAllRows: 'Select all rows',
   selectRow: (row) => (row ? `Select row ${row}` : 'Select row'),
@@ -379,6 +388,7 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   passwordRuleSymbol: 'A symbol',
   passwordStrength: (score) =>
     PASSWORD_STRENGTH_LABELS[Math.max(0, Math.min(4, score))],
+  passwordStrengthLabel: 'Password strength:',
   ruleMet: 'Met:',
   ruleNotMet: 'Not met:',
   oneTimeCode: 'One-time code',

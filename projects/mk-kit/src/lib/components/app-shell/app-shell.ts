@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { MkFocusTrap } from '../../core/a11y/focus-trap';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Viewport width (px) at/below which the sidebar becomes an off-canvas drawer. */
 const MOBILE_BREAKPOINT = 1024;
@@ -48,6 +49,7 @@ const MOBILE_BREAKPOINT = 1024;
 export class MkAppShell {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  protected readonly i18n = inject(MK_I18N);
 
   private readonly sidebarRef =
     viewChild<ElementRef<HTMLElement>>('sidebar');

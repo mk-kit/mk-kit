@@ -9,6 +9,7 @@ import {
   model,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Split direction for {@link MkSplitter}. */
 export type MkSplitterOrientation = 'horizontal' | 'vertical';
@@ -41,6 +42,7 @@ export type MkSplitterOrientation = 'horizontal' | 'vertical';
 })
 export class MkSplitter {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  protected readonly i18n = inject(MK_I18N);
 
   /** `horizontal` = side-by-side; `vertical` = stacked. */
   readonly orientation = input<MkSplitterOrientation>('horizontal');
@@ -55,7 +57,7 @@ export class MkSplitter {
   /** Disable resizing. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Accessible label for the separator. */
-  readonly ariaLabel = input('Resize panes');
+  readonly ariaLabel = input(this.i18n.resizePanes);
 
   private dragging = false;
 

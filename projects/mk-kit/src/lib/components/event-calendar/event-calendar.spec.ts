@@ -65,6 +65,32 @@ describe('MkEventCalendar', () => {
     expect(day9.overflow).toBe(2);
   });
 
+  it('dayLabel announces the date plus event count and titles (capped at 3)', () => {
+    const events: MkCalendarEvent[] = [
+      { date: new Date(2026, 6, 9), title: 'Standup' },
+      { date: new Date(2026, 6, 9), title: 'Demo' },
+      { date: new Date(2026, 6, 20), title: 'Ship' },
+      { date: new Date(2026, 6, 21), title: 'A' },
+      { date: new Date(2026, 6, 21), title: 'B' },
+      { date: new Date(2026, 6, 21), title: 'C' },
+      { date: new Date(2026, 6, 21), title: 'D' },
+    ];
+    fixture.componentRef.setInput('events', events);
+    fixture.detectChanges();
+
+    expect((cmp as any).dayLabel(findCell(10))).toBe('July 10, 2026');
+    expect((cmp as any).dayLabel(findCell(9))).toBe(
+      'July 9, 2026, 2 events: Standup, Demo',
+    );
+    expect((cmp as any).dayLabel(findCell(20))).toBe(
+      'July 20, 2026, 1 event: Ship',
+    );
+    // Count includes overflow; listed titles are capped at 3.
+    expect((cmp as any).dayLabel(findCell(21))).toBe(
+      'July 21, 2026, 4 events: A, B, C',
+    );
+  });
+
   it('nextMonth shifts viewDate forward one month and emits monthChange', () => {
     const seen: Date[] = [];
     cmp.monthChange.subscribe((d) => seen.push(d));

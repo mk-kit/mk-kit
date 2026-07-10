@@ -16,6 +16,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkTree, type MkTreeNode } from '../tree';
@@ -58,6 +59,7 @@ import { MkTree, type MkTreeNode } from '../tree';
 })
 export class MkTreeSelect implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly triggerRef =
@@ -69,7 +71,7 @@ export class MkTreeSelect implements ControlValueAccessor {
   /** Two-way selected value (a node's `value`, or the node itself if unset). */
   readonly value = model<unknown | null>(null);
   /** Placeholder shown when nothing is selected. */
-  readonly placeholder = input<string>('Select…');
+  readonly placeholder = input(this.i18n.selectPlaceholder);
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Show a clear button when a value is selected. */
@@ -86,6 +88,8 @@ export class MkTreeSelect implements ControlValueAccessor {
 
   readonly triggerId = this.field?.controlId ?? mkUniqueId('mk-tree-select');
   readonly panelId = mkUniqueId('mk-tree-select-panel');
+  /** Id of the rendered value/placeholder span, appended to `aria-labelledby`. */
+  readonly valueId = mkUniqueId('mk-tree-select-value');
 
   protected readonly effectiveSize = computed<MkSize>(() =>
     this.field ? this.field.size() : this.size(),

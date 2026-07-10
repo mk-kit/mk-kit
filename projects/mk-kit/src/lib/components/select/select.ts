@@ -78,7 +78,7 @@ export class MkSelect implements ControlValueAccessor {
   /** The list of options to choose from. */
   readonly options = input<readonly MkSelectOption[]>([]);
   /** Placeholder shown when nothing is selected. */
-  readonly placeholder = input<string>('Select…');
+  readonly placeholder = input<string>(this.i18n.selectPlaceholder);
   /** Control size. Ignored when nested in an `mk-form-field`. */
   readonly size = input<MkSize>('md');
   /** Force invalid styling + `aria-invalid` when used standalone. */

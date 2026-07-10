@@ -8,6 +8,7 @@ import {
   viewChild,
   ElementRef,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MK_OVERLAY_DATA, MkOverlayRef } from '../../core/overlay/overlay-ref';
 import { MkButton } from '../button';
 import { MkInput } from '../input';
@@ -51,11 +52,16 @@ export interface MkPromptDialogData {
 export class MkPromptDialog {
   private readonly ref = inject<MkOverlayRef<string | null>>(MkOverlayRef);
   protected readonly data = inject<MkPromptDialogData>(MK_OVERLAY_DATA);
+  protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   protected readonly value = signal(this.data.value ?? '');
-  protected readonly confirmText = computed(() => this.data.confirmText ?? 'OK');
-  protected readonly cancelText = computed(() => this.data.cancelText ?? 'Cancel');
+  protected readonly confirmText = computed(
+    () => this.data.confirmText ?? this.i18n.ok,
+  );
+  protected readonly cancelText = computed(
+    () => this.data.cancelText ?? this.i18n.cancel,
+  );
   protected readonly canConfirm = computed(
     () => !this.data.required || this.value().trim().length > 0,
   );

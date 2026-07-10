@@ -27,7 +27,7 @@
     <button
       type="button"
       class="mk-date-range-picker__clear"
-      aria-label="Clear range"
+      [attr.aria-label]="i18n.clear"
       (click)="clear()"
     >
       <span class="mk-date-range-picker__clear-icon" aria-hidden="true"></span>
@@ -37,7 +37,7 @@
   <button
     type="button"
     class="mk-date-range-picker__toggle"
-    aria-label="Open calendar"
+    [attr.aria-label]="i18n.openCalendar"
     aria-haspopup="dialog"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"
@@ -69,7 +69,7 @@
     (dismiss)="close()"
     [id]="panelId"
     role="dialog"
-    aria-label="Choose date range"
+    [attr.aria-label]="i18n.chooseDateRange"
   >
     <mk-calendar
       [rangeMode]="true"

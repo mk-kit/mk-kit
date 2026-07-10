@@ -3,10 +3,12 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
   signal,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { mkChartColor, mkFormatCompact } from './chart-utils';
 
 /** A single treemap tile: a labelled rectangle sized by `value`. */
@@ -185,6 +187,8 @@ interface RenderedTile {
   },
 })
 export class MkTreemap {
+  protected readonly i18n = inject(MK_I18N);
+
   /** The tiles to pack, largest first (order-independent — sorted internally). */
   readonly items = input<readonly MkTreemapItem[]>([]);
   /** Intrinsic width (viewBox units; the SVG scales to its container). */
@@ -233,6 +237,12 @@ export class MkTreemap {
 
   protected keyOf(index: number): string {
     return `t${index}`;
+  }
+
+  /** Rounded share of the total (e.g. `42%`) for the screen-reader table. */
+  protected shareOf(value: number): string {
+    const total = this.total();
+    return `${total > 0 ? Math.round((Math.max(value, 0) / total) * 100) : 0}%`;
   }
 
   protected readonly tooltip = computed(() => {

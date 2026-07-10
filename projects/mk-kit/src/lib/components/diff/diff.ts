@@ -3,9 +3,11 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   type MkDiffRow,
   mkComputeDiff,
@@ -42,6 +44,8 @@ interface SplitRow {
   },
 })
 export class MkDiff {
+  protected readonly i18n = inject(MK_I18N);
+
   /** The original ("before") text. */
   readonly before = input('');
   /** The new ("after") text. */
@@ -59,8 +63,8 @@ export class MkDiff {
   /** Show the +added / −removed summary header. */
   readonly showStats = input(true, { transform: booleanAttribute });
   /** Column labels (split view header / a11y). */
-  readonly beforeLabel = input('Before');
-  readonly afterLabel = input('After');
+  readonly beforeLabel = input(this.i18n.diffBefore);
+  readonly afterLabel = input(this.i18n.diffAfter);
 
   protected readonly rows = computed(() =>
     mkComputeDiff(this.before(), this.after(), {

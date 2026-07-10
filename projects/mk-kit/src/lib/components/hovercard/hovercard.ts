@@ -141,6 +141,20 @@ export class MkHovercard implements OnDestroy {
     this.scheduleClose();
   }
 
+  /**
+   * Keyboard mirror of `mouseleave`: when focus moves somewhere outside BOTH
+   * the card and its trigger, schedule a close. Focus hopping between the
+   * trigger and the card (either direction) keeps it open, so the card's
+   * content stays reachable with Tab.
+   */
+  protected onCardFocusout(event: FocusEvent): void {
+    const related = event.relatedTarget as Node | null;
+    if (!related) return;
+    const panel = event.currentTarget as HTMLElement | null;
+    if (panel?.contains(related) || this.triggerEl?.contains(related)) return;
+    this.scheduleClose();
+  }
+
   protected onEscape(event: Event): void {
     if (!this.closeOnEscape()) return;
     event.preventDefault();

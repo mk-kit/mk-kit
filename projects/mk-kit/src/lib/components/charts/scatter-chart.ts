@@ -3,10 +3,12 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
   signal,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   mkChartColor,
   mkFormatCompact,
@@ -69,6 +71,8 @@ interface RenderedPoint {
   },
 })
 export class MkScatterChart {
+  protected readonly i18n = inject(MK_I18N);
+
   /** One or more point series. */
   readonly series = input<readonly MkScatterSeries[]>([]);
   /** Intrinsic width (viewBox units; the SVG scales to its container). */

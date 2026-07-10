@@ -2,10 +2,12 @@ import {
   ChangeDetectionStrategy,
   Component,
   booleanAttribute,
+  inject,
   input,
   model,
   output,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkSize, MkTone } from '../../core/types';
 
 /** Visual treatment for a {@link MkChip}. */
@@ -47,6 +49,8 @@ export type MkChipVariant = 'solid' | 'soft' | 'outline';
   },
 })
 export class MkChip {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Semantic color tone. */
   readonly tone = input<MkTone>('neutral');
   /** Visual treatment. */
@@ -60,7 +64,7 @@ export class MkChip {
   /** Disable all interaction. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Accessible label for the remove button. */
-  readonly removeLabel = input('Remove');
+  readonly removeLabel = input(this.i18n.remove);
 
   /** Two-way selected state (only meaningful when `selectable`). */
   readonly selected = model(false);

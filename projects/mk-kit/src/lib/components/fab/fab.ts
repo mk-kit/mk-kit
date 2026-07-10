@@ -5,10 +5,12 @@ import {
   booleanAttribute,
   computed,
   contentChildren,
+  inject,
   input,
   model,
   output,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkSize, MkTone } from '../../core/types';
 
 /** Corner placement for a fixed {@link MkFab}. `static` renders it inline. */
@@ -54,6 +56,7 @@ export class MkFabAction {}
 })
 export class MkFab {
   private readonly actions = contentChildren(MkFabAction);
+  protected readonly i18n = inject(MK_I18N);
 
   /** Corner placement (or `static` to render inline). */
   readonly position = input<MkFabPosition>('bottom-end');
@@ -62,7 +65,7 @@ export class MkFab {
   /** Size scale. */
   readonly size = input<MkSize>('md');
   /** Accessible label (and visible text when `extended`). */
-  readonly label = input('Action');
+  readonly label = input(this.i18n.fabLabel);
   /** Render as a pill with the label beside the icon. */
   readonly extended = input(false, { transform: booleanAttribute });
   /** Disable the button. */

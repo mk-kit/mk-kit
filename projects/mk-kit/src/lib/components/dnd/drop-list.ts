@@ -71,6 +71,14 @@ export class MkDropList<T = unknown> {
   /** Ids of other lists items may be transferred into. */
   readonly mkDropListConnectedTo = input<readonly string[]>([]);
 
+  /**
+   * Human-readable name used in screen-reader announcements when an item is
+   * moved into this list (e.g. `"In progress"`). Falls back to the list `id`
+   * — which may be auto-generated gibberish — so set it wherever users can
+   * move items across lists by keyboard.
+   */
+  readonly mkDropListLabel = input<string>('');
+
   /** Layout axis; controls pointer hit-testing and arrow-key direction. */
   readonly mkDropListOrientation = input<MkDropListOrientation>('vertical');
 
@@ -83,6 +91,9 @@ export class MkDropList<T = unknown> {
   /** Resolved id (input or generated). */
   readonly id = computed(() => this.mkDropListId() ?? this.autoId);
   private readonly autoId = mkUniqueId('mk-drop-list');
+
+  /** Announceable name: the label when set, otherwise the resolved id. */
+  readonly label = computed(() => this.mkDropListLabel() || this.id());
 
   /** Connected-list ids, normalised to a plain array. */
   readonly connectedTo = computed<readonly string[]>(

@@ -5,6 +5,7 @@ import {
   inject,
   input,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkSnackbarItem, MkSnackbarService } from './snackbar.service';
 
 /**
@@ -29,6 +30,7 @@ import { MkSnackbarItem, MkSnackbarService } from './snackbar.service';
 })
 export class MkSnackbar {
   private readonly service = inject(MkSnackbarService);
+  protected readonly i18n = inject(MK_I18N);
 
   /** The snackbar model to render. */
   readonly item = input.required<MkSnackbarItem>();

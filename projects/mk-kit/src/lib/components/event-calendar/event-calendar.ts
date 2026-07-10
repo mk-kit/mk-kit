@@ -2,12 +2,14 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   input,
   model,
   numberAttribute,
   output,
 } from '@angular/core';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   addMonths,
   buildMonthMatrix,
@@ -73,6 +75,8 @@ interface MkDayCell {
   },
 })
 export class MkEventCalendar {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Events to plot onto the grid. */
   readonly events = input<readonly MkCalendarEvent[]>([]);
   /** Two-way month being viewed (any day within it). Defaults to today. */
@@ -84,7 +88,12 @@ export class MkEventCalendar {
 
   /** Emitted when a day cell is activated (click / Enter). */
   readonly dayClick = output<Date>();
-  /** Emitted when an event pill is activated (does not also fire `dayClick`). */
+  /**
+   * Emitted when an event pill is clicked (does not also fire `dayClick`).
+   * Mouse-only convenience: the pills are presentational (`aria-hidden`), so
+   * keyboard / screen-reader users reach events via the day button — its label
+   * announces the day's events and activating it fires `dayClick`.
+   */
   readonly eventClick = output<MkCalendarEvent>();
   /** Emitted when the viewed month changes via the prev/next buttons. */
   readonly monthChange = output<Date>();
@@ -96,7 +105,7 @@ export class MkEventCalendar {
   protected readonly viewMonth = computed(() => startOfMonth(this.viewDate()));
   /** Human label for the visible month, e.g. `July 2026`. */
   protected readonly monthLabel = computed(() =>
-    formatDate(this.viewDate(), 'MMMM yyyy'),
+    formatDate(this.viewDate(), 'MMMM yyyy', this.i18n.dateNames),
   );
 
   /** Raw 6×7 grid of dates for the visible month. */
@@ -107,8 +116,8 @@ export class MkEventCalendar {
   /** Weekday column headers ordered from `firstDayOfWeek`. */
   protected readonly weekdays = computed<MkWeekdayHeader[]>(() =>
     this.weeks()[0].map((d) => ({
-      short: formatDate(d, 'ddd'),
-      full: getWeekdayFullName(d),
+      short: formatDate(d, 'ddd', this.i18n.dateNames),
+      full: getWeekdayFullName(d, this.i18n.dateNames),
     })),
   );
 
@@ -144,9 +153,20 @@ export class MkEventCalendar {
     );
   });
 
-  /** Screen-reader label for a day cell, e.g. `July 9, 2026`. */
-  protected dayLabel(d: Date): string {
-    return formatDate(d, 'MMMM d, yyyy');
+  /**
+   * Screen-reader label for a day cell. The button's `aria-label` replaces its
+   * visual content, so the label also announces the day's events — count plus
+   * up to three titles — e.g. `July 9, 2026, 2 events: Standup, Demo`.
+   */
+  protected dayLabel(cell: MkDayCell): string {
+    const formatted = formatDate(cell.date, 'MMMM d, yyyy', this.i18n.dateNames);
+    const count = cell.visible.length + cell.overflow;
+    if (count === 0) return formatted;
+    const titles = cell.visible
+      .slice(0, 3)
+      .map((e) => e.title)
+      .join(', ');
+    return `${formatted}, ${this.i18n.dayEvents(count, titles)}`;
   }
 
   protected prevMonth(): void {

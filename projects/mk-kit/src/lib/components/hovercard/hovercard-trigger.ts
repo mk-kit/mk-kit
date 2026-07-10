@@ -5,8 +5,9 @@ import { MkHovercard } from './hovercard';
  * Turns its host element into a hover/focus trigger for an `<mk-hovercard>`.
  * On `mouseenter`/`focus` it opens the card (after the card's `openDelay`),
  * anchored to the host; on `mouseleave`/`blur` it schedules a close (after the
- * card's `closeDelay`). Moving the pointer from the host onto the card cancels
- * that close, so the card stays open. Escape closes it.
+ * card's `closeDelay`). Moving the pointer — or keyboard focus — from the host
+ * onto the card cancels that close, so the card stays open and its content is
+ * reachable with Tab. Escape closes it.
  *
  * ```html
  * <a href="/u/ada" [mkHovercardFor]="ada">@ada</a>

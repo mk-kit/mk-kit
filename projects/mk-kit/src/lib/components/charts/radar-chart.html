@@ -68,7 +68,7 @@
   <caption>{{ resolvedLabel() }}</caption>
   <thead>
     <tr>
-      <th scope="col">Axis</th>
+      <th scope="col">{{ i18n.chartAxis }}</th>
       @for (s of series(); track s.name) {
         <th scope="col">{{ s.name }}</th>
       }

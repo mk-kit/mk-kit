@@ -3,9 +3,11 @@ import {
   Component,
   booleanAttribute,
   computed,
+  inject,
   input,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import {
   MkChartSeries,
   mkChartColor,
@@ -56,6 +58,8 @@ interface RadarAxis {
   },
 })
 export class MkRadarChart {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Axis labels (one spoke each). Series data align to this order. */
   readonly axes = input<readonly string[]>([]);
   /** One or more series (values align to `axes`). */

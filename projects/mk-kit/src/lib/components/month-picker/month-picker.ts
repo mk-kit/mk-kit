@@ -18,12 +18,12 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import {
   endOfMonth,
   formatDate,
-  getMonthNames,
   isAfter,
   isBefore,
 } from '../datetime/date-utils';
@@ -76,6 +76,7 @@ interface Cell {
   ],
 })
 export class MkMonthPicker implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -135,14 +136,14 @@ export class MkMonthPicker implements ControlValueAccessor {
   protected readonly resolvedPlaceholder = computed(
     () =>
       this.placeholder() ||
-      (this.mode() === 'year' ? 'Select year…' : 'Select month…'),
+      (this.mode() === 'year' ? this.i18n.selectYear : this.i18n.selectMonth),
   );
   private readonly pattern = computed(
     () => this.displayFormat() || (this.mode() === 'year' ? 'yyyy' : 'MMM yyyy'),
   );
   protected readonly displayLabel = computed(() => {
     const v = this.value();
-    return v ? formatDate(v, this.pattern()) : '';
+    return v ? formatDate(v, this.pattern(), this.i18n.dateNames) : '';
   });
 
   /** The decade start when in year mode. */
@@ -159,7 +160,8 @@ export class MkMonthPicker implements ControlValueAccessor {
     return `${this.viewYear()}`;
   });
 
-  private readonly months = getMonthNames();
+  /** Abbreviated month labels for the grid, from the active locale. */
+  private readonly months = this.i18n.dateNames.monthsShort;
 
   /** The 12 grid cells (months or years). */
   protected readonly cells = computed<Cell[]>(() => {
@@ -182,7 +184,7 @@ export class MkMonthPicker implements ControlValueAccessor {
     return this.months.map((label, m) => {
       const date = new Date(year, m, 1);
       return {
-        label: label.slice(0, 3),
+        label,
         year,
         month: m,
         disabled: this.outOfRange(date, endOfMonth(date)),

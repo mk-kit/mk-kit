@@ -13,6 +13,8 @@
     (dismiss)="close()"
     (mouseenter)="onCardEnter()"
     (mouseleave)="onCardLeave()"
+    (focusin)="onCardEnter()"
+    (focusout)="onCardFocusout($event)"
     (keydown.escape)="onEscape($event)"
   >
     <ng-content />

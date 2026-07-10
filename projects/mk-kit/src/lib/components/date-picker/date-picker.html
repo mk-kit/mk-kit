@@ -23,7 +23,7 @@
     <button
       type="button"
       class="mk-date-picker__clear"
-      aria-label="Clear date"
+      [attr.aria-label]="i18n.clear"
       (click)="clear()"
     >
       <span class="mk-date-picker__clear-icon" aria-hidden="true"></span>
@@ -33,7 +33,7 @@
   <button
     type="button"
     class="mk-date-picker__toggle"
-    aria-label="Open calendar"
+    [attr.aria-label]="i18n.openCalendar"
     aria-haspopup="dialog"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"
@@ -65,7 +65,7 @@
     (dismiss)="close()"
     [id]="panelId"
     role="dialog"
-    aria-label="Choose date"
+    [attr.aria-label]="i18n.chooseDate"
   >
     <mk-calendar
       [value]="value()"

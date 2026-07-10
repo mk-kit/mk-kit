@@ -72,6 +72,8 @@ export class MkTourService {
   private snapshot?: MkTargetSnapshot;
   private endResolve?: () => void;
   private endPromise = Promise.resolve();
+  /** Element focused before start(); focus is restored to it on end(). */
+  private previouslyFocused: HTMLElement | null = null;
 
   /**
    * Begin a tour at step 0. Returns a promise that resolves when the tour ends
@@ -85,6 +87,8 @@ export class MkTourService {
     this.endPromise = new Promise<void>((resolve) => {
       this.endResolve = resolve;
     });
+    this.previouslyFocused = this.document
+      .activeElement as HTMLElement | null;
     this._steps.set([...steps]);
     this._running.set(true);
     this.document.addEventListener('keydown', this.onKeydown, true);
@@ -119,6 +123,10 @@ export class MkTourService {
     this.document.removeEventListener('keydown', this.onKeydown, true);
     this._index.set(-1);
     this._steps.set([]);
+    // Return focus to wherever the user was before the tour started
+    // (Done/Skip/Escape all funnel through here).
+    this.previouslyFocused?.focus?.();
+    this.previouslyFocused = null;
     const resolve = this.endResolve;
     this.endResolve = undefined;
     resolve?.();

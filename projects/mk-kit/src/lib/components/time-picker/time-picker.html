@@ -27,7 +27,7 @@
     <button
       type="button"
       class="mk-time-picker__clear"
-      aria-label="Clear time"
+      [attr.aria-label]="i18n.clear"
       (click)="clear()"
     >
       <span class="mk-time-picker__clear-icon" aria-hidden="true"></span>
@@ -37,7 +37,7 @@
   <button
     type="button"
     class="mk-time-picker__toggle"
-    aria-label="Open time list"
+    [attr.aria-label]="i18n.openTimeList"
     aria-haspopup="listbox"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="listId"
@@ -86,7 +86,9 @@
         {{ opt.label }}
       </li>
     } @empty {
-      <li class="mk-time-picker__empty" role="presentation">No times</li>
+      <li class="mk-time-picker__empty" role="presentation">
+        {{ i18n.noOptions }}
+      </li>
     }
   </ul>
 }

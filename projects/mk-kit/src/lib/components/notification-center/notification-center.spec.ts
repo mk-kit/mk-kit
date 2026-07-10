@@ -90,6 +90,45 @@ describe('MkNotificationCenter', () => {
     expect(clicked).toHaveBeenCalledOnce();
   });
 
+  it('flags unread rows with visually-hidden text (not color alone)', () => {
+    fixture.componentRef.setInput('notifications', sample());
+    cmp.openPanel();
+    fixture.detectChanges();
+
+    const items = document.querySelectorAll('.mk-notification-center__item');
+    expect(items.length).toBe(3);
+    expect(
+      items[0].querySelector('.mk-visually-hidden')?.textContent,
+    ).toContain('Unread');
+    expect(items[1].querySelector('.mk-visually-hidden')).toBeNull();
+    expect(items[2].querySelector('.mk-visually-hidden')).toBeTruthy();
+  });
+
+  it('"Mark all read" uses aria-disabled and stays focusable after activation', () => {
+    fixture.componentRef.setInput('notifications', sample());
+    cmp.openPanel();
+    fixture.detectChanges();
+
+    const markAll = document.querySelector<HTMLButtonElement>(
+      '.mk-notification-center__mark-all',
+    )!;
+    expect(markAll.textContent).toContain('Mark all read');
+    expect(markAll.disabled).toBe(false);
+    expect(markAll.getAttribute('aria-disabled')).toBe('false');
+
+    markAll.click();
+    fixture.detectChanges();
+
+    // Not natively disabled, so keyboard focus is not dropped…
+    expect(markAll.disabled).toBe(false);
+    expect(markAll.getAttribute('aria-disabled')).toBe('true');
+    // …and re-activating while aria-disabled is a guarded no-op.
+    const allRead = vi.fn();
+    cmp.markedAllRead.subscribe(allRead);
+    markAll.click();
+    expect(allRead).not.toHaveBeenCalled();
+  });
+
   it('shows the empty state when the panel is open with no notifications', () => {
     // The anchored panel teleports itself into document.body, so query there.
     cmp.openPanel();

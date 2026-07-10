@@ -11,6 +11,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /**
  * BackToTop — a floating button that appears once the page (or a scroll target)
@@ -36,13 +37,14 @@ import { isPlatformBrowser } from '@angular/common';
 export class MkBackToTop {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  protected readonly i18n = inject(MK_I18N);
 
   /** Scroll distance (px) before the button appears. */
   readonly threshold = input(400);
   /** Optional scroll container; defaults to the window. */
   readonly target = input<HTMLElement | null>(null);
   /** Accessible label. */
-  readonly ariaLabel = input('Back to top');
+  readonly ariaLabel = input(this.i18n.backToTop);
   /** Smooth-scroll on click (respects reduced-motion by browser). */
   readonly smooth = input(true, { transform: booleanAttribute });
 

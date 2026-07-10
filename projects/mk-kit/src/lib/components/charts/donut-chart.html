@@ -55,7 +55,7 @@
 <table class="mk-chart__sr-table">
   <caption>{{ resolvedLabel() }}</caption>
   <thead>
-    <tr><th scope="col">Slice</th><th scope="col">Value</th></tr>
+    <tr><th scope="col">{{ i18n.chartSlice }}</th><th scope="col">{{ i18n.chartValue }}</th></tr>
   </thead>
   <tbody>
     @for (s of slices(); track s.name) {

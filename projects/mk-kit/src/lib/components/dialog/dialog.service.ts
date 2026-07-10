@@ -3,6 +3,7 @@ import {
   MkOverlayConfig,
   MkOverlayService,
 } from '../../core/overlay/overlay.service';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkOverlayRef } from '../../core/overlay/overlay-ref';
 import { MkConfirmDialog, MkConfirmDialogData } from './confirm-dialog';
 import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
@@ -30,6 +31,7 @@ const DIALOG_PANEL_CLASS = 'mk-dialog-panel';
 @Injectable({ providedIn: 'root' })
 export class MkDialogService {
   private readonly overlay = inject(MkOverlayService);
+  private readonly i18n = inject(MK_I18N);
 
   /** Open `component` inside a themed dialog panel. */
   open<TComponent, TResult = unknown, TData = unknown>(
@@ -67,7 +69,11 @@ export class MkDialogService {
     const ref = this.open<MkConfirmDialog, boolean, MkConfirmDialogData>(
       MkConfirmDialog,
       {
-        data: { ...data, hideCancel: true, confirmText: data.confirmText ?? 'OK' },
+        data: {
+          ...data,
+          hideCancel: true,
+          confirmText: data.confirmText ?? this.i18n.ok,
+        },
         role: data.tone === 'danger' ? 'alertdialog' : 'dialog',
         ariaLabel: data.title,
       },

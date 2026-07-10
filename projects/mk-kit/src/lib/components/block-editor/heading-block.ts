@@ -1,4 +1,13 @@
-import { ChangeDetectionStrategy, Component, computed, input, output } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  computed,
+  inject,
+  input,
+  output,
+} from '@angular/core';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkBlock } from './block-model';
 import { MkRichText, type MkRichTextSplit } from './rich-text';
 
@@ -35,7 +44,7 @@ const LEVELS = [1, 2, 3, 4] as const;
       [placeholder]="'Heading ' + level()"
       [disabled]="readonly()"
       [multiline]="false"
-      [ariaLabel]="'Heading level ' + level()"
+      [ariaLabel]="i18n.blockEditor.headingLevel(level())"
       (contentChange)="onContent($event)"
       (splitAt)="splitAt.emit($event)"
       (removeEmpty)="removeEmpty.emit()"
@@ -98,8 +107,10 @@ const LEVELS = [1, 2, 3, 4] as const;
   ],
 })
 export class MkHeadingBlock {
+  protected readonly i18n = inject(MK_I18N);
+
   readonly block = input.required<MkBlock>();
-  readonly readonly = input(false);
+  readonly readonly = input(false, { transform: booleanAttribute });
 
   readonly blockChange = output<MkBlock>();
   readonly splitAt = output<MkRichTextSplit>();

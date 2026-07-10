@@ -6,12 +6,14 @@ import {
   computed,
   contentChildren,
   effect,
+  inject,
   input,
   model,
   output,
   viewChildren,
 } from '@angular/core';
 import { MkStep } from './step';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** Orientation of the step header rail. */
 export type MkStepperOrientation = 'horizontal' | 'vertical';
@@ -48,6 +50,8 @@ export type MkStepperOrientation = 'horizontal' | 'vertical';
   },
 })
 export class MkStepper {
+  protected readonly i18n = inject(MK_I18N);
+
   /** Projected steps, kept live via a signal content query. */
   readonly steps = contentChildren(MkStep);
   /** Rendered header buttons, used to move focus. */

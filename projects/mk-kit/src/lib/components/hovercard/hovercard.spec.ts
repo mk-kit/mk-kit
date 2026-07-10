@@ -89,6 +89,43 @@ describe('MkHovercard', () => {
     expect(card.opened()).toBe(false);
   });
 
+  it('keeps the card open while focus moves between trigger and panel', () => {
+    card.open(trigger);
+    const panel = document.createElement('div');
+
+    // Trigger blur schedules a close; focus landing inside the panel
+    // (focusin -> onCardEnter) must cancel it.
+    trigger.dispatchEvent(new FocusEvent('blur'));
+    (card as any).onCardEnter();
+    vi.advanceTimersByTime(500);
+    expect(card.opened()).toBe(true);
+
+    // Focus hopping from the panel back to the trigger keeps it open too.
+    (card as any).onCardFocusout({
+      relatedTarget: trigger,
+      currentTarget: panel,
+    } as unknown as FocusEvent);
+    vi.advanceTimersByTime(500);
+    expect(card.opened()).toBe(true);
+  });
+
+  it('closes when focus leaves both the trigger and the panel', () => {
+    card.open(trigger);
+    const panel = document.createElement('div');
+    const outside = document.createElement('button');
+    document.body.appendChild(outside);
+
+    (card as any).onCardFocusout({
+      relatedTarget: outside,
+      currentTarget: panel,
+    } as unknown as FocusEvent);
+    vi.advanceTimersByTime(199);
+    expect(card.opened()).toBe(true);
+    vi.advanceTimersByTime(1);
+    expect(card.opened()).toBe(false);
+    outside.remove();
+  });
+
   it('Escape closes an open card immediately', () => {
     card.open(trigger);
     expect(card.opened()).toBe(true);

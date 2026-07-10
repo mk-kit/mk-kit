@@ -55,6 +55,13 @@ export class MkScrollArea {
 
   /** Optional CSS max-height for the viewport, e.g. `'20rem'`. */
   readonly maxHeight = input<string>('');
+  /**
+   * Accessible name for the scrollable viewport. When set, the viewport is
+   * exposed as a labelled `region` landmark — recommended, since the viewport
+   * is keyboard-focusable (`tabindex="0"`) and a focusable scroll container
+   * should have an accessible name. When empty, no role / label is added.
+   */
+  readonly ariaLabel = input<string>('');
   /** Which axes render a custom bar. */
   readonly orientation = input<MkScrollAreaOrientation>('vertical');
   /** Auto-hide the bars after this many ms of inactivity (`0` = always on). */

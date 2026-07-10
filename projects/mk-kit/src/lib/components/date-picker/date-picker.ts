@@ -18,6 +18,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 import { MkCalendar } from '../calendar/calendar';
@@ -67,6 +68,7 @@ import {
   ],
 })
 export class MkDatePicker implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -82,7 +84,7 @@ export class MkDatePicker implements ControlValueAccessor {
   /** Latest selectable date (inclusive). */
   readonly max = input<Date | null>(null);
   /** Placeholder shown when empty. */
-  readonly placeholder = input<string>('Select date…');
+  readonly placeholder = input(this.i18n.selectDate);
   /** Pattern used to render the selected date in the field. */
   readonly displayFormat = input<string>('MMM d, yyyy');
   /** Disable the control. */
@@ -127,7 +129,9 @@ export class MkDatePicker implements ControlValueAccessor {
     // Keep the text field in sync with the model (typing does not touch value).
     effect(() => {
       const v = this.value();
-      this.inputText.set(v ? formatDate(v, this.displayFormat()) : '');
+      this.inputText.set(
+        v ? formatDate(v, this.displayFormat(), this.i18n.dateNames) : '',
+      );
     });
   }
 
@@ -204,7 +208,9 @@ export class MkDatePicker implements ControlValueAccessor {
     } else {
       // Invalid entry — revert to the current model's display.
       const v = this.value();
-      this.inputText.set(v ? formatDate(v, this.displayFormat()) : '');
+      this.inputText.set(
+        v ? formatDate(v, this.displayFormat(), this.i18n.dateNames) : '',
+      );
     }
   }
 

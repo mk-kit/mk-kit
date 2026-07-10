@@ -6,7 +6,7 @@
           [size]="effectiveSize()"
           [removable]="!isDisabled()"
           [disabled]="isDisabled()"
-          [removeLabel]="'Remove ' + tag"
+          [removeLabel]="i18n.removeItem(tag)"
           (removed)="removeAt(i)"
         >
           {{ tag }}

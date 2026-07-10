@@ -94,7 +94,7 @@
             <button
               type="button"
               class="mk-file-upload__retry"
-              aria-label="Retry upload"
+              [attr.aria-label]="i18n.retryUpload"
               (click)="retry(item)"
             >
               ↻
@@ -105,7 +105,7 @@
         <button
           type="button"
           class="mk-file-upload__remove"
-          [attr.aria-label]="'Remove ' + item.name"
+          [attr.aria-label]="i18n.removeItem(item.name)"
           (click)="remove(item)"
         >
           <span aria-hidden="true">&times;</span>

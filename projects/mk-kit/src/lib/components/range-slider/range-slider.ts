@@ -15,6 +15,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize, MkTone } from '../../core/types';
 import { MkFormField } from '../form-field/form-field';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 
 /** A `[low, high]` value pair. */
 export type MkRange = [number, number];
@@ -53,6 +54,7 @@ export type MkRange = [number, number];
 })
 export class MkRangeSlider implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly trackRef = viewChildren<ElementRef<HTMLElement>>('track');
   private readonly thumbRefs = viewChildren<ElementRef<HTMLElement>>('thumb');
 
@@ -69,9 +71,9 @@ export class MkRangeSlider implements ControlValueAccessor {
   /** Semantic tone for the filled range + thumbs. */
   readonly tone = input<MkTone>('primary');
   /** Accessible label for the low thumb. */
-  readonly minLabel = input('Minimum');
+  readonly minLabel = input(this.i18n.minimum);
   /** Accessible label for the high thumb. */
-  readonly maxLabel = input('Maximum');
+  readonly maxLabel = input(this.i18n.maximum);
   /** Two-way `[low, high]` value. */
   readonly value = model<MkRange>([0, 100]);
 

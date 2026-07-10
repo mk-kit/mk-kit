@@ -106,4 +106,16 @@ describe('MkQrCode', () => {
     const rect = fixture.nativeElement.querySelector('.mk-qr-code__module') as SVGRectElement;
     expect(rect.style.fill).toBe('rgb(10, 20, 30)');
   });
+
+  it('defaults the aria-label to the encoded content', () => {
+    const el: HTMLElement = fixture.nativeElement;
+    expect(el.getAttribute('role')).toBe('img');
+    expect(el.getAttribute('aria-label')).toBe('QR code: Hello');
+  });
+
+  it('prefers an explicit label over the generated one', () => {
+    fixture.componentRef.setInput('label', 'Ticket QR');
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).getAttribute('aria-label')).toBe('Ticket QR');
+  });
 });

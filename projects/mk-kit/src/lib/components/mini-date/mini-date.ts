@@ -15,13 +15,9 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkFormField } from '../form-field/form-field';
-import {
-  clampDate,
-  getMonthNames,
-  isSameDay,
-  startOfDay,
-} from '../datetime/date-utils';
+import { clampDate, isSameDay, startOfDay } from '../datetime/date-utils';
 
 /** Which segment a part represents. */
 type MkDateSegment = 'day' | 'month' | 'year';
@@ -52,9 +48,9 @@ function daysInMonth(m: number, year: number): number {
  * MiniDate — a compact, popover-free inline date editor with segmented
  * day / month / year spin fields (like a native `<input type="date">` but
  * themed and signal-driven). Each segment is an ARIA `spinbutton`: Arrow
- * Up/Down step the value (day wraps within the month), Arrow Left/Right move
- * between segments, and typing digits fills the focused segment and
- * auto-advances (OTP-style). Implements `ControlValueAccessor` and a two-way
+ * Up/Down step the value (day wraps within the month), Home/End jump to the
+ * segment's minimum/maximum, Arrow Left/Right move between segments, and
+ * typing digits fills the focused segment and auto-advances (OTP-style). Implements `ControlValueAccessor` and a two-way
  * `value` model over a real `Date | null`.
  *
  * A non-null `Date` is emitted only when all three segments are set and valid;
@@ -93,6 +89,7 @@ function daysInMonth(m: number, year: number): number {
 })
 export class MkMiniDate implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  protected readonly i18n = inject(MK_I18N);
   private readonly segEls =
     viewChildren<ElementRef<HTMLElement>>('seg');
 
@@ -116,7 +113,6 @@ export class MkMiniDate implements ControlValueAccessor {
   readonly yearMax = input(2100, { transform: numberAttribute });
 
   readonly segId = mkUniqueId('mk-mini-date');
-  private readonly monthNames = getMonthNames();
 
   // --- Segment state --------------------------------------------------------
   private readonly daySeg = signal<number | null>(null);
@@ -152,6 +148,7 @@ export class MkMiniDate implements ControlValueAccessor {
 
   /** Ordered, rendered segment descriptors. */
   protected readonly parts = computed<MkDatePart[]>(() => {
+    const names = this.i18n.dateNames;
     const byKey: Record<MkDateSegment, MkDatePart> = {
       day: {
         key: 'day',
@@ -160,14 +157,15 @@ export class MkMiniDate implements ControlValueAccessor {
         valueNow: this.daySeg(),
         valueMin: 1,
         valueMax: this.monthLength(),
-        valueText: this.daySeg() != null ? String(this.daySeg()) : 'Empty',
-        label: 'Day',
+        valueText:
+          this.daySeg() != null ? String(this.daySeg()) : this.i18n.empty,
+        label: this.i18n.daySegment,
       },
       month: {
         key: 'month',
         display:
           this.monthSeg() != null
-            ? this.monthNames[this.monthSeg()! - 1].slice(0, 3)
+            ? names.monthsShort[this.monthSeg()! - 1]
             : 'mmm',
         filled: this.monthSeg() != null,
         valueNow: this.monthSeg(),
@@ -175,9 +173,9 @@ export class MkMiniDate implements ControlValueAccessor {
         valueMax: 12,
         valueText:
           this.monthSeg() != null
-            ? this.monthNames[this.monthSeg()! - 1]
-            : 'Empty',
-        label: 'Month',
+            ? names.months[this.monthSeg()! - 1]
+            : this.i18n.empty,
+        label: this.i18n.monthSegment,
       },
       year: {
         key: 'year',
@@ -186,8 +184,9 @@ export class MkMiniDate implements ControlValueAccessor {
         valueNow: this.yearSeg(),
         valueMin: this.yearMin(),
         valueMax: this.yearMax(),
-        valueText: this.yearSeg() != null ? String(this.yearSeg()) : 'Empty',
-        label: 'Year',
+        valueText:
+          this.yearSeg() != null ? String(this.yearSeg()) : this.i18n.empty,
+        label: this.i18n.yearSegment,
       },
     };
     return this.order()
@@ -217,6 +216,16 @@ export class MkMiniDate implements ControlValueAccessor {
         e.preventDefault();
         this.focusSeg(index + 1);
         break;
+      case 'Home':
+        e.preventDefault();
+        this.setSegment(key, this.segMin(key));
+        this.resetBuffer();
+        break;
+      case 'End':
+        e.preventDefault();
+        this.setSegment(key, this.segMax(key));
+        this.resetBuffer();
+        break;
       case 'Backspace':
       case 'Delete':
         e.preventDefault();
@@ -239,6 +248,18 @@ export class MkMiniDate implements ControlValueAccessor {
 
   protected onBlur(): void {
     this.onTouched();
+  }
+
+  /** A segment's minimum value (Home key). */
+  private segMin(key: MkDateSegment): number {
+    return key === 'year' ? this.yearMin() : 1;
+  }
+
+  /** A segment's maximum value (End key). */
+  private segMax(key: MkDateSegment): number {
+    if (key === 'day') return this.monthLength();
+    if (key === 'month') return 12;
+    return this.yearMax();
   }
 
   /** Step a segment by `delta`; the day wraps within the current month. */

@@ -62,7 +62,7 @@ export class MkCarousel {
   /** Two-way current slide index. */
   readonly index = model(0);
   /** Accessible label for the carousel region. */
-  readonly ariaLabel = input('Carousel');
+  readonly ariaLabel = input(this.i18n.carouselLabel);
   /** Wrap around at the ends. */
   readonly loop = input(true, { transform: booleanAttribute });
   /** Show the dot indicators. */

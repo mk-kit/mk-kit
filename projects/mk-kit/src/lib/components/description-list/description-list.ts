@@ -1,4 +1,9 @@
-import { ChangeDetectionStrategy, Component, input } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  booleanAttribute,
+  input,
+} from '@angular/core';
 
 /** Layout for {@link MkDescriptionList}. */
 export type MkDescriptionLayout = 'grid' | 'stacked';
@@ -33,7 +38,7 @@ export class MkDescriptionList {
   /** `grid` aligns terms in a column; `stacked` puts each term above its value. */
   readonly layout = input<MkDescriptionLayout>('grid');
   /** Draw a divider between rows. */
-  readonly divided = input(false);
+  readonly divided = input(false, { transform: booleanAttribute });
 }
 
 /**

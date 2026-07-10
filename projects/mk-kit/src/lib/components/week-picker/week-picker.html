@@ -40,7 +40,7 @@
     <button
       type="button"
       class="mk-week-picker__clear"
-      aria-label="Clear week"
+      [attr.aria-label]="i18n.clear"
       (click)="clear()"
     >
       <span class="mk-week-picker__clear-icon" aria-hidden="true"></span>
@@ -57,7 +57,7 @@
     (dismiss)="close()"
     [id]="panelId"
     role="dialog"
-    aria-label="Choose week"
+    [attr.aria-label]="i18n.chooseWeek"
   >
     <mk-calendar
       [value]="calendarValue()"

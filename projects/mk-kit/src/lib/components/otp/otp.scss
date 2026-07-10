@@ -21,6 +21,18 @@
     border-color var(--mk-duration-fast) var(--mk-ease-standard),
     box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
 }
+:host(.mk-otp--sm) .mk-otp__cell {
+  width: 2.25rem;
+  height: 2.5rem;
+  font-size: var(--mk-font-size-md);
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-otp--lg) .mk-otp__cell {
+  width: 3.25rem;
+  height: 3.5rem;
+  font-size: var(--mk-font-size-xl);
+}
+
 .mk-otp__cell:hover:not(:disabled) {
   border-color: var(--mk-border-strong);
 }

@@ -69,6 +69,34 @@ describe('MkCountdown', () => {
     expect(parts.seconds).toBe(1);
   });
 
+  it('live text omits seconds so it only changes when the minute rolls over', () => {
+    fixture.componentRef.setInput('to', new Date(Date.now() + 65_000));
+    fixture.detectChanges();
+    const live = () => (cmp as any).liveText() as string;
+
+    expect(live()).toBe('0 days, 0 hrs, 1 min');
+
+    // 4 seconds later — same minute, so the announcement text is unchanged.
+    vi.advanceTimersByTime(4000);
+    expect(live()).toBe('0 days, 0 hrs, 1 min');
+
+    // Minute rolls over (65s -> 59s remaining).
+    vi.advanceTimersByTime(2000);
+    expect(live()).toBe('0 days, 0 hrs, 0 min');
+  });
+
+  it('live text switches to a final finished announcement at zero', () => {
+    fixture.componentRef.setInput('to', new Date(Date.now() + 1000));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(2000);
+    expect((cmp as any).liveText()).toBe('Finished');
+
+    fixture.componentRef.setInput('finishedText', 'Launched!');
+    fixture.detectChanges();
+    expect((cmp as any).liveText()).toBe('Launched!');
+  });
+
   it('fires finished once when the target passes', () => {
     const spy = vi.fn();
     fixture.componentRef.setInput('to', new Date(Date.now() + 2000));

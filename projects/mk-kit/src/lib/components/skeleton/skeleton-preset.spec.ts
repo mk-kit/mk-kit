@@ -22,7 +22,7 @@ describe('MkSkeletonPreset', () => {
     const host = fixture.nativeElement as HTMLElement;
     expect(host.getAttribute('role')).toBe('status');
     expect(host.getAttribute('aria-busy')).toBe('true');
-    expect(host.getAttribute('aria-label')).toBe('Loading');
+    expect(host.getAttribute('aria-label')).toBe('Loading…');
   });
 
   it('renders one skeleton per list row plus internals', () => {

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  booleanAttribute,
   computed,
   inject,
   input,
@@ -10,6 +11,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import type { MkBlockDefinition } from './block-registry';
 
 /** A group of definitions for the inserter list. */
@@ -40,17 +42,18 @@ interface DefGroup {
 export class MkBlockInserter {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly searchRef = viewChild<ElementRef<HTMLInputElement>>('search');
+  protected readonly i18n = inject(MK_I18N);
 
   /** The blocks to offer. */
   readonly definitions = input<MkBlockDefinition[]>([]);
   /** Trigger presentation: `button` (default) or `slim` between-blocks rule. */
   readonly variant = input<'button' | 'slim'>('button');
   /** Trigger label. */
-  readonly label = input<string>('Add block');
+  readonly label = input<string>(this.i18n.blockEditor.addBlock);
   /** Disable the trigger. */
-  readonly disabled = input(false);
+  readonly disabled = input(false, { transform: booleanAttribute });
   /** When true, only blocks allowed inside columns are shown. */
-  readonly columnsOnly = input(false);
+  readonly columnsOnly = input(false, { transform: booleanAttribute });
 
   /** Emitted with the chosen definition. */
   readonly pick = output<MkBlockDefinition>();
@@ -79,7 +82,7 @@ export class MkBlockInserter {
   protected readonly groups = computed<DefGroup[]>(() => {
     const map = new Map<string, MkBlockDefinition[]>();
     for (const def of this.filtered()) {
-      const key = def.group ?? 'Blocks';
+      const key = def.group ?? this.i18n.blockEditor.blocks;
       (map.get(key) ?? map.set(key, []).get(key)!).push(def);
     }
     return [...map.entries()].map(([name, items]) => ({ name, items }));

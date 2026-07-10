@@ -18,6 +18,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '../../core/types';
 import { mkUniqueId } from '../../core/a11y/unique-id';
+import { MK_I18N } from '../../core/i18n/mk-i18n';
 import { MkAnchoredPanel } from '../../core/overlay/anchored-overlay';
 import { MkFormField } from '../form-field/form-field';
 
@@ -72,6 +73,7 @@ function pad2(n: number): string {
   ],
 })
 export class MkTimePicker implements ControlValueAccessor {
+  protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -93,7 +95,7 @@ export class MkTimePicker implements ControlValueAccessor {
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Placeholder shown when empty. */
-  readonly placeholder = input<string>('Select time…');
+  readonly placeholder = input(this.i18n.selectTime);
   /** Show a clear button when a time is selected. */
   readonly clearable = input(false, { transform: booleanAttribute });
   /** Force invalid styling + `aria-invalid`. */
