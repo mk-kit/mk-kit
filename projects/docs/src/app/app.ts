@@ -49,6 +49,7 @@ export class App {
         { label: 'Introduction', path: '/introduction', icon: '◆' },
         { label: 'Getting started', path: '/getting-started', icon: '▶' },
         { label: 'Theming', path: '/theming', icon: '◑' },
+        { label: 'Theme builder', path: '/theme-builder', icon: '⛭' },
       ],
     },
     {

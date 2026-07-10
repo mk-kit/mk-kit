@@ -1,0 +1,48 @@
+<div
+  #viewport
+  [id]="viewportId"
+  class="mk-scroll-area__viewport"
+  tabindex="0"
+  [style.max-height]="maxHeight() || null"
+  (scroll)="onScroll()"
+>
+  <div #content class="mk-scroll-area__content">
+    <ng-content />
+  </div>
+</div>
+
+@if (showVertical() && vScrollable()) {
+  <div
+    class="mk-scroll-area__scrollbar mk-scroll-area__scrollbar--vertical"
+    [class.mk-scroll-area__scrollbar--visible]="barsVisible()"
+    aria-hidden="true"
+    (pointerdown)="onTrackPointerdown($event, 'vertical')"
+  >
+    <div
+      class="mk-scroll-area__thumb"
+      [style.height.%]="vThumbSize() * 100"
+      [style.top]="vThumbTop()"
+      (pointerdown)="onThumbPointerdown($event, 'vertical')"
+      (pointermove)="onThumbPointermove($event)"
+      (pointerup)="onThumbPointerup($event)"
+    ></div>
+  </div>
+}
+
+@if (showHorizontal() && hScrollable()) {
+  <div
+    class="mk-scroll-area__scrollbar mk-scroll-area__scrollbar--horizontal"
+    [class.mk-scroll-area__scrollbar--visible]="barsVisible()"
+    aria-hidden="true"
+    (pointerdown)="onTrackPointerdown($event, 'horizontal')"
+  >
+    <div
+      class="mk-scroll-area__thumb"
+      [style.width.%]="hThumbSize() * 100"
+      [style.left]="hThumbLeft()"
+      (pointerdown)="onThumbPointerdown($event, 'horizontal')"
+      (pointermove)="onThumbPointermove($event)"
+      (pointerup)="onThumbPointerup($event)"
+    ></div>
+  </div>
+}

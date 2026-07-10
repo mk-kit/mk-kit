@@ -79,7 +79,9 @@ live-announcer core.
 - ✅ **Heatmap** (`mk-heatmap`) — value-shaded matrix table, theme-aware via
   `color-mix`, min→max legend (shipped).
 - ✅ **Radar / spider** (`mk-radar-chart`) — multi-series polygons over shared
-  axes, concentric rings (shipped). **P3 funnel / treemap** remaining.
+  axes, concentric rings (shipped).
+- ✅ **Funnel** (`mk-funnel-chart`) — conversion trapezoids with per-stage %; and
+  ✅ **Treemap** (`mk-treemap`) — squarified value-sized tiles (shipped).
 
 ### Navigation & layout
 - ✅ **Drawer** (`mk-drawer`) — declarative slide-out side panel (shipped).
@@ -93,7 +95,8 @@ live-announcer core.
 - ✅ **FAB / speed-dial** (`mk-fab` + `mkFabAction`) and ✅ **back-to-top** (`mk-back-to-top`) shipped.
 - ✅ **Scrollspy** (`mkScrollspy`) — tracks the in-view section and exposes its
   `id` for table-of-contents highlighting; `root`/`offset` inputs (shipped).
-- **P3 Scroll-area** — cross-browser custom scrollbar container.
+- ✅ **Scroll-area** (`mk-scroll-area`) — themed auto-hiding custom scrollbars over
+  native scrolling; vertical/horizontal/both (shipped).
 
 ### Feedback & overlay
 - ✅ **Popover** (`mk-popover`) + **popconfirm** (`mk-popconfirm`) — rich non-text
@@ -118,7 +121,9 @@ live-announcer core.
   field + top-layer popover; 12-month / 12-year grid, roving keyboard nav (shipped).
 - ✅ **Week picker** (`mk-week-picker`) — pick a whole week from the calendar
   popover; hover previews the week, `MkWeek` `{start, end}` value, ISO week
-  number option (shipped). **P3 mini inline date** remaining.
+  number option (shipped).
+- ✅ **Mini inline date** (`mk-mini-date`) — compact popover-free segmented
+  day/month/year editor, CVA over Date (shipped).
 
 ---
 
@@ -147,7 +152,8 @@ live-announcer core.
   generalize to a token/attribute).
 - **P2 RTL audit** — verify logical properties; add `dir="rtl"` coverage.
 - **P3 High-contrast / forced-colors theme**, **P3 additional prebuilt themes**,
-  **P3 a theme-builder page** in the docs.
+  ✅ **a theme-builder page** in the docs (`/theme-builder` — live token controls +
+  copy-paste `:root` output).
 - **P3 CHANGELOG + semantic-release**, **P3 bundle-size budget** in CI.
 
 ---
@@ -157,9 +163,8 @@ live-announcer core.
 Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
 are shipped. What's left of Round 1 is P2/P3:
 
-1. **Mini inline date** — remaining picker P3.
-2. RTL audit + density mode; then P3 polish (QR, theme-builder,
-   high-contrast theme, funnel/treemap charts).
+1. **QR code** (`mk-qr-code`) — dependency-free generator (in progress).
+2. RTL audit + density mode; high-contrast / forced-colors theme (remaining P2/P3).
 
 ---
 

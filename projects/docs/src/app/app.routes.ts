@@ -25,6 +25,14 @@ export const routes: Routes = [
       import('./pages/theming/theming-page').then((m) => m.ThemingPage),
   },
   {
+    path: 'theme-builder',
+    title: 'Theme builder — mk-kit',
+    loadComponent: () =>
+      import('./pages/theme-builder/theme-builder-page').then(
+        (m) => m.ThemeBuilderPage,
+      ),
+  },
+  {
     path: 'examples/dashboard',
     title: 'Dashboard example — mk-kit',
     loadComponent: () =>

@@ -11,3 +11,4 @@ export * from './date-range-picker';
 export * from './month-picker';
 export * from './week-picker';
 export * from './event-calendar';
+export * from './mini-date';

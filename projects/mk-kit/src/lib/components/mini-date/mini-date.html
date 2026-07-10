@@ -1,0 +1,22 @@
+@for (part of parts(); track part.key; let last = $last) {
+  <span
+    #seg
+    class="mk-mini-date__seg"
+    [class.mk-mini-date__seg--empty]="!part.filled"
+    [id]="segId + '-' + part.key"
+    role="spinbutton"
+    [attr.tabindex]="isDisabled() ? -1 : 0"
+    [attr.aria-label]="part.label"
+    [attr.aria-valuenow]="part.valueNow"
+    [attr.aria-valuemin]="part.valueMin"
+    [attr.aria-valuemax]="part.valueMax"
+    [attr.aria-valuetext]="part.valueText"
+    [attr.aria-disabled]="isDisabled() || null"
+    (keydown)="onSegKeydown(part.key, $index, $event)"
+    (focus)="onSegFocus(part.key)"
+    (blur)="onBlur()"
+  >{{ part.display }}</span>
+  @if (!last) {
+    <span class="mk-mini-date__sep" aria-hidden="true">/</span>
+  }
+}

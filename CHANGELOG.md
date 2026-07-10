@@ -6,6 +6,19 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **`mk-funnel-chart`** — a funnel/conversion chart: stacked trapezoids whose
+  width tracks each stage's value, with per-stage conversion %.
+- **`mk-treemap`** — a squarified treemap of value-sized rectangles, with a
+  hover tooltip and screen-reader table.
+- **`mk-scroll-area`** — a scroll container with themed, auto-hiding custom
+  scrollbars over real native scrolling (`orientation` vertical/horizontal/both).
+- **`mk-mini-date`** — a compact, popover-free segmented day/month/year date
+  editor (spinbutton segments, keyboard nav); CVA over `Date | null`.
+- **Theme builder** docs page (`/theme-builder`) — live `--mk-*` token controls
+  with a real-time component preview and a copy-paste `:root { … }` output.
+
 ## [0.1.8] — 2026-07-10
 
 ### Added

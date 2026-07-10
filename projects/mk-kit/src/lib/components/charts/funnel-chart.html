@@ -1,0 +1,69 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <!-- Funnel bands (decreasing trapezoids) -->
+    @for (band of bands(); track band.label) {
+      <polygon
+        class="mk-funnel-chart__band"
+        [attr.points]="band.polygon"
+        [style.fill]="band.color"
+      />
+    }
+
+    <!-- Band labels + conversion -->
+    @if (showValues()) {
+      @for (band of bands(); track band.label) {
+        <text
+          class="mk-funnel-chart__label"
+          [attr.x]="band.labelX"
+          [attr.y]="band.labelY"
+        >
+          {{ band.label }}
+        </text>
+        <text
+          class="mk-funnel-chart__sublabel"
+          [attr.x]="band.labelX"
+          [attr.y]="band.subY"
+        >
+          {{ band.valueLabel }} · {{ band.percentLabel }}
+        </text>
+      }
+    }
+  </svg>
+</div>
+
+@if (legendVisible()) {
+  <ul class="mk-chart__legend">
+    @for (item of legend(); track item.name) {
+      <li class="mk-chart__legend-item">
+        <span class="mk-chart__swatch" [style.background]="item.color"></span>
+        {{ item.name }}
+      </li>
+    }
+  </ul>
+}
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Stage</th>
+      <th scope="col">Value</th>
+      <th scope="col">Conversion</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (band of bands(); track band.label) {
+      <tr>
+        <th scope="row">{{ band.label }}</th>
+        <td>{{ band.valueLabel }}</td>
+        <td>{{ band.percentLabel }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

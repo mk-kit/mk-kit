@@ -21,3 +21,4 @@ export * from './command-palette';
 export * from './splitter';
 export * from './fab';
 export * from './back-to-top';
+export * from './scroll-area';

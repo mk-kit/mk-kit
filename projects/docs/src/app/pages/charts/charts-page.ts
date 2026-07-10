@@ -9,9 +9,13 @@ import {
   MkHeatmap,
   MkLineChart,
   MkProgressRing,
+  MkFunnelChart,
+  type MkFunnelSegment,
   MkRadarChart,
   MkScatterChart,
   MkSparkline,
+  MkTreemap,
+  type MkTreemapItem,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -33,6 +37,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkScatterChart,
     MkHeatmap,
     MkRadarChart,
+    MkFunnelChart,
+    MkTreemap,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -198,6 +204,28 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-radar-chart [axes]="radarAxes" [series]="radarSeries" [max]="10" />
         </div>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Funnel chart</h2>
+      <p>
+        Show drop-off through a sequence of stages — each band's width is
+        proportional to its value, with the conversion rate relative to the top.
+      </p>
+      <docs-example [code]="funnelCode" column>
+        <div style="max-width: 30rem;">
+          <mk-funnel-chart [segments]="funnel" />
+        </div>
+      </docs-example>
+
+      <!-- ============================================================ -->
+      <h2>Treemap</h2>
+      <p>
+        Nested rectangles sized by value (squarified layout) — good for
+        part-to-whole breakdowns like spend by channel or storage by folder.
+      </p>
+      <docs-example [code]="treemapCode" column>
+        <mk-treemap [items]="treemap" [width]="520" [height]="300" />
+      </docs-example>
     </div>
   `,
 })
@@ -318,6 +346,32 @@ export class ChartsPage {
 
   protected readonly heatmapCode = `<mk-heatmap [xLabels]="hours" [yLabels]="days"
   [data]="activity" showValues />`;
+
+  protected readonly funnel: MkFunnelSegment[] = [
+    { label: 'Visits', value: 12400 },
+    { label: 'Signups', value: 4200 },
+    { label: 'Trials', value: 1800 },
+    { label: 'Paid', value: 640 },
+  ];
+  protected readonly treemap: MkTreemapItem[] = [
+    { label: 'Organic', value: 42 },
+    { label: 'Paid ads', value: 28 },
+    { label: 'Email', value: 16 },
+    { label: 'Social', value: 10 },
+    { label: 'Referral', value: 6 },
+  ];
+
+  protected readonly funnelCode = `<mk-funnel-chart [segments]="[
+  { label: 'Visits',  value: 12400 },
+  { label: 'Signups', value: 4200 },
+  { label: 'Trials',  value: 1800 },
+  { label: 'Paid',    value: 640 },
+]" />`;
+
+  protected readonly treemapCode = `<mk-treemap [items]="[
+  { label: 'Organic', value: 42 }, { label: 'Paid ads', value: 28 },
+  { label: 'Email', value: 16 }, { label: 'Social', value: 10 },
+]" />`;
 
   protected readonly radarCode = `<mk-radar-chart
   [axes]="['Speed','Power','Range','Comfort','Price','Safety']"

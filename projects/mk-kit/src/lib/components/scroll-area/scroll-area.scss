@@ -1,0 +1,103 @@
+@use '../../../styles/mixins' as mk;
+
+:host {
+  --_bar-size: 0.75rem;
+
+  position: relative;
+  display: block;
+  min-height: 0;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-scroll-area__viewport {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+  overscroll-behavior: contain;
+
+  // Hide the native scrollbar — the custom overlay bars replace it.
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  &::-webkit-scrollbar {
+    display: none;
+  }
+
+  &:focus-visible {
+    @include mk.focus-ring;
+    outline-offset: -2px;
+  }
+}
+
+.mk-scroll-area__content {
+  min-width: 0;
+  min-height: 0;
+}
+
+// --- Overlay scrollbars -----------------------------------------------------
+
+.mk-scroll-area__scrollbar {
+  position: absolute;
+  z-index: 1;
+  padding: var(--mk-space-1);
+  background-color: transparent;
+  touch-action: none;
+  opacity: 0;
+  transition:
+    opacity var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-scroll-area__scrollbar--visible {
+  opacity: 1;
+}
+.mk-scroll-area__scrollbar:hover {
+  background-color: var(--mk-hover-overlay);
+}
+
+.mk-scroll-area__scrollbar--vertical {
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: var(--_bar-size);
+}
+.mk-scroll-area__scrollbar--horizontal {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--_bar-size);
+}
+// When both bars show, keep them from overlapping in the corner.
+.mk-scroll-area__scrollbar--vertical {
+  bottom: var(--_bar-size);
+}
+.mk-scroll-area__scrollbar--horizontal {
+  right: var(--_bar-size);
+}
+
+.mk-scroll-area__thumb {
+  position: absolute;
+  border-radius: var(--mk-radius-pill);
+  background-color: var(--mk-scrollbar-thumb, var(--mk-text-muted));
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-scroll-area__thumb:hover,
+.mk-scroll-area__thumb:active {
+  background-color: var(--mk-scrollbar-thumb-hover, var(--mk-border));
+}
+
+.mk-scroll-area__scrollbar--vertical .mk-scroll-area__thumb {
+  left: var(--mk-space-1);
+  right: var(--mk-space-1);
+  min-height: 1.5rem;
+}
+.mk-scroll-area__scrollbar--horizontal .mk-scroll-area__thumb {
+  top: var(--mk-space-1);
+  bottom: var(--mk-space-1);
+  min-width: 1.5rem;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-scroll-area__scrollbar,
+  .mk-scroll-area__thumb {
+    transition: none;
+  }
+}

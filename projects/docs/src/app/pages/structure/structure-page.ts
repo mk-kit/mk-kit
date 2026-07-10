@@ -7,6 +7,7 @@ import {
   MkInput,
   MkPageHeader,
   MkSplitter,
+  MkScrollArea,
   MkToolbar,
 } from '@mkornas/ui';
 import { FormsModule } from '@angular/forms';
@@ -26,6 +27,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkToolbar,
     MkDrawer,
     MkSplitter,
+    MkScrollArea,
     MkButton,
     MkBadge,
     MkFormField,
@@ -150,6 +152,26 @@ import { DocsExample } from '../../shared/docs-example';
           </div>
         </mk-splitter>
       </docs-example>
+
+      <h2>Scroll area</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-scroll-area&gt;</code> wraps overflowing
+        content with themed, auto-hiding custom scrollbars (the native ones are
+        hidden) while keeping real, keyboard-accessible native scrolling. Set
+        <code class="docs-inline">maxHeight</code> and
+        <code class="docs-inline">orientation</code>.
+      </p>
+      <docs-example [code]="scrollAreaCode" [column]="true">
+        <mk-scroll-area maxHeight="12rem" style="max-width: 26rem;">
+          <div style="padding: var(--mk-space-3); display: grid; gap: var(--mk-space-2);">
+            @for (n of scrollItems; track n) {
+              <div style="padding: var(--mk-space-2) var(--mk-space-3); background: var(--mk-surface-2); border-radius: var(--mk-radius-sm);">
+                Item {{ n }}
+              </div>
+            }
+          </div>
+        </mk-scroll-area>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -169,6 +191,9 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class StructurePage {
+  protected readonly scrollItems = Array.from({ length: 20 }, (_, i) => i + 1);
+  protected readonly scrollAreaCode = `<mk-scroll-area maxHeight="12rem">\n  <!-- long content -->\n</mk-scroll-area>`;
+
   protected readonly endOpen = signal(false);
   protected readonly startOpen = signal(false);
   protected readonly keyword = signal('');

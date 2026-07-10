@@ -1,0 +1,95 @@
+<div class="mk-chart__frame">
+  <svg
+    class="mk-chart__svg mk-treemap__svg"
+    [attr.viewBox]="'0 0 ' + width() + ' ' + height()"
+    preserveAspectRatio="xMidYMid meet"
+    aria-hidden="true"
+    focusable="false"
+  >
+    <defs>
+      @for (tile of tiles(); track tile.index) {
+        <clipPath [attr.id]="tile.clipId">
+          <rect
+            [attr.x]="tile.x"
+            [attr.y]="tile.y"
+            [attr.width]="tile.w"
+            [attr.height]="tile.h"
+          />
+        </clipPath>
+      }
+    </defs>
+
+    @for (tile of tiles(); track tile.index; let i = $index) {
+      <g
+        class="mk-treemap__tile"
+        [class.mk-treemap__tile--active]="hoverKey() === keyOf(i)"
+        (pointerenter)="setHover(keyOf(i))"
+        (pointerleave)="setHover(null)"
+      >
+        <rect
+          class="mk-treemap__rect"
+          [attr.x]="tile.x"
+          [attr.y]="tile.y"
+          [attr.width]="tile.w"
+          [attr.height]="tile.h"
+          [style.fill]="tile.color"
+        />
+        @if (tile.showText) {
+          <text
+            class="mk-treemap__label"
+            [attr.clip-path]="'url(#' + tile.clipId + ')'"
+            [attr.x]="tile.x + 6"
+            [attr.y]="tile.y + 16"
+          >
+            {{ tile.label }}
+          </text>
+          @if (tile.showValue) {
+            <text
+              class="mk-treemap__value"
+              [attr.clip-path]="'url(#' + tile.clipId + ')'"
+              [attr.x]="tile.x + 6"
+              [attr.y]="tile.y + 30"
+            >
+              {{ tile.valueText }}
+            </text>
+          }
+        }
+      </g>
+    }
+  </svg>
+
+  @if (tooltip(); as t) {
+    <div class="mk-chart__tooltip" [style.left.%]="t.left" [style.top.%]="t.top">
+      <span class="mk-chart__tooltip-title">
+        <span class="mk-chart__swatch" [style.background]="t.color"></span>
+        {{ t.title }}
+      </span>
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__tooltip-name">Value</span>
+        <span class="mk-chart__tooltip-value">{{ t.value }}</span>
+      </span>
+      <span class="mk-chart__tooltip-row">
+        <span class="mk-chart__tooltip-name">Share</span>
+        <span class="mk-chart__tooltip-value">{{ t.pct }}</span>
+      </span>
+    </div>
+  }
+</div>
+
+<table class="mk-chart__sr-table">
+  <caption>{{ resolvedLabel() }}</caption>
+  <thead>
+    <tr>
+      <th scope="col">Label</th>
+      <th scope="col">Value</th>
+    </tr>
+  </thead>
+  <tbody>
+    @for (item of items(); track $index) {
+      <tr>
+        <th scope="row">{{ item.label }}</th>
+        <td>{{ item.value }}</td>
+      </tr>
+    }
+  </tbody>
+</table>

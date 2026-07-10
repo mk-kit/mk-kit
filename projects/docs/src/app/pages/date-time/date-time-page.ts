@@ -4,6 +4,7 @@ import {
   MkDatePicker,
   MkDateRangePicker,
   MkEventCalendar,
+  MkMiniDate,
   MkMonthPicker,
   MkTimePicker,
   MkWeekPicker,
@@ -23,7 +24,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-date-time-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker, MkEventCalendar],
+  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker, MkEventCalendar, MkMiniDate],
   template: `
     <div class="docs-page docs-container">
       <h1>Date &amp; time</h1>
@@ -330,6 +331,22 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>monthChange</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted when the viewed month changes via prev/next.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- MINI DATE -->
+      <!-- ============================================================ -->
+      <h2>Mini date</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-mini-date&gt;</code> is a compact,
+        popover-free date editor: three segmented day / month / year spin fields.
+        Type digits, or use Up/Down to step and Left/Right to move between
+        segments. Its model is a <code class="docs-inline">Date | null</code>.
+      </p>
+      <docs-example [code]="miniDateCode" [column]="true">
+        <mk-mini-date [(value)]="mini" order="dmy" />
+        <p class="echo">Value: {{ mini() ? formatDate(mini()!, 'MMM d, yyyy') : '—' }}</p>
+      </docs-example>
+
     </div>
   `,
   styles: [
@@ -380,6 +397,8 @@ export class DateTimePage {
 
   // --- Week picker ----------------------------------------------------------
   protected readonly week = signal<MkWeek | null>(null);
+  protected readonly mini = signal<Date | null>(new Date());
+  protected readonly miniDateCode = `<mk-mini-date [(value)]="date" order="dmy" />`;
   protected readonly weekLabel = computed(() => {
     const w = this.week();
     if (!w) return '—';

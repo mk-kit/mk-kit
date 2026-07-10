@@ -1,0 +1,29 @@
+<svg
+  class="mk-qr-code__svg"
+  [attr.viewBox]="'0 0 ' + dimension() + ' ' + dimension()"
+  [style.width.px]="size()"
+  [style.height.px]="size()"
+  preserveAspectRatio="xMidYMid meet"
+  shape-rendering="crispEdges"
+  aria-hidden="true"
+  focusable="false"
+>
+  <rect
+    class="mk-qr-code__bg"
+    x="0"
+    y="0"
+    [attr.width]="dimension()"
+    [attr.height]="dimension()"
+    [style.fill]="background()"
+  />
+  @for (module of modules(); track $index) {
+    <rect
+      class="mk-qr-code__module"
+      [attr.x]="module.x"
+      [attr.y]="module.y"
+      width="1"
+      height="1"
+      [style.fill]="color()"
+    />
+  }
+</svg>

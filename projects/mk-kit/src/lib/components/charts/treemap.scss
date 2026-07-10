@@ -1,0 +1,48 @@
+:host {
+  display: block;
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+}
+
+.mk-treemap__svg {
+  overflow: hidden;
+}
+
+.mk-treemap__tile {
+  cursor: pointer;
+}
+
+/* 1px gap between tiles, drawn in the surface colour so tiles read as separate */
+.mk-treemap__rect {
+  stroke: var(--mk-surface);
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+  transition: fill-opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-treemap__tile:hover .mk-treemap__rect,
+.mk-treemap__tile--active .mk-treemap__rect {
+  fill-opacity: 0.85;
+}
+
+.mk-treemap__label {
+  fill: var(--mk-primary-contrast, #fff);
+  font-size: 12px;
+  font-weight: var(--mk-font-weight-medium);
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.mk-treemap__value {
+  fill: var(--mk-primary-contrast, #fff);
+  font-size: 11px;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.85;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-treemap__rect {
+    transition: none;
+  }
+}

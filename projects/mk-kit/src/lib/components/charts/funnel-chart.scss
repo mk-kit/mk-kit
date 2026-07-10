@@ -1,0 +1,36 @@
+/*
+ * Funnel-specific styles. Shared chrome (frame, svg, legend, swatch, sr-table)
+ * lives in charts.scss — this file only adds the trapezoid bands and their
+ * centred, contrasting labels.
+ */
+
+.mk-funnel-chart__band {
+  stroke: var(--mk-surface);
+  stroke-width: 1.5;
+  transition: opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-funnel-chart__label,
+.mk-funnel-chart__sublabel {
+  fill: var(--mk-primary-contrast);
+  text-anchor: middle;
+  dominant-baseline: middle;
+  pointer-events: none;
+}
+
+.mk-funnel-chart__label {
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-semibold);
+}
+
+.mk-funnel-chart__sublabel {
+  font-size: var(--mk-font-size-xs);
+  fill-opacity: 0.85;
+  font-variant-numeric: tabular-nums;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-funnel-chart__band {
+    transition: none;
+  }
+}
