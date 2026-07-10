@@ -13,6 +13,7 @@ import {
   MkThemeService,
 } from '@mkornas/ui';
 import { DocsToc } from './shared/docs-toc';
+import { version as uiVersion } from '../../../mk-kit/package.json';
 
 interface NavLink {
   label: string;
@@ -43,6 +44,7 @@ interface NavSection {
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class App {
+  protected readonly uiVersion = uiVersion;
   private readonly router = inject(Router);
   protected readonly theme = inject(MkThemeService);
 
