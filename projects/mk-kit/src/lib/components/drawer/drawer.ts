@@ -118,6 +118,16 @@ export class MkDrawer {
     }
   }
 
+  /** Release the focus trap + scroll lock if destroyed while open. */
+  ngOnDestroy(): void {
+    this.focusTrap?.release();
+    this.focusTrap = undefined;
+    if (this.scrollLocked) {
+      this.document.body.style.removeProperty('overflow');
+      this.scrollLocked = false;
+    }
+  }
+
   /** Close the drawer. */
   close(): void {
     this.open.set(false);

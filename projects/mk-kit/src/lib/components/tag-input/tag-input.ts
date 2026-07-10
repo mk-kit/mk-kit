@@ -152,9 +152,14 @@ export class MkTagInput implements ControlValueAccessor {
 
   private commit(raw: string): void {
     const tag = raw.trim();
-    this.query.set('');
-    if (!tag || this.isDisabled() || this.atMax()) return;
+    if (!tag) {
+      this.query.set('');
+      return;
+    }
+    if (this.isDisabled() || this.atMax()) return;
+    // Keep the typed text when the tag is rejected so nothing is lost silently.
     if (!this.allowDuplicates() && this.value().includes(tag)) return;
+    this.query.set('');
     const next = [...this.value(), tag];
     this.setValue(next);
     this.added.emit(tag);

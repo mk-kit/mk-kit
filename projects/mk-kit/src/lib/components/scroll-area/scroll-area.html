@@ -25,6 +25,7 @@
       (pointerdown)="onThumbPointerdown($event, 'vertical')"
       (pointermove)="onThumbPointermove($event)"
       (pointerup)="onThumbPointerup($event)"
+      (pointercancel)="onThumbPointerup($event)"
     ></div>
   </div>
 }
@@ -43,6 +44,7 @@
       (pointerdown)="onThumbPointerdown($event, 'horizontal')"
       (pointermove)="onThumbPointermove($event)"
       (pointerup)="onThumbPointerup($event)"
+      (pointercancel)="onThumbPointerup($event)"
     ></div>
   </div>
 }

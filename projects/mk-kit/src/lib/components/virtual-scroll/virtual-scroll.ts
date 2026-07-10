@@ -83,10 +83,16 @@ export class MkVirtualScroll {
       this.measure();
       const view = this.viewportRef()?.nativeElement;
       if (view && this.isBrowser && 'ResizeObserver' in window) {
-        const ro = new ResizeObserver(() => this.measure());
-        ro.observe(view);
+        this.resizeObserver = new ResizeObserver(() => this.measure());
+        this.resizeObserver.observe(view);
       }
     });
+  }
+
+  private resizeObserver?: ResizeObserver;
+
+  ngOnDestroy(): void {
+    this.resizeObserver?.disconnect();
   }
 
   private measure(): void {

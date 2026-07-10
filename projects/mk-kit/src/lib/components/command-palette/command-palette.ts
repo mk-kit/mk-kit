@@ -101,6 +101,7 @@ export class MkCommandPalette {
   readonly listId = mkUniqueId('mk-cmdk-list');
 
   private focusTrap?: MkFocusTrap;
+  private scrollLocked = false;
   private previouslyFocused: HTMLElement | null = null;
 
   /** Commands matching the current query (label + keywords + group). */
@@ -149,6 +150,7 @@ export class MkCommandPalette {
       this.query.set('');
       this.activeIndex.set(this.firstEnabled());
       this.document.body.style.setProperty('overflow', 'hidden');
+      this.scrollLocked = true;
       if (panel) {
         this.focusTrap = new MkFocusTrap(panel);
         this.focusTrap.activate();
@@ -157,8 +159,24 @@ export class MkCommandPalette {
     } else {
       this.focusTrap?.release();
       this.focusTrap = undefined;
-      this.document.body.style.removeProperty('overflow');
+      if (this.scrollLocked) {
+        this.document.body.style.removeProperty('overflow');
+        this.scrollLocked = false;
+      }
       this.previouslyFocused?.focus?.();
+    }
+  }
+
+  /**
+   * Release the scroll lock + focus trap if the palette is destroyed while
+   * open (e.g. a command triggered a route navigation).
+   */
+  ngOnDestroy(): void {
+    this.focusTrap?.release();
+    this.focusTrap = undefined;
+    if (this.scrollLocked) {
+      this.document.body.style.removeProperty('overflow');
+      this.scrollLocked = false;
     }
   }
 

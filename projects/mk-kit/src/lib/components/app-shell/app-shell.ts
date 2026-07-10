@@ -69,10 +69,8 @@ export class MkAppShell {
       );
       if (mql) {
         this.isMobile.set(mql.matches);
-        mql.addEventListener('change', (e) => {
-          this.isMobile.set(e.matches);
-          if (!e.matches) this.sidebarOpen.set(false);
-        });
+        this.mql = mql;
+        mql.addEventListener('change', this.onMediaChange);
       }
     }
 
@@ -87,6 +85,18 @@ export class MkAppShell {
         this.focusTrap.activate();
       }
     });
+  }
+
+  private mql?: MediaQueryList;
+  private readonly onMediaChange = (e: MediaQueryListEvent): void => {
+    this.isMobile.set(e.matches);
+    if (!e.matches) this.sidebarOpen.set(false);
+  };
+
+  ngOnDestroy(): void {
+    this.mql?.removeEventListener('change', this.onMediaChange);
+    this.focusTrap?.release();
+    this.focusTrap = undefined;
   }
 
   /** Toggle the mobile drawer open/closed. Handy for a hamburger button. */

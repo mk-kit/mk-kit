@@ -237,6 +237,7 @@ export class MkDrag<T = unknown> {
   }
 
   private commitPointer(cancel: boolean): void {
+    if (this.destroyed) return;
     const container = this.targetList;
     const previousContainer = this.home;
     const currentIndex = this.targetIndex;
@@ -489,6 +490,22 @@ export class MkDrag<T = unknown> {
     this.doc.body.appendChild(clone);
     this.preview = clone;
   }
+
+  /** Remove the body-level preview + placeholder if destroyed mid-drag. */
+  ngOnDestroy(): void {
+    this.destroyed = true;
+    if (this.pointerId !== null) {
+      try {
+        this.element.releasePointerCapture(this.pointerId);
+      } catch {
+        /* capture may already be gone */
+      }
+      this.pointerId = null;
+    }
+    this.cleanupDom();
+  }
+
+  private destroyed = false;
 
   private cleanupDom(): void {
     this.placeholder?.remove();

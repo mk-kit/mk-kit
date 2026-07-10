@@ -10,6 +10,8 @@ import {
   input,
   output,
   signal,
+  effect,
+  untracked,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 
@@ -107,6 +109,12 @@ export class MkCountdown {
   private intervalId?: number;
 
   constructor() {
+    // Re-arm `finished` whenever the target moves into the future again
+    // (e.g. a "next round" pattern swapping `to` after completion).
+    effect(() => {
+      const target = this.to();
+      if (target && target.getTime() > untracked(this.now)) this.hasFinished = false;
+    });
     afterNextRender(() => {
       if (!this.isBrowser) return;
       this.tick();

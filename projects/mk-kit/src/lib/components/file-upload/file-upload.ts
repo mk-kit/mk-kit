@@ -13,6 +13,7 @@ import {
   output,
   signal,
   viewChild,
+  effect,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '../../core/a11y/unique-id';
@@ -304,7 +305,31 @@ export class MkFileUpload {
     return `${value.toFixed(value < 10 ? 1 : 0)} ${units[unit]}`;
   }
 
+  /**
+   * Revoke preview object-URLs for items that leave the two-way `files` model
+   * externally (e.g. a consumer resetting the list), not just via `remove()`.
+   */
+  private readonly trackedPreviews = new Map<string, string>();
+  private readonly trackPreviews = effect(() => {
+    const current = this.files();
+    const liveIds = new Set(current.map((i) => i.id));
+    for (const [id, url] of this.trackedPreviews) {
+      if (!liveIds.has(id)) {
+        if (this.isBrowser) this.document.defaultView?.URL.revokeObjectURL(url);
+        this.trackedPreviews.delete(id);
+      }
+    }
+    for (const item of current) {
+      if (item.previewUrl) this.trackedPreviews.set(item.id, item.previewUrl);
+    }
+  });
+
   ngOnDestroy(): void {
-    this.files().forEach((i) => this.revoke(i));
+    if (this.isBrowser) {
+      for (const url of this.trackedPreviews.values()) {
+        this.document.defaultView?.URL.revokeObjectURL(url);
+      }
+      this.trackedPreviews.clear();
+    }
   }
 }
