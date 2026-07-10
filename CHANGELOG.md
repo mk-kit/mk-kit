@@ -6,6 +6,8 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+## [0.1.9] — 2026-07-10
+
 ### Added
 
 - **`mk-qr-code`** — a dependency-free QR code generator rendered as SVG. The
@@ -213,7 +215,8 @@ Initial private release as `@mkornas/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.1.8...HEAD
+[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.1.9...HEAD
+[0.1.9]: https://github.com/mkornas/mk-kit/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/mkornas/mk-kit/compare/v0.1.7...v0.1.8
 [0.1.7]: https://github.com/mkornas/mk-kit/compare/v0.1.6...v0.1.7
 [0.1.6]: https://github.com/mkornas/mk-kit/compare/v0.1.5...v0.1.6
