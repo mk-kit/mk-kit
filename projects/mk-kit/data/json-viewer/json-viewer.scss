@@ -1,0 +1,96 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-relaxed);
+  color: var(--mk-text);
+  background-color: var(--mk-code-bg);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  padding: var(--mk-space-3) var(--mk-space-4);
+  overflow-x: auto;
+}
+
+.mk-json-viewer__children {
+  margin: 0;
+  padding: 0 0 0 var(--mk-space-5);
+  list-style: none;
+  border-inline-start: var(--mk-border-width) solid var(--mk-border-subtle);
+  margin-inline-start: var(--mk-space-2);
+}
+
+.mk-json-viewer__toggle {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  padding: 0 var(--mk-space-1);
+  font: inherit;
+  color: inherit;
+  background: none;
+  border: none;
+  border-radius: var(--mk-radius-xs);
+  cursor: pointer;
+}
+.mk-json-viewer__toggle:hover .mk-json-viewer__preview {
+  color: var(--mk-text);
+}
+.mk-json-viewer__toggle:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+.mk-json-viewer__chevron {
+  flex: none;
+  width: 0.35rem;
+  height: 0.35rem;
+  border-right: 2px solid var(--mk-text-muted);
+  border-bottom: 2px solid var(--mk-text-muted);
+  transform: rotate(-45deg);
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-json-viewer__toggle[aria-expanded='true'] .mk-json-viewer__chevron {
+  transform: rotate(45deg);
+}
+
+.mk-json-viewer__leaf {
+  padding-inline-start: calc(0.35rem + var(--mk-space-2));
+}
+
+.mk-json-viewer__key {
+  color: var(--mk-info);
+}
+.mk-json-viewer__colon {
+  margin-inline-end: var(--mk-space-1);
+  color: var(--mk-text-subtle);
+}
+.mk-json-viewer__preview,
+.mk-json-viewer__empty {
+  color: var(--mk-text-subtle);
+}
+.mk-json-viewer__brace {
+  color: var(--mk-text-subtle);
+}
+.mk-json-viewer__empty {
+  padding-inline-start: var(--mk-space-2);
+}
+
+.mk-json-viewer__value--string {
+  color: var(--mk-success);
+}
+.mk-json-viewer__value--number {
+  color: var(--mk-info);
+}
+.mk-json-viewer__value--boolean {
+  color: var(--mk-warning);
+}
+.mk-json-viewer__value--null {
+  color: var(--mk-text-subtle);
+  font-style: italic;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-json-viewer__chevron {
+    transition: none;
+  }
+}

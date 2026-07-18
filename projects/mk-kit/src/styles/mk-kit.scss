@@ -532,7 +532,25 @@ body.mk-app {
   .mk-menu__panel,
   .mk-cmdk__panel,
   .mk-select__list,
-  .mk-autocomplete__list {
+  .mk-autocomplete__list,
+  .mk-phone-input__panel {
     border: 1px solid CanvasText;
+  }
+
+  /* --- Phone input country list (same pattern as select) ------------------- */
+  .mk-phone-input__option--selected {
+    forced-color-adjust: none;
+    background-color: Highlight !important;
+    color: HighlightText !important;
+  }
+  .mk-phone-input__option--active {
+    outline: 2px solid Highlight;
+    outline-offset: -2px;
+  }
+
+  /* --- Card brand badge / currency affix: keep their boundary -------------- */
+  .mk-card-number-input__brand,
+  .mk-currency-input__symbol {
+    border: 1px solid ButtonText;
   }
 }

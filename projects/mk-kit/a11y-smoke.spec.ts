@@ -29,6 +29,8 @@ import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
+import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
+import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -167,6 +169,24 @@ class CardNumberInputHost {}
   `,
 })
 class IbanInputHost {}
+
+@Component({
+  imports: [MkFormField, MkSignaturePad],
+  template: `
+    <mk-form-field label="Signature">
+      <mk-signature-pad />
+    </mk-form-field>
+  `,
+})
+class SignaturePadHost {}
+
+@Component({
+  imports: [MkJsonViewer],
+  template: `<mk-json-viewer [data]="data" [expandDepth]="2" />`,
+})
+class JsonViewerHost {
+  readonly data = { user: { name: 'Ada' }, roles: ['admin'], active: true };
+}
 
 @Component({
   imports: [MkFormField, MkSelect],
@@ -316,6 +336,8 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'currency input', host: CurrencyInputHost },
   { name: 'card number input', host: CardNumberInputHost },
   { name: 'iban input', host: IbanInputHost },
+  { name: 'signature pad', host: SignaturePadHost },
+  { name: 'json viewer', host: JsonViewerHost },
   { name: 'tabs', host: TabsHost },
   { name: 'accordion', host: AccordionHost },
   { name: 'pagination', host: PaginationHost },

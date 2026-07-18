@@ -15,10 +15,10 @@ jobs:
   build-test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
       - name: Set up Node
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v5
         with:
           # Angular 22's CLI requires Node >= 24.15.
           node-version: 24.18.0
@@ -29,6 +29,9 @@ jobs:
 
       - name: Build library
         run: npm run build:lib
+
+      - name: Check bundle-size budget
+        run: node scripts/check-size.mjs
 
       - name: Test library
         run: npm run test:lib

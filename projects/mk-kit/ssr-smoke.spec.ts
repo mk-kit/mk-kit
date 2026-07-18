@@ -43,6 +43,8 @@ import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
+import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
+import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -80,6 +82,8 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkCurrencyInput,
     MkCardNumberInput,
     MkIbanInput,
+    MkSignaturePad,
+    MkJsonViewer,
     MkTabs,
     MkTab,
     MkAccordion,
@@ -140,6 +144,11 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       <mk-form-field label="IBAN">
         <mk-iban-input value="DE89370400440532013000" />
       </mk-form-field>
+      <mk-form-field label="Signature">
+        <mk-signature-pad />
+      </mk-form-field>
+      <mk-json-viewer [data]="jsonData" [expandDepth]="2" />
+
       <mk-checkbox [checked]="true">Accept terms</mk-checkbox>
       <mk-radio-group aria-label="Plan" [value]="'pro'">
         <mk-radio [value]="'free'">Free</mk-radio>
@@ -191,6 +200,7 @@ class SsrSmokeRoot {
     { label: 'README.md' },
   ];
   readonly items = Array.from({ length: 200 }, (_, i) => `Row ${i + 1}`);
+  readonly jsonData = { user: { name: 'Ada' }, active: true };
 }
 
 const INDEX_HTML = '<html><head><title>ssr-smoke</title></head><body><ssr-smoke-root></ssr-smoke-root></body></html>';
@@ -252,6 +262,8 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-currency-input',
       'mk-card-number-input',
       'mk-iban-input',
+      'mk-signature-pad',
+      'mk-json-viewer',
       'mk-checkbox',
       'mk-radio-group',
       'mk-switch',

@@ -48,6 +48,12 @@ export const routes: Routes = [
       import('./pages/payment/payment-page').then((m) => m.PaymentPage),
   },
   {
+    path: 'components/signature',
+    title: 'Signature pad — mk-kit',
+    loadComponent: () =>
+      import('./pages/signature/signature-page').then((m) => m.SignaturePage),
+  },
+  {
     path: 'components/toggles',
     title: 'Toggles & switches — mk-kit',
     loadComponent: () =>

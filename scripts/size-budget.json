@@ -1,0 +1,15 @@
+{
+  "comment": "Raw (uncompressed) size budgets in KiB for the built FESM2022 bundles. `total` covers the whole fesm2022 directory. Raise a budget deliberately (with the reason in the commit) — never to silence a surprise regression.",
+  "total": 3072,
+  "bundles": {
+    "mkornas-ui-forms.mjs": 700,
+    "mkornas-ui-data.mjs": 560,
+    "mkornas-ui-navigation.mjs": 320,
+    "mkornas-ui-block-editor.mjs": 300,
+    "mkornas-ui-datetime.mjs": 280,
+    "mkornas-ui-feedback.mjs": 260,
+    "mkornas-ui-table.mjs": 120,
+    "mkornas-ui-directives.mjs": 80,
+    "mkornas-ui-core.mjs": 80
+  }
+}

@@ -27,3 +27,4 @@ export * from './carousel';
 export * from './diff';
 export * from './kanban';
 export * from './qr-code';
+export * from './json-viewer';

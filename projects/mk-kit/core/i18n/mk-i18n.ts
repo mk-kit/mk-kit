@@ -358,6 +358,10 @@ export interface MkI18nStrings {
   cardBrand: (brand: string) => string;
   /** IBAN input: default accessible label. */
   iban: string;
+  /** Signature pad: default accessible label of the drawing surface. */
+  signature: string;
+  /** JSON viewer: default accessible label of the tree. */
+  jsonLabel: string;
   /** File upload dropzone + states. */
   dropzoneLabel: string;
   uploadFailed: string;
@@ -575,6 +579,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   cardNumber: 'Card number',
   cardBrand: (brand) => `Card brand: ${brand}`,
   iban: 'IBAN',
+  signature: 'Signature',
+  jsonLabel: 'JSON',
   dropzoneLabel: 'Drag files here or click to browse',
   uploadFailed: 'Upload failed',
   retryUpload: 'Retry upload',

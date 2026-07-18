@@ -1,0 +1,25 @@
+<canvas
+  #canvas
+  class="mk-signature-pad__canvas"
+  [id]="padId"
+  role="img"
+  [style.height.px]="height()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-label]="labelledBy() ? null : i18n.signature"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
+  (pointerup)="onPointerUp()"
+  (pointercancel)="onPointerUp()"
+></canvas>
+
+@if (!isEmpty() && !isDisabled()) {
+  <button
+    type="button"
+    class="mk-signature-pad__clear"
+    (click)="onClearClick()"
+  >
+    {{ i18n.clear }}
+  </button>
+}

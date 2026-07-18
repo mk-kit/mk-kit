@@ -68,6 +68,8 @@ live-announcer core.
   (Visa/MC/Amex/Discover/Diners/JCB), brand badge, Luhn validation (shipped).
 - ✅ **IBAN input** (`mk-iban-input`) — group-by-four display, 65-country
   length table, mod-97 checksum, `mkIbanValidator` (shipped).
+- ✅ **Signature pad** (`mk-signature-pad`) — canvas capture, PNG data-URL CVA
+  value, hi-DPI + lossless resize redraw (shipped).
 
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value
@@ -82,6 +84,8 @@ live-announcer core.
 - ✅ **Comparison / diff view** (`mk-diff`) — LCS line diff + word highlighting, unified/split (shipped).
 - ✅ **QR code** (`mk-qr-code`) — dependency-free generator (in-house byte-mode
   encoder + Reed–Solomon ECC + masking, versions 1–10, L/M/Q/H), SVG output (shipped).
+- ✅ **JSON viewer** (`mk-json-viewer`) — collapsible JSON tree, type-coloured
+  primitives, circular-safe, expand/collapse-all (shipped).
 
 ### Charts (extend the module)
 - ✅ **Horizontal bar** (`mk-bar-chart orientation="horizontal"`) + **stacked
@@ -156,24 +160,32 @@ live-announcer core.
   sort announcer. (shipped.)
 - **P2 Storybook (or keep the docs app) + visual-regression** snapshots
   (Playwright) in light/dark to catch UI regressions.
-- **P2 Automated a11y checks** (axe) in CI over the docs pages.
-- **P2 SSR / hydration verification** — components are `isPlatformBrowser`-guarded;
-  add an SSR smoke test.
+- ✅ **Automated a11y checks** — `a11y-smoke.spec.ts` runs axe-core over
+  rendered component fixtures in the normal test suite (shipped); docs-page
+  crawling remains optional follow-up.
+- ✅ **SSR verification** — `ssr-smoke.spec.ts` server-renders a component
+  gallery via `renderApplication`, catching unguarded `window`/`document`
+  access (shipped).
 - ✅ **SCSS preprocessor migration** — all component styles are `.scss`; theme
   source is `styles/mk-kit.scss` (dark tokens deduped) with shared
   `_mixins.scss` (`tone`/`focus-ring`/`control-size`). (shipped.)
-- **P2 Density mode** — global compact/comfortable switch (table has density;
-  generalize to a token/attribute).
+- ✅ **Density mode** — global comfortable/compact switch via
+  `data-mk-density` + `MkThemeService.toggleDensity()` (shipped).
 - ✅ **Secondary entry points** — Material-style per-group FESMs; code-split
   apps only carry the groups they use (docs main: 1,082KB → 415KB).
 - ✅ **Full i18n coverage** — every built-in string + localisable date names.
 - ✅ **Keyboard-complete data grid** — resize/reorder/edit all keyboard operable.
 - ✅ **Docs IA overhaul** — split pages, on-page TOC, ⌘K search, new nav.
-- **P2 RTL audit** — verify logical properties; add `dir="rtl"` coverage.
-- **P3 High-contrast / forced-colors theme**, **P3 additional prebuilt themes**,
+- ✅ **RTL support** — logical properties across the library (shipped).
+- ✅ **High-contrast / forced-colors support** — a dedicated
+  `@media (forced-colors: active)` layer in the theme re-expresses
+  selection/checked/fill states with system colors (shipped).
+  **P3 additional prebuilt themes**,
   ✅ **a theme-builder page** in the docs (`/theme-builder` — live token controls +
   copy-paste `:root` output).
-- **P3 CHANGELOG + semantic-release**, **P3 bundle-size budget** in CI.
+- **P3 CHANGELOG + semantic-release** (changelog is hand-kept; release on
+  `v*` tags). ✅ **Bundle-size budget** — CI fails when the built FESM bundles
+  exceed `scripts/size-budget.json` (shipped).
 
 ---
 
@@ -217,7 +229,8 @@ existing primitive it would reuse. Priorities as before.
   delays, stays open while hovered (shipped).
 - ✅ **`MkHotkeysService` + `[mkHotkey]`** — global shortcut registry (`mod+k`,
   chords), ignores editable targets; `mkParseHotkey`/`mkMatchesHotkey` (shipped).
-- ⏳ **`mk-tour`** — product-onboarding coach marks (in progress).
+- ✅ **`mk-tour`** — product-onboarding coach marks (`MkTourService` +
+  popup) (shipped).
 
 ### Tier 3 — larger / specialized
 - ✅ **Data-grid pro** — extended `mk-table` with column resize, drag reorder,

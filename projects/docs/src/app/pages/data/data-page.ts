@@ -6,6 +6,7 @@ import {
   MkCountdown,
   MkDiff,
   MkInput,
+  MkJsonViewer,
   MkKanban,
   MkQrCode,
   type MkKanbanColumn,
@@ -25,6 +26,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkCode,
     MkCountdown,
     MkInput,
+    MkJsonViewer,
     MkKanban,
     MkQrCode,
     MkVirtualScroll,
@@ -161,6 +163,35 @@ import { DocsExample } from '../../shared/docs-example';
       <docs-example [code]="countdownCode" [column]="true">
         <mk-countdown [to]="launchDate" />
       </docs-example>
+
+      <h2>JSON viewer</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-json-viewer&gt;</code> renders JSON-ish
+        data as a read-only collapsible tree: objects and arrays fold behind
+        disclosure buttons with a
+        <code class="docs-inline">{{ '{' }}…{{ '}' }} n items</code> preview,
+        primitives are colour-coded by type and circular references render as
+        <code class="docs-inline">[Circular]</code>.
+        <code class="docs-inline">expandDepth</code> sets the initial expansion;
+        <code class="docs-inline">expandAll()</code> /
+        <code class="docs-inline">collapseAll()</code> are available via
+        <code class="docs-inline">exportAs</code>. The complement of the code
+        editor: that edits JSON <em>text</em>, this explores JSON
+        <em>data</em>.
+      </p>
+      <docs-example [code]="jsonViewerCode" [column]="true">
+        <mk-json-viewer [data]="jsonSample" [expandDepth]="2" />
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>data</td><td>unknown</td><td>required</td><td>Any JSON-serialisable value to display.</td></tr>
+          <tr><td>expandDepth</td><td>number</td><td>1</td><td>How many levels start expanded (root = level 1).</td></tr>
+          <tr><td>aria-label</td><td>string</td><td>'JSON'</td><td>Accessible label of the tree region.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -249,4 +280,17 @@ published: true`;
   // ----- QR code -------------------------------------------------------
   protected readonly qrValue = signal('https://github.com/mkornas/mk-kit');
   protected readonly qrCode = `<mk-qr-code value="https://example.com" ecc="M" [size]="160" />`;
+
+  // ----- JSON viewer ---------------------------------------------------
+  protected readonly jsonSample = {
+    id: 'ord_1042',
+    total: 249.99,
+    paid: true,
+    customer: { name: 'Ada Lovelace', vip: null },
+    items: [
+      { sku: 'KB-01', qty: 1 },
+      { sku: 'MS-77', qty: 2 },
+    ],
+  };
+  protected readonly jsonViewerCode = `<mk-json-viewer [data]="order" [expandDepth]="2" />`;
 }

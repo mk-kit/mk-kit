@@ -1,0 +1,65 @@
+<div class="mk-json-viewer__root" role="group" [attr.aria-label]="ariaLabel()">
+  <ng-container
+    *ngTemplateOutlet="nodeTpl; context: { $implicit: root() }"
+  />
+</div>
+
+<ng-template #nodeTpl let-node>
+  @if (node.type === 'object' || node.type === 'array') {
+    <div class="mk-json-viewer__node">
+      <button
+        type="button"
+        class="mk-json-viewer__toggle"
+        [attr.aria-expanded]="isExpanded(node.path)"
+        [attr.aria-label]="node.key === null ? ariaLabel() : null"
+        (click)="toggle(node.path)"
+      >
+        <span class="mk-json-viewer__chevron" aria-hidden="true"></span>
+        @if (node.key !== null) {
+          <span class="mk-json-viewer__key">{{ node.key }}</span>
+          <span class="mk-json-viewer__colon" aria-hidden="true">:</span>
+        }
+        @if (!isExpanded(node.path)) {
+          <span class="mk-json-viewer__preview">{{ preview(node) }}</span>
+        } @else {
+          <span class="mk-json-viewer__brace" aria-hidden="true">{{
+            node.type === 'array' ? '[' : '{'
+          }}</span>
+        }
+      </button>
+      @if (isExpanded(node.path)) {
+        <ul class="mk-json-viewer__children">
+          @for (child of node.children; track child.path) {
+            <li>
+              <ng-container
+                *ngTemplateOutlet="nodeTpl; context: { $implicit: child }"
+              />
+            </li>
+          } @empty {
+            <li class="mk-json-viewer__empty">{{ i18n.noData }}</li>
+          }
+        </ul>
+        <span class="mk-json-viewer__brace" aria-hidden="true">{{
+          node.type === 'array' ? ']' : '}'
+        }}</span>
+      }
+    </div>
+  } @else {
+    <div class="mk-json-viewer__leaf">
+      @if (node.key !== null) {
+        <span class="mk-json-viewer__key">{{ node.key }}</span>
+        <span class="mk-json-viewer__colon" aria-hidden="true">:</span>
+      }
+      <span
+        class="mk-json-viewer__value"
+        [class.mk-json-viewer__value--string]="node.type === 'string'"
+        [class.mk-json-viewer__value--number]="node.type === 'number'"
+        [class.mk-json-viewer__value--boolean]="node.type === 'boolean'"
+        [class.mk-json-viewer__value--null]="
+          node.type === 'null' || node.type === 'circular'
+        "
+        >{{ node.display }}</span
+      >
+    </div>
+  }
+</ng-template>

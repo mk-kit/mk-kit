@@ -4,6 +4,33 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Signature pad** (`mk-signature-pad`) — canvas signature capture with
+  pointer/touch/pen: smoothed strokes, hi-DPI-crisp, lossless redraw on
+  resize; the form value is a PNG data-URL (`null` while empty), with a Clear
+  control, `clear()`/`isEmpty()` and `(cleared)`. CVA + two-way `value`.
+- **JSON viewer** (`mk-json-viewer`) — read-only collapsible tree for
+  JSON-ish data: `{…} n items` previews, type-coloured primitives, circular
+  references rendered as `[Circular]`, `expandDepth` +
+  `expandAll()`/`collapseAll()`. `mkBuildJsonTree` is exported.
+- **Bundle-size budget in CI** — `scripts/check-size.mjs` compares the built
+  FESM bundles against `scripts/size-budget.json` and fails the build on
+  regressions.
+- Forced-colors coverage for the new controls (phone-input country list,
+  card brand badge, currency affix) in the theme's
+  `@media (forced-colors: active)` layer.
+- New i18n keys: `signature`, `jsonLabel`.
+
+### Changed
+
+- CI and Release workflows bumped from `actions/checkout@v4` /
+  `actions/setup-node@v4` to `@v5` (Node 20 runner deprecation).
+- ROADMAP refreshed: SSR smoke, density mode, RTL, tour, forced-colors and
+  the axe suite were already shipped but still listed as open.
+
 ## [0.5.0] — 2026-07-18
 
 ### Added
