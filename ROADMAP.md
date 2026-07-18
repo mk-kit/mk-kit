@@ -71,6 +71,18 @@ live-announcer core.
 - ✅ **Signature pad** (`mk-signature-pad`) — canvas capture, PNG data-URL CVA
   value, hi-DPI + lossless resize redraw (shipped).
 
+### Media (new group, 2026-07-18)
+- ✅ **Image** (`mk-image`) — skeleton/error states, aspect/fit/rounded, lazy (shipped).
+- ✅ **Image gallery** (`mk-image-gallery`) — grid/masonry/strip + "+N" overflow,
+  lightbox integration (shipped).
+- ✅ **Lightbox** (`MkLightboxService`) — fullscreen keyboard-navigable viewer (shipped).
+- ✅ **Image cropper** (`mk-image-cropper`) — pan/zoom/aspect/round, `crop()` →
+  data-URL, exported geometry helpers (shipped).
+- ✅ **Media gallery** (`mk-media-gallery`) — select/reorder/actions management
+  grid on the dnd module (shipped).
+- ✅ **Profile card** (`mk-profile-card`, data group) — cover + overlapping
+  avatar, meta/actions slots (shipped).
+
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value
   pairs for entity-detail panels; grid/stacked, rich values (shipped).

@@ -1,0 +1,212 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+// --- Crop viewport ----------------------------------------------------------
+
+.mk-image-cropper__viewport {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  cursor: grab;
+  touch-action: none;
+  user-select: none;
+}
+.mk-image-cropper__viewport--fill {
+  height: 100%;
+}
+.mk-image-cropper__viewport--dragging {
+  cursor: grabbing;
+}
+.mk-image-cropper__viewport:focus-visible {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+
+:host(.mk-image-cropper--disabled) .mk-image-cropper__viewport {
+  cursor: not-allowed;
+  opacity: 0.7;
+}
+
+// The image renders at its natural CSS-pixel size and is positioned entirely
+// via transform (translate from the viewport centre + cover-scale × zoom).
+.mk-image-cropper__image {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: auto;
+  height: auto;
+  max-width: none;
+  max-height: none;
+  transform-origin: center;
+  will-change: transform;
+  pointer-events: none;
+  user-select: none;
+  opacity: 0;
+  transition: opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-image-cropper__image--ready {
+  opacity: 1;
+}
+
+// Rule-of-thirds grid, revealed while dragging.
+.mk-image-cropper__grid {
+  --_grid-line: color-mix(in srgb, var(--mk-surface) 75%, transparent);
+
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image:
+    linear-gradient(var(--_grid-line), var(--_grid-line)),
+    linear-gradient(var(--_grid-line), var(--_grid-line)),
+    linear-gradient(var(--_grid-line), var(--_grid-line)),
+    linear-gradient(var(--_grid-line), var(--_grid-line));
+  background-repeat: no-repeat;
+  background-position:
+    33.333% 0,
+    66.667% 0,
+    0 33.333%,
+    0 66.667%;
+  background-size:
+    1px 100%,
+    1px 100%,
+    100% 1px,
+    100% 1px;
+  opacity: 0;
+  transition: opacity var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-image-cropper__viewport--dragging .mk-image-cropper__grid {
+  opacity: 1;
+}
+
+// Circular scrim for avatar crops: everything outside the largest centred
+// circle is dimmed at ~50% opacity. Purely visual — crop() stays rectangular.
+.mk-image-cropper__mask {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: radial-gradient(
+    circle closest-side at 50% 50%,
+    transparent calc(100% - 1px),
+    color-mix(in srgb, var(--mk-bg) 50%, transparent) 100%
+  );
+}
+
+.mk-image-cropper__error {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--mk-space-4);
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+  text-align: center;
+}
+
+// --- Zoom controls ----------------------------------------------------------
+
+.mk-image-cropper__controls {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  margin-top: var(--mk-space-3);
+}
+
+.mk-image-cropper__zoom-btn {
+  display: inline-flex;
+  flex: none;
+  align-items: center;
+  justify-content: center;
+  width: var(--mk-control-height-sm);
+  height: var(--mk-control-height-sm);
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--mk-font-size-lg);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  color: var(--mk-text-muted);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  transition:
+    color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-image-cropper__zoom-btn:hover:not(:disabled) {
+  color: var(--mk-text);
+  background-color: var(--mk-surface-2);
+  border-color: var(--mk-border-strong);
+}
+.mk-image-cropper__zoom-btn:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-image-cropper__zoom-btn:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+.mk-image-cropper__range {
+  --_track-h: 0.4rem;
+  --_thumb: 1.15rem;
+
+  flex: 1 1 auto;
+  min-width: 0;
+  height: var(--mk-control-height-sm);
+  margin: 0;
+  appearance: none;
+  background: transparent;
+  cursor: pointer;
+}
+.mk-image-cropper__range::-webkit-slider-runnable-track {
+  height: var(--_track-h);
+  background-color: var(--mk-surface-3);
+  border-radius: var(--mk-radius-pill);
+}
+.mk-image-cropper__range::-webkit-slider-thumb {
+  appearance: none;
+  width: var(--_thumb);
+  height: var(--_thumb);
+  margin-top: calc((var(--_track-h) - var(--_thumb)) / 2);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width-strong) solid var(--mk-primary);
+  border-radius: var(--mk-radius-circle);
+  box-shadow: var(--mk-shadow-sm);
+}
+.mk-image-cropper__range::-moz-range-track {
+  height: var(--_track-h);
+  background-color: var(--mk-surface-3);
+  border-radius: var(--mk-radius-pill);
+}
+.mk-image-cropper__range::-moz-range-thumb {
+  width: var(--_thumb);
+  height: var(--_thumb);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width-strong) solid var(--mk-primary);
+  border-radius: var(--mk-radius-circle);
+  box-shadow: var(--mk-shadow-sm);
+}
+.mk-image-cropper__range:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-image-cropper__range:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-image-cropper__image,
+  .mk-image-cropper__grid,
+  .mk-image-cropper__zoom-btn {
+    transition: none;
+  }
+}

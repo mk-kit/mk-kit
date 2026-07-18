@@ -8,6 +8,36 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Media group** (`@mkornas/ui/media`) — a new entry point for image-heavy
+  UIs:
+  - **Image** (`mk-image`) — figure-based image block: skeleton shimmer
+    while loading, labelled error fallback, caption, `aspectRatio`/`fit`/
+    `rounded` presentation, native lazy loading.
+  - **Image gallery** (`mk-image-gallery`) — `grid`, `masonry` and `strip`
+    (scroll-snap) layouts, `max` + "+N" overflow tile, opens the lightbox on
+    click (`lightbox` off → `(itemClick)` only).
+  - **Lightbox** (`MkLightboxService.open(items, startIndex)`) — fullscreen
+    viewer over the overlay core: looping arrow/Home/End navigation, Esc +
+    backdrop close, focus trap, polite counter, captions.
+  - **Image cropper** (`mk-image-cropper`) — pan (pointer + arrow keys),
+    zoom (wheel/slider/±, two-way `zoom` model), fixed `aspect`, `round`
+    avatar mask, `crop()` → PNG data-URL; `crossOrigin` input for
+    CORS-enabled remote sources (otherwise a tainted canvas would make
+    `crop()` return `null`). Pure geometry helpers `mkCoverScale`,
+    `mkClampPan`, `mkCropRect` are exported.
+  - **Media gallery** (`mk-media-gallery`) — management grid with two-way
+    `items`/`selection` models, checkbox multi-select, drag reorder
+    (pointer + keyboard via the dnd module) and a per-item
+    `mkMediaActions` template slot for consumer-supplied actions.
+- **Profile card** (`mk-profile-card`, data group) — person/entity card
+  composing `mk-avatar` (initials fallback): optional cover banner with
+  overlapping avatar, name + subtitle, body, `[mkProfileMeta]` stats row and
+  `[mkProfileActions]` footer; `orientation="horizontal"` compact row.
+- New i18n keys: `previousImage`, `nextImage`, `imageOf`, `viewImage`,
+  `imageFailed`, `zoom`, `zoomIn`, `zoomOut`, `mediaLibrary`.
+- Docs: new **Media** nav section with "Images & lightbox" and
+  "Media manager" pages; profile card documented on Cards & lists.
+
 - **Signature pad** (`mk-signature-pad`) — canvas signature capture with
   pointer/touch/pen: smoothed strokes, hi-DPI-crisp, lossless redraw on
   resize; the form value is a PNG data-URL (`null` while empty), with a Clear

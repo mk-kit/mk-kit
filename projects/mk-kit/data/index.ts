@@ -13,6 +13,7 @@ export * from './list';
 export * from './empty-state';
 export * from './timeline';
 export * from './stat-card';
+export * from './profile-card';
 export * from './progress-bar';
 export * from './progress-ring';
 export * from './spinner';

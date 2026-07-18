@@ -1,0 +1,118 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_radius: var(--mk-radius-md);
+
+  display: block;
+  min-width: 0;
+  font-family: var(--mk-font-sans);
+}
+
+:host([data-rounded='none']) {
+  --_radius: var(--mk-radius-none);
+}
+:host([data-rounded='lg']) {
+  --_radius: var(--mk-radius-lg);
+}
+:host([data-rounded='circle']) {
+  --_radius: var(--mk-radius-circle);
+}
+
+.mk-image__figure {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  margin: 0;
+  min-width: 0;
+}
+
+.mk-image__frame {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  border-radius: var(--_radius);
+  background-color: var(--mk-surface-2);
+}
+
+.mk-image__img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+:host([data-fit='contain']) .mk-image__img {
+  object-fit: contain;
+}
+
+/* Keep the picture (and its alt text) invisible under the shimmer overlay. */
+:host([data-state='loading']) .mk-image__img {
+  opacity: 0;
+}
+
+/* Skeleton shimmer while the picture loads (same recipe as mk-skeleton). */
+.mk-image__skeleton {
+  position: absolute;
+  inset: 0;
+  background-color: var(--mk-skeleton-base);
+  background-image: linear-gradient(
+    90deg,
+    var(--mk-skeleton-base) 0%,
+    var(--mk-skeleton-shine) 50%,
+    var(--mk-skeleton-base) 100%
+  );
+  background-size: 200% 100%;
+  background-repeat: no-repeat;
+  animation: mk-image-shimmer 1.4s ease-in-out infinite;
+}
+
+@keyframes mk-image-shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
+
+/* Fallback panel when the picture fails: subtle surface, icon + text. */
+.mk-image__fallback {
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--mk-space-2);
+  width: 100%;
+  height: 100%;
+  min-height: var(--mk-control-height-lg);
+  padding: var(--mk-space-4);
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) dashed var(--mk-border);
+  border-radius: var(--_radius);
+  color: var(--mk-text-muted);
+  text-align: center;
+}
+
+.mk-image__fallback-icon {
+  flex: none;
+  width: var(--mk-space-6);
+  height: var(--mk-space-6);
+}
+
+.mk-image__fallback-text {
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-snug);
+}
+
+.mk-image__caption {
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text-muted);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-image__skeleton {
+    animation: none;
+    background-image: none;
+  }
+}

@@ -54,6 +54,20 @@ export const routes: Routes = [
       import('./pages/signature/signature-page').then((m) => m.SignaturePage),
   },
   {
+    path: 'components/images',
+    title: 'Images & lightbox — mk-kit',
+    loadComponent: () =>
+      import('./pages/images/images-page').then((m) => m.ImagesPage),
+  },
+  {
+    path: 'components/media-manager',
+    title: 'Media manager — mk-kit',
+    loadComponent: () =>
+      import('./pages/media-manager/media-manager-page').then(
+        (m) => m.MediaManagerPage,
+      ),
+  },
+  {
     path: 'components/toggles',
     title: 'Toggles & switches — mk-kit',
     loadComponent: () =>

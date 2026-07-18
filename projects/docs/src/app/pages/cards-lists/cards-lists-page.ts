@@ -11,9 +11,13 @@ import {
   MkDivider,
   MkList,
   MkListItem,
+  MkProfileActions,
+  MkProfileCard,
+  MkProfileMeta,
   MkStatCard,
   MkTag,
 } from '@mkornas/ui';
+import { MkButton } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface DemoUser {
@@ -44,6 +48,10 @@ interface DemoUser {
     MkDivider,
     MkList,
     MkListItem,
+    MkButton,
+    MkProfileCard,
+    MkProfileMeta,
+    MkProfileActions,
     MkStatCard,
     MkTag,
   ],
@@ -271,6 +279,66 @@ interface DemoUser {
           <mk-desc-item term="Created">Jul 1, 2026</mk-desc-item>
         </mk-description-list>
       </docs-example>
+
+      <h2>Profile card</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-profile-card&gt;</code> presents a person
+        or entity: optional cover banner with an overlapping
+        <code class="docs-inline">mk-avatar</code> (initials fallback for free),
+        name + subtitle, body content and two slots —
+        <code class="docs-inline">[mkProfileMeta]</code> for a stats row and
+        <code class="docs-inline">[mkProfileActions]</code> for buttons.
+        <code class="docs-inline">orientation="horizontal"</code> switches to a
+        compact row (no cover).
+      </p>
+      <docs-example [code]="profileCode">
+        <mk-profile-card
+          name="Ada Lovelace"
+          subtitle="Head chef"
+          coverSrc="https://picsum.photos/seed/kitchen/640/220"
+          avatarSrc="https://picsum.photos/seed/chef/200/200"
+          style="max-width: 20rem; width: 100%;"
+        >
+          <p>Seasonal tasting menus, pastry and fermentation.</p>
+          <div mkProfileMeta>
+            <span><strong>128</strong> dishes</span>
+            <span><strong>4.9</strong> rating</span>
+            <span><strong>12</strong> years</span>
+          </div>
+          <div mkProfileActions>
+            <button mkButton tone="primary" size="sm">Follow</button>
+            <button mkButton variant="outline" tone="neutral" size="sm">
+              Message
+            </button>
+          </div>
+        </mk-profile-card>
+        <mk-profile-card
+          name="Grace Hopper"
+          subtitle="Sommelier"
+          orientation="horizontal"
+          style="max-width: 24rem; width: 100%;"
+        >
+          <div mkProfileActions>
+            <button mkButton variant="outline" tone="neutral" size="sm">
+              View
+            </button>
+          </div>
+        </mk-profile-card>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Slot</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>name</td><td>string</td><td>required</td><td>Display name (labels the card, feeds avatar initials).</td></tr>
+          <tr><td>subtitle</td><td>string</td><td>''</td><td>Muted line under the name.</td></tr>
+          <tr><td>avatarSrc / avatarSize</td><td>string / 'sm'|'md'|'lg'</td><td>'' / 'lg'</td><td>Avatar image (initials fallback) and size.</td></tr>
+          <tr><td>coverSrc</td><td>string</td><td>''</td><td>Banner image; the avatar overlaps its bottom edge (vertical only).</td></tr>
+          <tr><td>orientation</td><td>'vertical' | 'horizontal'</td><td>'vertical'</td><td>Centered column vs compact row.</td></tr>
+          <tr><td>[mkProfileMeta] / [mkProfileActions]</td><td>slots</td><td>—</td><td>Stats row / action buttons (hidden when empty).</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -338,6 +406,18 @@ export class CardsListsPage {
   value="1.9%"
   delta="-0.4pt"
   deltaTrend="down" />`;
+
+  protected readonly profileCode = `<mk-profile-card name="Ada Lovelace" subtitle="Head chef"
+  coverSrc="/covers/kitchen.jpg" avatarSrc="/team/ada.jpg">
+  <p>Seasonal tasting menus, pastry and fermentation.</p>
+  <div mkProfileMeta>
+    <span><strong>128</strong> dishes</span>
+    <span><strong>4.9</strong> rating</span>
+  </div>
+  <div mkProfileActions>
+    <button mkButton tone="primary" size="sm">Follow</button>
+  </div>
+</mk-profile-card>`;
 
   protected readonly descListCode = `<mk-description-list divided>
   <mk-desc-item term="Status"><mk-badge tone="success">Active</mk-badge></mk-desc-item>

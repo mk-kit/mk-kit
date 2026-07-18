@@ -45,6 +45,11 @@ import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
+import { MkImage } from '@mkornas/ui/media/image';
+import { MkImageGallery } from '@mkornas/ui/media/image-gallery';
+import { MkImageCropper } from '@mkornas/ui/media/image-cropper';
+import { MkMediaGallery, type MkMediaItem } from '@mkornas/ui/media/media-gallery';
+import { MkProfileCard } from '@mkornas/ui/data/profile-card';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -84,6 +89,11 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkIbanInput,
     MkSignaturePad,
     MkJsonViewer,
+    MkImage,
+    MkImageGallery,
+    MkImageCropper,
+    MkMediaGallery,
+    MkProfileCard,
     MkTabs,
     MkTab,
     MkAccordion,
@@ -149,6 +159,17 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       </mk-form-field>
       <mk-json-viewer [data]="jsonData" [expandDepth]="2" />
 
+      <mk-image src="/dish.jpg" alt="Dish" aspectRatio="4 / 3" caption="Special" />
+      <mk-image-gallery
+        [items]="[{ src: '/a.jpg', alt: 'A' }, { src: '/b.jpg', alt: 'B' }]"
+        [lightbox]="false"
+      />
+      <mk-image-cropper src="/avatar.jpg" [aspect]="1" />
+      <mk-media-gallery [items]="mediaItems" selectable />
+      <mk-profile-card name="Ada Lovelace" subtitle="Head chef" avatarSrc="/ada.jpg">
+        <p>Bio text</p>
+      </mk-profile-card>
+
       <mk-checkbox [checked]="true">Accept terms</mk-checkbox>
       <mk-radio-group aria-label="Plan" [value]="'pro'">
         <mk-radio [value]="'free'">Free</mk-radio>
@@ -201,6 +222,10 @@ class SsrSmokeRoot {
   ];
   readonly items = Array.from({ length: 200 }, (_, i) => `Row ${i + 1}`);
   readonly jsonData = { user: { name: 'Ada' }, active: true };
+  readonly mediaItems: MkMediaItem[] = [
+    { id: 'm1', src: '/a.jpg', name: 'hero.jpg' },
+    { id: 'm2', src: '/b.jpg', name: 'menu.jpg' },
+  ];
 }
 
 const INDEX_HTML = '<html><head><title>ssr-smoke</title></head><body><ssr-smoke-root></ssr-smoke-root></body></html>';
@@ -264,6 +289,11 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-iban-input',
       'mk-signature-pad',
       'mk-json-viewer',
+      'mk-image',
+      'mk-image-gallery',
+      'mk-image-cropper',
+      'mk-media-gallery',
+      'mk-profile-card',
       'mk-checkbox',
       'mk-radio-group',
       'mk-switch',

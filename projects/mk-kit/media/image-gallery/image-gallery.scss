@@ -1,0 +1,105 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  --_cols: 3;
+  --_gap: var(--mk-space-2);
+  --_radius: var(--mk-radius-md);
+
+  display: grid;
+  grid-template-columns: repeat(var(--_cols), 1fr);
+  gap: var(--_gap);
+  min-width: 0;
+  font-family: var(--mk-font-sans);
+}
+
+:host([data-rounded='none']) {
+  --_radius: var(--mk-radius-none);
+}
+:host([data-rounded='lg']) {
+  --_radius: var(--mk-radius-lg);
+}
+:host([data-rounded='circle']) {
+  --_radius: var(--mk-radius-circle);
+}
+
+/* Masonry: CSS multi-columns; tiles keep their natural picture ratios. */
+:host([data-layout='masonry']) {
+  display: block;
+  columns: var(--_cols);
+  column-gap: var(--_gap);
+}
+:host([data-layout='masonry']) .mk-gallery__tile {
+  width: 100%;
+  break-inside: avoid;
+  margin-block-end: var(--_gap);
+}
+
+/* Strip: one snap-scrolling row; tile width still follows `columns`. */
+:host([data-layout='strip']) {
+  display: flex;
+  gap: var(--_gap);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding-block-end: var(--mk-space-1);
+}
+:host([data-layout='strip']) .mk-gallery__tile {
+  flex: 0 0 calc((100% - (var(--_cols) - 1) * var(--_gap)) / var(--_cols));
+  scroll-snap-align: start;
+}
+
+.mk-gallery__tile {
+  position: relative;
+  display: block;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: inherit;
+  font: inherit;
+  border-radius: var(--_radius);
+  cursor: pointer;
+}
+
+.mk-gallery__tile:focus-visible {
+  @include mk.focus-ring;
+}
+
+/* Hover/press feedback washed over the picture. */
+.mk-gallery__tile::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--_radius);
+  background-color: transparent;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+  pointer-events: none;
+}
+.mk-gallery__tile:hover::after {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-gallery__tile:active::after {
+  background-color: var(--mk-active-overlay);
+}
+
+/* "+N" overflow scrim on the last visible tile. The scrim token is dark in
+   both themes, so pair it with the always-light primary-contrast text. */
+.mk-gallery__more {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--_radius);
+  background-color: var(--mk-overlay-scrim);
+  color: var(--mk-primary-contrast);
+  font-size: var(--mk-font-size-xl);
+  font-weight: var(--mk-font-weight-semibold);
+  pointer-events: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-gallery__tile::after {
+    transition: none;
+  }
+}

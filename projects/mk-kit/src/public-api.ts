@@ -21,3 +21,4 @@ export * from '@mkornas/ui/data';
 export * from '@mkornas/ui/feedback';
 export * from '@mkornas/ui/block-editor';
 export * from '@mkornas/ui/context-menu';
+export * from '@mkornas/ui/media';

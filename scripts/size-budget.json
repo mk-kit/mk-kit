@@ -8,6 +8,7 @@
     "mkornas-ui-block-editor.mjs": 300,
     "mkornas-ui-datetime.mjs": 280,
     "mkornas-ui-feedback.mjs": 260,
+    "mkornas-ui-media.mjs": 140,
     "mkornas-ui-table.mjs": 120,
     "mkornas-ui-directives.mjs": 80,
     "mkornas-ui-core.mjs": 80

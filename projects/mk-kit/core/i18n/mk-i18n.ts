@@ -362,6 +362,24 @@ export interface MkI18nStrings {
   signature: string;
   /** JSON viewer: default accessible label of the tree. */
   jsonLabel: string;
+
+  // --- Media -----------------------------------------------------------------
+  /** Lightbox / gallery: previous-image control. */
+  previousImage: string;
+  /** Lightbox / gallery: next-image control. */
+  nextImage: string;
+  /** Lightbox counter + per-image aria label, e.g. `Image 2 of 8`. */
+  imageOf: (index: number, total: number) => string;
+  /** Gallery tile label; receives the image's alt text. */
+  viewImage: (alt: string) => string;
+  /** Shown in an image block whose source failed to load. */
+  imageFailed: string;
+  /** Cropper zoom controls. */
+  zoom: string;
+  zoomIn: string;
+  zoomOut: string;
+  /** Media gallery region label. */
+  mediaLibrary: string;
   /** File upload dropzone + states. */
   dropzoneLabel: string;
   uploadFailed: string;
@@ -581,6 +599,16 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   iban: 'IBAN',
   signature: 'Signature',
   jsonLabel: 'JSON',
+
+  previousImage: 'Previous image',
+  nextImage: 'Next image',
+  imageOf: (index, total) => `Image ${index} of ${total}`,
+  viewImage: (alt) => (alt ? `View ${alt}` : 'View image'),
+  imageFailed: 'Image failed to load',
+  zoom: 'Zoom',
+  zoomIn: 'Zoom in',
+  zoomOut: 'Zoom out',
+  mediaLibrary: 'Media library',
   dropzoneLabel: 'Drag files here or click to browse',
   uploadFailed: 'Upload failed',
   retryUpload: 'Retry upload',

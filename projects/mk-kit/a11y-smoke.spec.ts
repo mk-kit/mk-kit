@@ -31,6 +31,11 @@ import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
+import { MkImage } from '@mkornas/ui/media/image';
+import { MkImageGallery } from '@mkornas/ui/media/image-gallery';
+import { MkImageCropper } from '@mkornas/ui/media/image-cropper';
+import { MkMediaGallery, type MkMediaItem } from '@mkornas/ui/media/media-gallery';
+import { MkProfileCard, MkProfileMeta, MkProfileActions } from '@mkornas/ui/data/profile-card';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -189,6 +194,74 @@ class JsonViewerHost {
 }
 
 @Component({
+  imports: [MkImage],
+  template: `
+    <mk-image
+      src="/assets/dish.jpg"
+      alt="Grilled salmon on a plate"
+      aspectRatio="4 / 3"
+      caption="Today's special"
+    />
+  `,
+})
+class ImageHost {}
+
+@Component({
+  imports: [MkImageGallery],
+  template: `
+    <mk-image-gallery
+      [items]="[
+        { src: '/a.jpg', alt: 'Starter plate' },
+        { src: '/b.jpg', alt: 'Main course' },
+        { src: '/c.jpg', alt: 'Dessert' },
+      ]"
+      [lightbox]="false"
+    />
+  `,
+})
+class ImageGalleryHost {}
+
+@Component({
+  imports: [MkImageCropper],
+  template: `<mk-image-cropper src="/assets/avatar-source.jpg" [aspect]="1" round />`,
+})
+class ImageCropperHost {}
+
+@Component({
+  imports: [MkMediaGallery],
+  template: `
+    <mk-media-gallery [items]="items" selectable [selection]="['m1']" />
+  `,
+})
+class MediaGalleryHost {
+  readonly items: MkMediaItem[] = [
+    { id: 'm1', src: '/a.jpg', name: 'hero.jpg', meta: '1.2 MB · JPG' },
+    { id: 'm2', src: '/b.jpg', name: 'menu.pdf', meta: '0.4 MB · PDF' },
+  ];
+}
+
+@Component({
+  imports: [MkProfileCard, MkProfileMeta, MkProfileActions],
+  template: `
+    <mk-profile-card
+      name="Ada Lovelace"
+      subtitle="Head chef"
+      coverSrc="/cover.jpg"
+    >
+      <p>Seasonal tasting menus and pastry.</p>
+      <div mkProfileMeta>
+        <span>128 dishes</span>
+        <span>4.9 rating</span>
+      </div>
+      <div mkProfileActions>
+        <button type="button">Follow</button>
+      </div>
+    </mk-profile-card>
+  `,
+})
+class ProfileCardHost {}
+
+@Component({
   imports: [MkFormField, MkSelect],
   template: `
     <mk-form-field label="Role">
@@ -338,6 +411,11 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'iban input', host: IbanInputHost },
   { name: 'signature pad', host: SignaturePadHost },
   { name: 'json viewer', host: JsonViewerHost },
+  { name: 'image', host: ImageHost },
+  { name: 'image gallery', host: ImageGalleryHost },
+  { name: 'image cropper', host: ImageCropperHost },
+  { name: 'media gallery', host: MediaGalleryHost },
+  { name: 'profile card', host: ProfileCardHost },
   { name: 'tabs', host: TabsHost },
   { name: 'accordion', host: AccordionHost },
   { name: 'pagination', host: PaginationHost },

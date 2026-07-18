@@ -1,0 +1,168 @@
+@use '../../src/styles/mixins' as mk;
+
+// The lightbox chrome floats on the overlay scrim, which is dark in BOTH
+// themes. Pair the inverse surface/text tokens (designed to contrast with
+// each other in every theme) as translucent chips so buttons, captions and
+// the counter stay readable over any image or scrim.
+:host {
+  --_chrome-bg: color-mix(in srgb, var(--mk-surface-inverse) 60%, transparent);
+  --_chrome-bg-hover: color-mix(
+    in srgb,
+    var(--mk-surface-inverse) 80%,
+    transparent
+  );
+  --_chrome-fg: var(--mk-text-inverse);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100vw;
+  height: 100dvh;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-lightbox__figure {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-space-3);
+  margin: 0;
+  max-width: 90vw;
+}
+
+.mk-lightbox__stage {
+  position: relative;
+  display: grid;
+  place-items: center;
+  min-width: 4rem;
+  min-height: 4rem;
+}
+
+.mk-lightbox__image {
+  display: block;
+  max-width: 90vw;
+  max-height: 85vh;
+  object-fit: contain;
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-xl);
+  transition: opacity var(--mk-duration-normal) var(--mk-ease-out);
+}
+
+.mk-lightbox__image--loading {
+  opacity: 0;
+}
+
+// Border spinner, mirroring .mk-autocomplete__spinner but sized for the
+// fullscreen stage and coloured for the dark scrim.
+.mk-lightbox__spinner {
+  position: absolute;
+  inset: 0;
+  margin: auto;
+  width: 2rem;
+  height: 2rem;
+  border: 3px solid color-mix(in srgb, var(--mk-surface-inverse) 45%, transparent);
+  border-top-color: var(--_chrome-fg);
+  border-radius: var(--mk-radius-circle);
+  animation: mk-lightbox-spin var(--mk-duration-slow) linear infinite;
+}
+
+.mk-lightbox__error {
+  margin: 0;
+  padding: var(--mk-space-3) var(--mk-space-5);
+  border-radius: var(--mk-radius-lg);
+  background: var(--_chrome-bg);
+  color: var(--_chrome-fg);
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-snug);
+}
+
+.mk-lightbox__caption {
+  max-width: 90vw;
+  padding: var(--mk-space-2) var(--mk-space-4);
+  border-radius: var(--mk-radius-pill);
+  background: var(--_chrome-bg);
+  color: var(--_chrome-fg);
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-snug);
+  text-align: center;
+}
+
+.mk-lightbox__counter {
+  margin: 0;
+  padding: var(--mk-space-1) var(--mk-space-3);
+  border-radius: var(--mk-radius-pill);
+  background: var(--_chrome-bg);
+  color: var(--_chrome-fg);
+  font-size: var(--mk-font-size-xs);
+  font-variant-numeric: tabular-nums;
+}
+
+// ≥44px hit targets, floating over the stage.
+.mk-lightbox__button {
+  position: absolute;
+  display: grid;
+  place-items: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  padding: 0;
+  border: 0;
+  border-radius: var(--mk-radius-circle);
+  background: var(--_chrome-bg);
+  color: var(--_chrome-fg);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    scale var(--mk-duration-fast) var(--mk-ease-standard);
+
+  &:hover {
+    background: var(--_chrome-bg-hover);
+  }
+
+  &:active {
+    scale: 0.94;
+  }
+
+  &:focus-visible {
+    @include mk.focus-ring;
+  }
+
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+.mk-lightbox__close {
+  top: var(--mk-space-4);
+  right: var(--mk-space-4);
+}
+
+.mk-lightbox__nav {
+  top: 50%;
+  translate: 0 -50%;
+}
+
+.mk-lightbox__nav--prev {
+  left: var(--mk-space-4);
+}
+
+.mk-lightbox__nav--next {
+  right: var(--mk-space-4);
+}
+
+@keyframes mk-lightbox-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-lightbox__image,
+  .mk-lightbox__button {
+    transition: none;
+  }
+
+  .mk-lightbox__spinner {
+    animation: none;
+  }
+}

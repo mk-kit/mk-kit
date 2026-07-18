@@ -1,0 +1,100 @@
+@if (items().length === 0) {
+  <div class="mk-media-gallery__empty">{{ i18n.noData }}</div>
+} @else if (reorderable()) {
+  <div
+    mkDropList
+    class="mk-media-gallery__grid"
+    [style.--_cols]="columns()"
+    [mkDropListData]="items()"
+    [mkDropListLabel]="ariaLabel()"
+    mkDropListOrientation="horizontal"
+    (mkDropListDropped)="onDrop($event)"
+  >
+    @for (item of items(); track item.id) {
+      <div
+        mkDrag
+        class="mk-media-gallery__tile"
+        [class.mk-media-gallery__tile--selected]="isSelected(item.id)"
+        [mkDragData]="item"
+      >
+        <ng-container
+          [ngTemplateOutlet]="tile"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        />
+      </div>
+    }
+  </div>
+} @else {
+  <div class="mk-media-gallery__grid" [style.--_cols]="columns()">
+    @for (item of items(); track item.id) {
+      <div
+        class="mk-media-gallery__tile"
+        [class.mk-media-gallery__tile--selected]="isSelected(item.id)"
+      >
+        <ng-container
+          [ngTemplateOutlet]="tile"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        />
+      </div>
+    }
+  </div>
+}
+
+<ng-template #tile let-item>
+  <div class="mk-media-gallery__media">
+    <button
+      type="button"
+      class="mk-media-gallery__preview"
+      [attr.aria-label]="i18n.viewImage(item.alt ?? item.name)"
+      (click)="onPreviewClick(item)"
+      (keydown)="stopEvent($event)"
+    >
+      <img
+        class="mk-media-gallery__img"
+        [src]="item.thumb ?? item.src"
+        [alt]="item.alt ?? ''"
+        loading="lazy"
+        draggable="false"
+      />
+    </button>
+
+    @if (selectable()) {
+      <span
+        class="mk-media-gallery__check"
+        (keydown)="stopEvent($event)"
+        (pointerdown)="stopEvent($event)"
+      >
+        <input
+          type="checkbox"
+          class="mk-media-gallery__check-input"
+          [checked]="isSelected(item.id)"
+          [attr.aria-label]="i18n.selectRow(item.name)"
+          (change)="onCheckboxChange(item, $event)"
+        />
+        <span class="mk-media-gallery__check-box" aria-hidden="true">
+          <span class="mk-media-gallery__check-mark"></span>
+        </span>
+      </span>
+    }
+
+    @if (actions(); as actionsDir) {
+      <div
+        class="mk-media-gallery__actions"
+        (keydown)="stopEvent($event)"
+        (pointerdown)="stopEvent($event)"
+      >
+        <ng-container
+          [ngTemplateOutlet]="actionsDir.template"
+          [ngTemplateOutletContext]="{ $implicit: item }"
+        />
+      </div>
+    }
+  </div>
+
+  <div class="mk-media-gallery__caption">
+    <span class="mk-media-gallery__name">{{ item.name }}</span>
+    @if (item.meta) {
+      <span class="mk-media-gallery__meta">{{ item.meta }}</span>
+    }
+  </div>
+</ng-template>

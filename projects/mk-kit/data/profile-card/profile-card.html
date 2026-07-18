@@ -1,0 +1,34 @@
+@if (showCover()) {
+  <div class="mk-profile-card__cover" aria-hidden="true">
+    <img class="mk-profile-card__cover-img" [src]="coverSrc()" alt="" />
+  </div>
+}
+
+<div class="mk-profile-card__content">
+  <mk-avatar
+    class="mk-profile-card__avatar"
+    [src]="avatarSrc()"
+    [name]="name()"
+    [size]="avatarSize()" />
+
+  <div class="mk-profile-card__main">
+    <div class="mk-profile-card__identity">
+      <div class="mk-profile-card__name" [id]="nameId">{{ name() }}</div>
+      @if (subtitle()) {
+        <div class="mk-profile-card__subtitle">{{ subtitle() }}</div>
+      }
+    </div>
+
+    <div class="mk-profile-card__body">
+      <ng-content />
+    </div>
+
+    <div class="mk-profile-card__meta">
+      <ng-content select="[mkProfileMeta]" />
+    </div>
+  </div>
+
+  <div class="mk-profile-card__actions">
+    <ng-content select="[mkProfileActions]" />
+  </div>
+</div>

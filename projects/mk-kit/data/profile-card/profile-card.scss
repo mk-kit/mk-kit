@@ -1,0 +1,134 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-xs);
+  color: var(--mk-text);
+  overflow: hidden;
+}
+
+/* ---------------------------------------------------------------- cover */
+
+.mk-profile-card__cover {
+  aspect-ratio: 3 / 1;
+  min-height: 0;
+  background-color: var(--mk-surface-2);
+}
+
+.mk-profile-card__cover-img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* -------------------------------------------------------------- content */
+
+.mk-profile-card__content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-space-4);
+  min-width: 0;
+  padding: var(--mk-space-5);
+  text-align: center;
+}
+
+.mk-profile-card__avatar {
+  flex: none;
+}
+
+/* When a cover is shown the avatar is pulled up to straddle its bottom edge
+   and gets a surface-coloured ring so it reads as punched through the banner.
+   The pull equals the card padding plus half the avatar height per size. */
+:host(.mk-profile-card--has-cover) .mk-profile-card__avatar {
+  border-radius: var(--mk-radius-circle);
+  box-shadow: 0 0 0 3px var(--mk-surface);
+}
+:host(.mk-profile-card--has-cover[data-avatar-size='sm']) .mk-profile-card__avatar {
+  margin-top: calc(-1rem - var(--mk-space-5));
+}
+:host(.mk-profile-card--has-cover[data-avatar-size='md']) .mk-profile-card__avatar {
+  margin-top: calc(-1.25rem - var(--mk-space-5));
+}
+:host(.mk-profile-card--has-cover[data-avatar-size='lg']) .mk-profile-card__avatar {
+  margin-top: calc(-1.625rem - var(--mk-space-5));
+}
+
+.mk-profile-card__main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--mk-space-3);
+  min-width: 0;
+  width: 100%;
+}
+
+/* ------------------------------------------------------------- identity */
+
+.mk-profile-card__name {
+  font-size: var(--mk-font-size-lg);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: var(--mk-line-height-snug);
+  color: var(--mk-text);
+  overflow-wrap: anywhere;
+}
+
+.mk-profile-card__subtitle {
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text-muted);
+  overflow-wrap: anywhere;
+}
+
+/* ------------------------------------------------------ body/meta/actions */
+
+.mk-profile-card__body {
+  font-size: var(--mk-font-size-sm);
+  line-height: var(--mk-line-height-relaxed);
+  color: var(--mk-text);
+  min-width: 0;
+}
+.mk-profile-card__body:empty {
+  display: none;
+}
+
+.mk-profile-card__meta {
+  width: 100%;
+  min-width: 0;
+}
+.mk-profile-card__meta:empty {
+  display: none;
+}
+
+.mk-profile-card__actions {
+  min-width: 0;
+}
+.mk-profile-card__actions:empty {
+  display: none;
+}
+
+/* ----------------------------------------------------------- horizontal */
+/* Avatar left, text column in the middle, actions pinned to the end.
+   The cover banner is not rendered in this orientation (see component doc). */
+
+:host(.mk-profile-card--horizontal) .mk-profile-card__content {
+  flex-direction: row;
+  align-items: center;
+  text-align: start;
+}
+
+:host(.mk-profile-card--horizontal) .mk-profile-card__main {
+  flex: 1 1 auto;
+  align-items: flex-start;
+  gap: var(--mk-space-2);
+}
+
+:host(.mk-profile-card--horizontal) .mk-profile-card__actions {
+  flex: none;
+  margin-inline-start: auto;
+}

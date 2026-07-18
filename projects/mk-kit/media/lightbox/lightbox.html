@@ -1,0 +1,82 @@
+@if (current(); as item) {
+  <figure class="mk-lightbox__figure">
+    <div class="mk-lightbox__stage">
+      @if (failed()) {
+        <p class="mk-lightbox__error" role="alert">{{ i18n.imageFailed }}</p>
+      } @else {
+        @if (loading()) {
+          <span class="mk-lightbox__spinner" aria-hidden="true"></span>
+        }
+        <img
+          class="mk-lightbox__image"
+          [class.mk-lightbox__image--loading]="loading()"
+          [src]="item.src"
+          [alt]="item.alt ?? ''"
+          (load)="onLoad()"
+          (error)="onError()"
+        />
+      }
+    </div>
+    @if (item.caption) {
+      <figcaption class="mk-lightbox__caption">{{ item.caption }}</figcaption>
+    }
+    <p class="mk-lightbox__counter" aria-live="polite">{{ counter() }}</p>
+  </figure>
+}
+
+<button
+  type="button"
+  class="mk-lightbox__button mk-lightbox__close"
+  [attr.aria-label]="i18n.close"
+  (click)="close()"
+>
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="2"
+    stroke-linecap="round"
+    aria-hidden="true"
+  >
+    <path d="M6 6l12 12M18 6L6 18" />
+  </svg>
+</button>
+
+@if (total > 1) {
+  <button
+    type="button"
+    class="mk-lightbox__button mk-lightbox__nav mk-lightbox__nav--prev"
+    [attr.aria-label]="i18n.previousImage"
+    (click)="previous()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M15 5l-7 7 7 7" />
+    </svg>
+  </button>
+  <button
+    type="button"
+    class="mk-lightbox__button mk-lightbox__nav mk-lightbox__nav--next"
+    [attr.aria-label]="i18n.nextImage"
+    (click)="next()"
+  >
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      stroke-linecap="round"
+      stroke-linejoin="round"
+      aria-hidden="true"
+    >
+      <path d="M9 5l7 7-7 7" />
+    </svg>
+  </button>
+}

@@ -1,0 +1,19 @@
+@for (item of visibleItems(); track $index; let i = $index; let last = $last) {
+  <button
+    type="button"
+    class="mk-gallery__tile"
+    [attr.aria-label]="tileLabel(i)"
+    (click)="onTileClick(i)"
+  >
+    <mk-image
+      [src]="item.thumb ?? item.src"
+      [aspectRatio]="tileAspectRatio()"
+      [rounded]="rounded()"
+    />
+    @if (last && overflowCount() > 0) {
+      <span class="mk-gallery__more" aria-hidden="true"
+        >+{{ overflowCount() }}</span
+      >
+    }
+  </button>
+}

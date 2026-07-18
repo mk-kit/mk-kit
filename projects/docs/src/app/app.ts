@@ -73,6 +73,13 @@ export class App {
       ],
     },
     {
+      title: 'Media',
+      links: [
+        { label: 'Images & lightbox', path: '/components/images' },
+        { label: 'Media manager', path: '/components/media-manager' },
+      ],
+    },
+    {
       title: 'Data display',
       links: [
         { label: 'Badges & labels', path: '/components/badges-avatars' },
