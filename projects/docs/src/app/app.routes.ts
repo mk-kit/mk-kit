@@ -34,6 +34,14 @@ export const routes: Routes = [
       import('./pages/text-inputs/text-inputs-page').then((m) => m.TextInputsPage),
   },
   {
+    path: 'components/phone-postal',
+    title: 'Phone & postal code — mk-kit',
+    loadComponent: () =>
+      import('./pages/phone-postal/phone-postal-page').then(
+        (m) => m.PhonePostalPage,
+      ),
+  },
+  {
     path: 'components/toggles',
     title: 'Toggles & switches — mk-kit',
     loadComponent: () =>

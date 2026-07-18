@@ -8,6 +8,52 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Phone input** (`mk-phone-input`) — international telephone field: a
+  searchable country-prefix dropdown (60 built-in countries with flag,
+  localised name via `Intl.DisplayNames`, dial code) next to a national-number
+  input masked per country. Emits a single E.164 string by default or a
+  structured `{ country, dialCode, national, e164 }` object with
+  `valueFormat="parts"`; pasting a full `+…` number switches the country
+  automatically. `preferredCountries` pins codes to the top; the country set
+  is replaceable via `countries`. CVA + two-way `value`/`country` models.
+- **Postal code input** (`mk-postal-code-input`) — country-aware postal/ZIP
+  field: masks, uppercases and validates against 35+ built-in formats
+  (PL `00-000`, US ZIP+4, CA `A0A 0A0`, NL `0000 AA`, …); free-format
+  countries (GB, IE-style) validate by pattern and normalise the missing
+  space on blur. Placeholder defaults to a valid example; `valid()` exposes
+  tri-state validity; `mkPostalCodeValidator(country)` covers reactive forms.
+- **`mkMask` improvements** — the caret helper is now exported as
+  `mkMaskCaret` for building custom masked controls, and the directive derives
+  `inputmode` from the pattern (`numeric` for digit-only masks) with an
+  `mkMaskInputmode` override.
+- New i18n keys: `chooseCountry`, `searchCountries`, `phoneNumber`,
+  `postalCode`.
+
+### Changed
+
+- **`@mkornas/ui/data` no longer re-exports the icon, chip and table entry
+  points** — import `@mkornas/ui/icon`, `/chip` and `/table` directly (the
+  root `@mkornas/ui` barrel still exports everything). This removes an
+  implicit `data → table` coupling that dragged the table into any chunk
+  importing the data group.
+- **Docs redesigned** — flat text-only sidebar (no icons, no collapsing
+  groups), router-link navigation, quieter sidebar chrome, frosted sticky
+  header, icon-only theme/density toggles and refreshed page typography.
+
+### Fixed
+
+- Anchored overlay scroll tracking now registers its capture-phase scroll
+  listener as `passive` (no scroll-jank risk while a panel is open).
+- `MkSelect` and `MkMenu` clear their typeahead reset timer on destroy.
+- `MkFocusTrap` no longer steals focus back when an overlay is opened and
+  released within the same tick (deferred initial focus is skipped after
+  release).
+- `MkThemeService` detaches its `prefers-color-scheme` media-query listener
+  on injector destroy (repeated bootstraps in SSR/HMR/tests no longer leak).
+- `PATTERN.md` updated to the real per-group entry-point layout,
+  `@mkornas/ui/*` import convention and `.scss` styling (it still described
+  the pre-audit `src/lib/components/` tree).
+
 - **Grouped table rows** — `mk-table` gained `groupBy` (column key or accessor):
   rows render under collapsible group headers with a row count, sticky below
   the (optionally sticky) column header. `groupLabel` formats the header,

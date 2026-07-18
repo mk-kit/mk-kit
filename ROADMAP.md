@@ -56,6 +56,18 @@ live-announcer core.
 - ✅ **Form error summary** (`mk-form-error-summary`) — WAI/GOV.UK alert listing
   validation errors, each linking to + focusing its field; `focus()` on submit
   (shipped).
+- ✅ **Phone input** (`mk-phone-input`) — searchable country-prefix dropdown +
+  per-country masked national number; E.164 or `{prefix, number}` parts output
+  (shipped).
+- ✅ **Postal code input** (`mk-postal-code-input`) — country-aware mask +
+  validation for 35+ formats, plus `mkPostalCodeValidator` (shipped).
+- **P1 Currency / amount input** (`mk-currency-input`) — `Intl.NumberFormat`
+  live grouping, decimal precision, currency affix, numeric CVA value. The
+  most-requested admin control still missing; builds on `mkMaskCaret`.
+- **P2 Card number input** — `0000 0000 0000 0000` mask (exists via `mkMask`)
+  plus brand detection (Visa/MC/Amex ranges) and Luhn validation.
+- **P3 IBAN input** — per-country IBAN length/grouping masks + mod-97 check,
+  reusing the postal-format table pattern.
 
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value

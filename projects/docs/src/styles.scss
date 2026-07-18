@@ -15,6 +15,20 @@ body {
   margin: 0;
 }
 
+/* Docs shell chrome (overrides on the library app-shell) ------------------ */
+/* Quieter sidebar: page background + hairline divider instead of a boxed
+ * panel, so the text-only nav reads as part of the page. */
+.mk-app-shell__sidebar {
+  background: var(--mk-bg);
+  border-inline-end: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+/* Frosted sticky header. */
+.mk-app-shell__header {
+  background: color-mix(in srgb, var(--mk-surface) 82%, transparent);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
 /* Docs layout primitives ------------------------------------------------- */
 .docs-container {
   width: 100%;
@@ -24,10 +38,11 @@ body {
 }
 
 .docs-page h1 {
-  font-size: var(--mk-font-size-3xl);
+  font-size: var(--mk-font-size-4xl);
   font-weight: var(--mk-font-weight-bold);
   letter-spacing: var(--mk-letter-spacing-tight);
-  margin: 0 0 var(--mk-space-2);
+  line-height: var(--mk-line-height-tight);
+  margin: 0 0 var(--mk-space-3);
 }
 .docs-page h2 {
   font-size: var(--mk-font-size-xl);
@@ -68,6 +83,7 @@ body {
   overflow: hidden;
   margin: var(--mk-space-4) 0 var(--mk-space-6);
   background: var(--mk-surface);
+  box-shadow: var(--mk-shadow-xs);
 }
 .docs-example__preview {
   padding: var(--mk-space-6);
@@ -118,6 +134,12 @@ code.docs-inline {
 .docs-props th {
   color: var(--mk-text-subtle);
   font-weight: var(--mk-font-weight-semibold);
+  font-size: var(--mk-font-size-xs);
+  letter-spacing: var(--mk-letter-spacing-wide);
+  text-transform: uppercase;
+}
+.docs-props tbody tr:hover td {
+  background: var(--mk-hover-overlay);
 }
 .docs-props td code {
   font-family: var(--mk-font-mono);

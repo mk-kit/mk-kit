@@ -13,23 +13,8 @@
         >
           ☰
         </button>
-      } @else {
-        <button
-          mkButton
-          variant="ghost"
-          tone="neutral"
-          iconOnly
-          aria-label="Collapse sidebar"
-          (click)="shell.toggleCollapsed()"
-        >
-          ⟨⟩
-        </button>
       }
-      <a
-        class="docs-brand"
-        href="/introduction"
-        (click)="$event.preventDefault(); go(shell, '/introduction')"
-      >
+      <a class="docs-brand" routerLink="/introduction">
         <span class="docs-brand__mark">mk</span>
         <span class="docs-brand__name">mk-kit</span>
         <span class="docs-brand__ver">v{{ uiVersion }}</span>
@@ -51,25 +36,25 @@
       </button>
       <button
         mkButton
-        variant="outline"
+        variant="ghost"
         tone="neutral"
         size="sm"
+        iconOnly
         (click)="theme.toggleDensity()"
         [attr.aria-label]="'Density: ' + theme.density() + '. Click to toggle.'"
       >
-        <span aria-hidden="true">{{ theme.density() === 'compact' ? '▤' : '☰' }}</span>
-        {{ theme.density() === 'compact' ? 'Compact' : 'Comfortable' }}
+        {{ theme.density() === 'compact' ? '▤' : '☰' }}
       </button>
       <button
         mkButton
-        variant="outline"
+        variant="ghost"
         tone="neutral"
         size="sm"
+        iconOnly
         (click)="cycleTheme()"
         [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
       >
-        <span aria-hidden="true">{{ themeIcon() }}</span>
-        {{ themeLabel() }}
+        {{ themeIcon() }}
       </button>
       <a
         mkButton
@@ -85,25 +70,23 @@
     </div>
   </div>
 
-  <!-- Sidebar -->
-  <mk-nav-list
-    mkAppSidebar
-    [collapsed]="shell.sidebarCollapsed() && !shell.isMobile()"
-  >
+  <!-- Sidebar: flat, text-only navigation -->
+  <nav mkAppSidebar class="docs-nav" aria-label="Documentation">
     @for (section of sections; track section.title) {
-      <mk-nav-group [label]="section.title" [collapsible]="!!section.collapsible">
+      <div class="docs-nav__group">
+        <p class="docs-nav__heading">{{ section.title }}</p>
         @for (link of section.links; track link.path) {
-          <mk-nav-item
-            [label]="link.label"
-            [active]="isActive(link.path)"
-            (action)="go(shell, link.path)"
+          <a
+            class="docs-nav__link"
+            [routerLink]="link.path"
+            routerLinkActive="docs-nav__link--active"
+            (click)="shell.closeSidebar()"
+            >{{ link.label }}</a
           >
-            <span mkNavIcon aria-hidden="true">{{ link.icon }}</span>
-          </mk-nav-item>
         }
-      </mk-nav-group>
+      </div>
     }
-  </mk-nav-list>
+  </nav>
 
   <!-- Main content -->
   <router-outlet />
