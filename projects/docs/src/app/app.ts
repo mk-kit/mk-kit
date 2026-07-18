@@ -64,6 +64,7 @@ export class App {
         { label: 'Form fields', path: '/components/forms' },
         { label: 'Text inputs', path: '/components/text-inputs' },
         { label: 'Phone & postal code', path: '/components/phone-postal' },
+        { label: 'Money & payment', path: '/components/payment' },
         { label: 'Toggles', path: '/components/toggles' },
         { label: 'Sliders & rating', path: '/components/sliders' },
         { label: 'Selection', path: '/components/selection' },

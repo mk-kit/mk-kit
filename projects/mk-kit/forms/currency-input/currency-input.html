@@ -1,0 +1,30 @@
+@if (localeInfo().symbol && localeInfo().symbolPrefix) {
+  <span class="mk-currency-input__symbol" aria-hidden="true">{{
+    localeInfo().symbol
+  }}</span>
+}
+
+<input
+  type="text"
+  class="mk-currency-input__field"
+  [id]="inputId"
+  inputmode="decimal"
+  autocomplete="transaction-amount"
+  spellcheck="false"
+  [value]="display()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-label]="labelledBy() ? null : i18n.amount"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+/>
+
+@if (localeInfo().symbol && !localeInfo().symbolPrefix) {
+  <span class="mk-currency-input__symbol" aria-hidden="true">{{
+    localeInfo().symbol
+  }}</span>
+}

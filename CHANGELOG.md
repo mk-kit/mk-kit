@@ -26,8 +26,24 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
   `mkMaskCaret` for building custom masked controls, and the directive derives
   `inputmode` from the pattern (`numeric` for digit-only masks) with an
   `mkMaskInputmode` override.
+- **Currency input** (`mk-currency-input`) — money/amount field formatted by
+  `Intl.NumberFormat`: live thousands grouping, locale separators, currency
+  symbol as a fixed affix (per-locale side), fraction digits padded to the
+  currency's convention on blur, zero-decimal currencies honoured; the form
+  value stays a plain `number` (`null` when empty), with `min`/`max` clamping
+  and an `allowNegative` switch.
+- **Card number input** (`mk-card-number-input`) — payment-card field that
+  groups digits per detected network (Visa/Mastercard/Discover/JCB 4-4-4-4,
+  Amex 4-6-5, Diners 4-6-4), shows the brand as a badge (`(brandChange)` +
+  `brand()`), stores raw digits and validates complete numbers with Luhn
+  (`valid()` tri-state). `mkDetectCardBrand` and `mkLuhnCheck` are exported.
+- **IBAN input** (`mk-iban-input`) — uppercases and groups in blocks of four,
+  caps input at the country's exact length (65 countries) and validates with
+  the ISO 13616 mod-97 checksum; value is the compact electronic format.
+  `mkIbanValidator()`, `mkIbanIsValid`, `mkIbanChecksum` and
+  `MK_IBAN_LENGTHS` are exported for reactive forms / custom use.
 - New i18n keys: `chooseCountry`, `searchCountries`, `phoneNumber`,
-  `postalCode`.
+  `postalCode`, `amount`, `cardNumber`, `cardBrand`, `iban`.
 
 ### Changed
 

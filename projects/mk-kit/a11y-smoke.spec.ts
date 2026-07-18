@@ -26,6 +26,9 @@ import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkSelect } from '@mkornas/ui/forms/select';
 import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
 import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
+import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
+import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
+import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -134,6 +137,36 @@ class PhoneInputHost {}
   `,
 })
 class PostalCodeInputHost {}
+
+@Component({
+  imports: [MkFormField, MkCurrencyInput],
+  template: `
+    <mk-form-field label="Price">
+      <mk-currency-input currency="PLN" locale="pl-PL" />
+    </mk-form-field>
+  `,
+})
+class CurrencyInputHost {}
+
+@Component({
+  imports: [MkFormField, MkCardNumberInput],
+  template: `
+    <mk-form-field label="Card number">
+      <mk-card-number-input value="4111111111111111" />
+    </mk-form-field>
+  `,
+})
+class CardNumberInputHost {}
+
+@Component({
+  imports: [MkFormField, MkIbanInput],
+  template: `
+    <mk-form-field label="IBAN">
+      <mk-iban-input value="DE89370400440532013000" />
+    </mk-form-field>
+  `,
+})
+class IbanInputHost {}
 
 @Component({
   imports: [MkFormField, MkSelect],
@@ -280,6 +313,9 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'select (closed)', host: SelectHost },
   { name: 'phone input (closed)', host: PhoneInputHost },
   { name: 'postal code input', host: PostalCodeInputHost },
+  { name: 'currency input', host: CurrencyInputHost },
+  { name: 'card number input', host: CardNumberInputHost },
+  { name: 'iban input', host: IbanInputHost },
   { name: 'tabs', host: TabsHost },
   { name: 'accordion', host: AccordionHost },
   { name: 'pagination', host: PaginationHost },

@@ -61,13 +61,13 @@ live-announcer core.
   (shipped).
 - ✅ **Postal code input** (`mk-postal-code-input`) — country-aware mask +
   validation for 35+ formats, plus `mkPostalCodeValidator` (shipped).
-- **P1 Currency / amount input** (`mk-currency-input`) — `Intl.NumberFormat`
-  live grouping, decimal precision, currency affix, numeric CVA value. The
-  most-requested admin control still missing; builds on `mkMaskCaret`.
-- **P2 Card number input** — `0000 0000 0000 0000` mask (exists via `mkMask`)
-  plus brand detection (Visa/MC/Amex ranges) and Luhn validation.
-- **P3 IBAN input** — per-country IBAN length/grouping masks + mod-97 check,
-  reusing the postal-format table pattern.
+- ✅ **Currency / amount input** (`mk-currency-input`) — `Intl.NumberFormat`
+  live grouping, locale separators, currency affix, blur padding/clamping,
+  numeric CVA value (shipped).
+- ✅ **Card number input** (`mk-card-number-input`) — brand-aware grouping
+  (Visa/MC/Amex/Discover/Diners/JCB), brand badge, Luhn validation (shipped).
+- ✅ **IBAN input** (`mk-iban-input`) — group-by-four display, 65-country
+  length table, mod-97 checksum, `mkIbanValidator` (shipped).
 
 ### Data display
 - ✅ **Description list** (`mk-description-list` + `mk-desc-item`) — key/value

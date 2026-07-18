@@ -1,0 +1,25 @@
+<input
+  type="text"
+  class="mk-card-number-input__field"
+  [id]="inputId"
+  autocomplete="cc-number"
+  spellcheck="false"
+  [mkMask]="mask()"
+  [value]="masked()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-label]="labelledBy() ? null : i18n.cardNumber"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (unmaskedChange)="onDigitsChange($event)"
+  (blur)="onBlur()"
+/>
+
+@if (showBrand() && brandName()) {
+  <span class="mk-card-number-input__brand">
+    {{ brandName() }}
+    <span class="mk-visually-hidden">{{ i18n.cardBrand(brandName()) }}</span>
+  </span>
+}

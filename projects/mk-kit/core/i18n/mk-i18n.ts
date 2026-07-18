@@ -350,6 +350,14 @@ export interface MkI18nStrings {
   phoneNumber: string;
   /** Postal-code input: default accessible label. */
   postalCode: string;
+  /** Currency input: default accessible label. */
+  amount: string;
+  /** Card-number input: default accessible label. */
+  cardNumber: string;
+  /** Card-number input: announced/badge text for a detected brand. */
+  cardBrand: (brand: string) => string;
+  /** IBAN input: default accessible label. */
+  iban: string;
   /** File upload dropzone + states. */
   dropzoneLabel: string;
   uploadFailed: string;
@@ -563,6 +571,10 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   searchCountries: 'Search countries…',
   phoneNumber: 'Phone number',
   postalCode: 'Postal code',
+  amount: 'Amount',
+  cardNumber: 'Card number',
+  cardBrand: (brand) => `Card brand: ${brand}`,
+  iban: 'IBAN',
   dropzoneLabel: 'Drag files here or click to browse',
   uploadFailed: 'Upload failed',
   retryUpload: 'Retry upload',

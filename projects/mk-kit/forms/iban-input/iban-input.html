@@ -1,0 +1,18 @@
+<input
+  type="text"
+  class="mk-iban-input__field"
+  [id]="inputId"
+  autocomplete="off"
+  autocapitalize="characters"
+  spellcheck="false"
+  [value]="grouped()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-label]="labelledBy() ? null : i18n.iban"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (input)="onInput($event)"
+  (blur)="onBlur()"
+/>

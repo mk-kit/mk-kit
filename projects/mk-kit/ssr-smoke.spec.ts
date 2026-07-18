@@ -40,6 +40,9 @@ import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkSelect, type MkSelectOption } from '@mkornas/ui/forms/select';
 import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
 import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
+import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
+import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
+import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -74,6 +77,9 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkSelect,
     MkPhoneInput,
     MkPostalCodeInput,
+    MkCurrencyInput,
+    MkCardNumberInput,
+    MkIbanInput,
     MkTabs,
     MkTab,
     MkAccordion,
@@ -124,6 +130,15 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       </mk-form-field>
       <mk-form-field label="Postal code">
         <mk-postal-code-input country="PL" value="00-950" />
+      </mk-form-field>
+      <mk-form-field label="Price">
+        <mk-currency-input currency="USD" locale="en-US" [value]="1234.5" />
+      </mk-form-field>
+      <mk-form-field label="Card number">
+        <mk-card-number-input value="4111111111111111" />
+      </mk-form-field>
+      <mk-form-field label="IBAN">
+        <mk-iban-input value="DE89370400440532013000" />
       </mk-form-field>
       <mk-checkbox [checked]="true">Accept terms</mk-checkbox>
       <mk-radio-group aria-label="Plan" [value]="'pro'">
@@ -234,6 +249,9 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-select',
       'mk-phone-input',
       'mk-postal-code-input',
+      'mk-currency-input',
+      'mk-card-number-input',
+      'mk-iban-input',
       'mk-checkbox',
       'mk-radio-group',
       'mk-switch',

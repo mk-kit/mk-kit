@@ -42,6 +42,12 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'components/payment',
+    title: 'Money & payment — mk-kit',
+    loadComponent: () =>
+      import('./pages/payment/payment-page').then((m) => m.PaymentPage),
+  },
+  {
     path: 'components/toggles',
     title: 'Toggles & switches — mk-kit',
     loadComponent: () =>
