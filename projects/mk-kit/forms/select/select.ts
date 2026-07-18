@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  type OnDestroy,
   booleanAttribute,
   computed,
   forwardRef,
@@ -68,7 +69,7 @@ export interface MkSelectOption {
     },
   ],
 })
-export class MkSelect implements ControlValueAccessor {
+export class MkSelect implements ControlValueAccessor, OnDestroy {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -255,6 +256,10 @@ export class MkSelect implements ControlValueAccessor {
 
   private focusTrigger(): void {
     this.triggerRef()?.nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.typeaheadTimer) clearTimeout(this.typeaheadTimer);
   }
 
   // --- ControlValueAccessor -------------------------------------------------

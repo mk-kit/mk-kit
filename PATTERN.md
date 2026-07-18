@@ -3,8 +3,8 @@
 You are building components for **@mkornas/ui**, an Angular 22 admin/dashboard
 component library. Every component MUST follow this spec exactly so the whole
 library compiles and looks like one coherent system. The reference
-implementation is `projects/mk-kit/src/lib/components/button/` — read it and
-mirror its structure precisely.
+implementation is `projects/mk-kit/button/` — read it and mirror its structure
+precisely.
 
 ## Hard rules
 
@@ -15,18 +15,22 @@ mirror its structure precisely.
    `model()`, events via `output()`. Use `computed()` for derived state,
    `signal()` for local state. Transforms: `booleanAttribute`, `numberAttribute`.
    NEVER use `@Input()`/`@Output()` decorators or Zone-based patterns.
-3. **File layout per component:** its own folder under
-   `projects/mk-kit/src/lib/components/<name>/` with:
+3. **File layout per component:** its own folder under the component's GROUP
+   entry point, `projects/mk-kit/<group>/<name>/` (e.g. `forms/select/`), with:
    - `<name>.ts` — component, uses `templateUrl` + `styleUrl` (separate files).
    - `<name>.html`
-   - `<name>.css`
-   - larger components may add sub-components in the same folder.
-   Each GROUP gets one barrel `index.ts` re-exporting every public symbol.
+   - `<name>.scss` (starts with `@use '../../src/styles/mixins' as mk;`)
+   - `<name>.spec.ts` — vitest spec (`provideZonelessChangeDetection()` in
+     the TestBed providers).
+   - `index.ts` — `export * from './<name>';`
+   Register the component with ONE line in the group barrel
+   `projects/mk-kit/<group>/index.ts`, and add it to the repo-wide
+   `ssr-smoke.spec.ts` and `a11y-smoke.spec.ts` case lists.
 4. **Styling = tokens only.** CSS uses `:host` selectors (default Emulated
    encapsulation). You may ONLY reference `--mk-*` custom properties for colors,
    spacing, radius, typography, shadows, motion, z-index. NEVER hardcode a hex
    color, px color, or raw color name. Hardcoded geometry px is acceptable only
-   where no token fits. Use the local-var tone pattern from button.css
+   where no token fits. Use the local-var tone pattern from button.scss
    (`--_main`, `--_subtle`, etc.) for tone-aware components. `color-mix(in srgb, ...)`
    is allowed for derived shades. Respect `prefers-reduced-motion`.
 5. **WCAG 2.1 AA.** Correct semantic elements/roles, `aria-*` wiring, visible
@@ -44,11 +48,12 @@ mirror its structure precisely.
    a11y (e.g. `button[mkButton]`); element selectors `mk-*` for structural
    components (e.g. `mk-card`, `mk-alert`). Prefix everything `mk`/`mk-`.
 8. **Imports** only from `@angular/core`, `@angular/common`, `@angular/forms`.
-   Shared helpers come from the core barrel via RELATIVE paths, e.g.
-   `import { MkSize, MkTone } from '../../core/types';`
-   `import { mkUniqueId } from '../../core/a11y/unique-id';`
-   `import { MkOverlayService } from '../../core/overlay/overlay.service';`
-   Do NOT import from `'@mkornas/ui'` or `'mk-kit'` (circular).
+   Shared helpers come from the SECONDARY ENTRY POINTS, e.g.
+   `import { MkSize, mkUniqueId, MK_I18N, MkAnchoredPanel } from '@mkornas/ui/core';`
+   `import { mkApplyMask } from '@mkornas/ui/directives';`
+   Sibling components in the SAME group are imported via relative paths, e.g.
+   `import { MkFormField } from '../form-field/form-field';`
+   Do NOT import from the ROOT `'@mkornas/ui'` or `'mk-kit'` (circular).
 9. **Do NOT run `ng build`** (parallel builds race on the dist folder). Do NOT
    edit `public-api.ts`, `angular.json`, or any file outside your assigned
    component folders and your group barrel. Do NOT edit the Button. Do NOT

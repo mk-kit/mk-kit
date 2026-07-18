@@ -233,7 +233,10 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     this.position();
 
     const view = this.document.defaultView;
-    view?.addEventListener('scroll', this.onScroll, true);
+    view?.addEventListener('scroll', this.onScroll, {
+      capture: true,
+      passive: true,
+    });
     view?.addEventListener('resize', this.onResize);
     view?.addEventListener('blur', this.onWindowBlur);
     this.document.addEventListener('pointerdown', this.onDocPointerdown, true);

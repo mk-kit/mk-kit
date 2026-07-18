@@ -27,6 +27,7 @@ export function mkGetFocusable(root: HTMLElement): HTMLElement[] {
  */
 export class MkFocusTrap {
   private previouslyFocused: HTMLElement | null = null;
+  private active = false;
   private readonly keydownHandler = (e: KeyboardEvent) => this.onKeydown(e);
 
   constructor(private readonly root: HTMLElement) {}
@@ -35,6 +36,7 @@ export class MkFocusTrap {
   activate(initialFocus?: HTMLElement): void {
     this.previouslyFocused = this.root.ownerDocument
       .activeElement as HTMLElement | null;
+    this.active = true;
     this.root.addEventListener('keydown', this.keydownHandler, true);
 
     const target =
@@ -45,11 +47,16 @@ export class MkFocusTrap {
     if (target === this.root && !this.root.hasAttribute('tabindex')) {
       this.root.setAttribute('tabindex', '-1');
     }
-    queueMicrotask(() => target.focus());
+    // Skip if the trap was released within the same tick, so the deferred
+    // focus can't steal focus back after release() restored it.
+    queueMicrotask(() => {
+      if (this.active) target.focus();
+    });
   }
 
   /** Deactivate and restore focus to the trigger element. */
   release(): void {
+    this.active = false;
     this.root.removeEventListener('keydown', this.keydownHandler, true);
     this.previouslyFocused?.focus?.();
     this.previouslyFocused = null;

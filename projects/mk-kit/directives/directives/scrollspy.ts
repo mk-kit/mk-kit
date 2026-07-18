@@ -1,7 +1,6 @@
 import {
   DOCUMENT,
   Directive,
-  Injector,
   PLATFORM_ID,
   afterNextRender,
   inject,
@@ -36,7 +35,6 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class MkScrollspy {
   private readonly document = inject(DOCUMENT);
-  private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   /** CSS selector for the section elements to track (queried within `root`). */

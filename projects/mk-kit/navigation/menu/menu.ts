@@ -3,6 +3,7 @@ import {
   Component,
   DOCUMENT,
   Injector,
+  type OnDestroy,
   PLATFORM_ID,
   afterNextRender,
   contentChildren,
@@ -42,7 +43,7 @@ import { MkMenuItem } from './menu-item';
     class: 'mk-menu',
   },
 })
-export class MkMenu {
+export class MkMenu implements OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
@@ -211,5 +212,9 @@ export class MkMenu {
         return;
       }
     }
+  }
+
+  ngOnDestroy(): void {
+    if (this.typeaheadTimer) clearTimeout(this.typeaheadTimer);
   }
 }

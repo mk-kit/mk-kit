@@ -1,7 +1,6 @@
 import {
   Directive,
   ElementRef,
-  Injector,
   PLATFORM_ID,
   afterNextRender,
   booleanAttribute,
@@ -33,7 +32,6 @@ import { isPlatformBrowser } from '@angular/common';
 })
 export class MkInfiniteScroll {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
-  private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   /** Distance (px) from the bottom at which the output fires. */
@@ -55,7 +53,7 @@ export class MkInfiniteScroll {
       });
       // Fire immediately if the initial content doesn't fill the container.
       this.check();
-    }, { injector: this.injector });
+    });
   }
 
   private readonly onScroll = (): void => this.check();

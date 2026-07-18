@@ -1,5 +1,6 @@
 import {
   DOCUMENT,
+  DestroyRef,
   Injectable,
   PLATFORM_ID,
   computed,
@@ -32,6 +33,7 @@ export type MkDensity = 'comfortable' | 'compact';
 @Injectable({ providedIn: 'root' })
 export class MkThemeService {
   private readonly document = inject(DOCUMENT);
+  private readonly destroyRef = inject(DestroyRef);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _preference = signal<MkThemePreference>(this.readInitial());
@@ -155,7 +157,12 @@ export class MkThemeService {
     const mql = this.document.defaultView?.matchMedia(
       '(prefers-color-scheme: dark)',
     );
-    mql?.addEventListener('change', (e) => this._systemPrefersDark.set(e.matches));
+    if (!mql) return;
+    const onChange = (e: MediaQueryListEvent) =>
+      this._systemPrefersDark.set(e.matches);
+    mql.addEventListener('change', onChange);
+    // Detach when the injector dies (repeated bootstraps in SSR/HMR/tests).
+    this.destroyRef.onDestroy(() => mql.removeEventListener('change', onChange));
   }
 
   private isBrowserEnv(): boolean {
