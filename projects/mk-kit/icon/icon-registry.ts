@@ -21,6 +21,7 @@ import { MK_DEFAULT_ICONS } from './default-icons';
 export class MkIconRegistry {
   private readonly sanitizer = inject(DomSanitizer);
   private readonly icons = new Map<string, SafeHtml>();
+  private readonly aliases = new Map<string, string>();
 
   constructor() {
     this.registerIcons(MK_DEFAULT_ICONS);
@@ -38,14 +39,27 @@ export class MkIconRegistry {
     return this;
   }
 
-  /** Sanitized SVG for a name, or `null` when it is not registered. */
-  get(name: string): SafeHtml | null {
-    return this.icons.get(name) ?? null;
+  /**
+   * Register alternative names that resolve to existing icons — e.g. map
+   * Material Symbols ligature names onto the built-in set
+   * (`{ delete: 'trash', expand_more: 'chevron-down' }`). A real icon
+   * registered under an alias name always wins over the alias.
+   */
+  registerAliases(aliases: Readonly<Record<string, string>>): this {
+    for (const [alias, target] of Object.entries(aliases)) {
+      this.aliases.set(alias, target);
+    }
+    return this;
   }
 
-  /** Whether an icon with this name is registered. */
+  /** Sanitized SVG for a name (aliases resolved), or `null` when unknown. */
+  get(name: string): SafeHtml | null {
+    return this.icons.get(name) ?? this.icons.get(this.aliases.get(name) ?? '') ?? null;
+  }
+
+  /** Whether an icon with this name (or alias) is registered. */
   has(name: string): boolean {
-    return this.icons.has(name);
+    return this.icons.has(name) || this.icons.has(this.aliases.get(name) ?? '');
   }
 
   /** All registered icon names (useful for a picker / catalogue). */

@@ -37,6 +37,21 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
   `imageFailed`, `zoom`, `zoomIn`, `zoomOut`, `mediaLibrary`.
 - Docs: new **Media** nav section with "Images & lightbox" and
   "Media manager" pages; profile card documented on Cards & lists.
+- **Icon set 25 → 112 glyphs** — ~70 new Feather-style icons (commerce,
+  media, users, files, charts, security, nature/food and more), plus
+  `arrow-up`/`arrow-down` and alias support in `MkIconRegistry`
+  (`registerAliases`; a real icon registered under an alias name wins).
+- **Material Symbols aliases** — `provideMkMaterialIcons()` installs ~185
+  Material ligature names (`delete`, `expand_more`, `visibility_off`,
+  `qr_code_scanner`, …) onto the built-in set, so templates migrating from
+  `<mat-icon>` keep their icon names. Coverage driven by a real Material
+  app's full icon inventory.
+- **Angular Material migration guide** — `MIGRATION.md` + a condensed
+  `/migration` docs page: complete component map (~30 Material modules +
+  CDK → mk-kit equivalents), `--mat-sys-*` → `--mk-*` token mapping,
+  before/after snippets for dialogs/tables/icons, honest gap list and an
+  incremental migration order. Future compat helpers (MkTableDataSource,
+  dialog token aliases, projected options, codemod) are listed as roadmap.
 
 - **Signature pad** (`mk-signature-pad`) — canvas signature capture with
   pointer/touch/pen: smoothed strokes, hi-DPI-crisp, lossless redraw on

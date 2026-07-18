@@ -48,6 +48,7 @@ export class App {
         { label: 'Theming', path: '/theming' },
         { label: 'Theme builder', path: '/theme-builder' },
         { label: 'Core & services', path: '/core-services' },
+        { label: 'Material migration', path: '/migration' },
       ],
     },
     {

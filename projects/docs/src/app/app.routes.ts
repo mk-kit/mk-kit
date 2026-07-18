@@ -54,6 +54,12 @@ export const routes: Routes = [
       import('./pages/signature/signature-page').then((m) => m.SignaturePage),
   },
   {
+    path: 'migration',
+    title: 'Material migration — mk-kit',
+    loadComponent: () =>
+      import('./pages/migration/migration-page').then((m) => m.MigrationPage),
+  },
+  {
     path: 'components/images',
     title: 'Images & lightbox — mk-kit',
     loadComponent: () =>

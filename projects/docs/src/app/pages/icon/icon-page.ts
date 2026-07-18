@@ -98,6 +98,22 @@ import { DocsExample } from '../../shared/docs-example';
       </p>
 
       <!-- ============================================================ -->
+      <h2>Material name aliases</h2>
+      <p>
+        Migrating from <code class="docs-inline">&lt;mat-icon&gt;</code>
+        ligatures? <code class="docs-inline">provideMkMaterialIcons()</code>
+        installs ~185 Material Symbols aliases onto the built-in set
+        (<code class="docs-inline">delete → trash</code>,
+        <code class="docs-inline">expand_more → chevron-down</code>,
+        <code class="docs-inline">visibility → eye</code>,
+        <code class="docs-inline">qr_code_scanner → qr-code</code>, …), so
+        existing icon names keep working:
+        <code class="docs-inline">&lt;mk-icon name="delete" /&gt;</code>.
+        A real icon registered under an alias name always wins over the
+        alias. See the <a href="/migration">Material migration guide</a>.
+      </p>
+
+      <!-- ============================================================ -->
       <h2>API</h2>
 
       <h3><code class="docs-inline">&lt;mk-icon&gt;</code></h3>
