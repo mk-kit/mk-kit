@@ -17,6 +17,8 @@ export * from './code-editor';
 export * from './rating';
 export * from './number-input';
 export * from './otp';
+export * from './phone-input';
+export * from './postal-code-input';
 export * from './button-toggle';
 export * from './checkbox';
 export * from './radio';

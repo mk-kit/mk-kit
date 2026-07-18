@@ -24,6 +24,8 @@ import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
 import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkSelect } from '@mkornas/ui/forms/select';
+import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
+import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -112,6 +114,26 @@ class RadioGroupHost {}
   template: `<mk-switch [checked]="true">Email notifications</mk-switch>`,
 })
 class SwitchHost {}
+
+@Component({
+  imports: [MkFormField, MkPhoneInput],
+  template: `
+    <mk-form-field label="Phone">
+      <mk-phone-input country="PL" />
+    </mk-form-field>
+  `,
+})
+class PhoneInputHost {}
+
+@Component({
+  imports: [MkFormField, MkPostalCodeInput],
+  template: `
+    <mk-form-field label="Postal code">
+      <mk-postal-code-input country="PL" />
+    </mk-form-field>
+  `,
+})
+class PostalCodeInputHost {}
 
 @Component({
   imports: [MkFormField, MkSelect],
@@ -256,6 +278,8 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'radio group', host: RadioGroupHost },
   { name: 'switch', host: SwitchHost },
   { name: 'select (closed)', host: SelectHost },
+  { name: 'phone input (closed)', host: PhoneInputHost },
+  { name: 'postal code input', host: PostalCodeInputHost },
   { name: 'tabs', host: TabsHost },
   { name: 'accordion', host: AccordionHost },
   { name: 'pagination', host: PaginationHost },

@@ -1,4 +1,11 @@
-import { Directive, ElementRef, inject, input, output } from '@angular/core';
+import {
+  Directive,
+  ElementRef,
+  computed,
+  inject,
+  input,
+  output,
+} from '@angular/core';
 
 /** Result of applying a mask: the formatted string and its raw token chars. */
 export interface MkMaskResult {
@@ -48,6 +55,29 @@ export function mkApplyMask(value: string, pattern: string): MkMaskResult {
 }
 
 /**
+ * Compute where the caret belongs after re-masking: after the same number of
+ * value (alphanumeric) characters the caret used to sit behind, absorbing any
+ * literal(s) that immediately follow — so typing "1" in "(0)" lands the caret
+ * after the "(". Shared by {@link MkMask} and the masked form controls.
+ */
+export function mkMaskCaret(
+  oldValue: string,
+  oldCaret: number,
+  masked: string,
+): number {
+  const before = oldValue.slice(0, oldCaret);
+  const target = (before.match(/[0-9A-Za-z]/g) ?? []).length;
+  let pos = 0;
+  let seen = 0;
+  while (pos < masked.length && seen < target) {
+    if (ALNUM.test(masked[pos])) seen++;
+    pos++;
+  }
+  while (pos < masked.length && !ALNUM.test(masked[pos])) pos++;
+  return pos;
+}
+
+/**
  * Mask — formats an `<input>` as the user types against a token pattern
  * (phone, card, date, custom). Apply it to any text input; read the raw value
  * via `(unmaskedChange)` (or the exported `unmasked` getter) and the formatted
@@ -63,7 +93,7 @@ export function mkApplyMask(value: string, pattern: string): MkMaskResult {
   exportAs: 'mkMask',
   host: {
     '(input)': 'onInput()',
-    inputmode: 'text',
+    '[attr.inputmode]': 'inputMode()',
   },
 })
 export class MkMask {
@@ -71,6 +101,15 @@ export class MkMask {
 
   /** The mask pattern (token string). */
   readonly pattern = input.required<string>({ alias: 'mkMask' });
+  /** Override the derived `inputmode` (`numeric` for digit-only masks). */
+  readonly maskInputmode = input<string | null>(null, {
+    alias: 'mkMaskInputmode',
+  });
+
+  /** Mobile keyboard hint: numeric for digit-only patterns unless overridden. */
+  protected readonly inputMode = computed(
+    () => this.maskInputmode() ?? (/[A*]/.test(this.pattern()) ? 'text' : 'numeric'),
+  );
 
   /** The formatted value, on every change. */
   readonly maskedChange = output<string>();
@@ -112,17 +151,7 @@ export class MkMask {
     oldCaret: number,
     masked: string,
   ): void {
-    const before = oldValue.slice(0, oldCaret);
-    const target = (before.match(/[0-9A-Za-z]/g) ?? []).length;
-    let pos = 0;
-    let seen = 0;
-    while (pos < masked.length && seen < target) {
-      if (ALNUM.test(masked[pos])) seen++;
-      pos++;
-    }
-    // Absorb any literal(s) immediately following, so typing "1" in "(0)"
-    // lands the caret after the "(".
-    while (pos < masked.length && !ALNUM.test(masked[pos])) pos++;
+    const pos = mkMaskCaret(oldValue, oldCaret, masked);
     try {
       el.setSelectionRange(pos, pos);
     } catch {

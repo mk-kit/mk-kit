@@ -1,0 +1,103 @@
+<button
+  #trigger
+  type="button"
+  class="mk-phone-input__country"
+  aria-haspopup="listbox"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="open() ? listId : null"
+  [attr.aria-label]="i18n.chooseCountry"
+  [disabled]="isDisabled()"
+  (click)="toggle()"
+  (keydown)="onTriggerKeydown($event)"
+>
+  <span class="mk-phone-input__flag" aria-hidden="true">{{
+    selectedFlag()
+  }}</span>
+  <span class="mk-phone-input__dial">+{{ selectedCountry().dialCode }}</span>
+  <span class="mk-visually-hidden">{{ selectedName() }}</span>
+  <span class="mk-phone-input__arrow" aria-hidden="true"></span>
+</button>
+
+<input
+  #national
+  type="tel"
+  class="mk-phone-input__field"
+  [id]="inputId"
+  autocomplete="tel-national"
+  [mkMask]="selectedCountry().mask"
+  mkMaskInputmode="tel"
+  [value]="nationalMasked()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-label]="labelledBy() ? null : i18n.phoneNumber"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-required]="isRequired() || null"
+  (unmaskedChange)="onNationalChange($event)"
+  (paste)="onNationalPaste($event)"
+  (blur)="onBlur()"
+/>
+
+@if (open()) {
+  <div
+    class="mk-phone-input__panel"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="trigger"
+    (dismiss)="close()"
+  >
+    <input
+      #search
+      type="text"
+      class="mk-phone-input__search"
+      [id]="searchId"
+      role="combobox"
+      autocomplete="off"
+      aria-haspopup="listbox"
+      aria-autocomplete="list"
+      [attr.aria-expanded]="true"
+      [attr.aria-controls]="listId"
+      [attr.aria-activedescendant]="
+        activeIndex() >= 0 ? optionId(activeIndex()) : null
+      "
+      [placeholder]="i18n.searchCountries"
+      [value]="query()"
+      (input)="onSearch($event)"
+      (keydown)="onSearchKeydown($event)"
+    />
+    <ul
+      class="mk-phone-input__list"
+      [id]="listId"
+      role="listbox"
+      [attr.aria-label]="i18n.chooseCountry"
+    >
+      @for (opt of filtered(); track opt.country.code; let i = $index) {
+        <li
+          class="mk-phone-input__option"
+          [id]="optionId(i)"
+          role="option"
+          [attr.aria-selected]="opt.country.code === selectedCountry().code"
+          [class.mk-phone-input__option--active]="i === activeIndex()"
+          [class.mk-phone-input__option--selected]="
+            opt.country.code === selectedCountry().code
+          "
+          (mousedown)="$event.preventDefault()"
+          (mousemove)="activeIndex.set(i)"
+          (click)="selectCountry(i)"
+        >
+          <span class="mk-phone-input__flag" aria-hidden="true">{{
+            opt.flag
+          }}</span>
+          <span class="mk-phone-input__option-name">{{ opt.name }}</span>
+          <span class="mk-phone-input__option-dial"
+            >+{{ opt.country.dialCode }}</span
+          >
+        </li>
+      } @empty {
+        <li class="mk-phone-input__empty" role="presentation">
+          {{ i18n.noResults }}
+        </li>
+      }
+    </ul>
+  </div>
+}

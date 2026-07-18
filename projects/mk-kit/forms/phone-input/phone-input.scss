@@ -1,0 +1,202 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: inline-flex;
+  align-items: stretch;
+  width: 100%;
+  height: var(--mk-control-height-md);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  font-family: var(--mk-font-sans);
+  overflow: hidden;
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-phone-input--sm) {
+  height: var(--mk-control-height-sm);
+  border-radius: var(--mk-radius-sm);
+}
+:host(.mk-phone-input--lg) {
+  height: var(--mk-control-height-lg);
+}
+:host(:hover:not(.mk-phone-input--disabled)) {
+  border-color: var(--mk-border-strong);
+}
+:host(:focus-within) {
+  @include mk.focus-ring;
+  border-color: var(--mk-primary);
+}
+:host(.mk-phone-input--invalid) {
+  border-color: var(--mk-danger);
+}
+:host(.mk-phone-input--invalid:focus-within) {
+  outline-color: var(--mk-danger);
+}
+:host(.mk-phone-input--disabled) {
+  background-color: var(--mk-surface-2);
+  opacity: 0.7;
+}
+
+.mk-phone-input__country {
+  flex: none;
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  padding: 0 var(--mk-space-2);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  background-color: var(--mk-surface-2);
+  border: none;
+  border-inline-end: var(--mk-border-width) solid var(--mk-border-subtle);
+  cursor: pointer;
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-phone-input__country:not(:disabled):hover {
+  background-color: var(--mk-hover-overlay);
+}
+.mk-phone-input__country:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+.mk-phone-input__country:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-offset)));
+}
+
+.mk-phone-input__flag {
+  font-size: 1.1em;
+  line-height: 1;
+}
+.mk-phone-input__dial {
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-text-muted);
+}
+
+.mk-phone-input__arrow {
+  width: 0.4rem;
+  height: 0.4rem;
+  margin-inline-start: var(--mk-space-1);
+  border-right: 2px solid var(--mk-text-muted);
+  border-bottom: 2px solid var(--mk-text-muted);
+  transform: rotate(45deg) translateY(-2px);
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host(.mk-phone-input--open) .mk-phone-input__arrow {
+  transform: rotate(-135deg) translateY(-2px);
+}
+
+.mk-phone-input__field {
+  flex: 1 1 auto;
+  min-width: 0;
+  padding: 0 var(--mk-space-3);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  background: transparent;
+  border: none;
+  outline: none;
+}
+.mk-phone-input__field::placeholder {
+  color: var(--mk-text-subtle);
+}
+.mk-phone-input__field:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+:host(.mk-phone-input--sm) .mk-phone-input__country,
+:host(.mk-phone-input--sm) .mk-phone-input__field {
+  font-size: var(--mk-font-size-sm);
+}
+:host(.mk-phone-input--lg) .mk-phone-input__country,
+:host(.mk-phone-input--lg) .mk-phone-input__field {
+  font-size: var(--mk-font-size-lg);
+}
+
+/* Popup panel (positioning is owned by mkAnchoredPanel) */
+.mk-phone-input__panel {
+  display: flex;
+  flex-direction: column;
+  min-width: 18rem;
+  max-height: 20rem;
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+  overflow: hidden;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-phone-input__search {
+  flex: none;
+  margin: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  font-family: inherit;
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text);
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-sm);
+  outline: none;
+}
+.mk-phone-input__search:focus-visible {
+  border-color: var(--mk-primary);
+}
+.mk-phone-input__search::placeholder {
+  color: var(--mk-text-subtle);
+}
+
+.mk-phone-input__list {
+  flex: 1 1 auto;
+  margin: 0;
+  padding: 0 var(--mk-space-1) var(--mk-space-1);
+  list-style: none;
+  overflow-y: auto;
+}
+
+.mk-phone-input__option {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+.mk-phone-input__option-name {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.mk-phone-input__option-dial {
+  flex: none;
+  color: var(--mk-text-muted);
+  font-variant-numeric: tabular-nums;
+}
+.mk-phone-input__option--active {
+  background-color: var(--mk-selected-bg);
+}
+.mk-phone-input__option--selected {
+  color: var(--mk-selected-text);
+  font-weight: var(--mk-font-weight-medium);
+}
+
+.mk-phone-input__empty {
+  padding: var(--mk-space-2) var(--mk-space-3);
+  color: var(--mk-text-subtle);
+  font-size: var(--mk-font-size-sm);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :host,
+  .mk-phone-input__country,
+  .mk-phone-input__arrow {
+    transition: none;
+  }
+}

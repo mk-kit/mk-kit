@@ -342,6 +342,14 @@ export interface MkI18nStrings {
   chooseColor: string;
   hexValue: string;
   presetColors: string;
+  /** Phone input: country-prefix trigger label. */
+  chooseCountry: string;
+  /** Phone input: search field placeholder inside the country list. */
+  searchCountries: string;
+  /** Phone input: default accessible label of the national-number field. */
+  phoneNumber: string;
+  /** Postal-code input: default accessible label. */
+  postalCode: string;
   /** File upload dropzone + states. */
   dropzoneLabel: string;
   uploadFailed: string;
@@ -551,6 +559,10 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chooseColor: 'Choose color',
   hexValue: 'Hex value',
   presetColors: 'Preset colors',
+  chooseCountry: 'Choose country',
+  searchCountries: 'Search countries…',
+  phoneNumber: 'Phone number',
+  postalCode: 'Postal code',
   dropzoneLabel: 'Drag files here or click to browse',
   uploadFailed: 'Upload failed',
   retryUpload: 'Retry upload',

@@ -38,6 +38,8 @@ import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
 import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkSelect, type MkSelectOption } from '@mkornas/ui/forms/select';
+import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
+import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
@@ -70,6 +72,8 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkRadio,
     MkSwitch,
     MkSelect,
+    MkPhoneInput,
+    MkPostalCodeInput,
     MkTabs,
     MkTab,
     MkAccordion,
@@ -114,6 +118,12 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       </mk-form-field>
       <mk-form-field label="Role">
         <mk-select placeholder="Pick a role" [options]="roleOptions" />
+      </mk-form-field>
+      <mk-form-field label="Phone">
+        <mk-phone-input country="PL" value="+48601234567" />
+      </mk-form-field>
+      <mk-form-field label="Postal code">
+        <mk-postal-code-input country="PL" value="00-950" />
       </mk-form-field>
       <mk-checkbox [checked]="true">Accept terms</mk-checkbox>
       <mk-radio-group aria-label="Plan" [value]="'pro'">
@@ -222,6 +232,8 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-card',
       'mk-form-field',
       'mk-select',
+      'mk-phone-input',
+      'mk-postal-code-input',
       'mk-checkbox',
       'mk-radio-group',
       'mk-switch',
