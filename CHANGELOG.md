@@ -4,7 +4,7 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.6.0] — 2026-07-18
 
 ### Added
 
