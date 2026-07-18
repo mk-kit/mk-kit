@@ -4,7 +4,7 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.5.0] — 2026-07-18
 
 ### Added
 
@@ -69,6 +69,10 @@ Packages releases published on `v*` tags. Dates are ISO-8601.
 - `PATTERN.md` updated to the real per-group entry-point layout,
   `@mkornas/ui/*` import convention and `.scss` styling (it still described
   the pre-audit `src/lib/components/` tree).
+
+## [0.4.0] — 2026-07-10
+
+### Added
 
 - **Grouped table rows** — `mk-table` gained `groupBy` (column key or accessor):
   rows render under collapsible group headers with a row count, sticky below
