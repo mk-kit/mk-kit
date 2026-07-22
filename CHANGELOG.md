@@ -81,6 +81,13 @@ form-field that words its own errors.
   `isRequired()` (the `required` input is unchanged and still means "forced
   required"); nested controls read the derived signal.
 
+### Fixed
+
+- Docs app spec asserted on an `mk-nav-list` element the shell stopped
+  rendering when the docs IA overhaul replaced the sidebar with a flat text
+  nav, failing `npm run test:docs` (and CI) since then. It now checks the
+  actual landmark, its grouped links and the version badge.
+
 ### Migration notes
 
 - Forms that were valid can now become invalid, because constraint inputs
