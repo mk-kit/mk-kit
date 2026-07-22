@@ -10,8 +10,16 @@ import {
   numberAttribute,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MK_I18N } from '@mkornas/ui/core';
 
@@ -45,6 +53,8 @@ import { MK_I18N } from '@mkornas/ui/core';
     '[attr.aria-valuetext]': 'valueText()',
     '[attr.aria-readonly]': 'readonly() || null',
     '[attr.aria-disabled]': 'isDisabled() || null',
+    '[class.mk-rating--invalid]': 'isInvalid()',
+    '[attr.aria-invalid]': 'isInvalid() || null',
     '(keydown)': 'onKeydown($event)',
     '(mouseleave)': 'hover.set(-1)',
     '(blur)': 'onBlur()',
@@ -55,9 +65,14 @@ import { MK_I18N } from '@mkornas/ui/core';
       useExisting: forwardRef(() => MkRating),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkRating),
+      multi: true,
+    },
   ],
 })
-export class MkRating implements ControlValueAccessor {
+export class MkRating implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
 
@@ -69,6 +84,8 @@ export class MkRating implements ControlValueAccessor {
   readonly readonly = input(false, { transform: booleanAttribute });
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Size scale. */
   readonly size = input<MkSize>('md');
   /** Accessible label. */
@@ -82,6 +99,7 @@ export class MkRating implements ControlValueAccessor {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
+  protected readonly isInvalid = computed(() => this.invalid());
 
   /** The stars to render (1-based indices). */
   protected readonly stars = computed(() =>
@@ -154,5 +172,27 @@ export class MkRating implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.max();
+  });
+
+  /**
+   * Reports `max` for a rating above `[max]`. Zero means "unrated" and is
+   * left to `Validators.required` to reject.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'number' || !Number.isFinite(v) || v === 0) return null;
+    if (v < 0) return { min: { min: 0, actual: v } };
+    const max = this.max();
+    if (v > max) return { max: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

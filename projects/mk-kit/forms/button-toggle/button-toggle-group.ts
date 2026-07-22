@@ -1,14 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  ElementRef,
   booleanAttribute,
   computed,
   contentChildren,
   forwardRef,
+  inject,
   input,
   model,
   signal,
-  inject,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
@@ -52,6 +53,9 @@ import { MkButtonToggle } from './button-toggle';
     '[class.mk-button-toggle-group--md]': "size() === 'md'",
     '[class.mk-button-toggle-group--lg]': "size() === 'lg'",
     '[class.mk-button-toggle-group--disabled]': 'isDisabled()',
+    '[class.mk-button-toggle-group--invalid]': 'isInvalid()',
+    '[attr.aria-invalid]': 'isInvalid() || null',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     {
@@ -62,6 +66,7 @@ import { MkButtonToggle } from './button-toggle';
   ],
 })
 export class MkButtonToggleGroup implements ControlValueAccessor {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   /** Optional surrounding form field — supplies label/hint/error wiring. */
   private readonly field = inject(MkFormField, { optional: true });
 
@@ -87,6 +92,8 @@ export class MkButtonToggleGroup implements ControlValueAccessor {
   readonly tone = input<MkTone>('primary');
   /** Disable the whole group. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Accessible name for the group (recommended). */
   readonly ariaLabel = input<string>('', { alias: 'aria-label' });
 
@@ -102,6 +109,9 @@ export class MkButtonToggleGroup implements ControlValueAccessor {
   private onTouched: () => void = () => {};
 
   readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
 
   /** The single item that currently owns the tab stop (roving tabindex). */
   private readonly rovingTarget = computed<MkButtonToggle | null>(() => {
@@ -194,6 +204,16 @@ export class MkButtonToggleGroup implements ControlValueAccessor {
   private commit(value: unknown): void {
     this.value.set(value);
     this.onChange(value);
+    this.onTouched();
+  }
+
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
     this.onTouched();
   }
 

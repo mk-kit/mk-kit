@@ -170,12 +170,69 @@ export interface MkBlockEditorStrings {
 }
 
 /**
+ * Messages rendered by `mk-form-field` for the validation errors the library's
+ * own controls produce, plus the standard Angular `Validators` keys, so a
+ * field wrapping any control shows something sensible without per-form wiring.
+ *
+ * Keys match the `ValidationErrors` keys exactly and each entry receives that
+ * key's error payload. Override any subset through
+ * `provideMkI18n({ validation: … })`, or a whole map per field via
+ * `mk-form-field`'s `errorMessages` input.
+ */
+export interface MkValidationStrings {
+  /** `Validators.required` — also emitted by checkbox and radio-group. */
+  required: string;
+  /** `Validators.email`. */
+  email: string;
+  /** `Validators.min`, and the numeric controls' `[min]`. */
+  min: (err: { min: number; actual: number }) => string;
+  /** `Validators.max`, and the numeric controls' `[max]`. */
+  max: (err: { max: number; actual: number }) => string;
+  /** `Validators.minLength` — also emitted by password-input and OTP. */
+  minlength: (err: { requiredLength: number; actualLength: number }) => string;
+  /** `Validators.maxLength`. */
+  maxlength: (err: { requiredLength: number; actualLength: number }) => string;
+  /** `Validators.pattern`. */
+  pattern: string;
+  /** A date/month/week picker's `[min]`. */
+  mkMinDate: (err: { min: Date; actual: Date }) => string;
+  /** A date/month/week picker's `[max]`. */
+  mkMaxDate: (err: { max: Date; actual: Date }) => string;
+  /** A date rejected by a calendar's `[disabledDate]` predicate. */
+  mkDateFilter: string;
+  /** A range picker with only one end filled in. */
+  mkDateRangeIncomplete: string;
+  /** The time-picker's `[min]`. */
+  mkMinTime: (err: { min: string; actual: string }) => string;
+  /** The time-picker's `[max]`. */
+  mkMaxTime: (err: { max: string; actual: string }) => string;
+  /** More items than a multi-select's, tag-input's or upload's `[max*]` allows. */
+  mkMaxItems: (err: { max: number; actual: number }) => string;
+  /** A file larger than a file-upload's `[maxSize]`. */
+  mkFileSize: (err: { max: number; maxLabel: string; name: string }) => string;
+  /** A file not matching a file-upload's `[accept]` filter. */
+  mkFileType: (err: { accept: string; name: string }) => string;
+  /** A card number failing the Luhn checksum. */
+  cardNumber: string;
+  /** An IBAN failing the mod-97 checksum. */
+  iban: (err: { country: string; expectedLength: number | null }) => string;
+  /** A postal code not matching the country's format. */
+  postalCode: (err: { country: string; example: string }) => string;
+  /** Fallback for an error key with no message of its own. */
+  unknown: string;
+}
+
+/**
  * All user-facing strings the library renders itself (aria-labels, empty-state
  * text, control captions and screen-reader announcements). Consumers localise
  * the library by overriding any subset via {@link provideMkI18n}. Interpolated
  * strings are functions so translators control word order.
  */
 export interface MkI18nStrings {
+  // --- Validation -----------------------------------------------------------
+  /** Validation messages (deep-merged by provideMkI18n). */
+  validation: MkValidationStrings;
+
   // --- Generic controls -----------------------------------------------------
   /** Generic "Close" control (dialog, drawer, bottom-sheet). */
   close: string;
@@ -466,6 +523,36 @@ export interface MkI18nStrings {
   blockEditor: MkBlockEditorStrings;
 }
 
+/** The built-in English validation messages. */
+export const MK_DEFAULT_VALIDATION: MkValidationStrings = {
+  required: 'This field is required',
+  email: 'Enter a valid email address',
+  min: ({ min }) => `Must be ${min} or more`,
+  max: ({ max }) => `Must be ${max} or less`,
+  minlength: ({ requiredLength }) =>
+    `Must be at least ${requiredLength} characters`,
+  maxlength: ({ requiredLength }) =>
+    `Must be at most ${requiredLength} characters`,
+  pattern: 'Enter a value in the expected format',
+  mkMinDate: ({ min }) => `Must be on or after ${min.toLocaleDateString()}`,
+  mkMaxDate: ({ max }) => `Must be on or before ${max.toLocaleDateString()}`,
+  mkDateFilter: 'This date is not available',
+  mkDateRangeIncomplete: 'Select both a start and an end date',
+  mkMinTime: ({ min }) => `Must be at or after ${min}`,
+  mkMaxTime: ({ max }) => `Must be at or before ${max}`,
+  mkMaxItems: ({ max }) =>
+    `Select at most ${max} ${max === 1 ? 'item' : 'items'}`,
+  mkFileSize: ({ name, maxLabel }) => `${name} is larger than ${maxLabel}`,
+  mkFileType: ({ name }) => `${name} is not an accepted file type`,
+  cardNumber: 'Enter a valid card number',
+  iban: ({ expectedLength }) =>
+    expectedLength
+      ? `Enter a valid IBAN (${expectedLength} characters)`
+      : 'Enter a valid IBAN',
+  postalCode: ({ example }) => `Enter a valid postal code, e.g. ${example}`,
+  unknown: 'This value is not valid',
+};
+
 /** The built-in English date names. */
 export const MK_DEFAULT_DATE_NAMES: MkDateNames = {
   months: [
@@ -487,6 +574,8 @@ const PASSWORD_STRENGTH_LABELS = ['Weak', 'Weak', 'Fair', 'Good', 'Strong'];
 
 /** The built-in English strings. */
 export const MK_DEFAULT_I18N: MkI18nStrings = {
+  validation: MK_DEFAULT_VALIDATION,
+
   close: 'Close',
   dismiss: 'Dismiss',
   clear: 'Clear',
@@ -805,8 +894,8 @@ export const MK_I18N = new InjectionToken<MkI18nStrings>('MK_I18N', {
 
 /**
  * Provide localised strings (merged over the English defaults) — pass any
- * subset. The nested `dateNames` and `blockEditor` groups are merged deeply,
- * so partial overrides of those work too.
+ * subset. The nested `dateNames`, `blockEditor` and `validation` groups are
+ * merged deeply, so partial overrides of those work too.
  *
  * ```ts
  * bootstrapApplication(App, {
@@ -815,9 +904,12 @@ export const MK_I18N = new InjectionToken<MkI18nStrings>('MK_I18N', {
  * ```
  */
 export function provideMkI18n(
-  overrides: Partial<Omit<MkI18nStrings, 'dateNames' | 'blockEditor'>> & {
+  overrides: Partial<
+    Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'>
+  > & {
     dateNames?: Partial<MkDateNames>;
     blockEditor?: Partial<MkBlockEditorStrings>;
+    validation?: Partial<MkValidationStrings>;
   },
 ): Provider {
   const value: MkI18nStrings = {
@@ -825,6 +917,7 @@ export function provideMkI18n(
     ...overrides,
     dateNames: { ...MK_DEFAULT_DATE_NAMES, ...overrides.dateNames },
     blockEditor: { ...MK_DEFAULT_I18N.blockEditor, ...overrides.blockEditor },
+    validation: { ...MK_DEFAULT_VALIDATION, ...overrides.validation },
   };
   return { provide: MK_I18N, useValue: value };
 }

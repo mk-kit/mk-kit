@@ -13,8 +13,8 @@ import {
   numberAttribute,
   output,
   signal,
-  viewChild,
   type OnDestroy,
+  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
@@ -57,6 +57,7 @@ type Stroke = { x: number; y: number }[];
     class: 'mk-signature-pad',
     '[class.mk-signature-pad--invalid]': 'isInvalid()',
     '[class.mk-signature-pad--disabled]': 'isDisabled()',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     {
@@ -67,6 +68,7 @@ type Stroke = { x: number; y: number }[];
   ],
 })
 export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   /** Localised strings (override globally via `provideMkI18n`). */
@@ -262,6 +264,16 @@ export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
       this.empty.set(false);
     };
     img.src = src;
+  }
+
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
+    this.onTouched();
   }
 
   // --- ControlValueAccessor -------------------------------------------------

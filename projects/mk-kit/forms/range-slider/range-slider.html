@@ -19,6 +19,7 @@
     [attr.aria-valuemax]="high()"
     [attr.aria-valuenow]="low()"
     [attr.aria-disabled]="isDisabled() || null"
+    [attr.aria-invalid]="isInvalid() || null"
     (keydown)="onKeydown(0, $event)"
   ></div>
 
@@ -33,6 +34,7 @@
     [attr.aria-valuemax]="max()"
     [attr.aria-valuenow]="high()"
     [attr.aria-disabled]="isDisabled() || null"
+    [attr.aria-invalid]="isInvalid() || null"
     (keydown)="onKeydown(1, $event)"
   ></div>
 </div>

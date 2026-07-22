@@ -73,6 +73,8 @@ export class MkInlineEdit implements ControlValueAccessor {
   readonly ariaLabel = input(this.i18n.edit);
   /** Disable editing. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
   readonly size = input<MkSize>('md');
 
@@ -95,7 +97,9 @@ export class MkInlineEdit implements ControlValueAccessor {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isInvalid = computed(() => this.field?.hasError() ?? false);
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,

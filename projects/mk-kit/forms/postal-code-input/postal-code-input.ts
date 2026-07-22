@@ -12,11 +12,14 @@ import {
 import {
   AbstractControl,
   ControlValueAccessor,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ValidationErrors,
   ValidatorFn,
+  type Validator,
 } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
 import { mkApplyMask, mkMaskCaret } from '@mkornas/ui/directives';
 import { MkFormField } from '../form-field/form-field';
@@ -89,9 +92,14 @@ export function mkPostalCodeValidator(
       useExisting: forwardRef(() => MkPostalCodeInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkPostalCodeInput),
+      multi: true,
+    },
   ],
 })
-export class MkPostalCodeInput implements ControlValueAccessor {
+export class MkPostalCodeInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -125,7 +133,7 @@ export class MkPostalCodeInput implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isRequired = computed(
-    () => this.field?.required() ?? false,
+    () => this.field?.isRequired() ?? false,
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
@@ -226,5 +234,28 @@ export class MkPostalCodeInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.country();
+    this.formats();
+  });
+
+  /**
+   * Reports `postalCode` for a code not matching `[country]`'s format — the
+   * same error `mkPostalCodeValidator()` produces. Empty values and countries
+   * without a built-in format pass.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const raw = control.value;
+    const v = typeof raw === 'string' ? raw.trim() : '';
+    const format = this.format();
+    if (!v || !format || format.pattern.test(v)) return null;
+    return { postalCode: { country: format.code, example: format.example } };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

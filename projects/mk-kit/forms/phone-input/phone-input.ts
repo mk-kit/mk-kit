@@ -151,7 +151,7 @@ export class MkPhoneInput implements ControlValueAccessor {
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(
-    () => this.field?.required() ?? false,
+    () => this.field?.isRequired() ?? false,
   );
   protected readonly labelledBy = computed(
     () => this.field?.labelId ?? null,

@@ -1,7 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  type Signal,
+  ElementRef,
   booleanAttribute,
   computed,
   forwardRef,
@@ -9,10 +9,19 @@ import {
   input,
   model,
   signal,
+  type Signal,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import type { MkRadio } from './radio';
 
@@ -47,6 +56,7 @@ import type { MkRadio } from './radio';
     '[attr.aria-required]': 'isRequired() || null',
     '[attr.aria-disabled]': 'isDisabled() || null',
     '(keydown)': 'onKeydown($event)',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     {
@@ -54,15 +64,23 @@ import type { MkRadio } from './radio';
       useExisting: forwardRef(() => MkRadioGroup),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkRadioGroup),
+      multi: true,
+    },
   ],
 })
-export class MkRadioGroup implements ControlValueAccessor {
+export class MkRadioGroup implements ControlValueAccessor, Validator {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
 
   /** Two-way selected value. */
   readonly value = model<unknown>(null);
   /** Disable the whole group. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Mark required (adds `aria-required`). */
   readonly required = input(false, { transform: booleanAttribute });
   /** Size applied to all child radios. */
@@ -81,9 +99,11 @@ export class MkRadioGroup implements ControlValueAccessor {
 
   readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   protected readonly isRequired = computed(
-    () => this.required() || (this.field?.required() ?? false),
+    () => this.required() || (this.field?.isRequired() ?? false),
   );
-  protected readonly isInvalid = computed(() => this.field?.hasError() ?? false);
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -149,6 +169,16 @@ export class MkRadioGroup implements ControlValueAccessor {
     radio.focus();
   }
 
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
+    this.onTouched();
+  }
+
   // --- ControlValueAccessor -------------------------------------------------
   writeValue(value: unknown): void {
     this.value.set(value);
@@ -161,5 +191,23 @@ export class MkRadioGroup implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.required();
+  });
+
+  /**
+   * Reports `required` when `[required]` is set and no radio is selected.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!this.required()) return null;
+    const v = control.value;
+    return v === null || v === undefined || v === '' ? { required: true } : null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

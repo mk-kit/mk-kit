@@ -132,7 +132,7 @@ export class MkAutocomplete implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,

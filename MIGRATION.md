@@ -60,7 +60,7 @@ cases the token you were fighting for is a first-class `--mk-*` token
 | `MatButton` (`mat-button`, `mat-raised-…`) | `MkButton` — `button[mkButton]` | `variant="solid\|soft\|outline\|ghost\|link"`, `tone`, `size`, `iconOnly`, `loading` |
 | `MatIcon` (`<mat-icon>name</mat-icon>`) | `MkIcon` — `<mk-icon name="…" />` | see §4 — `provideMkMaterialIcons()` keeps your ligature names |
 | `MatDialog` | `MkDialogService` | see §5 — near drop-in (`open(Component, { data })`, `MK_OVERLAY_DATA`, `MkOverlayRef`) |
-| `MatFormField` + `MatInput` | `MkFormField` + `input[mkInput]` | `<mk-form-field label hint error required>` — label/hint/error are inputs, not child elements; no `appearance` (one look) |
+| `MatFormField` + `MatInput` + `MatError` | `MkFormField` + `input[mkInput]` | see §8 — label/hint are inputs, not child elements; the error is derived from the bound control like `mat-error`; no `appearance` (one look) |
 | `MatSelect` | `MkSelect` | options via `[options]="[{label, value}]"` input instead of `<mat-option>` children |
 | `MatProgressSpinner` | `MkSpinner` | |
 | `MatTooltip` | `MkTooltip` — `[mkTooltip]="text"` | same attribute style |
@@ -176,11 +176,61 @@ check before porting custom code.
 (bottom, single, with action) or `MkToastService.success/error/info(message)`
 (stacked corner toasts). Both return refs with dismissal.
 
-## 8. Honest gaps & differences
+## 8. Errors & validation
+
+There is no `<mat-error>` element and no `ErrorStateMatcher`. `mk-form-field`
+picks up the projected control's `NgControl` and renders the first error
+itself, wording it from the `validation` i18n table — so the common case loses
+the per-field `@if` ladder entirely:
+
+```html
+<!-- Material -->
+<mat-form-field>
+  <mat-label>Email</mat-label>
+  <input matInput formControlName="email" />
+  @if (form.controls.email.hasError('required')) {
+    <mat-error>Email is required</mat-error>
+  }
+  @if (form.controls.email.hasError('email')) {
+    <mat-error>Enter a valid email address</mat-error>
+  }
+</mat-form-field>
+
+<!-- mk-kit -->
+<mk-form-field label="Email">
+  <input mkInput formControlName="email" />
+</mk-form-field>
+```
+
+The required indicator and the disabled styling come from the control too
+(`Validators.required` / `control.disable()`), so those attributes disappear
+as well.
+
+| Material | mk-kit |
+|---|---|
+| `<mat-error>` per error key | automatic; `[errorMessages]` rewords one key for one field |
+| `ErrorStateMatcher` | `errorOn` — `'touched'` (Material's default behaviour), `'dirty'`, `'always'` |
+| global `ErrorStateMatcher` provider | `provideMkI18n({ validation: … })` for wording; `errorOn` per field |
+| hand-written `<mat-error>` strings | `validation` i18n group — localise every field once |
+
+Constraint inputs behave like Material's validator directives: `[min]`/`[max]`
+on a date picker report `mkMinDate`/`mkMaxDate` (Material's
+`matDatepickerMin`/`matDatepickerMax`), numeric controls report the standard
+`min`/`max` keys, `required` on `mk-checkbox` behaves like
+`Validators.requiredTrue`, and `mk-card-number-input` / `mk-iban-input` /
+`mk-postal-code-input` validate their own format.
+
+For a submit-time list, point `mk-form-error-summary` at the `FormGroup`
+(`[form]` + `[labels]`) instead of building the entries by hand.
+
+## 9. Honest gaps & differences
 
 - **No `MatTableDataSource`** — see §6.
 - **Select/autocomplete options are inputs, not projected `<mat-option>`s** —
   templates get shorter but option-level custom templates are limited today.
+- **Validation errors are worded by the library**, not by `<mat-error>`
+  children — see §8. Per-field wording is `[errorMessages]`; an explicit
+  `[error]` still overrides everything.
 - **`mat-form-field` appearance variants** (`outline`/`fill`) don't exist —
   mk has one field look; 234 `appearance="outline"` attributes just get
   deleted.
@@ -193,20 +243,21 @@ check before porting custom code.
 - CDK niches (portal, layout/breakpoint observer, text-field autosize →
   `mkAutosize` exists) — check per usage.
 
-## 9. Suggested migration order (per app)
+## 10. Suggested migration order (per app)
 
 1. Install, import the stylesheet, map brand tokens, wire `MkThemeService`
    (delete the hand-rolled dark-mode token sheet).
 2. `provideMkMaterialIcons()` + swap `mat-icon` → `mk-icon` (mechanical).
 3. Buttons, tooltips, spinners, cards, dividers (mechanical).
-4. Form fields + inputs/selects/toggles per feature.
+4. Form fields + inputs/selects/toggles per feature — delete the
+   `<mat-error>` blocks and the `ErrorStateMatcher`s as you go (§8).
 5. Dialogs + bottom sheets (rename injection tokens, then per-dialog markup).
 6. Tables + paginators/sort.
 7. Datepickers, steppers, chips, autocomplete, snackbars, menus, tabs.
 8. Drop `@angular/material`/`@angular/cdk` and the Symbols font, prune the
    `.mat-*` override CSS.
 
-## 10. Possible future compat helpers (not built yet)
+## 11. Possible future compat helpers (not built yet)
 
 If repeat migrations justify them, the cheapest levers to build in mk-kit:
 

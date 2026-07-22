@@ -14,10 +14,18 @@ import {
   untracked,
   viewChildren,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /**
@@ -50,9 +58,14 @@ import { MkFormField } from '../form-field/form-field';
       useExisting: forwardRef(() => MkOtp),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkOtp),
+      multi: true,
+    },
   ],
 })
-export class MkOtp implements ControlValueAccessor {
+export class MkOtp implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly cells =
@@ -209,5 +222,26 @@ export class MkOtp implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.length();
+  });
+
+  /**
+   * Reports `minlength` for a partially entered code. An empty value passes;
+   * compose with `Validators.required` to reject it.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'string' || !v) return null;
+    const requiredLength = this.length();
+    if (v.length >= requiredLength) return null;
+    return { minlength: { requiredLength, actualLength: v.length } };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

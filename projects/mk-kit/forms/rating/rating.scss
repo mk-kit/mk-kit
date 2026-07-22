@@ -49,3 +49,7 @@
     transition: none;
   }
 }
+/* Invalid (forced via [invalid], or an error on a wrapping mk-form-field) */
+:host(.mk-rating--invalid) .mk-rating__star {
+  color: var(--mk-danger);
+}

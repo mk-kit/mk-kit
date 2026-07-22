@@ -15,9 +15,17 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkChip } from '@mkornas/ui/chip';
@@ -83,9 +91,14 @@ export type MkMultiSelectFilterMode = 'contains' | 'startsWith' | 'none';
       useExisting: forwardRef(() => MkMultiSelect),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkMultiSelect),
+      multi: true,
+    },
   ],
 })
-export class MkMultiSelect implements ControlValueAccessor {
+export class MkMultiSelect implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   /** Localised strings (override globally via `provideMkI18n`). */
@@ -167,7 +180,7 @@ export class MkMultiSelect implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -396,5 +409,24 @@ export class MkMultiSelect implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.max();
+  });
+
+  /**
+   * Reports `mkMaxItems` when more options are selected than `[max]` allows.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const max = this.max();
+    const v = control.value;
+    if (max <= 0 || !Array.isArray(v) || v.length <= max) return null;
+    return { mkMaxItems: { max, actual: v.length } };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

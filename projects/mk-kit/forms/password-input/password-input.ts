@@ -12,9 +12,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
@@ -54,9 +62,14 @@ export interface MkPasswordRule {
       useExisting: forwardRef(() => MkPasswordInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkPasswordInput),
+      multi: true,
+    },
   ],
 })
-export class MkPasswordInput implements ControlValueAccessor {
+export class MkPasswordInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
@@ -99,7 +112,7 @@ export class MkPasswordInput implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
 
   /** The four rules and whether the current value satisfies each. */
@@ -190,5 +203,27 @@ export class MkPasswordInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.minLength();
+  });
+
+  /**
+   * Reports `minlength` for a password shorter than `[minLength]` — the same
+   * requirement the rules list shows. An empty value passes; compose with
+   * `Validators.required` to reject it.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'string' || !v) return null;
+    const requiredLength = this.minLength();
+    if (v.length >= requiredLength) return null;
+    return { minlength: { requiredLength, actualLength: v.length } };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

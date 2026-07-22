@@ -15,9 +15,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkFormField } from '@mkornas/ui/forms';
@@ -70,9 +78,14 @@ function pad2(n: number): string {
       useExisting: forwardRef(() => MkTimePicker),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkTimePicker),
+      multi: true,
+    },
   ],
 })
-export class MkTimePicker implements ControlValueAccessor {
+export class MkTimePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -122,7 +135,7 @@ export class MkTimePicker implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );
@@ -341,5 +354,30 @@ export class MkTimePicker implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `mkMinTime` / `mkMaxTime` against the `[min]` and `[max]` inputs.
+   * Both sides are zero-padded `HH:mm`, so a lexicographic compare is a
+   * chronological one.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'string' || !v) return null;
+    const min = this.min();
+    if (min && v < min) return { mkMinTime: { min, actual: v } };
+    const max = this.max();
+    if (max && v > max) return { mkMaxTime: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

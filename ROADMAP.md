@@ -159,9 +159,11 @@ live-announcer core.
 
 ## Features & infrastructure (not components)
 
-- ✅ **Unit tests** — Vitest specs (`@angular/build:unit-test`), 144 tests across
+- ✅ **Unit tests** — Vitest specs (`@angular/build:unit-test`), 776 tests across
   components (CVA, keyboard, ARIA, signals) + the diff/HTML-parser/overlay-math
-  utilities. (shipped; grow coverage as components land.)
+  utilities, including two library-wide conformance suites
+  (`cva-conformance.spec.ts`, `forms-integration.spec.ts`). (shipped; grow
+  coverage as components land.)
 - ✅ **CI pipeline** — `.github/workflows/ci.yml` (build lib → test lib → test
   docs → build docs → publish dry-run, on push/PR) + `release.yml` (publish to
   GitHub Packages on `v*` tags). (shipped.)
@@ -185,7 +187,15 @@ live-announcer core.
   `data-mk-density` + `MkThemeService.toggleDensity()` (shipped).
 - ✅ **Secondary entry points** — Material-style per-group FESMs; code-split
   apps only carry the groups they use (docs main: 1,082KB → 415KB).
-- ✅ **Full i18n coverage** — every built-in string + localisable date names.
+- ✅ **Full i18n coverage** — every built-in string + localisable date names,
+  plus the `validation` message group behind automatic form-field errors.
+- ✅ **Reactive-forms parity (v0.7.0)** — every control is a value accessor;
+  constraint inputs (`min`/`max`/`minLength`/`required`, date & time bounds,
+  item counts, card/IBAN/postal formats) report validation errors via
+  `NG_VALIDATORS` and re-validate when the constraint changes; `mk-form-field`
+  derives its error/required/disabled state from the projected `NgControl`
+  (no `ErrorStateMatcher`, no `<mat-error>` equivalent needed) and
+  `mk-form-error-summary` can collect a whole `FormGroup`. (shipped.)
 - ✅ **Keyboard-complete data grid** — resize/reorder/edit all keyboard operable.
 - ✅ **Docs IA overhaul** — split pages, on-page TOC, ⌘K search, new nav.
 - ✅ **RTL support** — logical properties across the library (shipped).

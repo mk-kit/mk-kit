@@ -9,9 +9,17 @@ import {
   model,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /**
@@ -51,9 +59,14 @@ import { MkFormField } from '../form-field/form-field';
       useExisting: forwardRef(() => MkCheckbox),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkCheckbox),
+      multi: true,
+    },
   ],
 })
-export class MkCheckbox implements ControlValueAccessor {
+export class MkCheckbox implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
 
   /** Two-way checked state. */
@@ -62,6 +75,8 @@ export class MkCheckbox implements ControlValueAccessor {
   readonly indeterminate = model(false);
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Mark required (adds `aria-required`). */
   readonly required = input(false, { transform: booleanAttribute });
   /** Control size. */
@@ -81,9 +96,11 @@ export class MkCheckbox implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isRequired = computed(
-    () => this.required() || (this.field?.required() ?? false),
+    () => this.required() || (this.field?.isRequired() ?? false),
   );
-  protected readonly isInvalid = computed(() => this.field?.hasError() ?? false);
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );
@@ -107,5 +124,23 @@ export class MkCheckbox implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.required();
+  });
+
+  /**
+   * Reports `required` for an unchecked box when `[required]` is set, so
+   * `required` on the element behaves like `Validators.requiredTrue`.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    if (!this.required()) return null;
+    return control.value === true ? null : { required: true };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

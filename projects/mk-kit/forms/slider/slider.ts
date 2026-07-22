@@ -12,8 +12,16 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /**
@@ -49,9 +57,14 @@ import { MkFormField } from '../form-field/form-field';
       useExisting: forwardRef(() => MkSlider),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkSlider),
+      multi: true,
+    },
   ],
 })
-export class MkSlider implements ControlValueAccessor {
+export class MkSlider implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   private readonly trackRef = viewChild<ElementRef<HTMLElement>>('track');
   private readonly thumbRef = viewChild<ElementRef<HTMLElement>>('thumb');
@@ -64,6 +77,8 @@ export class MkSlider implements ControlValueAccessor {
   readonly step = input(1, { transform: numberAttribute });
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Control size (track/thumb thickness). */
   readonly size = input<MkSize>('md');
   /** Semantic color tone for the filled track + thumb. */
@@ -81,8 +96,10 @@ export class MkSlider implements ControlValueAccessor {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
-  protected readonly isInvalid = computed(() => this.field?.hasError() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
   protected readonly labelledBy = computed(() => {
     if (this.ariaLabel()) return null;
     return this.field?.labelId ?? null;
@@ -199,5 +216,30 @@ export class MkSlider implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `min` / `max` for a value outside the track. The slider clamps
+   * what the user can produce, so this only fires for a value written in
+   * from the model side.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'number' || !Number.isFinite(v)) return null;
+    const min = this.min();
+    if (v < min) return { min: { min, actual: v } };
+    const max = this.max();
+    if (v > max) return { max: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

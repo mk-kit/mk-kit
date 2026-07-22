@@ -67,7 +67,10 @@ export type MkBlockValueFormat = 'document' | 'html';
     role: 'group',
     '[attr.aria-label]': 'ariaLabel()',
     '[class.mk-block-editor--readonly]': 'readonly()',
+    '[class.mk-block-editor--invalid]': 'isInvalid()',
+    '[attr.aria-invalid]': 'isInvalid() || null',
     '[class.mk-block-editor--disabled]': 'disabled() || cvaDisabled()',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     MkBlockEditorContext,
@@ -105,6 +108,8 @@ export class MkBlockEditor implements ControlValueAccessor {
   readonly readonly = input(false, { transform: booleanAttribute });
   /** Disabled (form-level). */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Async upload handler (overrides the {@link MK_BLOCK_UPLOAD_HANDLER} token). */
   readonly uploadHandler = input<MkBlockUploadHandler | null>(null);
   /** Extra embed providers (merged with defaults + token). */
@@ -116,6 +121,9 @@ export class MkBlockEditor implements ControlValueAccessor {
   readonly htmlChange = output<string>();
 
   protected readonly cvaDisabled = signal(false);
+
+  /** Invalid visual, forced by the `invalid` input. */
+  protected readonly isInvalid = computed(() => this.invalid());
 
   private onChange: (value: MkBlockDocument | string) => void = () => {};
   private onTouched: () => void = () => {};
@@ -162,6 +170,16 @@ export class MkBlockEditor implements ControlValueAccessor {
     this.onTouched();
     this.change.emit(next);
     this.htmlChange.emit(html);
+  }
+
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.hostRef.nativeElement.contains(next)) return;
+    this.onTouched();
   }
 
   // --- ControlValueAccessor -------------------------------------------------

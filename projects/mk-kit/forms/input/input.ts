@@ -58,7 +58,7 @@ export class MkInput {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly resolvedId = computed(
     () => this.field?.controlId ?? this.initialId,
   );

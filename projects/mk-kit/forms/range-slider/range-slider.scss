@@ -84,3 +84,7 @@
     transition: none;
   }
 }
+/* Invalid (forced via [invalid], or an error on a wrapping mk-form-field) */
+:host(.mk-range-slider--invalid) {
+  --_main: var(--mk-danger);
+}

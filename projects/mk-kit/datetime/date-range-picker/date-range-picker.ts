@@ -14,14 +14,22 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkFormField } from '@mkornas/ui/forms';
 import { MkCalendar } from '../calendar/calendar';
-import { formatDate, isBefore, startOfDay } from '../datetime/date-utils';
+import { formatDate, isAfter, isBefore, startOfDay } from '../datetime/date-utils';
 
 /** A selected date range. Either endpoint may be `null` while incomplete. */
 export interface MkDateRange {
@@ -62,9 +70,14 @@ export interface MkDateRange {
       useExisting: forwardRef(() => MkDateRangePicker),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkDateRangePicker),
+      multi: true,
+    },
   ],
 })
-export class MkDateRangePicker implements ControlValueAccessor {
+export class MkDateRangePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -118,7 +131,7 @@ export class MkDateRangePicker implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -227,5 +240,42 @@ export class MkDateRangePicker implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+    this.disabledDate();
+  });
+
+  /**
+   * Reports `mkDateRangeIncomplete` for a half-picked range, `mkMinDate` /
+   * `mkMaxDate` for ends outside `[min]`/`[max]`, and `mkDateFilter` for an
+   * end rejected by `[disabledDate]`. A fully empty range passes; compose
+   * with `Validators.required` to reject it.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    const start = v?.start instanceof Date ? v.start : null;
+    const end = v?.end instanceof Date ? v.end : null;
+    if (!start && !end) return null;
+    if (!start || !end) return { mkDateRangeIncomplete: true };
+
+    const min = this.min();
+    if (min && isBefore(startOfDay(start), startOfDay(min))) {
+      return { mkMinDate: { min, actual: start } };
+    }
+    const max = this.max();
+    if (max && isAfter(startOfDay(end), startOfDay(max))) {
+      return { mkMaxDate: { max, actual: end } };
+    }
+    const filter = this.disabledDate();
+    if (filter?.(start) || filter?.(end)) return { mkDateFilter: true };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

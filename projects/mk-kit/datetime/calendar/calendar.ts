@@ -18,10 +18,15 @@ import {
 } from '@angular/core';
 import {
   ControlValueAccessor,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
 } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import {
@@ -77,18 +82,25 @@ interface MkWeekdayHeader {
       useExisting: forwardRef(() => MkCalendar),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkCalendar),
+      multi: true,
+    },
   ],
   host: {
     class: 'mk-calendar',
-    '[class.mk-calendar--disabled]': 'cvaDisabled()',
+    '[class.mk-calendar--disabled]': 'isControlDisabled()',
     '(focusout)': 'onFocusout($event)',
     '[class.mk-calendar--sm]': "size() === 'sm'",
     '[class.mk-calendar--md]': "size() === 'md'",
     '[class.mk-calendar--lg]': "size() === 'lg'",
     '[class.mk-calendar--range]': 'rangeMode()',
+    '[class.mk-calendar--invalid]': 'isInvalid()',
+    '[attr.aria-invalid]': 'isInvalid() || null',
   },
 })
-export class MkCalendar implements ControlValueAccessor {
+export class MkCalendar implements ControlValueAccessor, Validator {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   protected readonly i18n = inject(MK_I18N);
   private readonly injector = inject(Injector);
@@ -102,6 +114,10 @@ export class MkCalendar implements ControlValueAccessor {
   readonly max = input<Date | null>(null);
   /** First column of the week: 0 = Sunday … 6 = Saturday. */
   readonly firstDayOfWeek = input(0, { transform: numberAttribute });
+  /** Disable the whole calendar. */
+  readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Predicate marking individual days as disabled. */
   readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Control size. */
@@ -134,6 +150,12 @@ export class MkCalendar implements ControlValueAccessor {
   protected readonly focusedDate = signal<Date>(this.initialFocus());
   /** Hovered day used to preview a range before the end is picked. */
   protected readonly hoveredDate = signal<Date | null>(null);
+
+  /** Disabled by the `disabled` input or by the bound form control. */
+  protected readonly isControlDisabled = computed(
+    () => this.disabled() || this.cvaDisabled(),
+  );
+  protected readonly isInvalid = computed(() => this.invalid());
 
   /** First day of the visible month. */
   protected readonly viewMonth = computed(() =>
@@ -214,7 +236,7 @@ export class MkCalendar implements ControlValueAccessor {
   }
 
   protected isDisabled(d: Date): boolean {
-    if (this.cvaDisabled()) return true;
+    if (this.isControlDisabled()) return true;
     const day = startOfDay(d);
     const min = this.min();
     const max = this.max();
@@ -369,5 +391,31 @@ export class MkCalendar implements ControlValueAccessor {
       },
       { injector: this.injector },
     );
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+    this.disabledDate();
+  });
+
+  /**
+   * Reports `mkMinDate` / `mkMaxDate` for a date outside `[min]`/`[max]`, and
+   * `mkDateFilter` for one rejected by `[disabledDate]`.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (!(v instanceof Date) || Number.isNaN(v.getTime())) return null;
+    const day = startOfDay(v);
+    const min = this.min();
+    if (min && isBefore(day, startOfDay(min))) return { mkMinDate: { min, actual: v } };
+    const max = this.max();
+    if (max && isAfter(day, startOfDay(max))) return { mkMaxDate: { max, actual: v } };
+    return this.disabledDate()?.(v) ? { mkDateFilter: true } : null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

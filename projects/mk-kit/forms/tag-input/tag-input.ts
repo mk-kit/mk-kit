@@ -13,10 +13,18 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkChip } from '@mkornas/ui/chip';
 
@@ -51,9 +59,14 @@ import { MkChip } from '@mkornas/ui/chip';
       useExisting: forwardRef(() => MkTagInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkTagInput),
+      multi: true,
+    },
   ],
 })
-export class MkTagInput implements ControlValueAccessor {
+export class MkTagInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
@@ -101,7 +114,7 @@ export class MkTagInput implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -192,5 +205,24 @@ export class MkTagInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.max();
+  });
+
+  /**
+   * Reports `mkMaxItems` when more tags are present than `[max]` allows.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const max = this.max();
+    const v = control.value;
+    if (max <= 0 || !Array.isArray(v) || v.length <= max) return null;
+    return { mkMaxItems: { max, actual: v.length } };
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

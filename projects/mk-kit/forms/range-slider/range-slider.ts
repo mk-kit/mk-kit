@@ -12,8 +12,16 @@ import {
   signal,
   viewChildren,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MK_I18N } from '@mkornas/ui/core';
 
@@ -40,9 +48,11 @@ export type MkRange = [number, number];
     '[class.mk-range-slider--sm]': "size() === 'sm'",
     '[class.mk-range-slider--lg]': "size() === 'lg'",
     '[class.mk-range-slider--disabled]': 'isDisabled()',
+    '[class.mk-range-slider--invalid]': 'isInvalid()',
     '[attr.data-tone]': 'tone()',
     '(document:pointermove)': 'onPointerMove($event)',
     '(document:pointerup)': 'onPointerUp()',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     {
@@ -50,9 +60,15 @@ export type MkRange = [number, number];
       useExisting: forwardRef(() => MkRangeSlider),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkRangeSlider),
+      multi: true,
+    },
   ],
 })
-export class MkRangeSlider implements ControlValueAccessor {
+export class MkRangeSlider implements ControlValueAccessor, Validator {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly trackRef = viewChildren<ElementRef<HTMLElement>>('track');
@@ -66,6 +82,8 @@ export class MkRangeSlider implements ControlValueAccessor {
   readonly step = input(1, { transform: numberAttribute });
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Control size. */
   readonly size = input<MkSize>('md');
   /** Semantic tone for the filled range + thumbs. */
@@ -87,6 +105,9 @@ export class MkRangeSlider implements ControlValueAccessor {
 
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
+  );
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
 
@@ -195,6 +216,16 @@ export class MkRangeSlider implements ControlValueAccessor {
     return Math.min(this.max(), Math.max(min, Number(snapped.toFixed(6))));
   }
 
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
+    this.onTouched();
+  }
+
   // --- ControlValueAccessor -------------------------------------------------
   writeValue(value: MkRange | null): void {
     if (Array.isArray(value) && value.length === 2) {
@@ -211,5 +242,33 @@ export class MkRangeSlider implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `min` / `max` for either endpoint falling outside the track. The
+   * slider clamps what the user can produce, so this only fires for a range
+   * written in from the model side.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (!Array.isArray(v) || v.length !== 2) return null;
+    const lo = Number(v[0]);
+    const hi = Number(v[1]);
+    if (!Number.isFinite(lo) || !Number.isFinite(hi)) return null;
+    const min = this.min();
+    if (lo < min) return { min: { min, actual: lo } };
+    const max = this.max();
+    if (hi > max) return { max: { max, actual: hi } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

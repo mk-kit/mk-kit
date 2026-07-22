@@ -15,9 +15,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkFormField } from '@mkornas/ui/forms';
@@ -25,6 +33,8 @@ import { MkCalendar } from '../calendar/calendar';
 import {
   clampDate,
   formatDate,
+  isAfter,
+  isBefore,
   parseISODate,
   startOfDay,
 } from '../datetime/date-utils';
@@ -65,9 +75,14 @@ import {
       useExisting: forwardRef(() => MkDatePicker),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkDatePicker),
+      multi: true,
+    },
   ],
 })
-export class MkDatePicker implements ControlValueAccessor {
+export class MkDatePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -117,7 +132,7 @@ export class MkDatePicker implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );
@@ -248,5 +263,29 @@ export class MkDatePicker implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `mkMinDate` / `mkMaxDate` against the `[min]` and `[max]` inputs.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (!(v instanceof Date) || Number.isNaN(v.getTime())) return null;
+    const day = startOfDay(v);
+    const min = this.min();
+    if (min && isBefore(day, startOfDay(min))) return { mkMinDate: { min, actual: v } };
+    const max = this.max();
+    if (max && isAfter(day, startOfDay(max))) return { mkMaxDate: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

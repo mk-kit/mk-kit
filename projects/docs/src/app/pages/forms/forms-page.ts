@@ -1,5 +1,11 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { FormsModule } from '@angular/forms';
+import {
+  FormControl,
+  FormGroup,
+  FormsModule,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
 import {
   MkButton,
   MkCodeEditor,
@@ -11,6 +17,7 @@ import {
   MkFormErrorSummary,
   type MkFormError,
   MkInput,
+  MkNumberInput,
   MkSelect,
   type MkSelectOption,
 } from '@mkornas/ui';
@@ -25,11 +32,13 @@ import { DocsExample } from '../../shared/docs-example';
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
     FormsModule,
+    ReactiveFormsModule,
     DocsExample,
     MkFormField,
     MkFormErrorSummary,
     MkInput,
     MkSelect,
+    MkNumberInput,
     MkFileUpload,
     MkCodeEditor,
     MkButton,
@@ -83,12 +92,66 @@ import { DocsExample } from '../../shared/docs-example';
         <tbody>
           <tr><td>label</td><td>string</td><td>''</td><td>Visible label, rendered as a real &lt;label for&gt;.</td></tr>
           <tr><td>hint</td><td>string</td><td>''</td><td>Helper text below the control (hidden while an error shows).</td></tr>
-          <tr><td>error</td><td>string | null</td><td>null</td><td>Error message; non-empty marks the field invalid.</td></tr>
-          <tr><td>required</td><td>boolean</td><td>false</td><td>Adds a required indicator + aria-required.</td></tr>
-          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Visually reflect a disabled control.</td></tr>
+          <tr><td>error</td><td>string | null</td><td>null</td><td>Explicit error message; overrides the automatic one.</td></tr>
+          <tr><td>errorMessages</td><td>MkErrorMessages | null</td><td>null</td><td>Per-field wording for automatic errors, keyed by ValidationErrors key.</td></tr>
+          <tr><td>errorOn</td><td>'touched' | 'dirty' | 'always'</td><td>'touched'</td><td>When an automatic error becomes visible.</td></tr>
+          <tr><td>required</td><td>boolean</td><td>false</td><td>Adds a required indicator + aria-required. Derived from the control's validators when it is bound to a form.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Visually reflect a disabled control. Derived from the bound control.</td></tr>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size; nested controls inherit it.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- REACTIVE FORMS -->
+      <!-- ============================================================ -->
+      <h2>Reactive forms</h2>
+      <p>
+        Every mk-kit control implements
+        <code class="docs-inline">ControlValueAccessor</code>, so
+        <code class="docs-inline">formControlName</code>,
+        <code class="docs-inline">[formControl]</code> and
+        <code class="docs-inline">[(ngModel)]</code> all work, and
+        <code class="docs-inline">disable()</code> /
+        <code class="docs-inline">enable()</code> drive the disabled state.
+      </p>
+      <p>
+        Controls with constraint inputs also implement
+        <code class="docs-inline">Validator</code>: <code class="docs-inline">[min]</code>,
+        <code class="docs-inline">[max]</code>, <code class="docs-inline">[minLength]</code>,
+        <code class="docs-inline">required</code> and the format checks
+        (card number, IBAN, postal code) report errors on the bound control,
+        and re-validate when the constraint changes. And a
+        <code class="docs-inline">mk-form-field</code> wrapping a bound control
+        shows the first error itself — once the control is touched or dirty, or
+        the form is submitted — with no
+        <code class="docs-inline">[error]</code> binding at all. Blur the fields
+        below, or submit, to see it.
+      </p>
+
+      <docs-example [code]="reactiveCode" [column]="true">
+        <form class="es-form" [formGroup]="profile" (ngSubmit)="profile.markAllAsTouched()">
+          <mk-form-error-summary
+            [form]="profile"
+            [labels]="profileLabels"
+          />
+          <mk-form-field label="Email">
+            <input mkInput type="email" formControlName="email" />
+          </mk-form-field>
+          <mk-form-field label="Age" [errorMessages]="ageMessages">
+            <mk-number-input formControlName="age" [min]="18" [max]="120" />
+          </mk-form-field>
+          <button mkButton type="submit">Submit</button>
+        </form>
+        <p class="echo">Status: {{ profile.status }}</p>
+      </docs-example>
+
+      <p>
+        Messages come from the <code class="docs-inline">validation</code> group
+        of the i18n table, so a single
+        <code class="docs-inline">provideMkI18n({{ '{' }} validation: … {{ '}' }})</code>
+        localises every field; <code class="docs-inline">errorMessages</code>
+        overrides a key for one field only.
+      </p>
 
       <!-- ============================================================ -->
       <!-- FORM ERROR SUMMARY -->
@@ -359,6 +422,14 @@ export class FormsPage {
     error: null,
   });
 
+  // --- Reactive forms demo ---------------------------------------------------
+  protected readonly profileLabels = { email: 'Email address', age: 'Age' };
+  protected readonly ageMessages = { min: 'You must be 18 or over' };
+  protected readonly profile = new FormGroup({
+    email: new FormControl('', [Validators.required, Validators.email]),
+    age: new FormControl<number | null>(null, Validators.required),
+  });
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
   protected readonly formFieldCode = `<mk-form-field
   label="Email"
@@ -384,6 +455,28 @@ onSubmit() {
   if (this.errors().length) this.summary.focus();  // move focus to the list
 }
 // errors(): { fieldId: field.controlId, message: '…' }[]`;
+
+  protected readonly reactiveCode = `profile = new FormGroup({
+  email: new FormControl('', [Validators.required, Validators.email]),
+  age: new FormControl<number | null>(null, Validators.required),
+});
+
+<form [formGroup]="profile" (ngSubmit)="submit()">
+  <mk-form-error-summary [form]="profile"
+    [labels]="profileLabels" />
+
+  <!-- no [error] binding: the field reads the control itself -->
+  <mk-form-field label="Email">
+    <input mkInput type="email" formControlName="email" />
+  </mk-form-field>
+
+  <!-- [min] reports a \`min\` error; errorMessages rewords it here only -->
+  <mk-form-field label="Age" [errorMessages]="ageMessages">
+    <mk-number-input formControlName="age" [min]="18" [max]="120" />
+  </mk-form-field>
+
+  <button mkButton type="submit">Submit</button>
+</form>`;
 
   protected readonly selectCode = `roleOptions: MkSelectOption[] = [
   { label: 'Admin', value: 'admin' },

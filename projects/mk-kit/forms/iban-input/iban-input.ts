@@ -12,9 +12,11 @@ import {
 import {
   AbstractControl,
   ControlValueAccessor,
+  NG_VALIDATORS,
   NG_VALUE_ACCESSOR,
   ValidationErrors,
   ValidatorFn,
+  type Validator,
 } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
@@ -120,9 +122,14 @@ export function mkIbanValidator(): ValidatorFn {
       useExisting: forwardRef(() => MkIbanInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkIbanInput),
+      multi: true,
+    },
   ],
 })
-export class MkIbanInput implements ControlValueAccessor {
+export class MkIbanInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -152,7 +159,7 @@ export class MkIbanInput implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isRequired = computed(
-    () => this.field?.required() ?? false,
+    () => this.field?.isRequired() ?? false,
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
@@ -231,5 +238,19 @@ export class MkIbanInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  /**
+   * Reports `iban` for a number failing the mod-97 checksum — the same error
+   * `mkIbanValidator()` produces, so the two are interchangeable. An empty
+   * value passes; compose with `Validators.required` to reject it.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const raw = control.value;
+    const compact = typeof raw === 'string' ? raw.replace(/\s+/g, '').toUpperCase() : '';
+    if (!compact || mkIbanIsValid(compact)) return null;
+    const country = compact.slice(0, 2);
+    return { iban: { country, expectedLength: MK_IBAN_LENGTHS[country] ?? null } };
   }
 }

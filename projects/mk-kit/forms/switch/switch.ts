@@ -55,6 +55,8 @@ export class MkSwitch implements ControlValueAccessor {
   readonly checked = model(false);
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
+  /** Force the invalid visual + `aria-invalid` when used standalone. */
+  readonly invalid = input(false, { transform: booleanAttribute });
   /** Control size. */
   readonly size = input<MkSize>('md');
   /** Semantic color tone for the "on" track. */
@@ -71,8 +73,10 @@ export class MkSwitch implements ControlValueAccessor {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isInvalid = computed(() => this.field?.hasError() ?? false);
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );

@@ -36,3 +36,10 @@
 :host(.mk-button-toggle-group--disabled) {
   opacity: 0.7;
 }
+/* Invalid (forced via [invalid], or an error on a wrapping mk-form-field) */
+:host(.mk-button-toggle-group--invalid) {
+  --_main: var(--mk-danger);
+  --_subtle: var(--mk-danger-subtle);
+  --_subtle-text: var(--mk-danger-subtle-text);
+  --_contrast: var(--mk-danger-contrast);
+}

@@ -72,6 +72,7 @@ type MkTransferSide = 'available' | 'selected';
     '[class.mk-transfer-list--lg]': "effectiveSize() === 'lg'",
     '[class.mk-transfer-list--invalid]': 'isInvalid()',
     '[class.mk-transfer-list--disabled]': 'isDisabled()',
+    '(focusout)': 'onFocusOut($event)',
   },
   providers: [
     {
@@ -82,6 +83,7 @@ type MkTransferSide = 'available' | 'selected';
   ],
 })
 export class MkTransferList implements ControlValueAccessor {
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly announcer = inject(MkLiveAnnouncer);
@@ -412,6 +414,16 @@ export class MkTransferList implements ControlValueAccessor {
     this.onChange(next);
     this.onTouched();
     this.change.emit(next);
+  }
+
+  /**
+   * Marks the control touched once focus leaves it entirely, so a form that
+   * gates its errors on `touched` behaves the same here as on a native input.
+   */
+  protected onFocusOut(event: FocusEvent): void {
+    const next = event.relatedTarget as Node | null;
+    if (next && this.host.nativeElement.contains(next)) return;
+    this.onTouched();
   }
 
   // --- ControlValueAccessor -------------------------------------------------

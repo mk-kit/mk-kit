@@ -10,7 +10,14 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
 import { MkMask, mkApplyMask } from '@mkornas/ui/directives';
@@ -110,9 +117,14 @@ const DEFAULT_MASK = '0000 0000 0000 0000';
       useExisting: forwardRef(() => MkCardNumberInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkCardNumberInput),
+      multi: true,
+    },
   ],
 })
-export class MkCardNumberInput implements ControlValueAccessor {
+export class MkCardNumberInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -147,7 +159,7 @@ export class MkCardNumberInput implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isRequired = computed(
-    () => this.field?.required() ?? false,
+    () => this.field?.isRequired() ?? false,
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
@@ -226,5 +238,18 @@ export class MkCardNumberInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  /**
+   * Reports `cardNumber` for a number failing the Luhn checksum (which
+   * includes a half-typed one). An empty value passes; compose with
+   * `Validators.required` to reject it.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const raw = control.value;
+    const digits = typeof raw === 'string' ? raw.replace(/\D/g, '') : '';
+    if (!digits) return null;
+    return mkLuhnCheck(digits) ? null : { cardNumber: true };
   }
 }

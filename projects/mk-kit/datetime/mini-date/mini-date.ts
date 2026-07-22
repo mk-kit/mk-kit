@@ -12,12 +12,20 @@ import {
   signal,
   viewChildren,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkFormField } from '@mkornas/ui/forms';
-import { clampDate, isSameDay, startOfDay } from '../datetime/date-utils';
+import { clampDate, isAfter, isBefore, isSameDay, startOfDay } from '../datetime/date-utils';
 
 /** Which segment a part represents. */
 type MkDateSegment = 'day' | 'month' | 'year';
@@ -85,9 +93,14 @@ function daysInMonth(m: number, year: number): number {
       useExisting: forwardRef(() => MkMiniDate),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkMiniDate),
+      multi: true,
+    },
   ],
 })
-export class MkMiniDate implements ControlValueAccessor {
+export class MkMiniDate implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly segEls =
@@ -135,7 +148,7 @@ export class MkMiniDate implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -391,5 +404,29 @@ export class MkMiniDate implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `mkMinDate` / `mkMaxDate` against the `[min]` and `[max]` inputs.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (!(v instanceof Date) || Number.isNaN(v.getTime())) return null;
+    const day = startOfDay(v);
+    const min = this.min();
+    if (min && isBefore(day, startOfDay(min))) return { mkMinDate: { min, actual: v } };
+    const max = this.max();
+    if (max && isAfter(day, startOfDay(max))) return { mkMaxDate: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

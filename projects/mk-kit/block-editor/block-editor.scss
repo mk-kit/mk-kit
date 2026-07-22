@@ -18,3 +18,7 @@
 :host(.mk-block-editor--readonly) {
   border-style: dashed;
 }
+/* Invalid (forced via [invalid]) */
+:host(.mk-block-editor--invalid) {
+  border-color: var(--mk-danger);
+}

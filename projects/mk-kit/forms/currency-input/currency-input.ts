@@ -11,8 +11,16 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
 import { mkMaskCaret } from '@mkornas/ui/directives';
 import { MkFormField } from '../form-field/form-field';
@@ -70,9 +78,14 @@ interface LocaleInfo {
       useExisting: forwardRef(() => MkCurrencyInput),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkCurrencyInput),
+      multi: true,
+    },
   ],
 })
-export class MkCurrencyInput implements ControlValueAccessor {
+export class MkCurrencyInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -120,7 +133,7 @@ export class MkCurrencyInput implements ControlValueAccessor {
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(
-    () => this.field?.required() ?? false,
+    () => this.field?.isRequired() ?? false,
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
@@ -300,5 +313,29 @@ export class MkCurrencyInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `min` / `max` against the `[min]` and `[max]` inputs, using the
+   * same error shapes as `Validators.min` / `Validators.max`.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    if (typeof v !== 'number' || Number.isNaN(v)) return null;
+    const min = this.min();
+    if (min != null && v < min) return { min: { min, actual: v } };
+    const max = this.max();
+    if (max != null && v > max) return { max: { max, actual: v } };
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
   }
 }

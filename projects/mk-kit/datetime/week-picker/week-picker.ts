@@ -14,9 +14,17 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
+import {
+  ControlValueAccessor,
+  NG_VALIDATORS,
+  NG_VALUE_ACCESSOR,
+  type AbstractControl,
+  type ValidationErrors,
+  type Validator,
+} from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
+import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkFormField } from '@mkornas/ui/forms';
@@ -25,6 +33,9 @@ import {
   endOfWeek,
   formatDate,
   getISOWeek,
+  isAfter,
+  isBefore,
+  startOfDay,
   startOfWeek,
 } from '../datetime/date-utils';
 
@@ -66,9 +77,14 @@ export interface MkWeek {
       useExisting: forwardRef(() => MkWeekPicker),
       multi: true,
     },
+    {
+      provide: NG_VALIDATORS,
+      useExisting: forwardRef(() => MkWeekPicker),
+      multi: true,
+    },
   ],
 })
-export class MkWeekPicker implements ControlValueAccessor {
+export class MkWeekPicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -119,7 +135,7 @@ export class MkWeekPicker implements ControlValueAccessor {
   protected readonly isInvalid = computed(
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.required() ?? false);
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
@@ -230,4 +246,34 @@ export class MkWeekPicker implements ControlValueAccessor {
   /** Expose the raw highlight endpoints to the template. */
   protected highlightStart = computed(() => this.highlightWeek()?.start ?? null);
   protected highlightEnd = computed(() => this.highlightWeek()?.end ?? null);
+
+  // --- Validator ------------------------------------------------------------
+  private readonly validatorChange = mkValidatorChange(() => {
+    this.min();
+    this.max();
+  });
+
+  /**
+   * Reports `mkMinDate` / `mkMaxDate` when the selected week starts before
+   * `[min]` or ends after `[max]`.
+   */
+  validate(control: AbstractControl): ValidationErrors | null {
+    const v = control.value;
+    const start = v?.start;
+    const end = v?.end;
+    if (!(start instanceof Date) || !(end instanceof Date)) return null;
+    const min = this.min();
+    if (min && isBefore(startOfDay(start), startOfDay(min))) {
+      return { mkMinDate: { min, actual: start } };
+    }
+    const max = this.max();
+    if (max && isAfter(startOfDay(end), startOfDay(max))) {
+      return { mkMaxDate: { max, actual: end } };
+    }
+    return null;
+  }
+
+  registerOnValidatorChange(fn: () => void): void {
+    this.validatorChange.register(fn);
+  }
 }

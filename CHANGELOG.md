@@ -4,6 +4,95 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.7.0] — 2026-07-22
+
+Reactive-forms parity pass: every control now behaves like an Angular Material
+control end to end — value accessor, validator, touched-on-blur, and a
+form-field that words its own errors.
+
+### Added
+
+- **`Validator` on every control with constraint inputs** (22 of them). The
+  bound control now reports the constraint as a validation error instead of the
+  input only clamping the UI, and re-validates when the constraint changes
+  (`registerOnValidatorChange`, wired by the new `mkValidatorChange()` helper in
+  `@mkornas/ui/core`):
+  - Standard Angular keys where they map — `min` / `max` (`mk-number-input`,
+    `mk-currency-input`, `mk-slider`, `mk-range-slider`, `mk-rating`),
+    `minlength` (`mk-password-input` `[minLength]`, `mk-otp` `[length]`),
+    `required` (`mk-checkbox`, `mk-radio-group` — `required` on a checkbox
+    behaves like `Validators.requiredTrue`).
+  - `mk*` keys where there is no standard one — `mkMinDate` / `mkMaxDate`
+    (all seven date/month/week pickers + `mk-calendar`), `mkDateFilter`
+    (`[disabledDate]`), `mkDateRangeIncomplete` (half-picked range),
+    `mkMinTime` / `mkMaxTime` (`mk-time-picker`), `mkMaxItems`
+    (`mk-multi-select`, `mk-tag-input`, `mk-file-upload` `[maxFiles]`),
+    `mkFileSize` / `mkFileType`.
+  - Format checks now validate themselves with the same error shapes their
+    standalone validators produce, so the two are interchangeable:
+    `cardNumber` (Luhn), `iban` (mod-97, matching `mkIbanValidator()`),
+    `postalCode` (matching `mkPostalCodeValidator()`).
+- **`mk-form-field` derives its own state from the projected control.** It
+  adopts the control's `NgControl` and renders the first validation error
+  itself — no `[error]` binding — replacing the per-field `@if` ladder that
+  `<mat-error>` requires. New inputs: `errorMessages` (reword one key for this
+  field) and `errorOn` (`'touched'` | `'dirty'` | `'always'`; `'touched'`
+  matches Material and stands in for `ErrorStateMatcher`). `required` and the
+  disabled styling are derived from the control's validators / disabled state,
+  and `hasError()` is joined by `errorText()`.
+- **`mk-form-error-summary` collects a whole form.** Point `[form]` at a
+  `FormGroup` and it walks it, one entry per invalid control, with `[labels]`
+  naming the fields and `showOn` (`'submit'` | `'always'`) gating visibility.
+  An explicit `[errors]` list still wins, so server-side errors compose.
+- **`validation` i18n group** — messages for every key above plus the standard
+  `Validators` keys, deep-merged by `provideMkI18n({ validation: … })` like
+  `dateNames` and `blockEditor`. `mkFirstErrorMessage()` and the
+  `MkErrorMessages` type are exported from `@mkornas/ui/core`.
+- **`mk-file-upload` is a form control** — `ControlValueAccessor` + `Validator`.
+  The form value is `File[]`, or the tracked `MkUploadFile[]` via the new
+  `[valueFormat]="'item'"` (`MkUploadValueFormat`). Upload-progress ticks do not
+  churn the form value in `file` format. `accept` / `maxSize` / `maxFiles` are
+  enforced as validation errors as well as at pick time, so a list written in
+  from the model side is checked too.
+- `disabled` input on `mk-calendar` (previously only reachable through a form),
+  and the `invalid` input the rest of the library already had on `mk-rating`,
+  `mk-checkbox`, `mk-radio-group`, `mk-switch`, `mk-slider`, `mk-range-slider`,
+  `mk-button-toggle-group`, `mk-block-editor`, `mk-inline-edit` and
+  `mk-calendar` — with the matching `--invalid` styling and `aria-invalid`.
+- **Two conformance suites** (222 tests) — `cva-conformance.spec.ts` binds all
+  34 value accessors to a real `FormControl` and checks the contract
+  (accessor resolution, `writeValue` without echoing back through `onChange`,
+  `setDisabledState` both ways, starting disabled, callback registration);
+  `forms-integration.spec.ts` covers the validators, the automatic form-field
+  errors, touched-on-blur and the error summary.
+- Docs: a **Reactive forms** section with a live demo on the Form fields page,
+  and an **Errors and validation** section on the Material migration page
+  contrasting the `mat-error` ladder with the automatic equivalent.
+
+### Changed
+
+- **Controls mark themselves touched on blur, not only on change.**
+  `mk-radio-group`, `mk-button-toggle-group`, `mk-transfer-list`,
+  `mk-block-editor`, `mk-signature-pad`, `mk-range-slider` and
+  `mk-file-upload` gained a `focusout` handler with a containment check.
+  Previously, focusing one and tabbing away without changing anything left the
+  control `untouched`, so touched-gated error display never fired.
+- `mk-form-field`'s derived required state moved from `required()` to
+  `isRequired()` (the `required` input is unchanged and still means "forced
+  required"); nested controls read the derived signal.
+
+### Migration notes
+
+- Forms that were valid can now become invalid, because constraint inputs
+  report errors instead of only clamping the UI. The two most likely to bite:
+  `mk-password-input` validates against `minLength` (default `8`), and
+  `mk-otp` reports `minlength` for a partially entered code. Remove the input
+  or relax it where the constraint was only meant as a UI hint.
+- A `mk-form-field` wrapping a form-bound control now shows errors on its own.
+  If you were already computing the message and passing `[error]`, nothing
+  changes — an explicit `[error]` still wins. Pass `[error]="''"` to suppress
+  errors entirely.
+
 ## [0.6.0] — 2026-07-18
 
 ### Added
@@ -480,7 +569,8 @@ Initial private release as `@mkornas/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.2.0...HEAD
+[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/mkornas/mk-kit/compare/v0.6.0...v0.7.0
 [0.2.0]: https://github.com/mkornas/mk-kit/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/mkornas/mk-kit/compare/v0.1.8...v0.1.9
 [0.1.8]: https://github.com/mkornas/mk-kit/compare/v0.1.7...v0.1.8

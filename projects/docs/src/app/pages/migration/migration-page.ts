@@ -29,7 +29,7 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>MatButton</td><td>button[mkButton]</td><td>variant / tone / size / iconOnly / loading</td></tr>
           <tr><td>MatIcon (ligatures)</td><td>&lt;mk-icon name&gt;</td><td>provideMkMaterialIcons() keeps your names — see below</td></tr>
           <tr><td>MatDialog</td><td>MkDialogService</td><td>open(Cmp, {{ '{' }} data {{ '}' }}) · MK_OVERLAY_DATA · MkOverlayRef · await ref.afterClosed</td></tr>
-          <tr><td>MatFormField + MatInput</td><td>mk-form-field + input[mkInput]</td><td>label/hint/error are inputs; no appearance variants</td></tr>
+          <tr><td>MatFormField + MatInput + MatError</td><td>mk-form-field + input[mkInput]</td><td>label/hint are inputs; the error is derived from the bound control like mat-error (no ErrorStateMatcher — see below); no appearance variants</td></tr>
           <tr><td>MatSelect / MatAutocomplete</td><td>mk-select / mk-autocomplete</td><td>[options] input instead of &lt;mat-option&gt; children</td></tr>
           <tr><td>MatTable + Sort + Paginator</td><td>mk-table + mkSort + mk-pagination</td><td>plain arrays + signals instead of MatTableDataSource</td></tr>
           <tr><td>MatSnackBar</td><td>MkSnackbarService / MkToastService</td><td>bottom snackbar with action, or stacked toasts</td></tr>
@@ -40,6 +40,37 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>CDK Overlay / DragDrop / Clipboard / A11y / VirtualScroll</td><td>MkOverlayService · MkAnchoredPanel / &#64;mkornas/ui/dnd / mkCopyToClipboard / MkFocusTrap · MkLiveAnnouncer / mk-virtual-scroll</td><td>keyboard drag built in</td></tr>
         </tbody>
       </table>
+
+      <h2>Errors and validation</h2>
+      <p>
+        There is no <code class="docs-inline">&lt;mat-error&gt;</code> element
+        and no <code class="docs-inline">ErrorStateMatcher</code>.
+        <code class="docs-inline">mk-form-field</code> picks up the projected
+        control's <code class="docs-inline">NgControl</code> and renders the
+        first error itself, wording it from the
+        <code class="docs-inline">validation</code> i18n table — so the common
+        case loses the per-field <code class="docs-inline">&#64;if</code> ladder
+        entirely. The <code class="docs-inline">errorOn</code> input replaces a
+        custom matcher (<code class="docs-inline">'touched'</code> is Material's
+        default behaviour), and <code class="docs-inline">errorMessages</code>
+        rewords a single key.
+      </p>
+      <docs-example [code]="errorCode" [column]="true">
+        <p class="echo">One field, no error plumbing — see the code.</p>
+      </docs-example>
+      <p>
+        Constraint inputs behave like Material's validator directives:
+        <code class="docs-inline">[min]</code> / <code class="docs-inline">[max]</code>
+        on a date picker report <code class="docs-inline">mkMinDate</code> /
+        <code class="docs-inline">mkMaxDate</code> (Material's
+        <code class="docs-inline">matDatepickerMin</code> /
+        <code class="docs-inline">matDatepickerMax</code>), numeric controls
+        report the standard <code class="docs-inline">min</code> /
+        <code class="docs-inline">max</code> keys, and
+        <code class="docs-inline">required</code> on
+        <code class="docs-inline">mk-checkbox</code> behaves like
+        <code class="docs-inline">Validators.requiredTrue</code>.
+      </p>
 
       <h2>Icons: keep your Material names</h2>
       <p>
@@ -106,6 +137,23 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class MigrationPage {
+  protected readonly errorCode = `// Material
+<mat-form-field>
+  <mat-label>Email</mat-label>
+  <input matInput formControlName="email" />
+  @if (form.controls.email.hasError('required')) {
+    <mat-error>Email is required</mat-error>
+  }
+  @if (form.controls.email.hasError('email')) {
+    <mat-error>Enter a valid email address</mat-error>
+  }
+</mat-form-field>
+
+// mk-kit — the field reads the control and words the error itself
+<mk-form-field label="Email">
+  <input mkInput formControlName="email" />
+</mk-form-field>`;
+
   protected readonly iconCode = `bootstrapApplication(App, {
   providers: [provideMkMaterialIcons()],
 });
