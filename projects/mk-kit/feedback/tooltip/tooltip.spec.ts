@@ -138,11 +138,17 @@ describe('MkTooltip', () => {
     expect(mine).toBeTruthy();
 
     trigger.dispatchEvent(
-      new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
+      new KeyboardEvent('keydown', {
+        key: 'Escape',
+        code: 'Escape',
+        bubbles: true,
+      }),
     );
     fixture.detectChanges();
 
-    // Assert this panel left the document rather than "no panel exists".
+    // hide() restores aria-describedby synchronously, so this proves the
+    // handler ran even if panel teardown is scheduled differently.
+    expect(trigger.getAttribute('aria-describedby')).toBeNull();
     expect(mine.isConnected).toBe(false);
   });
 
