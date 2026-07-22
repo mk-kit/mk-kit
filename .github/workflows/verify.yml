@@ -42,7 +42,7 @@ jobs:
         working-directory: dist/mk-kit
 
       - name: Upload built package
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: mk-kit-dist
           path: dist/mk-kit
