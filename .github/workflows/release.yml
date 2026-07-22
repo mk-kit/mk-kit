@@ -1,22 +1,114 @@
 name: Release
 
-# Publishes @mkornas/ui privately to GitHub Packages when a version tag
-# (e.g. v0.1.0) is pushed. Auth uses the built-in GITHUB_TOKEN — no secret to
-# configure. Package visibility follows the repository (private repo → private
-# package); consumers need a PAT with `read:packages` to install.
+# Publishes @mkornas/ui privately to GitHub Packages. Auth uses the built-in
+# GITHUB_TOKEN — no secret to configure. Package visibility follows the
+# repository (private repo → private package); consumers need a PAT with
+# `read:packages` to install.
+#
+# Normal flow — fully automatic: land a commit on `main` that changes the
+# version in projects/mk-kit/package.json. This workflow verifies the build,
+# publishes, creates the `v<version>` tag and opens a GitHub Release with that
+# version's CHANGELOG section. No manual tagging.
+#
+# Escape hatches:
+#   - push a `v*` tag yourself (the pre-0.7.0 flow); the tag must match the
+#     version in package.json or the run fails rather than shipping a mismatch.
+#   - run the workflow manually from the Actions tab.
+#
+# Every path is idempotent: a version already tagged or already on the registry
+# is skipped, so re-runs and overlapping triggers cannot double-publish.
+#
+# Note there is deliberately no `paths:` filter: a path filter would also apply
+# to tag pushes (which change no files) and silently disable that trigger. The
+# "is this version already published?" check below is the real gate, and it is
+# accurate even when the bump lands alongside other changes.
 on:
   push:
+    branches: [main]
     tags: ['v*']
+  workflow_dispatch:
 
 permissions:
-  contents: read
-  packages: write
+  contents: write # create the tag + GitHub Release
+  packages: write # publish to GitHub Packages
+
+# Serialize the whole workflow, never cancel. Two runs starting together (a
+# branch push and a tag push for the same version, say) would both pass the
+# "already published?" check and race to publish, and the loser would fail on a
+# 409. Queued instead, the second run resolves after the first has published
+# and cleanly skips.
+concurrency:
+  group: release
+  cancel-in-progress: false
 
 jobs:
+  resolve:
+    name: Resolve version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.resolve.outputs.version }}
+      should_release: ${{ steps.resolve.outputs.should_release }}
+    steps:
+      - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0 # need tags to tell a new version from a re-run
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          node-version: 24.18.0
+          registry-url: https://npm.pkg.github.com
+          scope: '@mkornas'
+
+      - name: Resolve version and decide whether to publish
+        id: resolve
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          PKG_VERSION="$(node -p "require('./projects/mk-kit/package.json').version")"
+          echo "package.json version: $PKG_VERSION"
+
+          # A tag push pins the version; it must agree with package.json,
+          # otherwise we would ship contents that do not match the tag.
+          if [ "${GITHUB_REF_TYPE:-}" = "tag" ]; then
+            TAG_VERSION="${GITHUB_REF_NAME#v}"
+            if [ "$TAG_VERSION" != "$PKG_VERSION" ]; then
+              echo "::error::Tag $GITHUB_REF_NAME does not match projects/mk-kit/package.json ($PKG_VERSION). Bump the package or retag."
+              exit 1
+            fi
+          fi
+
+          echo "version=$PKG_VERSION" >> "$GITHUB_OUTPUT"
+
+          # The CHANGELOG section doubles as the release notes — fail early
+          # (before publishing) if this version was never written up.
+          node scripts/changelog-section.mjs "$PKG_VERSION" > /dev/null
+
+          # Already on the registry? Then this is a re-run; nothing to do.
+          if npm view "@mkornas/ui@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "::notice::@mkornas/ui@$PKG_VERSION is already published — skipping."
+            echo "should_release=false" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          echo "should_release=true" >> "$GITHUB_OUTPUT"
+
+  verify:
+    name: Verify
+    needs: resolve
+    if: needs.resolve.outputs.should_release == 'true'
+    uses: ./.github/workflows/verify.yml
+
   publish:
+    name: Publish ${{ needs.resolve.outputs.version }}
+    needs: [resolve, verify]
+    if: needs.resolve.outputs.should_release == 'true'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v5
+        with:
+          fetch-depth: 0
 
       - name: Set up Node
         uses: actions/setup-node@v5
@@ -32,11 +124,37 @@ jobs:
       - name: Build library
         run: npm run build:lib
 
-      - name: Test library
-        run: npm run test:lib
-
       - name: Publish to GitHub Packages
         run: npm publish
         working-directory: dist/mk-kit
         env:
           NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Tag the release
+        env:
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          if git rev-parse "v$VERSION" >/dev/null 2>&1; then
+            echo "Tag v$VERSION already exists — leaving it alone."
+            exit 0
+          fi
+          git config user.name  "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git tag -a "v$VERSION" -m "Release v$VERSION"
+          git push origin "v$VERSION"
+
+      - name: Create the GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          if gh release view "v$VERSION" >/dev/null 2>&1; then
+            echo "Release v$VERSION already exists — leaving it alone."
+            exit 0
+          fi
+          node scripts/changelog-section.mjs "$VERSION" > release-notes.md
+          gh release create "v$VERSION" \
+            --title "v$VERSION" \
+            --notes-file release-notes.md

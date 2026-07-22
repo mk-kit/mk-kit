@@ -12,36 +12,5 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build-test:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v5
-
-      - name: Set up Node
-        uses: actions/setup-node@v5
-        with:
-          # Angular 22's CLI requires Node >= 24.15.
-          node-version: 24.18.0
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Build library
-        run: npm run build:lib
-
-      - name: Check bundle-size budget
-        run: node scripts/check-size.mjs
-
-      - name: Test library
-        run: npm run test:lib
-
-      - name: Test docs
-        run: npm run test:docs
-
-      - name: Build docs
-        run: npm run build
-
-      - name: Verify package (publish dry-run)
-        run: npm publish --dry-run
-        working-directory: dist/mk-kit
+  verify:
+    uses: ./.github/workflows/verify.yml

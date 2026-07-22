@@ -1,0 +1,49 @@
+name: Verify
+
+# The single build+test definition, called by both CI (on push/PR) and Release
+# (before publishing). Keeping it in one place means a release can never ship
+# something CI would have rejected.
+on:
+  workflow_call:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          # Angular 22's CLI requires Node >= 24.15.
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build library
+        run: npm run build:lib
+
+      - name: Check bundle-size budget
+        run: node scripts/check-size.mjs
+
+      - name: Test library
+        run: npm run test:lib
+
+      - name: Test docs
+        run: npm run test:docs
+
+      - name: Build docs
+        run: npm run build
+
+      - name: Verify package (publish dry-run)
+        run: npm publish --dry-run
+        working-directory: dist/mk-kit
+
+      - name: Upload built package
+        uses: actions/upload-artifact@v4
+        with:
+          name: mk-kit-dist
+          path: dist/mk-kit
+          retention-days: 7

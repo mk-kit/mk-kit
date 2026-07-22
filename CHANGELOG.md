@@ -81,6 +81,21 @@ form-field that words its own errors.
   `isRequired()` (the `required` input is unchanged and still means "forced
   required"); nested controls read the derived signal.
 
+### Infrastructure
+
+- **Releases are automatic.** Pushing a version bump to `main` now publishes
+  `@mkornas/ui`, creates the `v<version>` tag and opens a GitHub Release with
+  that version's changelog section — no manual tagging. Pushing a `v*` tag
+  still works and now fails loudly if the tag and `package.json` disagree
+  instead of shipping a mismatch; every path skips a version that is already
+  published, so re-runs and overlapping triggers cannot double-publish.
+- Build and test steps moved into a reusable `verify.yml` called by both CI and
+  Release, so a release runs exactly what CI runs (build lib → size budget →
+  test lib → test docs → build docs → publish dry-run) and the two cannot
+  drift. The built package is uploaded as a workflow artifact.
+- New `scripts/changelog-section.mjs` extracts a version's changelog section;
+  the release fails before publishing if that section is missing.
+
 ### Fixed
 
 - Docs app spec asserted on an `mk-nav-list` element the shell stopped
