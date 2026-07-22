@@ -162,7 +162,9 @@ export class MkStepper {
     }
     if (next >= 0) {
       event.preventDefault();
-      // Move focus only; selection follows on Enter/Space or click.
+      // Automatic activation (as in `mk-tabs`): selection follows focus for
+      // reachable steps. `nextFocusable` already skips unreachable ones, so the
+      // guard only matters if the step became unreachable in between.
       this.focusHeader(next);
       if (this.isReachable(next)) this.select(next);
     }
