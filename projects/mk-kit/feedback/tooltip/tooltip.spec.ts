@@ -45,12 +45,20 @@ describe('MkTooltip', () => {
     fixture.detectChanges();
   }
 
-  beforeEach(() => vi.useFakeTimers());
+  const clearPanels = () =>
+    document.querySelectorAll('mk-tooltip').forEach((n) => n.remove());
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    // The directive portals its panel into document.body, which is shared with
+    // every other spec in this worker. Start from a clean slate so a stray
+    // panel from elsewhere can never be mistaken for this test's own.
+    clearPanels();
+  });
   afterEach(() => {
     vi.useRealTimers();
     TestBed.resetTestingModule();
-    // The directive portals into body; make sure nothing leaks between tests.
-    document.querySelectorAll('mk-tooltip').forEach((n) => n.remove());
+    clearPanels();
   });
 
   it('shows nothing until the trigger is used', () => {
@@ -102,8 +110,9 @@ describe('MkTooltip', () => {
     expect(describedBy).toBeTruthy();
     expect(panel()!.id).toBe(describedBy);
 
+    const mine = panel()!;
     out(fixture, trigger);
-    expect(panel()).toBeNull();
+    expect(mine.isConnected).toBe(false);
     expect(trigger.getAttribute('aria-describedby')).toBeNull();
   });
 
@@ -125,13 +134,16 @@ describe('MkTooltip', () => {
   it('closes on Escape', () => {
     const { fixture, trigger } = mount();
     focusIn(fixture, trigger);
-    expect(panel()).toBeTruthy();
+    const mine = panel()!;
+    expect(mine).toBeTruthy();
 
     trigger.dispatchEvent(
       new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }),
     );
     fixture.detectChanges();
-    expect(panel()).toBeNull();
+
+    // Assert this panel left the document rather than "no panel exists".
+    expect(mine.isConnected).toBe(false);
   });
 
   it('does not open for empty or whitespace-only text', () => {
