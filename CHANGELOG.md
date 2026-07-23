@@ -4,6 +4,20 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.12.0] — 2026-07-23
+
+### Added
+
+- **`disabledDate` on `MkDatePicker`.** `MkCalendar` already accepted a
+  per-day disable predicate, but the picker never threaded it through, so a
+  consumer needing "closed days aren't selectable" (a restaurant's reservation
+  form) had to keep a Material datepicker alive just for its filter. Same
+  predicate, now on the picker:
+
+  ```html
+  <mk-date-picker [(value)]="date" [disabledDate]="isClosedDay" />
+  ```
+
 ## [0.11.0] — 2026-07-23
 
 ### Added

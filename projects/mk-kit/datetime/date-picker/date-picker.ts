@@ -98,6 +98,8 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
   readonly min = input<Date | null>(null);
   /** Latest selectable date (inclusive). */
   readonly max = input<Date | null>(null);
+  /** Predicate marking individual days as disabled (threaded to the calendar). */
+  readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Placeholder shown when empty. */
   readonly placeholder = input(this.i18n.selectDate);
   /** Pattern used to render the selected date in the field. */
