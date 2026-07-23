@@ -4,6 +4,15 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.14.0] — 2026-07-23
+
+### Added
+
+- **`cropRect()` on `MkImageCropper`** — the visible crop region in natural
+  image pixels (exactly what `crop()` would rasterise), without touching a
+  canvas. For backends that perform the actual crop from the master image:
+  the client sends coordinates, keeps full quality and works in jsdom/SSR.
+
 ## [0.13.0] — 2026-07-23
 
 ### Added

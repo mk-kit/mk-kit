@@ -262,6 +262,19 @@ export class MkImageCropper implements OnDestroy {
    * data-URL (longest edge capped at `options.size ?? 1024`). Returns `null`
    * when the image is not loaded or the canvas is unavailable (SSR, jsdom).
    */
+  /**
+   * The visible crop region in natural image pixels — what `crop()` would
+   * rasterise, without touching a canvas. Use it when the backend performs
+   * the actual crop from the master image (no client-side quality loss).
+   * Returns `null` until the image has loaded and the viewport is measured.
+   */
+  cropRect(): { sx: number; sy: number; sw: number; sh: number } | null {
+    if (this.status() !== 'loaded') return null;
+    const [natW, natH, vpW, vpH] = [this.natW(), this.natH(), this.vpW(), this.vpH()];
+    if (!natW || !natH || !vpW || !vpH) return null;
+    return mkCropRect(natW, natH, vpW, vpH, this.totalScale(), this.panX(), this.panY());
+  }
+
   crop(options?: { type?: string; quality?: number; size?: number }): string | null {
     const image = this.imageRef()?.nativeElement;
     if (!this.isBrowser || this.status() !== 'loaded' || !image) return null;

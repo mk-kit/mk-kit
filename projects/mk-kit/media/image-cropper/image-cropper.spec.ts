@@ -220,6 +220,18 @@ describe('MkImageCropper', () => {
     expect(changes.length).toBe(2); // zoomTo + reset
   });
 
+  it('cropRect() is null until loaded, then exposes the natural-px region', () => {
+    expect(cmp.cropRect()).toBeNull();
+    sizeTo(2000, 1000, 400, 400);
+    (cmp as any).status.set('loaded');
+    // cover scale = 0.4; centred viewport shows a 1000×1000 region at (500,0)
+    expect(cmp.cropRect()).toEqual({ sx: 500, sy: 0, sw: 1000, sh: 1000 });
+    (cmp as any).zoomTo(2);
+    const r = cmp.cropRect()!;
+    expect(r.sw).toBe(500);
+    expect(r.sh).toBe(500);
+  });
+
   it('crop() returns null when the image is not loaded (jsdom)', () => {
     expect(cmp.crop()).toBeNull();
   });
