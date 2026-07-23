@@ -7,6 +7,7 @@ import {
   booleanAttribute,
   computed,
   contentChild,
+  contentChildren,
   effect,
   inject,
   input,
@@ -20,6 +21,7 @@ import { MK_I18N } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MkCheckbox } from '@mkornas/ui/forms';
 import { MkTableRowDetail } from './table-row-detail';
+import { MkTableCell } from './table-cell';
 
 /** Horizontal text alignment for a table column. */
 export type MkTableAlign = 'start' | 'center' | 'end';
@@ -543,6 +545,19 @@ export class MkTable<T = Record<string, unknown>> {
   /** The projected row-detail template (enable via `expandable`). */
   protected readonly rowDetail = contentChild(MkTableRowDetail);
 
+  /** Per-column cell templates, projected as `<ng-template mkTableCell="key">`. */
+  private readonly cellTemplates = contentChildren(MkTableCell);
+  private readonly cellTemplateByKey = computed(() => {
+    const map = new Map<string, MkTableCell>();
+    for (const t of this.cellTemplates()) map.set(t.mkTableCell(), t);
+    return map;
+  });
+
+  /** The template registered for a column, or null to fall back to text. */
+  protected cellTemplateFor(key: string) {
+    return this.cellTemplateByKey().get(key)?.template ?? null;
+  }
+
   private readonly sortKey = signal<string | null>(null);
   private readonly sortDir = signal<Exclude<MkSortDirection, 'none'> | null>(
     null,
@@ -589,6 +604,11 @@ export class MkTable<T = Record<string, unknown>> {
   protected sortGlyph(col: MkTableColumn<T>): string {
     if (this.sortKey() !== col.key) return '↕';
     return this.sortDir() === 'asc' ? '↑' : '↓';
+  }
+
+  /** Raw cell value, handed to an `[mkTableCell]` template unformatted. */
+  protected cellValue(row: T, col: MkTableColumn<T>): unknown {
+    return (row as Record<string, unknown>)[col.key];
   }
 
   /** Rendered text for a cell, applying the column formatter if present. */

@@ -5,6 +5,7 @@
 export * from './form-field';
 export * from './form-error-summary';
 export * from './input';
+export * from './i18n-input';
 export * from './select';
 export * from './autocomplete';
 export * from './multi-select';

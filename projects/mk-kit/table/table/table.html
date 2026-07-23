@@ -165,6 +165,14 @@
                   (blur)="commitEdit(item.row, col, $any($event.target).value)"
                   autofocus
                 />
+              } @else if (cellTemplateFor(col.key); as tpl) {
+                <ng-container
+                  [ngTemplateOutlet]="tpl"
+                  [ngTemplateOutletContext]="{
+                    $implicit: cellValue(item.row, col),
+                    row: item.row,
+                  }"
+                />
               } @else {
                 {{ cellText(item.row, col) }}
                 @if (col.editable) {

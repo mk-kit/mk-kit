@@ -4,6 +4,44 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.10.0] — 2026-07-23
+
+### Added
+
+- **`[mkTableCell]` — per-column cell templates for `MkTable`.** A cell could
+  only be text (`MkTableColumn.format` returns a string), so a status tag, an
+  avatar, a progress bar or an action button meant abandoning `mk-table` for a
+  hand-rolled `<table>`. An `<ng-template mkTableCell="key" let-value
+  let-row="row">` now renders that column's cells, receiving the **raw** value
+  (not the formatted string) plus the row. Columns without a template are
+  unchanged, and `format` still applies wherever a string is needed.
+
+  ```html
+  <mk-table [columns]="cols" [data]="rows()">
+    <ng-template mkTableCell="status" let-value>
+      <mk-tag [tone]="toneFor(value)">{{ label(value) }}</mk-tag>
+    </ng-template>
+  </mk-table>
+  ```
+
+- **`MkI18nInput` — one field, many languages.** Translatable text is usually
+  built as one input per locale, stacked; the form then grows linearly with
+  locale count and the field the author actually wants is buried. This renders
+  a single input with a compact locale switcher, and marks any `requiredLocales`
+  that are still empty so a missing translation is visible without switching to
+  it. Binds a `Record<code, string>` as a single control, so it drops into
+  reactive forms without a nested group.
+
+  ```html
+  <mk-form-field label="Name">
+    <mk-i18n-input formControlName="name" [locales]="locales"
+                   [requiredLocales]="['pl']" />
+  </mk-form-field>
+  ```
+
+  The empty marker is a glyph as well as a colour — colour alone would not
+  survive a monochrome or colour-blind read.
+
 ## [0.9.0] — 2026-07-23
 
 Closes the gaps that forced a consuming app to keep local wrappers and CSS

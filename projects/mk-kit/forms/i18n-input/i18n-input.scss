@@ -1,0 +1,22 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+}
+
+.mk-i18n-input__switcher {
+  align-self: flex-start;
+}
+
+/* A locale that is required and still empty. Deliberately a glyph as well as a
+ * colour — colour alone would not survive a monochrome or colour-blind read. */
+.mk-i18n-input__marker {
+  margin-inline-start: 0.25rem;
+  color: var(--mk-danger);
+  font-weight: var(--mk-font-weight-bold);
+  line-height: 1;
+}
+
+.mk-i18n-input__field {
+  width: 100%;
+}

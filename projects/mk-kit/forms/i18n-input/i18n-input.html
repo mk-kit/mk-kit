@@ -1,0 +1,45 @@
+@if (locales().length > 1) {
+  <mk-button-toggle-group
+    class="mk-i18n-input__switcher"
+    [size]="size()"
+    [disabled]="isDisabled()"
+    [ngModel]="active()?.code"
+    (ngModelChange)="onSwitch($event)"
+  >
+    @for (locale of locales(); track locale.code) {
+      <mk-button-toggle [value]="locale.code" [attr.aria-label]="switcherAria(locale)">
+        {{ locale.label }}
+        @if (missing(locale.code)) {
+          <span class="mk-i18n-input__marker" aria-hidden="true">•</span>
+        }
+      </mk-button-toggle>
+    }
+  </mk-button-toggle-group>
+}
+
+@if (multiline()) {
+  <textarea
+    mkInput
+    class="mk-i18n-input__field"
+    [rows]="rows()"
+    [size]="size()"
+    [disabled]="isDisabled()"
+    [placeholder]="placeholder()"
+    [value]="activeText()"
+    [attr.lang]="active()?.code"
+    (input)="onInput($any($event.target).value)"
+    (blur)="onBlur()"
+  ></textarea>
+} @else {
+  <input
+    mkInput
+    class="mk-i18n-input__field"
+    [size]="size()"
+    [disabled]="isDisabled()"
+    [placeholder]="placeholder()"
+    [value]="activeText()"
+    [attr.lang]="active()?.code"
+    (input)="onInput($any($event.target).value)"
+    (blur)="onBlur()"
+  />
+}
