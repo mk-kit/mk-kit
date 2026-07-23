@@ -433,3 +433,28 @@ describe('MkTable — grouped rows', () => {
     expect(dataRows()).toHaveLength(3);
   });
 });
+
+describe('MkTable rowClass', () => {
+  it('appends the consumer class per row and tolerates null', async () => {
+    @Component({
+      imports: [MkTable],
+      template: `<mk-table
+        [columns]="cols"
+        [data]="rows"
+        [rowClass]="rowClass"
+      />`,
+    })
+    class Host {
+      cols = [{ key: 'name', header: 'Name' }] as MkTableColumn<{
+        name: string;
+      }>[];
+      rows = [{ name: 'a' }, { name: 'b' }];
+      rowClass = (r: { name: string }) => (r.name === 'a' ? 'is-hot' : null);
+    }
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const rows = fixture.nativeElement.querySelectorAll('tr.mk-table__row');
+    expect(rows[0].classList.contains('is-hot')).toBe(true);
+    expect(rows[1].classList.contains('is-hot')).toBe(false);
+  });
+});

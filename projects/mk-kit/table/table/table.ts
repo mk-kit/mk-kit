@@ -199,6 +199,21 @@ export class MkTable<T = Record<string, unknown>> {
    * are matched by reference.
    */
   readonly trackKey = input<string>();
+
+  /**
+   * Optional per-row CSS class: called with each row, the returned string is
+   * appended to the row's class list (falsy → none). For state the consumer
+   * owns — an "active in the side panel" highlight, an unread accent — that
+   * `selectable`'s own selected style doesn't cover.
+   */
+  readonly rowClass = input<((row: T) => string | null | undefined) | null>(
+    null,
+  );
+
+  /** Resolved class for a row (empty string when no `rowClass` is set). */
+  protected rowClassFor(row: T): string {
+    return this.rowClass()?.(row) ?? '';
+  }
   /**
    * Render a leading expander column. Each row can reveal a detail panel
    * supplied via an `<ng-template mkTableRowDetail let-row>`.

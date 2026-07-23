@@ -106,6 +106,7 @@
         <ng-container>
         <tr
           class="mk-table__row"
+          [class]="rowClassFor(item.row)"
           [class.mk-table__row--selected]="selectable() && isSelected(item.row)"
           [class.mk-table__row--expanded]="expandable() && isExpanded(item.row)"
           [attr.tabindex]="clickableRows() ? 0 : null"
