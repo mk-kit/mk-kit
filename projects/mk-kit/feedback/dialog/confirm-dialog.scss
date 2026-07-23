@@ -7,3 +7,19 @@
   font-size: var(--mk-font-size-md);
   line-height: var(--mk-line-height-relaxed);
 }
+
+.mk-confirm-dialog__body {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mk-space-3);
+}
+
+.mk-confirm-dialog__icon {
+  flex-shrink: 0;
+  margin-top: 0.125rem;
+  color: var(--mk-text-muted);
+}
+
+.mk-confirm-dialog__icon--danger {
+  color: var(--mk-danger);
+}

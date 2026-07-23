@@ -77,3 +77,15 @@
 .mk-page-header__tabs:empty {
   display: none;
 }
+
+/* Optional leading media (icon, avatar, logo). Collapses when nothing is
+ * projected so the heading keeps its original alignment. */
+.mk-page-header__media {
+  display: flex;
+  align-items: center;
+  flex-shrink: 0;
+}
+
+.mk-page-header__media:empty {
+  display: none;
+}

@@ -8,9 +8,23 @@ import { MkOverlayRef } from '@mkornas/ui/core';
 import { MkConfirmDialog, MkConfirmDialogData } from './confirm-dialog';
 import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
 
+/**
+ * Panel width preset. The panel is always `min(target, 92vw)`, so it shrinks to
+ * fit a phone and grows to its target on a desktop.
+ *
+ * - `sm` (32rem) — confirmations, single-field prompts
+ * - `md` (45rem) — the default; two-column forms
+ * - `lg` (56rem) — forms with nested sections
+ * - `xl` (75rem) — tables or side-by-side content inside a modal
+ */
+export type MkDialogSize = 'sm' | 'md' | 'lg' | 'xl';
+
 /** Configuration for `MkDialogService.open`. Extends the raw overlay config. */
 export interface MkDialogConfig<TData = unknown>
-  extends MkOverlayConfig<TData> {}
+  extends MkOverlayConfig<TData> {
+  /** Panel width preset. Defaults to `sm`, matching pre-0.9 behaviour. */
+  size?: MkDialogSize;
+}
 
 const DIALOG_PANEL_CLASS = 'mk-dialog-panel';
 
@@ -38,10 +52,11 @@ export class MkDialogService {
     component: Type<TComponent>,
     config: MkDialogConfig<TData> = {},
   ): MkOverlayRef<TResult, TComponent> {
+    const sizeClass = `mk-dialog-panel--${config.size ?? 'sm'}`;
     return this.overlay.open<TComponent, TResult, TData>(component, {
       ...config,
       role: config.role ?? 'dialog',
-      panelClass: this.mergePanelClass(config.panelClass),
+      panelClass: this.mergePanelClass(config.panelClass, sizeClass),
     });
   }
 
@@ -95,9 +110,11 @@ export class MkDialogService {
 
   private mergePanelClass(
     panelClass: string | string[] | undefined,
+    sizeClass: string,
   ): string[] {
-    if (!panelClass) return [DIALOG_PANEL_CLASS];
+    const base = [DIALOG_PANEL_CLASS, sizeClass];
+    if (!panelClass) return base;
     const extra = Array.isArray(panelClass) ? panelClass : [panelClass];
-    return [DIALOG_PANEL_CLASS, ...extra];
+    return [...base, ...extra];
   }
 }

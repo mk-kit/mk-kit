@@ -4,6 +4,35 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.9.0] — 2026-07-23
+
+Closes the gaps that forced a consuming app to keep local wrappers and CSS
+overrides instead of using the kit as-is.
+
+### Added
+
+- **`MkDialogConfig.size`** — `'sm' | 'md' | 'lg' | 'xl'` (32/45/56/75rem, each
+  `min(target, 92vw)`). The panel had exactly one width, so anything wider than
+  a confirmation — a two-column form, a table in a modal — needed the consumer
+  to ship its own panel-class CSS. Defaults to `sm`, so existing dialogs are
+  unchanged.
+
+- **`MkOverlayRef.result` and `MkOverlayRef.closed$`.** The close result was
+  only a Promise, which forced RxJS callers to wrap it in `from(...)` and made
+  every dialog assertion in their tests async. It is now also a signal
+  (`result`) and an Observable (`closed$`, emits once then completes, and
+  replays to a late subscriber so it can't hang). All three settle together;
+  `afterClosed` is unchanged.
+
+- **`[mkPageHeaderMedia]` slot on `MkPageHeader`** — a leading icon/avatar/logo
+  beside the title. Its absence was the one reason a consumer kept a hand-rolled
+  page header. The slot collapses when nothing is projected, so existing headers
+  keep their alignment.
+
+- **`MkConfirmDialogData.icon`** — an icon beside the message, tinted by
+  `tone === 'danger'`. Destructive confirms otherwise carried no visual weight
+  beyond their wording, which is why consumers rebuilt the body by hand.
+
 ## [0.8.0] — 2026-07-23
 
 Two defects found while migrating a real admin panel onto the library.

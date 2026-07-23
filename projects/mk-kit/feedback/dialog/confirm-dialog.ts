@@ -7,6 +7,7 @@ import {
 import { MK_I18N } from '@mkornas/ui/core';
 import { MK_OVERLAY_DATA, MkOverlayRef } from '@mkornas/ui/core';
 import { MkButton } from '@mkornas/ui/button';
+import { MkIcon } from '@mkornas/ui/icon';
 import { MkDialog } from './dialog';
 
 /** Data contract for {@link MkConfirmDialog} / `MkDialogService.confirm`. */
@@ -21,6 +22,12 @@ export interface MkConfirmDialogData {
   cancelText?: string;
   /** Tone of the confirm button (and `alertdialog` semantics when `danger`). */
   tone?: 'primary' | 'danger' | 'warning' | 'success';
+  /**
+   * Optional registered icon name shown beside the message. Useful when the
+   * action is destructive and the wording alone carries no visual weight
+   * (`trash`, `alert-triangle`, `user-x`).
+   */
+  icon?: string;
   /** Hide the cancel button — a single-button acknowledgement (`alert`). */
   hideCancel?: boolean;
 }
@@ -33,7 +40,7 @@ export interface MkConfirmDialogData {
  */
 @Component({
   selector: 'mk-confirm-dialog',
-  imports: [MkDialog, MkButton],
+  imports: [MkDialog, MkButton, MkIcon],
   templateUrl: './confirm-dialog.html',
   styleUrl: './confirm-dialog.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,

@@ -1,5 +1,15 @@
 <mk-dialog [dialogTitle]="data.title" hideClose>
-  <p class="mk-confirm-dialog__message">{{ data.message }}</p>
+  <div class="mk-confirm-dialog__body">
+    @if (data.icon; as icon) {
+      <mk-icon
+        class="mk-confirm-dialog__icon"
+        [class.mk-confirm-dialog__icon--danger]="data.tone === 'danger'"
+        [name]="icon"
+        [size]="22"
+      />
+    }
+    <p class="mk-confirm-dialog__message">{{ data.message }}</p>
+  </div>
 
   <div mkDialogFooter>
     @if (!data.hideCancel) {

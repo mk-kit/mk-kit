@@ -3,6 +3,9 @@
 </div>
 
 <div class="mk-page-header__main">
+  <div class="mk-page-header__media">
+    <ng-content select="[mkPageHeaderMedia]" />
+  </div>
   <div class="mk-page-header__heading">
     <div class="mk-page-header__title-row">
       @if (heading(); as h) {

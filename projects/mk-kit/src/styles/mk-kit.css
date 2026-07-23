@@ -422,6 +422,24 @@ body.mk-app {
   animation: mk-overlay-pop var(--mk-duration-normal) var(--mk-ease-emphasized);
 }
 
+/* Width presets (MkDialogConfig.size). Always `min(target, 92vw)` so a dialog
+ * shrinks to fit a phone and grows to its target on a desktop. */
+.mk-dialog-panel--sm {
+  width: min(92vw, 32rem);
+}
+
+.mk-dialog-panel--md {
+  width: min(92vw, 45rem);
+}
+
+.mk-dialog-panel--lg {
+  width: min(92vw, 56rem);
+}
+
+.mk-dialog-panel--xl {
+  width: min(92vw, 75rem);
+}
+
 /* A bare component (no mk-dialog wrapper) still needs its own padding and a
  * scroll region, otherwise long content is clipped by `overflow: hidden`. */
 .mk-dialog-panel > :not(.mk-dialog) {
