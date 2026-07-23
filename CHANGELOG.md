@@ -4,6 +4,15 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.13.0] — 2026-07-23
+
+### Added
+
+- **`description` on `MkAutocompleteOption`** — a muted second line under the
+  label, rendered only when present. Labels alone can collide (two customers
+  named Jan Kowalski); the description is the disambiguator (email · phone, an
+  id under a product name). Options without one are unchanged.
+
 ## [0.12.0] — 2026-07-23
 
 ### Added

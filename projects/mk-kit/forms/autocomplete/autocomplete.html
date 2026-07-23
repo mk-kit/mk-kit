@@ -71,6 +71,11 @@
           (click)="selectOption(i)"
         >
           <span class="mk-autocomplete__option-label">{{ opt.label }}</span>
+          @if (opt.description) {
+            <span class="mk-autocomplete__option-desc">{{
+              opt.description
+            }}</span>
+          }
         </li>
       } @empty {
         <li class="mk-autocomplete__status" role="presentation">

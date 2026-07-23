@@ -28,6 +28,12 @@ export interface MkAutocompleteOption {
   value: unknown;
   /** Disable the option (skipped by keyboard + not selectable). */
   disabled?: boolean;
+  /**
+   * Muted second line under the label — the disambiguator when labels can
+   * collide (two customers named Jan Kowalski, telling accounts apart by
+   * email, an id under a product name).
+   */
+  description?: string;
 }
 
 /** How the option list is narrowed against the typed text. */

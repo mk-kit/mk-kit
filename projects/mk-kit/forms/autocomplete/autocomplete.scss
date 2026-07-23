@@ -196,3 +196,10 @@
     animation: none;
   }
 }
+
+.mk-autocomplete__option-desc {
+  display: block;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+  line-height: var(--mk-line-height-snug);
+}
