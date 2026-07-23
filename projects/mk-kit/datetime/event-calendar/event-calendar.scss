@@ -151,3 +151,111 @@
     transition: none;
   }
 }
+
+/* ── week/day time grid ─────────────────────────────────────────────────── */
+.mk-event-calendar__timegrid {
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-md);
+  overflow: hidden;
+}
+
+.mk-event-calendar__timegrid-head {
+  display: flex;
+  border-bottom: var(--mk-border-width) solid var(--mk-border-subtle);
+  background: var(--mk-surface-2);
+}
+
+.mk-event-calendar__gutter-spacer {
+  flex: 0 0 3.25rem;
+}
+
+.mk-event-calendar__col-head {
+  flex: 1;
+  padding: var(--mk-space-2);
+  text-align: center;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+}
+
+.mk-event-calendar__col-head--today {
+  color: var(--mk-primary);
+  font-weight: var(--mk-font-weight-semibold);
+}
+
+.mk-event-calendar__timegrid-body {
+  display: flex;
+}
+
+.mk-event-calendar__gutter {
+  flex: 0 0 3.25rem;
+  display: flex;
+  flex-direction: column;
+}
+
+.mk-event-calendar__hour-label {
+  flex: 1 0 3rem;
+  padding: 2px var(--mk-space-2) 0 0;
+  text-align: right;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-subtle);
+}
+
+.mk-event-calendar__col {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  border-inline-start: var(--mk-border-width) solid var(--mk-border-subtle);
+}
+
+.mk-event-calendar__col--today {
+  background: color-mix(in srgb, var(--mk-primary) 4%, transparent);
+}
+
+.mk-event-calendar__slot {
+  flex: 1 0 3rem;
+  border: 0;
+  border-top: var(--mk-border-width) solid var(--mk-border-subtle);
+  background: transparent;
+  cursor: pointer;
+  padding: 0;
+}
+
+.mk-event-calendar__slot:hover {
+  background: var(--mk-hover-overlay);
+}
+
+.mk-event-calendar__slot:focus-visible {
+  outline: 2px solid var(--mk-focus-ring);
+  outline-offset: -2px;
+}
+
+.mk-event-calendar__block {
+  position: absolute;
+  z-index: 1;
+  overflow: hidden;
+  margin: 1px;
+  padding: 2px var(--mk-space-1);
+  border: 0;
+  border-radius: var(--mk-radius-sm);
+  color: var(--mk-primary-contrast);
+  font-size: var(--mk-font-size-xs);
+  text-align: start;
+  cursor: pointer;
+  min-height: 1rem;
+}
+
+.mk-event-calendar__block:focus-visible {
+  outline: 2px solid var(--mk-focus-ring);
+  outline-offset: 1px;
+}
+
+.mk-event-calendar__all-day {
+  position: absolute;
+  inset-inline: 2px;
+  top: 2px;
+  z-index: 2;
+  display: flex;
+  gap: 2px;
+  flex-wrap: wrap;
+}

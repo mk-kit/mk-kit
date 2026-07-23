@@ -4,6 +4,32 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.11.0] — 2026-07-23
+
+### Added
+
+- **Week and day views on `MkEventCalendar`.** The component was month-grid
+  only, which rules it out for the screen schedulers actually live in — staff
+  work *today*, not *this month*. A new `view` model (`'month' | 'week' |
+  'day'`, default `month`) switches to a timed hour grid: events gain optional
+  `start`/`end` instants, overlaps pack side-by-side into lanes (the standard
+  scheduler layout, implemented as a pure, unit-tested function), untimed
+  events render in an all-day strip, and `dayStartHour`/`dayEndHour` bound the
+  visible range. Clicking an empty slot emits `slotClick` with the slot's start
+  instant — the "create at this time" affordance every scheduler needs. Header
+  navigation steps by the active unit and the label follows
+  (`July 2026` / `Jul 20 – Jul 26, 2026` / `July 23, 2026`).
+
+  ```html
+  <mk-event-calendar
+    [(view)]="view" [(viewDate)]="date" [events]="events"
+    [dayStartHour]="10" [dayEndHour]="23"
+    (slotClick)="createAt($event)" (eventClick)="open($event)" />
+  ```
+
+  Month-view behaviour, markup and APIs are unchanged; `date` alone still
+  places an event on the month grid.
+
 ## [0.10.0] — 2026-07-23
 
 ### Added

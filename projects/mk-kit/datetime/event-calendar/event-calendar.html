@@ -40,6 +40,7 @@
   </button>
 </div>
 
+@if (view() === 'month') {
 <!--
   The days are a plain list of buttons (role="group"), not an ARIA grid — there
   is no roving-tabindex arrow navigation here, so grid semantics would be wrong.
@@ -97,3 +98,79 @@
     </div>
   }
 </div>
+} @else {
+  <div
+    class="mk-event-calendar__timegrid"
+    role="group"
+    [attr.aria-labelledby]="labelId"
+  >
+    @if (view() === 'week') {
+      <div class="mk-event-calendar__timegrid-head" aria-hidden="true">
+        <span class="mk-event-calendar__gutter-spacer"></span>
+        @for (col of timedColumns(); track col.day.getTime()) {
+          <span
+            class="mk-event-calendar__col-head"
+            [class.mk-event-calendar__col-head--today]="col.today"
+          >
+            {{ colHead(col.day) }}
+          </span>
+        }
+      </div>
+    }
+
+    <div class="mk-event-calendar__timegrid-body">
+      <div class="mk-event-calendar__gutter" aria-hidden="true">
+        @for (h of hours(); track h) {
+          <span class="mk-event-calendar__hour-label">{{ hourLabel(h) }}</span>
+        }
+      </div>
+
+      @for (col of timedColumns(); track col.day.getTime()) {
+        <div
+          class="mk-event-calendar__col"
+          [class.mk-event-calendar__col--today]="col.today"
+        >
+          @for (h of hours(); track h) {
+            <button
+              type="button"
+              class="mk-event-calendar__slot"
+              [attr.aria-label]="colHead(col.day) + ' ' + hourLabel(h)"
+              (click)="onSlotClick(col.day, h)"
+            ></button>
+          }
+
+          @for (p of col.placements; track $index) {
+            <button
+              type="button"
+              class="mk-event-calendar__block"
+              [style.top.%]="p.top"
+              [style.height.%]="p.height"
+              [style.left.%]="(100 / p.lanes) * p.lane"
+              [style.width.%]="100 / p.lanes"
+              [style.background-color]="p.event.color || 'var(--mk-primary)'"
+              [title]="placementTitle(p)"
+              (click)="onEventClick($event, p.event)"
+            >
+              {{ p.event.title }}
+            </button>
+          }
+
+          @if (col.allDay.length) {
+            <span class="mk-event-calendar__all-day" aria-hidden="true">
+              @for (event of col.allDay; track $index) {
+                <span
+                  class="mk-event-calendar__pill"
+                  [style.background-color]="event.color || 'var(--mk-primary)'"
+                  [title]="event.title"
+                  (click)="onEventClick($event, event)"
+                >
+                  {{ event.title }}
+                </span>
+              }
+            </span>
+          }
+        </div>
+      }
+    </div>
+  </div>
+}

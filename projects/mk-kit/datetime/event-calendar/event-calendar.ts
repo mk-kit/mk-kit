@@ -11,6 +11,7 @@ import {
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import {
+  addDays,
   addMonths,
   buildMonthMatrix,
   formatDate,
@@ -19,12 +20,28 @@ import {
   isSameMonth,
   startOfDay,
   startOfMonth,
+  startOfWeek,
 } from '../datetime/date-utils';
+import {
+  MkTimedPlacement,
+  allDayEvents,
+  layoutTimedEvents,
+} from './event-calendar-layout';
 
-/** A single event plotted onto the {@link MkEventCalendar} month grid. */
+/** The calendar's presentation: month grid, or a timed week/day grid. */
+export type MkCalendarView = 'month' | 'week' | 'day';
+
+/** A single event plotted onto the {@link MkEventCalendar}. */
 export interface MkCalendarEvent {
-  /** The day the event falls on (time component is ignored for placement). */
+  /**
+   * The day the event falls on. Month view places by this alone; in week/day
+   * view an event with no `start` renders in the all-day strip.
+   */
   date: Date;
+  /** Start instant — positions the event on the week/day time grid. */
+  start?: Date;
+  /** End instant; defaults to 30 minutes after `start`. */
+  end?: Date;
   /** Short label shown inside the event pill. */
   title: string;
   /** Optional pill background colour; falls back to `--mk-primary`. */
@@ -85,6 +102,12 @@ export class MkEventCalendar {
   readonly firstDayOfWeek = input(0, { transform: numberAttribute });
   /** Max event pills per day before collapsing the rest into "+N more". */
   readonly maxPerDay = input(3, { transform: numberAttribute });
+  /** Presentation: the classic month grid, or a timed `week`/`day` grid. */
+  readonly view = model<MkCalendarView>('month');
+  /** First hour shown on the week/day time grid. */
+  readonly dayStartHour = input(8, { transform: numberAttribute });
+  /** Hour the time grid ends at (exclusive). */
+  readonly dayEndHour = input(22, { transform: numberAttribute });
 
   /** Emitted when a day cell is activated (click / Enter). */
   readonly dayClick = output<Date>();
@@ -95,18 +118,84 @@ export class MkEventCalendar {
    * announces the day's events and activating it fires `dayClick`.
    */
   readonly eventClick = output<MkCalendarEvent>();
-  /** Emitted when the viewed month changes via the prev/next buttons. */
+  /** Emitted when the viewed range changes via the prev/next buttons. */
   readonly monthChange = output<Date>();
+  /** Week/day view: an empty hour slot was clicked — the slot's start instant. */
+  readonly slotClick = output<Date>();
 
   /** id of the visible month/year label — wired as the grid's label. */
   readonly labelId = mkUniqueId('mk-event-calendar-label');
 
   /** First day of the visible month. */
   protected readonly viewMonth = computed(() => startOfMonth(this.viewDate()));
-  /** Human label for the visible month, e.g. `July 2026`. */
-  protected readonly monthLabel = computed(() =>
-    formatDate(this.viewDate(), 'MMMM yyyy', this.i18n.dateNames),
+  /** Header label — month, day, or week range, matching the active view. */
+  protected readonly monthLabel = computed(() => {
+    const d = this.viewDate();
+    const names = this.i18n.dateNames;
+    switch (this.view()) {
+      case 'day':
+        return formatDate(d, 'MMMM d, yyyy', names);
+      case 'week': {
+        const from = startOfWeek(d, this.firstDayOfWeek());
+        const to = addDays(from, 6);
+        return `${formatDate(from, 'MMM d', names)} – ${formatDate(to, 'MMM d, yyyy', names)}`;
+      }
+      default:
+        return formatDate(d, 'MMMM yyyy', names);
+    }
+  });
+
+  /** Days of the active time grid: one for `day`, seven for `week`. */
+  protected readonly gridDays = computed<Date[]>(() => {
+    const d = startOfDay(this.viewDate());
+    if (this.view() === 'day') return [d];
+    const from = startOfWeek(d, this.firstDayOfWeek());
+    return Array.from({ length: 7 }, (_, i) => addDays(from, i));
+  });
+
+  /** Hour rows of the time grid. */
+  protected readonly hours = computed<number[]>(() => {
+    const from = this.dayStartHour();
+    const to = this.dayEndHour();
+    return Array.from({ length: Math.max(to - from, 0) }, (_, i) => from + i);
+  });
+
+  /** Per-day positioned events + all-day strip for the time grid. */
+  protected readonly timedColumns = computed(() =>
+    this.gridDays().map((day) => ({
+      day,
+      today: isSameDay(day, new Date()),
+      placements: layoutTimedEvents(
+        this.events(),
+        day,
+        this.dayStartHour(),
+        this.dayEndHour(),
+      ),
+      allDay: allDayEvents(this.events(), day),
+    })),
   );
+
+  /** Week-view column head, e.g. `Mon 21`. */
+  protected colHead(day: Date): string {
+    return formatDate(day, 'ddd d', this.i18n.dateNames);
+  }
+
+  protected hourLabel(hour: number): string {
+    return `${String(hour).padStart(2, '0')}:00`;
+  }
+
+  protected placementTitle(p: MkTimedPlacement): string {
+    const from = p.event.start
+      ? formatDate(p.event.start, 'HH:mm', this.i18n.dateNames)
+      : '';
+    return from ? `${from} ${p.event.title}` : p.event.title;
+  }
+
+  protected onSlotClick(day: Date, hour: number): void {
+    const at = new Date(day);
+    at.setHours(hour, 0, 0, 0);
+    this.slotClick.emit(at);
+  }
 
   /** Raw 6×7 grid of dates for the visible month. */
   private readonly weeks = computed(() =>
@@ -178,7 +267,11 @@ export class MkEventCalendar {
   }
 
   private shiftMonth(delta: number): void {
-    const next = addMonths(this.viewDate(), delta);
+    const view = this.view();
+    const next =
+      view === 'month'
+        ? addMonths(this.viewDate(), delta)
+        : addDays(this.viewDate(), delta * (view === 'week' ? 7 : 1));
     this.viewDate.set(next);
     this.monthChange.emit(next);
   }
