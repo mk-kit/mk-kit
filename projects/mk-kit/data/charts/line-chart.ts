@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { mkChartAutoWidth } from './chart-autowidth';
 import {
   MkChartSeries,
   MkPoint,
@@ -61,14 +62,27 @@ function stackedAreaPath(
   },
 })
 export class MkLineChart {
+  /** Measured host width (falls back to `width` before first measure). */
+  private readonly autoWidth = mkChartAutoWidth(computed(() => this.width()));
+  /** The viewBox width the geometry is drawn against. */
+  protected readonly drawWidth = computed(() =>
+    this.responsive() ? this.autoWidth() : this.width(),
+  );
   protected readonly i18n = inject(MK_I18N);
 
   /** Ordered category labels along the x axis. */
   readonly categories = input<readonly string[]>([]);
   /** One or more data series (values align to `categories`). */
   readonly series = input<readonly MkChartSeries[]>([]);
-  /** Intrinsic width (viewBox units; the SVG scales to its container). */
+  /** Intrinsic width in viewBox units — the fallback before the host is
+   *  measured, and the fixed drawing width when `responsive` is off. */
   readonly width = input(480, { transform: numberAttribute });
+  /**
+   * Match the viewBox width to the host's actual width so `height` means
+   * pixels and a wide container no longer stretches the chart vertically.
+   * Set false to pin the drawing to `width` (the pre-0.8 behaviour).
+   */
+  readonly responsive = input(true, { transform: booleanAttribute });
   /** Intrinsic height. */
   readonly height = input(260, { transform: numberAttribute });
   /** Fill the area under each line. */
@@ -89,7 +103,7 @@ export class MkLineChart {
   protected readonly plot = computed(() => ({
     x: MARGIN.left,
     y: MARGIN.top,
-    w: Math.max(this.width() - MARGIN.left - MARGIN.right, 1),
+    w: Math.max(this.drawWidth() - MARGIN.left - MARGIN.right, 1),
     h: Math.max(this.height() - MARGIN.top - MARGIN.bottom, 1),
   }));
 
@@ -232,7 +246,7 @@ export class MkLineChart {
     if (i == null || !pts.length) return null;
     const topY = Math.min(...pts.map((p) => p.y));
     return {
-      left: (this.xAt()(i) / this.width()) * 100,
+      left: (this.xAt()(i) / this.drawWidth()) * 100,
       top: (topY / this.height()) * 100,
       category: this.categories()[i],
       rows: pts.map((p) => ({

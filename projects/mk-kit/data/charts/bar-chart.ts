@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { mkChartAutoWidth } from './chart-autowidth';
 import {
   MkChartSeries,
   mkChartColor,
@@ -71,6 +72,12 @@ export type MkBarOrientation = 'vertical' | 'horizontal';
   },
 })
 export class MkBarChart {
+  /** Measured host width (falls back to `width` before first measure). */
+  private readonly autoWidth = mkChartAutoWidth(computed(() => this.width()));
+  /** The viewBox width the geometry is drawn against. */
+  protected readonly drawWidth = computed(() =>
+    this.responsive() ? this.autoWidth() : this.width(),
+  );
   protected readonly i18n = inject(MK_I18N);
 
   /** Category labels along the category axis. */
@@ -79,8 +86,15 @@ export class MkBarChart {
   readonly series = input<readonly MkChartSeries[]>([]);
   /** Bar direction. */
   readonly orientation = input<MkBarOrientation>('vertical');
-  /** Intrinsic width (viewBox units; the SVG scales to its container). */
+  /** Intrinsic width in viewBox units — the fallback before the host is
+   *  measured, and the fixed drawing width when `responsive` is off. */
   readonly width = input(480, { transform: numberAttribute });
+  /**
+   * Match the viewBox width to the host's actual width so `height` means
+   * pixels and a wide container no longer stretches the chart vertically.
+   * Set false to pin the drawing to `width` (the pre-0.8 behaviour).
+   */
+  readonly responsive = input(true, { transform: booleanAttribute });
   /** Intrinsic height. */
   readonly height = input(260, { transform: numberAttribute });
   /** Stack series into one bar per category instead of grouping. */
@@ -109,7 +123,7 @@ export class MkBarChart {
     return {
       x: m.left,
       y: m.top,
-      w: Math.max(this.width() - m.left - m.right, 1),
+      w: Math.max(this.drawWidth() - m.left - m.right, 1),
       h: Math.max(this.height() - m.top - m.bottom, 1),
     };
   });
@@ -258,7 +272,7 @@ export class MkBarChart {
       ? [b.x + b.w, b.y + b.h / 2]
       : [b.x + b.w / 2, b.y];
     return {
-      left: (px / this.width()) * 100,
+      left: (px / this.drawWidth()) * 100,
       top: (py / this.height()) * 100,
       category: this.categories()[b.categoryIndex],
       series: this.series()[b.seriesIndex]?.name ?? '',

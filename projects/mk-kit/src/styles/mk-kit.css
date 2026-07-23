@@ -399,6 +399,45 @@ body.mk-app {
   background-clip: content-box;
 }
 
+/* Body-level overlay chrome.
+ *
+ * These MUST live in the global sheet rather than a component stylesheet.
+ * MkOverlayService renders an arbitrary component into `.mk-overlay-panel`, so
+ * chrome defined in dialog.scss (which is MkDialog's own stylesheet) only
+ * existed when MkDialog itself happened to be rendered. A component opened with
+ * `MkDialogService.open(MyComponent)` therefore got no surface at all — no
+ * background, no radius, no overflow containment — and its content spilled onto
+ * the scrim. */
+.mk-dialog-panel {
+  display: flex;
+  flex-direction: column;
+  width: min(92vw, 32rem);
+  max-height: min(90vh, 44rem);
+  overflow: hidden;
+  background-color: var(--mk-surface);
+  color: var(--mk-text);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-lg);
+  box-shadow: var(--mk-shadow-xl);
+  animation: mk-overlay-pop var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+/* A bare component (no mk-dialog wrapper) still needs its own padding and a
+ * scroll region, otherwise long content is clipped by `overflow: hidden`. */
+.mk-dialog-panel > :not(.mk-dialog) {
+  min-height: 0;
+  overflow: auto;
+}
+
+.mk-dialog-panel:not(:has(.mk-dialog)) {
+  padding: var(--mk-space-5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-dialog-panel {
+    animation: none;
+  }
+}
 /* Body-level overlay animations (dialog / menu / toast live outside components) */
 @keyframes mk-overlay-fade {
   from {

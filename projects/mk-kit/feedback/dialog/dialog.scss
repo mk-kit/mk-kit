@@ -4,25 +4,8 @@
  * rule is namespaced under `.mk-dialog`. `.mk-dialog-panel` targets the
  * body-level overlay panel produced by MkOverlayService. */
 
-.mk-dialog-panel {
-  display: flex;
-  flex-direction: column;
-  width: min(92vw, 32rem);
-  max-height: min(90vh, 44rem);
-  overflow: hidden;
-  background-color: var(--mk-surface);
-  color: var(--mk-text);
-  border: var(--mk-border-width) solid var(--mk-border-subtle);
-  border-radius: var(--mk-radius-lg);
-  box-shadow: var(--mk-shadow-xl);
-  animation: mk-overlay-pop var(--mk-duration-normal) var(--mk-ease-emphasized);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .mk-dialog-panel {
-    animation: none;
-  }
-}
+/* `.mk-dialog-panel` chrome now lives in src/styles/mk-kit.scss so it applies
+ * to any component opened via MkDialogService, not just MkDialog. */
 
 .mk-dialog {
   display: flex;

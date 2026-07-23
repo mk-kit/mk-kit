@@ -4,6 +4,46 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.8.0] — 2026-07-23
+
+Two defects found while migrating a real admin panel onto the library.
+
+### Fixed
+
+- **Body-level overlay panels had no chrome.** `.mk-dialog-panel` — background,
+  border, radius, shadow, `max-height`, `overflow: hidden` — was defined in
+  `dialog.scss`, which is `MkDialog`'s own stylesheet. `MkOverlayService`
+  renders an *arbitrary* component into the panel, so opening one with
+  `MkDialogService.open(MyComponent)` loaded none of it: the component rendered
+  bare on the scrim with no surface and no overflow containment, and long
+  content spilled. The chrome now lives in `styles/mk-kit.css`, where the rest
+  of the body-level overlay CSS already lived, so it applies to any component
+  the service renders. A panel with no `mk-dialog` wrapper also gets padding
+  and its own scroll region.
+
+- **Charts grew unboundedly tall.** `MkBarChart` / `MkLineChart` draw into a
+  viewBox while `.mk-chart__svg` sets `width: 100%; height: auto`, so rendered
+  height was `containerWidth × (viewBoxHeight / viewBoxWidth)`. A full-width
+  chart on a wide monitor measured over 2000px tall. Capping the height is not
+  a fix — `preserveAspectRatio="xMidYMid meet"` then letterboxes the plot into
+  a narrow band with empty margins either side.
+
+### Added
+
+- **`responsive` on `MkBarChart` and `MkLineChart`** (default `true`). The
+  viewBox width is re-derived from the measured host, so `height` means pixels
+  and the drawing fills the available width without distortion or letterboxing.
+  Set `[responsive]="false"` to pin the drawing to `width` (the 0.7 behaviour).
+  SSR-safe: with no `ResizeObserver`, or before the first measurement, the
+  declared `width` is used unchanged.
+
+### Notes
+
+- The chart change alters default rendering: a chart in a container wider than
+  its `width` now fills that width at its declared pixel height, instead of
+  scaling both. That is the intended fix, but it *will* change existing layouts
+  that relied on the old scaling — opt out per chart with `[responsive]="false"`.
+
 ## [0.7.0] — 2026-07-22
 
 Reactive-forms parity pass: every control now behaves like an Angular Material
