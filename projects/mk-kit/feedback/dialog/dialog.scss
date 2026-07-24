@@ -72,6 +72,29 @@
   display: none;
 }
 
+/* The `[mkDialogFooter]` content is projected as the footer's single child, so
+ * the footer's own `gap` never reaches the buttons inside it — they'd touch.
+ * Lay the projected wrapper out as the actions row itself (gap + alignment).
+ * `data-align` lets consumers control button distribution:
+ *   <div mkDialogFooter data-align="between">…</div>  (default: end). */
+.mk-dialog__footer > * {
+  display: flex;
+  flex: 1 1 auto;
+  align-items: center;
+  justify-content: flex-end;
+  gap: var(--mk-space-2);
+  flex-wrap: wrap;
+}
+.mk-dialog__footer > [data-align='start'] {
+  justify-content: flex-start;
+}
+.mk-dialog__footer > [data-align='center'] {
+  justify-content: center;
+}
+.mk-dialog__footer > [data-align='between'] {
+  justify-content: space-between;
+}
+
 .mk-dialog__close {
   flex-shrink: 0;
   display: inline-flex;

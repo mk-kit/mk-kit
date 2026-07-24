@@ -4,6 +4,22 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.17.2] — 2026-07-24
+
+### Fixed
+
+- **Nested `mkDrag` no longer captures a nested item's drag handles.** An outer
+  draggable item collected its handles with `descendants: true`, so a nested
+  `[mkDropList]`/`[mkDrag]` (e.g. a product list inside a draggable category)
+  had its handles claimed by the outer item — pressing an inner handle started
+  the *outer* drag and inner dnd never worked. Handles are now scoped to their
+  nearest `[mkDrag]` ancestor.
+- **`mkDialogFooter` buttons no longer touch.** The projected footer content is
+  the footer's single child, so the footer's `gap` never reached the buttons
+  inside it. The projected wrapper is now laid out as the actions row itself
+  (gap + right-alignment). New: `data-align="start|center|end|between"` on the
+  `[mkDialogFooter]` element controls button distribution (default `end`).
+
 ## [0.17.1] — 2026-07-24
 
 ### Fixed

@@ -59,7 +59,7 @@ const SETTLE_MS = 180;
     '[class.mk-drag--disabled]': 'disabled()',
     '[class.mk-drag--dragging]': 'dragging()',
     '[class.mk-drag--lifted]': 'lifted()',
-    '[class.mk-drag--has-handle]': 'handles().length > 0',
+    '[class.mk-drag--has-handle]': 'ownHandles().length > 0',
     '(pointerdown)': 'onPointerDown($event)',
     '(keydown)': 'onKeyDown($event)',
     '(blur)': 'onBlur()',
@@ -83,8 +83,19 @@ export class MkDrag<T = unknown> {
   /** Disable dragging this specific item. */
   readonly mkDragDisabled = input(false, { transform: booleanAttribute });
 
-  /** Handles inside this item; if any exist, drags must start on one. */
-  protected readonly handles = contentChildren(MkDragHandle, { descendants: true });
+  /** Every handle in the projected subtree, including those of nested drags. */
+  private readonly handles = contentChildren(MkDragHandle, { descendants: true });
+
+  /**
+   * Handles that belong to *this* drag — i.e. whose nearest `[mkDrag]` ancestor
+   * is this item, not a nested one. A nested `[mkDropList]`/`[mkDrag]` (a
+   * product list inside a draggable category, say) would otherwise have its
+   * handles captured by the outer item via `descendants: true`, so pressing an
+   * inner handle would start the outer drag and inner dnd would never work.
+   */
+  protected readonly ownHandles = computed(() =>
+    this.handles().filter((h) => h.element.closest('[mkDrag]') === this.element),
+  );
 
   /** True while a pointer drag is in progress. */
   protected readonly dragging = signal(false);
@@ -124,7 +135,7 @@ export class MkDrag<T = unknown> {
     const e = event as PointerEvent;
     if (this.disabled() || !this.home || this.lifted()) return;
     if (e.button !== undefined && e.button !== 0) return;
-    if (this.handles().length && !this.isHandleTarget(e.target)) return;
+    if (this.ownHandles().length && !this.isHandleTarget(e.target)) return;
 
     this.pointerId = e.pointerId;
     this.started = false;
@@ -553,7 +564,7 @@ export class MkDrag<T = unknown> {
 
   private isHandleTarget(target: EventTarget | null): boolean {
     if (!(target instanceof Node)) return false;
-    return this.handles().some((h) => h.element.contains(target));
+    return this.ownHandles().some((h) => h.element.contains(target));
   }
 
   private prefersReducedMotion(): boolean {
