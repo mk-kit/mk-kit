@@ -376,6 +376,28 @@ body.mk-app {
   border: 0;
 }
 
+/* mk-drag-handle — the grip a pointer drag must start on. MkDragHandle is a
+ * DIRECTIVE (so it composes onto any element, including other components'
+ * hosts like mk-icon), and directives cannot carry styles — hence the global
+ * class, same precedent as the overlay chrome below. */
+.mk-drag-handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: grab;
+  /* Stop the browser from treating a press-drag as a scroll/gesture. */
+  touch-action: none;
+  color: var(--mk-text-subtle);
+}
+
+.mk-drag-handle:hover {
+  color: var(--mk-text-muted);
+}
+
+.mk-drag-handle:active {
+  cursor: grabbing;
+}
+
 /* Themed scrollbars (progressive enhancement) */
 .mk-app * {
   scrollbar-color: var(--mk-scrollbar-thumb) transparent;

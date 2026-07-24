@@ -4,6 +4,19 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.17.0] — 2026-07-24
+
+### Changed
+
+- **`MkDragHandle` is now a directive** (was an attribute-selector component).
+  A component selector cannot sit on another component's element, so
+  `<mk-icon mkDragHandle />` failed with NG8023 — exactly the composition the
+  CDK's `cdkDragHandle` allowed. The handle's look (grab cursor, muted colour,
+  `touch-action: none`) moved from the component stylesheet to the global
+  `.mk-drag-handle` class in the theme stylesheet (same precedent as the
+  overlay chrome). Markup and behaviour are unchanged for existing
+  `<span mkDragHandle>` / `<button mkDragHandle>` consumers.
+
 ## [0.16.0] — 2026-07-24
 
 ### Added
