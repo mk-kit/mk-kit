@@ -34,6 +34,7 @@ import { MkButton } from '@mkornas/ui/button';
 import { MkChip } from '@mkornas/ui/chip';
 import { MkFormField } from '@mkornas/ui/forms/form-field';
 import { MkInput } from '@mkornas/ui/forms/input';
+import { MkInputGroup } from '@mkornas/ui/forms/input-group';
 import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
 import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
@@ -77,6 +78,7 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkChip,
     MkFormField,
     MkInput,
+    MkInputGroup,
     MkCheckbox,
     MkRadioGroup,
     MkRadio,
@@ -136,6 +138,10 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       <mk-form-field label="Full name" hint="As on your ID">
         <input mkInput placeholder="Ada Lovelace" />
       </mk-form-field>
+      <mk-input-group>
+        <span mkInputPrefix>@</span>
+        <input mkInput placeholder="handle" />
+      </mk-input-group>
       <mk-form-field label="Role">
         <mk-select placeholder="Pick a role" [options]="roleOptions" />
       </mk-form-field>

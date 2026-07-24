@@ -3,7 +3,9 @@ import { FormsModule } from '@angular/forms';
 import {
   MkAutosize,
   MkFormField,
+  MkIcon,
   MkInput,
+  MkInputGroup,
   MkNumberInput,
   MkOtp,
   MkPasswordInput,
@@ -21,7 +23,9 @@ import { DocsExample } from '../../shared/docs-example';
     FormsModule,
     DocsExample,
     MkFormField,
+    MkIcon,
     MkInput,
+    MkInputGroup,
     MkAutosize,
     MkPasswordInput,
     MkNumberInput,
@@ -76,6 +80,47 @@ import { DocsExample } from '../../shared/docs-example';
         <tbody>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored (inherited) inside an mk-form-field.</td></tr>
           <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid visual + aria-invalid when used standalone.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <!-- INPUT GROUP -->
+      <!-- ============================================================ -->
+      <h2>Input group (prefix / suffix)</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-input-group&gt;</code> wraps a native
+        <code class="docs-inline">input[mkInput]</code> with leading / trailing
+        affixes — icons, static text or compact buttons — inside one shared
+        control frame. The group carries the border and focus ring; the nested
+        input detects it and drops its own chrome. Project affixes with the
+        <code class="docs-inline">mkInputPrefix</code> /
+        <code class="docs-inline">mkInputSuffix</code> attributes. Inside an
+        <code class="docs-inline">mk-form-field</code> the group inherits the
+        field's size and invalid state.
+      </p>
+
+      <docs-example [code]="inputGroupCode" [column]="true">
+        <mk-input-group style="max-width: 26rem;">
+          <mk-icon mkInputPrefix name="search" [size]="18" />
+          <input mkInput type="search" placeholder="Search…" [(ngModel)]="query" />
+        </mk-input-group>
+        <mk-form-field label="Price" hint="Gross, VAT included" style="max-width: 26rem;">
+          <mk-input-group>
+            <input mkInput type="number" min="0" step="0.01" [(ngModel)]="price" />
+            <span mkInputSuffix>zł</span>
+          </mk-input-group>
+        </mk-form-field>
+        <p class="echo">Query: {{ query() || '—' }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored (inherited) inside an mk-form-field.</td></tr>
+          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force the invalid frame when used standalone.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Visually reflect a disabled inner control.</td></tr>
         </tbody>
       </table>
 
@@ -196,6 +241,10 @@ export class TextInputsPage {
   protected readonly name = signal('');
   protected readonly message = signal('');
 
+  // --- Input group ------------------------------------------------------------
+  protected readonly query = signal('');
+  protected readonly price = signal<number | null>(null);
+
   // --- Autosize ---------------------------------------------------------------
   protected readonly note = signal('');
 
@@ -213,6 +262,18 @@ export class TextInputsPage {
 <input mkInput placeholder="Invalid" [invalid]="true" />`;
 
   protected readonly textareaCode = `<textarea mkInput rows="4" placeholder="Your message…" [(ngModel)]="message"></textarea>`;
+
+  protected readonly inputGroupCode = `<mk-input-group>
+  <mk-icon mkInputPrefix name="search" [size]="18" />
+  <input mkInput type="search" placeholder="Search…" [(ngModel)]="query" />
+</mk-input-group>
+
+<mk-form-field label="Price" hint="Gross, VAT included">
+  <mk-input-group>
+    <input mkInput type="number" formControlName="price" />
+    <span mkInputSuffix>zł</span>
+  </mk-input-group>
+</mk-form-field>`;
 
   protected readonly autosizeCode = `<textarea mkInput mkAutosize [mkAutosizeMaxRows]="8"
   [mkAutosizeValue]="note()" [(ngModel)]="note"></textarea>`;

@@ -20,6 +20,7 @@ import { MkButton } from '@mkornas/ui/button';
 import { MkChip } from '@mkornas/ui/chip';
 import { MkFormField } from '@mkornas/ui/forms/form-field';
 import { MkInput } from '@mkornas/ui/forms/input';
+import { MkInputGroup } from '@mkornas/ui/forms/input-group';
 import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
 import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
@@ -97,6 +98,17 @@ class ButtonHost {}
   `,
 })
 class FormFieldInputHost {}
+
+@Component({
+  imports: [MkInputGroup, MkInput],
+  template: `
+    <mk-input-group>
+      <span mkInputPrefix aria-hidden="true">@</span>
+      <input mkInput placeholder="handle" aria-label="Handle" />
+    </mk-input-group>
+  `,
+})
+class InputGroupHost {}
 
 @Component({
   imports: [MkCheckbox],
@@ -400,6 +412,7 @@ class TreeHost {
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
+  { name: 'input group', host: InputGroupHost },
   { name: 'checkbox', host: CheckboxHost },
   { name: 'radio group', host: RadioGroupHost },
   { name: 'switch', host: SwitchHost },

@@ -4,6 +4,18 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.16.0] — 2026-07-24
+
+### Added
+
+- **`MkInputGroup`** (`mk-input-group`) — wraps a native `input[mkInput]` with
+  `mkInputPrefix` / `mkInputSuffix` affixes (icons, static text, compact
+  buttons) inside one shared control frame. The group owns the border, focus
+  ring and invalid state; the nested input detects the group via DI and drops
+  its own chrome. Inherits size + invalid from a wrapping `mk-form-field`.
+  Closes the long-standing "search field with a leading icon" gap that
+  consumers papered over with local wrappers.
+
 ## [0.15.0] — 2026-07-23
 
 ### Added

@@ -68,6 +68,21 @@
   border-color: var(--mk-danger);
 }
 
+/* Inside an mk-input-group the group owns the frame and focus ring. */
+:host(.mk-input--grouped) {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding-inline: var(--mk-space-2);
+  background-color: transparent;
+  border: none;
+  border-radius: inherit;
+}
+:host(.mk-input--grouped:focus),
+:host(.mk-input--grouped:focus-visible) {
+  outline: none;
+}
+
 /* Read-only */
 :host([readonly]) {
   background-color: var(--mk-surface-2);

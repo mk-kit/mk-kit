@@ -9,6 +9,7 @@ import {
 } from '@angular/core';
 import type { MkSize } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
+import { MkInputGroup } from '../input-group/input-group';
 
 /**
  * Input — enhances a native `<input>` or `<textarea>` with mk-kit theming and
@@ -36,6 +37,7 @@ import { MkFormField } from '../form-field/form-field';
     '[class.mk-input--md]': "effectiveSize() === 'md'",
     '[class.mk-input--lg]': "effectiveSize() === 'lg'",
     '[class.mk-input--invalid]': 'isInvalid()',
+    '[class.mk-input--grouped]': 'inGroup',
     '[attr.id]': 'resolvedId()',
     '[attr.aria-invalid]': 'isInvalid() || null',
     '[attr.aria-required]': 'isRequired() || null',
@@ -44,8 +46,12 @@ import { MkFormField } from '../form-field/form-field';
 })
 export class MkInput {
   private readonly field = inject(MkFormField, { optional: true });
+  private readonly group = inject(MkInputGroup, { optional: true });
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly initialId = this.host.nativeElement.getAttribute('id');
+
+  /** Whether this input sits inside an `mk-input-group` (the group then owns the frame). */
+  protected readonly inGroup = !!this.group;
 
   /** Control size. Ignored when nested in an `mk-form-field` (inherits it). */
   readonly size = input<MkSize>('md');
@@ -53,10 +59,15 @@ export class MkInput {
   readonly invalid = input(false, { transform: booleanAttribute });
 
   protected readonly effectiveSize = computed<MkSize>(() =>
-    this.field ? this.field.size() : this.size(),
+    this.field
+      ? this.field.size()
+      : (this.group?.effectiveSize() ?? this.size()),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () =>
+      this.invalid() ||
+      (this.field?.hasError() ?? false) ||
+      (this.group?.isInvalid() ?? false),
   );
   protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly resolvedId = computed(
