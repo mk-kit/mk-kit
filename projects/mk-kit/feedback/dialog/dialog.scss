@@ -39,6 +39,9 @@
 
 .mk-dialog__title {
   margin: 0;
+  min-width: 0;
+  // Long / unbroken titles wrap instead of overflowing past the close button.
+  overflow-wrap: anywhere;
   font-size: var(--mk-font-size-lg);
   font-weight: var(--mk-font-weight-semibold);
   line-height: var(--mk-line-height-snug);

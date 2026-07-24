@@ -21,7 +21,7 @@
   height: var(--mk-control-height-lg);
 }
 :host(:focus-within) {
-  @include mk.focus-ring;
+  @include mk.focus-ring(-2px);
   border-color: var(--mk-primary);
 }
 :host(.mk-number-input--invalid) {

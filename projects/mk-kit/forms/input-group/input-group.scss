@@ -28,7 +28,8 @@
 
 /* The group owns the focus ring; the bare inner input suppresses its own. */
 :host(:focus-within) {
-  @include mk.focus-ring;
+  // Inset (see input.scss) so the ring is never clipped by a tight ancestor.
+  @include mk.focus-ring(-2px);
   border-color: var(--mk-primary);
 }
 

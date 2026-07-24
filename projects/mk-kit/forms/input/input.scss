@@ -54,7 +54,9 @@
 
 :host(:focus),
 :host(:focus-visible) {
-  @include mk.focus-ring;
+  // Inset ring (offset -2px, hugging inside the border) so it is never clipped
+  // by an `overflow:hidden` ancestor — cards, dialog/drawer bodies, table cells.
+  @include mk.focus-ring(-2px);
   border-color: var(--mk-primary);
 }
 

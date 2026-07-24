@@ -4,6 +4,19 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.17.3] — 2026-07-24
+
+### Fixed
+
+- **Input focus rings are now inset** (`outline-offset: -2px`) on `mkInput`,
+  `MkInputGroup`, `MkNumberInput`, `MkCurrencyInput` and `MkPhoneInput`. The
+  previous outward ring was clipped when the field sat flush inside an
+  `overflow:hidden` ancestor (cards, dialog/drawer bodies, table cells); an
+  inset ring hugs inside the border and is never clipped.
+- **Dialog and drawer titles wrap** instead of overflowing past the header's
+  close button (`overflow-wrap: anywhere` + `min-width: 0`), so long entity
+  names no longer push the close control off the edge.
+
 ## [0.17.2] — 2026-07-24
 
 ### Fixed

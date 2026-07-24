@@ -25,7 +25,7 @@
   border-color: var(--mk-border-strong);
 }
 :host(:focus-within) {
-  @include mk.focus-ring;
+  @include mk.focus-ring(-2px);
   border-color: var(--mk-primary);
 }
 :host(.mk-currency-input--invalid) {
