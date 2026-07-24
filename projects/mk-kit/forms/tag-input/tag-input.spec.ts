@@ -36,6 +36,27 @@ describe('MkTagInput', () => {
     expect(onChange).toHaveBeenCalledWith(['angular']);
   });
 
+  it('clears the native input element after committing a tag', () => {
+    // Drive the real DOM input (as a user would) so the one-way [value] binding
+    // is exercised: committing must empty the visible field, not just the signal.
+    const input = fixture.nativeElement.querySelector(
+      'input.mk-tag-input__input',
+    ) as HTMLInputElement;
+    input.value = 'example.com';
+    input.dispatchEvent(new Event('input'));
+    fixture.detectChanges();
+
+    input.dispatchEvent(
+      Object.assign(new KeyboardEvent('keydown', { key: 'Enter' }), {
+        preventDefault: () => {},
+      }),
+    );
+    fixture.detectChanges();
+
+    expect(cmp.value()).toEqual(['example.com']);
+    expect(input.value).toBe('');
+  });
+
   it('adds a tag on a separator key', () => {
     typeAndPress('design', ',');
     expect(cmp.value()).toEqual(['design']);

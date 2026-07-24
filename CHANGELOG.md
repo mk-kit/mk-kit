@@ -4,6 +4,24 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.17.1] — 2026-07-24
+
+### Fixed
+
+- **`mkInput` now provides its own `ControlValueAccessor`.** It previously
+  leaned on Angular's built-in `DefaultValueAccessor`, which did not reliably
+  push a programmatic model reset back onto the native element — clearing the
+  bound model (e.g. `newValue = ''` after adding an item) left the old text
+  visible in the field. The directive now writes the value straight to the host
+  `<input>`/`<textarea>`, buffers IME composition so `onChange` fires once per
+  completed character, and reflects `setDisabledState`. Existing `[(ngModel)]`
+  and reactive-forms usage is unchanged; the field just clears when the model
+  says it should.
+- **`MkTagInput` clears its entry field after committing a tag.** The one-way
+  `[value]="query()"` binding did not empty an input the user had just typed
+  into, so a second tag concatenated onto the first. Commit now resets the
+  native element directly alongside the signal.
+
 ## [0.17.0] — 2026-07-24
 
 ### Changed

@@ -4,18 +4,26 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
+  forwardRef,
   inject,
   input,
 } from '@angular/core';
+import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkInputGroup } from '../input-group/input-group';
 
 /**
  * Input — enhances a native `<input>` or `<textarea>` with mk-kit theming and
- * a11y wiring. It is an attribute-selector component so all native semantics,
- * keyboard behaviour and form integration (`ngModel`, reactive forms) come for
- * free; this only layers on tokenised styling and aria state.
+ * a11y wiring. It is an attribute-selector component so all native semantics
+ * and keyboard behaviour come for free; this layers on tokenised styling, aria
+ * state and form integration.
+ *
+ * It provides its own `ControlValueAccessor` (over the native `value`) so
+ * `[(ngModel)]` and reactive forms write back to the DOM reliably — including
+ * when the bound model is reset programmatically. IME composition is buffered
+ * so `onChange` fires once per completed character, matching Angular's built-in
+ * `DefaultValueAccessor`.
  *
  * When placed inside an `mk-form-field` it automatically adopts the field's
  * control id (so the `<label for>` associates), `aria-describedby`,
@@ -42,12 +50,24 @@ import { MkInputGroup } from '../input-group/input-group';
     '[attr.aria-invalid]': 'isInvalid() || null',
     '[attr.aria-required]': 'isRequired() || null',
     '[attr.aria-describedby]': 'describedBy()',
+    '(input)': 'onInput($event)',
+    '(compositionstart)': 'onCompositionStart()',
+    '(compositionend)': 'onCompositionEnd($event)',
+    '(blur)': 'onTouched()',
   },
+  providers: [
+    {
+      provide: NG_VALUE_ACCESSOR,
+      useExisting: forwardRef(() => MkInput),
+      multi: true,
+    },
+  ],
 })
-export class MkInput {
+export class MkInput implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
   private readonly group = inject(MkInputGroup, { optional: true });
-  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly host =
+    inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef);
   private readonly initialId = this.host.nativeElement.getAttribute('id');
 
   /** Whether this input sits inside an `mk-input-group` (the group then owns the frame). */
@@ -76,4 +96,37 @@ export class MkInput {
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );
+
+  private onChange: (value: string) => void = () => {};
+  protected onTouched: () => void = () => {};
+  /** True while an IME composition is in flight (buffers `onChange`). */
+  private composing = false;
+
+  protected onInput(event: Event): void {
+    if (this.composing) return;
+    this.onChange((event.target as HTMLInputElement).value);
+  }
+
+  protected onCompositionStart(): void {
+    this.composing = true;
+  }
+
+  protected onCompositionEnd(event: Event): void {
+    this.composing = false;
+    this.onChange((event.target as HTMLInputElement).value);
+  }
+
+  // --- ControlValueAccessor -------------------------------------------------
+  writeValue(value: unknown): void {
+    this.host.nativeElement.value = value == null ? '' : String(value);
+  }
+  registerOnChange(fn: (value: string) => void): void {
+    this.onChange = fn;
+  }
+  registerOnTouched(fn: () => void): void {
+    this.onTouched = fn;
+  }
+  setDisabledState(isDisabled: boolean): void {
+    this.host.nativeElement.disabled = isDisabled;
+  }
 }

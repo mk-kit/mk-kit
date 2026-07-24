@@ -168,16 +168,27 @@ export class MkTagInput implements ControlValueAccessor, Validator {
   private commit(raw: string): void {
     const tag = raw.trim();
     if (!tag) {
-      this.query.set('');
+      this.clearQuery();
       return;
     }
     if (this.isDisabled() || this.atMax()) return;
     // Keep the typed text when the tag is rejected so nothing is lost silently.
     if (!this.allowDuplicates() && this.value().includes(tag)) return;
-    this.query.set('');
+    this.clearQuery();
     const next = [...this.value(), tag];
     this.setValue(next);
     this.added.emit(tag);
+  }
+
+  /**
+   * Reset the pending text. A one-way `[value]="query()"` binding does not
+   * reliably push an empty value back onto an input the user has just edited,
+   * so clear the native element directly as well as the signal.
+   */
+  private clearQuery(): void {
+    this.query.set('');
+    const el = this.inputRef()?.nativeElement;
+    if (el) el.value = '';
   }
 
   protected removeAt(index: number): void {
