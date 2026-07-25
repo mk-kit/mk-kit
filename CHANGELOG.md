@@ -4,6 +4,31 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.19.0] — 2026-07-25
+
+### Added
+
+- **Field directive** (`mkField`) — one attribute that applies the semantic
+  mobile-keyboard and autofill bundle a text input needs, so the two mistakes
+  every codebase makes stop happening: email fields without
+  `autocapitalize="off"` (iOS capitalises every address) and address fields with
+  no `autocomplete` at all (the browser cannot offer a saved address at
+  checkout). `<input mkInput mkField="street" formControlName="street" />` sets
+  `type`, `inputmode`, `autocomplete`, `autocapitalize`, `autocorrect`,
+  `spellcheck` and `enterkeyhint` from one name. Eighteen kinds — `email`,
+  `tel`, `url`, `search`, `numeric`, `given-name`, `family-name`, `name`,
+  `organization`, `street`, `address-line1`, `address-line2`, `city`, `region`,
+  `country`, `postal-code`, `username`, `one-time-code` — exported as
+  `MkFieldKind` with the lookup table itself (`MK_FIELD_PRESETS`, typed
+  `MkFieldPreset`) so hosts can inspect or extend it. The kind is a signal
+  input, so a bound kind re-applies the whole bundle. It only sets attributes,
+  so it composes with `mkInput`, `mk-form-field`, `[(ngModel)]` and reactive
+  forms without touching their APIs. Precedence: a **static** attribute on the
+  element wins (the directive snapshots the seven attributes at construction and
+  fills in only what is missing — `mkField="username" type="password"` stays a
+  password field); a template `[attr.…]` binding does **not**, because Angular
+  applies host bindings after template bindings.
+
 ## [0.18.0] — 2026-07-25
 
 ### Added
