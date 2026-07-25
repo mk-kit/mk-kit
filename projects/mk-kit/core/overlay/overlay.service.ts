@@ -43,6 +43,14 @@ export interface MkOverlayConfig<TData = unknown> {
 }
 
 let openOverlays = 0;
+/**
+ * Every overlay currently on screen, in open order. Kept so {@link
+ * MkOverlayService.closeAll} can dismiss them — an app-level event (logging
+ * out, a session expiring, a hard route change) has to clear whatever is
+ * floating above the page, and the caller usually has no handle on it.
+ * Entries remove themselves on dispose, so a closed overlay never lingers.
+ */
+const openRefs = new Set<MkOverlayRef<unknown>>();
 
 /**
  * Lightweight, dependency-free overlay renderer. Instantiates a standalone
@@ -55,6 +63,21 @@ export class MkOverlayService {
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+
+  /** How many overlays are currently open. */
+  get openCount(): number {
+    return openRefs.size;
+  }
+
+  /**
+   * Close every open overlay, newest first. Each is closed with no result, so
+   * `afterClosed` resolves undefined exactly as a backdrop click or Escape
+   * would. Safe to call when nothing is open.
+   */
+  closeAll(): void {
+    // Iterate a COPY: close() disposes synchronously, which mutates the set.
+    for (const ref of [...openRefs].reverse()) ref.close();
+  }
 
   open<TComponent, TResult = unknown, TData = unknown>(
     component: Type<TComponent>,
@@ -144,7 +167,10 @@ export class MkOverlayService {
     };
     this.document.addEventListener('keydown', keyHandler, true);
 
+    openRefs.add(overlayRef as MkOverlayRef<unknown>);
+
     overlayRef._dispose = () => {
+      openRefs.delete(overlayRef as MkOverlayRef<unknown>);
       this.document.removeEventListener('keydown', keyHandler, true);
       focusTrap?.release();
       this.appRef.detachView(componentRef.hostView);

@@ -4,6 +4,42 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.23.0] — 2026-07-25
+
+### Fixed
+
+- **`MkStepper` vertical orientation now interleaves each step's body with its
+  own header**, instead of stacking all three headers and dropping the content
+  below them. `orientation="vertical"` previously only changed the header
+  rail's `flex-direction`, which is a horizontal layout wearing a column — the
+  content never sat under the step it belonged to.
+
+  This required `MkStep` to capture its body as a **template** rather than
+  projecting it in place, so the stepper can render each body in the position
+  the orientation calls for. The public API is unchanged —
+  `<mk-step label="…">content</mk-step>` still reads identically — but the step
+  host element is now empty and the panel wrapper (with its role and aria)
+  belongs to the stepper.
+
+  The ARIA model deliberately differs by orientation, matching what Angular
+  Material does: horizontal stays a `tablist` of `tab`s over `tabpanel`s, while
+  vertical becomes a disclosure pattern — plain buttons carrying
+  `aria-expanded` / `aria-current="step"` over `role="region"` panels. `role=tab`
+  requires tabs to be direct children of their `tablist`, which an interleaved
+  layout cannot satisfy, so reusing it there would have been invalid.
+
+  The vertical connector is now the content wrapper's leading border, so the
+  rule spans the expanded body and stops at the last step rather than being a
+  fixed-height stub.
+
+### Added
+
+- **`MkOverlayService.closeAll()`** (plus `openCount`) — dismisses every open
+  overlay, newest first. App-level events (logging out, a session expiring)
+  have to clear whatever is floating above the page, and the caller generally
+  holds no reference to it; previously there was no way to do this at all.
+  Each is closed with no result, exactly as a backdrop click would.
+
 ## [0.22.0] — 2026-07-25
 
 ### Added

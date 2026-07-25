@@ -1,53 +1,129 @@
-<div
-  class="mk-stepper__header"
-  role="tablist"
-  [attr.aria-orientation]="orientation()"
->
-  @for (step of steps(); track step.headerId; let i = $index; let last = $last) {
-    <button
-      #stepBtn
-      type="button"
-      role="tab"
-      class="mk-stepper__step"
-      [class.mk-stepper__step--active]="step.active()"
-      [class.mk-stepper__step--completed]="step.completed()"
-      [class.mk-stepper__step--error]="step.hasError()"
-      [id]="step.headerId"
-      [attr.aria-controls]="step.panelId"
-      [attr.aria-selected]="step.active()"
-      [attr.aria-disabled]="!isReachable(i) || null"
-      [attr.tabindex]="step.active() ? 0 : -1"
-      [disabled]="!isReachable(i)"
-      (click)="select(i)"
-      (keydown)="onKeydown($event, i)"
-    >
-      <span class="mk-stepper__marker" aria-hidden="true">
-        @if (step.hasError()) {
-          <span class="mk-stepper__bang">!</span>
-        } @else if (step.completed()) {
-          <span class="mk-stepper__check"></span>
-        } @else {
-          {{ stepNumber(i) }}
-        }
-      </span>
-      <span class="mk-stepper__labels">
-        <span class="mk-stepper__label">
-          {{ step.label() }}
-          @if (step.optional()) {
-            <span class="mk-stepper__optional">{{ i18n.optional }}</span>
-          }
-        </span>
-        @if (step.description()) {
-          <span class="mk-stepper__description">{{ step.description() }}</span>
-        }
-      </span>
-    </button>
-    @if (!last) {
-      <span class="mk-stepper__connector" aria-hidden="true"></span>
-    }
-  }
-</div>
+<!--
+  Steps are content children whose bodies are TEMPLATES (see MkStep), so this
+  view decides where each one lands. Horizontal keeps the classic split: one
+  header rail, one panel area below it. Vertical INTERLEAVES header and body,
+  the way a vertical stepper is expected to read.
 
-<div class="mk-stepper__panels">
+  The ARIA model differs with it, deliberately. Horizontal is a tablist: tabs
+  must be direct children of their tablist, which an interleaved layout cannot
+  satisfy. Vertical is therefore a disclosure pattern instead — plain buttons
+  with aria-expanded driving labelled regions. Same visuals, both valid.
+
+  On the server the step hosts still have to be projected somewhere or the
+  serializer has nowhere to put the projected nodes and hydration fails. They
+  render empty (the body lives in a template), so this costs nothing visually.
+-->
+@if (isServer) {
   <ng-content />
-</div>
+}
+
+@if (orientation() === 'horizontal') {
+  <div class="mk-stepper__header" role="tablist" aria-orientation="horizontal">
+    @for (
+      step of steps();
+      track step.headerId;
+      let i = $index;
+      let last = $last
+    ) {
+      <ng-container
+        [ngTemplateOutlet]="headerTpl"
+        [ngTemplateOutletContext]="{ step: step, i: i }"
+      />
+      @if (!last) {
+        <span class="mk-stepper__connector" aria-hidden="true"></span>
+      }
+    }
+  </div>
+
+  <div class="mk-stepper__panels">
+    @for (step of steps(); track step.headerId) {
+      <div
+        class="mk-stepper__panel"
+        role="tabpanel"
+        [id]="step.panelId"
+        [attr.aria-labelledby]="step.headerId"
+        [attr.tabindex]="step.active() ? 0 : null"
+        [attr.inert]="step.active() ? null : ''"
+        [hidden]="!step.active()"
+      >
+        <ng-container [ngTemplateOutlet]="step.content()" />
+      </div>
+    }
+  </div>
+} @else {
+  @for (
+    step of steps();
+    track step.headerId;
+    let i = $index;
+    let last = $last
+  ) {
+    <div class="mk-stepper__row">
+      <ng-container
+        [ngTemplateOutlet]="headerTpl"
+        [ngTemplateOutletContext]="{ step: step, i: i }"
+      />
+      <!-- The rule down the side is this wrapper's left border, so it spans the
+           expanded body and stops at the last step. -->
+      <div
+        class="mk-stepper__vline"
+        [class.mk-stepper__vline--last]="last"
+        [attr.inert]="step.active() ? null : ''"
+      >
+        <div
+          class="mk-stepper__panel"
+          role="region"
+          [id]="step.panelId"
+          [attr.aria-labelledby]="step.headerId"
+          [hidden]="!step.active()"
+        >
+          <ng-container [ngTemplateOutlet]="step.content()" />
+        </div>
+      </div>
+    </div>
+  }
+}
+
+<ng-template #headerTpl let-step="step" let-i="i">
+  <button
+    #stepBtn
+    type="button"
+    class="mk-stepper__step"
+    [class.mk-stepper__step--active]="step.active()"
+    [class.mk-stepper__step--completed]="step.completed()"
+    [class.mk-stepper__step--error]="step.hasError()"
+    [id]="step.headerId"
+    [attr.role]="isHorizontal() ? 'tab' : null"
+    [attr.aria-controls]="step.panelId"
+    [attr.aria-selected]="isHorizontal() ? step.active() : null"
+    [attr.aria-posinset]="isHorizontal() ? i + 1 : null"
+    [attr.aria-setsize]="isHorizontal() ? steps().length : null"
+    [attr.aria-expanded]="isHorizontal() ? null : step.active()"
+    [attr.aria-current]="!isHorizontal() && step.active() ? 'step' : null"
+    [attr.aria-disabled]="!isReachable(i) || null"
+    [attr.tabindex]="step.active() ? 0 : -1"
+    [disabled]="!isReachable(i)"
+    (click)="select(i)"
+    (keydown)="onKeydown($event, i)"
+  >
+    <span class="mk-stepper__marker" aria-hidden="true">
+      @if (step.hasError()) {
+        <span class="mk-stepper__bang">!</span>
+      } @else if (step.completed()) {
+        <span class="mk-stepper__check"></span>
+      } @else {
+        {{ stepNumber(i) }}
+      }
+    </span>
+    <span class="mk-stepper__labels">
+      <span class="mk-stepper__label">
+        {{ step.label() }}
+        @if (step.optional()) {
+          <span class="mk-stepper__optional">{{ i18n.optional }}</span>
+        }
+      </span>
+      @if (step.description()) {
+        <span class="mk-stepper__description">{{ step.description() }}</span>
+      }
+    </span>
+  </button>
+</ng-template>

@@ -1,7 +1,10 @@
+import { NgTemplateOutlet } from '@angular/common';
+import { isPlatformServer } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  PLATFORM_ID,
   booleanAttribute,
   computed,
   contentChildren,
@@ -40,6 +43,7 @@ export type MkStepperOrientation = 'horizontal' | 'vertical';
  */
 @Component({
   selector: 'mk-stepper',
+  imports: [NgTemplateOutlet],
   templateUrl: './stepper.html',
   styleUrl: './stepper.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -51,6 +55,8 @@ export type MkStepperOrientation = 'horizontal' | 'vertical';
 })
 export class MkStepper {
   protected readonly i18n = inject(MK_I18N);
+  /** Step hosts are projected on the server only — see stepper.html. */
+  protected readonly isServer = isPlatformServer(inject(PLATFORM_ID));
 
   /** Projected steps, kept live via a signal content query. */
   readonly steps = contentChildren(MkStep);
@@ -64,6 +70,10 @@ export class MkStepper {
   readonly orientation = input<MkStepperOrientation>('horizontal');
   /** Enforce sequential completion before a step becomes reachable. */
   readonly linear = input(false, { transform: booleanAttribute });
+
+  protected readonly isHorizontal = computed(
+    () => this.orientation() === 'horizontal',
+  );
 
   /** Emits the newly selected index whenever the active step changes. */
   readonly selectionChange = output<number>();

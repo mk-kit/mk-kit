@@ -1,10 +1,12 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  TemplateRef,
   booleanAttribute,
   input,
   model,
   signal,
+  viewChild,
 } from '@angular/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 
@@ -30,11 +32,6 @@ import { mkUniqueId } from '@mkornas/ui/core';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-step',
-    role: 'tabpanel',
-    '[id]': 'panelId',
-    '[attr.aria-labelledby]': 'headerId',
-    '[attr.hidden]': "active() ? null : ''",
-    '[attr.tabindex]': 'active() ? 0 : null',
   },
 })
 export class MkStep {
@@ -58,4 +55,12 @@ export class MkStep {
 
   /** Whether this step is currently selected. Set by the parent `MkStepper`. */
   readonly active = signal(false);
+
+  /**
+   * The step body, captured so `MkStepper` can render it in the position the
+   * orientation calls for. The host element itself stays empty — the panel
+   * wrapper (and its role/aria) belongs to the stepper, which is the only
+   * place that knows whether this is a tab panel or a disclosure region.
+   */
+  readonly content = viewChild.required(TemplateRef);
 }

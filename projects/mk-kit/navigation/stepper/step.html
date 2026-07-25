@@ -1,1 +1,9 @@
-<ng-content />
+<!--
+  The body is captured as a TEMPLATE rather than projected in place, so the
+  parent `MkStepper` can render it wherever the orientation requires — beneath
+  the header rail when horizontal, or interleaved directly under its own header
+  when vertical. Projecting it here would pin every panel below every header.
+-->
+<ng-template>
+  <ng-content />
+</ng-template>

@@ -10,10 +10,6 @@
   align-items: center;
 }
 
-:host(.mk-stepper--vertical) .mk-stepper__header {
-  flex-direction: column;
-  align-items: stretch;
-}
 
 /* --- Step header button --- */
 .mk-stepper__step {
@@ -127,23 +123,38 @@
   margin: 0 var(--mk-space-2);
   background-color: var(--mk-border);
 }
-:host(.mk-stepper--vertical) .mk-stepper__connector {
-  flex: none;
-  width: var(--mk-border-width);
-  min-width: 0;
-  height: var(--mk-space-4);
-  /* align under the centre of the 1.75rem marker + step padding */
-  margin: 0;
-  margin-inline-start: calc(var(--mk-space-3) + 0.875rem);
-}
 
 /* --- Panels --- */
 .mk-stepper__panels {
   padding-top: var(--mk-space-4);
 }
-:host(.mk-stepper--vertical) .mk-stepper__panels {
-  padding-top: var(--mk-space-3);
-  padding-inline-start: calc(var(--mk-space-3) + 0.875rem);
+
+/* --- Vertical: header and body interleave, one row per step --- */
+:host(.mk-stepper--vertical) .mk-stepper__row {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+:host(.mk-stepper--vertical) .mk-stepper__step {
+  align-self: stretch;
+  justify-content: flex-start;
+  text-align: start;
+}
+/* The rule runs down the side of the body, aligned to the marker's centre:
+   step padding + half the 1.75rem marker. It is the wrapper's border, so it
+   grows with the expanded content and disappears on the final step. */
+:host(.mk-stepper--vertical) .mk-stepper__vline {
+  margin-inline-start: calc(var(--mk-space-3) + 0.875rem);
+  border-inline-start: var(--mk-border-width) solid var(--mk-border);
+  padding-inline-start: calc(var(--mk-space-4) - var(--mk-border-width));
+  min-height: var(--mk-space-4);
+}
+:host(.mk-stepper--vertical) .mk-stepper__vline--last {
+  border-inline-start-color: transparent;
+  min-height: 0;
+}
+:host(.mk-stepper--vertical) .mk-stepper__panel:not([hidden]) {
+  padding-block: var(--mk-space-3);
 }
 
 @media (prefers-reduced-motion: reduce) {
