@@ -449,6 +449,48 @@ body.mk-app {
   .mk-dialog-panel { animation: none; }
 }
 
+/* Bottom-sheet panel chrome. Lives here rather than in bottom-sheet.scss so a
+ * BARE component opened through MkBottomSheetService gets a real panel — that
+ * component stylesheet only loads when the `mk-bottom-sheet` layout component
+ * is actually rendered, which apps with a bespoke sheet body never do. Mirrors
+ * how `.mk-dialog-panel` is handled above. */
+.mk-bottom-sheet-panel {
+  align-self: flex-end;
+  /* `width` (not max-width) so the panel's inline max-width:100% can't win. */
+  width: min(100%, 42rem);
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  background-color: var(--mk-surface);
+  color: var(--mk-text);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-bottom: none;
+  border-top-left-radius: var(--mk-radius-xl);
+  border-top-right-radius: var(--mk-radius-xl);
+  box-shadow: var(--mk-shadow-xl);
+  animation: mk-bottom-sheet-in var(--mk-duration-normal) var(--mk-ease-emphasized);
+}
+
+/* As with dialogs, a bare component still needs a scroll region and padding. */
+.mk-bottom-sheet-panel > :not(.mk-bottom-sheet) {
+  min-height: 0;
+  overflow: auto;
+}
+
+.mk-bottom-sheet-panel:not(:has(.mk-bottom-sheet)) {
+  padding: var(--mk-space-5);
+}
+
+@keyframes mk-bottom-sheet-in {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-bottom-sheet-panel { animation: none; }
+}
+
 /* Body-level overlay animations (dialog / menu / toast live outside components) */
 @keyframes mk-overlay-fade {
   from { opacity: 0; }

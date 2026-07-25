@@ -24,6 +24,14 @@ export interface MkOverlayConfig<TData = unknown> {
   closeOnEscape?: boolean;
   /** Trap focus within the panel and restore it on close. Default `true`. */
   trapFocus?: boolean;
+  /**
+   * Move focus to the panel's first focusable element on open. Default `true`.
+   * Set `false` to focus the panel itself instead — for content-led surfaces
+   * (a product sheet, a preview) where focusing the close button first reads
+   * as "dismiss me". Tab containment and focus restore are unaffected; turn
+   * `trapFocus` off only if you want neither.
+   */
+  autoFocus?: boolean;
   /** Extra class(es) applied to the panel host element. */
   panelClass?: string | string[];
   /** Accessible role for the panel. Default `dialog`. */
@@ -57,6 +65,7 @@ export class MkOverlayService {
       closeOnBackdropClick = true,
       closeOnEscape = true,
       trapFocus = true,
+      autoFocus = true,
       role = 'dialog',
     } = config;
 
@@ -122,7 +131,9 @@ export class MkOverlayService {
 
     // Focus management.
     const focusTrap = trapFocus ? new MkFocusTrap(panel) : undefined;
-    focusTrap?.activate();
+    // `autoFocus: false` focuses the panel rather than its first control, so
+    // the trap still contains Tab and restores focus on close.
+    focusTrap?.activate(autoFocus ? undefined : panel);
 
     // Escape handling.
     const keyHandler = (e: KeyboardEvent) => {

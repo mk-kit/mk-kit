@@ -4,6 +4,34 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.22.0] — 2026-07-25
+
+### Added
+
+- **`MkOverlayConfig.autoFocus`** (default `true`) — set `false` to focus the
+  panel itself instead of its first focusable control. Content-led surfaces (a
+  product sheet, an image preview) usually have a close button first, so the
+  default announces "dismiss me" before the content. This is deliberately *not*
+  implemented as `trapFocus: false`: Tab containment and focus restore are what
+  make the overlay modal, and they stay on.
+
+- **`--mk-spinner-size` / `--mk-spinner-thickness`** — public tokens on
+  `MkSpinner`. The `sm`/`md`/`lg` presets top out at 2.25rem, which is right for
+  inline spinners but too small for a page-level loader; either token now
+  overrides the preset. Chosen over a second sizing *input* so there is no way
+  for `size` and a diameter to disagree.
+
+### Fixed
+
+- **`.mk-bottom-sheet-panel` chrome now ships in `mk-kit.css`**, alongside
+  `.mk-dialog-panel`, instead of living in the `MkBottomSheet` component's
+  stylesheet. That stylesheet only loads when the layout component is actually
+  rendered, so opening a *bare* component through `MkBottomSheetService` — the
+  normal thing to do when the sheet body is bespoke — produced an unstyled,
+  viewport-centred panel with no surface, radius, bottom anchoring or entrance
+  animation. Bare panels also get the same padding/scroll-region fallback
+  dialogs already had.
+
 ## [0.21.0] — 2026-07-25
 
 ### Added

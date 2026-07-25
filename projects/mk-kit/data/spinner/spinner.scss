@@ -1,7 +1,12 @@
 :host {
   --_color: var(--mk-primary);
-  --_size: 1.5rem;
-  --_thickness: 2px;
+  /* `--mk-spinner-size` / `--mk-spinner-thickness` are the public escape hatch:
+   * set either on the host (or an ancestor) and it wins over the size preset.
+   * Page-level loaders want a diameter well past `lg`, and hard-coding one in
+   * every consumer beats exposing a second sizing input that can disagree
+   * with `size`. */
+  --_size: var(--mk-spinner-size, 1.5rem);
+  --_thickness: var(--mk-spinner-thickness, 2px);
 
   display: inline-flex;
   align-items: center;
@@ -17,9 +22,18 @@
 :host([data-tone='danger']) { --_color: var(--mk-danger); }
 :host([data-tone='info']) { --_color: var(--mk-info); }
 
-:host(.mk-spinner--sm) { --_size: 1rem; --_thickness: 2px; }
-:host(.mk-spinner--md) { --_size: 1.5rem; --_thickness: 2px; }
-:host(.mk-spinner--lg) { --_size: 2.25rem; --_thickness: 3px; }
+:host(.mk-spinner--sm) {
+  --_size: var(--mk-spinner-size, 1rem);
+  --_thickness: var(--mk-spinner-thickness, 2px);
+}
+:host(.mk-spinner--md) {
+  --_size: var(--mk-spinner-size, 1.5rem);
+  --_thickness: var(--mk-spinner-thickness, 2px);
+}
+:host(.mk-spinner--lg) {
+  --_size: var(--mk-spinner-size, 2.25rem);
+  --_thickness: var(--mk-spinner-thickness, 3px);
+}
 
 .mk-spinner__circle {
   display: block;
