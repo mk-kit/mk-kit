@@ -30,6 +30,7 @@ import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
+import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
 import { MkImage } from '@mkornas/ui/media/image';
@@ -186,6 +187,16 @@ class CardNumberInputHost {}
   `,
 })
 class IbanInputHost {}
+
+@Component({
+  imports: [MkFormField, MkTaxIdInput],
+  template: `
+    <mk-form-field label="NIP">
+      <mk-tax-id-input country="PL" value="1234563218" />
+    </mk-form-field>
+  `,
+})
+class TaxIdInputHost {}
 
 @Component({
   imports: [MkFormField, MkSignaturePad],
@@ -422,6 +433,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'currency input', host: CurrencyInputHost },
   { name: 'card number input', host: CardNumberInputHost },
   { name: 'iban input', host: IbanInputHost },
+  { name: 'tax id input', host: TaxIdInputHost },
   { name: 'signature pad', host: SignaturePadHost },
   { name: 'json viewer', host: JsonViewerHost },
   { name: 'image', host: ImageHost },

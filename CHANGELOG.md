@@ -4,6 +4,24 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.18.0] — 2026-07-25
+
+### Added
+
+- **Tax-ID input** (`mk-tax-id-input`) — a country-aware business
+  tax-identifier field: it masks as you type, keeps the **compact** identifier
+  (digits only) as the form value while displaying it masked, defaults its
+  placeholder to a valid example for the country and self-validates through
+  `NG_VALIDATORS` (error key `taxId`). Five built-in formats — `PL` NIP
+  (`000-000-00-00`, verified with the official weighted mod-11 checksum,
+  including the "remainder 10 is never valid" rule), `DE` USt-IdNr., `CZ` DIČ,
+  `IT` Partita IVA and `SK` IČ DPH (shape-verified). `MK_TAX_ID_FORMATS`,
+  `MkTaxIdFormat`, `mkTaxIdFormat()`, `mkTaxIdIsValid()`, `mkNipChecksum()` and
+  `mkTaxIdValidator(country)` are exported for reactive forms / custom use;
+  empty values pass so they compose with `Validators.required`.
+- New i18n keys: `taxId` (accessible label) and `validation.taxId` (error
+  wording, receives `{ country, label, example }`).
+
 ## [0.17.4] — 2026-07-25
 
 ### Fixed

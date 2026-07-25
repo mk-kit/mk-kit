@@ -218,6 +218,8 @@ export interface MkValidationStrings {
   iban: (err: { country: string; expectedLength: number | null }) => string;
   /** A postal code not matching the country's format. */
   postalCode: (err: { country: string; example: string }) => string;
+  /** A tax identifier not matching the country's format or checksum. */
+  taxId: (err: { country: string; label: string; example: string }) => string;
   /** Fallback for an error key with no message of its own. */
   unknown: string;
 }
@@ -415,6 +417,8 @@ export interface MkI18nStrings {
   cardBrand: (brand: string) => string;
   /** IBAN input: default accessible label. */
   iban: string;
+  /** Tax-ID input: default accessible label. */
+  taxId: string;
   /** Signature pad: default accessible label of the drawing surface. */
   signature: string;
   /** JSON viewer: default accessible label of the tree. */
@@ -550,6 +554,7 @@ export const MK_DEFAULT_VALIDATION: MkValidationStrings = {
       ? `Enter a valid IBAN (${expectedLength} characters)`
       : 'Enter a valid IBAN',
   postalCode: ({ example }) => `Enter a valid postal code, e.g. ${example}`,
+  taxId: ({ label, example }) => `Enter a valid ${label}, e.g. ${example}`,
   unknown: 'This value is not valid',
 };
 
@@ -686,6 +691,7 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   cardNumber: 'Card number',
   cardBrand: (brand) => `Card brand: ${brand}`,
   iban: 'IBAN',
+  taxId: 'Tax ID',
   signature: 'Signature',
   jsonLabel: 'JSON',
 

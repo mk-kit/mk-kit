@@ -38,6 +38,7 @@ import { MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
+import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkFileUpload } from '@mkornas/ui/forms/file-upload';
 import { MkButtonToggleGroup } from '@mkornas/ui/forms/button-toggle';
 import { MkTransferList } from '@mkornas/ui/forms/transfer-list';
@@ -202,6 +203,14 @@ const VALIDATOR_CASES: readonly ValidatorCase[] = [
     bad: 'DE89370400440532013001',
     key: 'iban',
     good: 'DE89370400440532013000',
+  },
+  {
+    name: 'mk-tax-id-input NIP checksum',
+    type: MkTaxIdInput,
+    template: '<mk-tax-id-input country="PL" [formControl]="ctrl" />',
+    bad: '1234563219',
+    key: 'taxId',
+    good: '1234563218',
   },
   {
     name: 'mk-postal-code-input format',

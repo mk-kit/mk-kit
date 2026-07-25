@@ -24,6 +24,7 @@ export * from './postal-code-input';
 export * from './currency-input';
 export * from './card-number-input';
 export * from './iban-input';
+export * from './tax-id-input';
 export * from './signature-pad';
 export * from './button-toggle';
 export * from './checkbox';

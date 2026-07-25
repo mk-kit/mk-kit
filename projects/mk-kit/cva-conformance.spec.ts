@@ -46,6 +46,7 @@ import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkSlider } from '@mkornas/ui/forms/slider';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkTagInput } from '@mkornas/ui/forms/tag-input';
+import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkTransferList } from '@mkornas/ui/forms/transfer-list';
 import { MkTreeSelect } from '@mkornas/ui/forms/tree-select';
 import { MkCalendar } from '@mkornas/ui/datetime/calendar';
@@ -130,6 +131,13 @@ const CASES: readonly CvaCase[] = [
     type: MkIbanInput,
     tag: 'mk-iban-input',
     value: 'DE89370400440532013000',
+    read: readValue,
+  },
+  {
+    name: 'mk-tax-id-input',
+    type: MkTaxIdInput,
+    tag: 'mk-tax-id-input',
+    value: '1234563218',
     read: readValue,
   },
   {
