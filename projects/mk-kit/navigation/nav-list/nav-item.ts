@@ -18,7 +18,9 @@ import { MkNavList } from './nav-list';
  * active state. Renders a link when `href` is set, otherwise a button that
  * emits `action`. If it contains nested `<mk-nav-item>`s it becomes an
  * expandable disclosure (`aria-expanded`). Collapses to an icon in a collapsed
- * list, exposing the label as a tooltip.
+ * list, exposing the label as a tooltip — and because a sub-list can't be shown
+ * at rail width, a parent item there emits `action` (navigate) instead of
+ * toggling, so it never becomes a dead button.
  *
  * ```html
  * <mk-nav-item label="Reports" active href="/reports" badge="3">
@@ -75,6 +77,15 @@ export class MkNavItem {
 
   protected toggle(): void {
     if (this.disabled()) return;
+    // In a collapsed (icon-rail) list the sub-list cannot be shown, so flipping
+    // `expanded` would be an invisible no-op and the item would read as a dead
+    // button. Emit `action` instead, letting the host navigate to the section —
+    // the same thing a leaf item does. Hosts that don't bind `(action)` on
+    // parents simply keep the previous (no-op) behaviour.
+    if (this.collapsed()) {
+      this.action.emit();
+      return;
+    }
     this.expanded.update((v) => !v);
   }
 

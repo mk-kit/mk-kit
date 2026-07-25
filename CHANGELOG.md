@@ -4,6 +4,20 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.17.4] — 2026-07-25
+
+### Fixed
+
+- **`MkNavItem` parents are no longer dead buttons in a collapsed rail.** When
+  the enclosing `MkNavList` is `collapsed`, an item's sub-list cannot be shown
+  (`mk-nav-item__sub` is always hidden at rail width), so clicking a parent only
+  flipped an invisible `expanded` flag and appeared to do nothing — making every
+  section that has children unreachable while the sidebar was collapsed. The
+  parent now emits `action` instead, so the host can navigate to the section,
+  matching what a leaf item does. Expanded lists are unchanged (still toggle the
+  disclosure), and hosts that don't bind `(action)` on parents keep the previous
+  behaviour.
+
 ## [0.17.3] — 2026-07-24
 
 ### Fixed

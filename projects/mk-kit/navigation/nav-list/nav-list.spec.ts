@@ -15,7 +15,11 @@ import { MkNavGroup } from './nav-group';
         [badge]="badge()"
         (action)="hits = hits + 1"
       />
-      <mk-nav-item label="Reports" [(expanded)]="reportsOpen">
+      <mk-nav-item
+        label="Reports"
+        [(expanded)]="reportsOpen"
+        (action)="parentHits = parentHits + 1"
+      >
         <mk-nav-item label="Monthly" href="/m" />
       </mk-nav-item>
     </mk-nav-group>
@@ -30,6 +34,7 @@ class Host {
   badge = signal<string | number | undefined>(undefined);
   reportsOpen = signal(false);
   hits = 0;
+  parentHits = 0;
 }
 
 describe('MkNavList', () => {
@@ -168,5 +173,35 @@ describe('MkNavList', () => {
 
     const link = el.querySelector<HTMLElement>('.mk-nav-item__link')!;
     expect(link.getAttribute('title')).toBe('Dashboard');
+  });
+
+  it('a parent in the collapsed rail navigates instead of toggling a hidden sub-list', () => {
+    const { fixture, el, host } = mount();
+    host.collapsed.set(true);
+    fixture.detectChanges();
+
+    const toggle = [...el.querySelectorAll<HTMLElement>('.mk-nav-item__link')].find(
+      (n) => n.textContent?.includes('Reports'),
+    )!;
+    toggle.click();
+    fixture.detectChanges();
+
+    // The sub-list can't be shown at rail width, so the click must emit
+    // `action` (host navigates) and must NOT flip the invisible disclosure.
+    expect(host.parentHits).toBe(1);
+    expect(host.reportsOpen()).toBe(false);
+  });
+
+  it('a parent in an expanded list still toggles its sub-list, not action', () => {
+    const { fixture, el, host } = mount();
+
+    const toggle = [...el.querySelectorAll<HTMLElement>('.mk-nav-item__link')].find(
+      (n) => n.textContent?.includes('Reports'),
+    )!;
+    toggle.click();
+    fixture.detectChanges();
+
+    expect(host.reportsOpen()).toBe(true);
+    expect(host.parentHits).toBe(0);
   });
 });
