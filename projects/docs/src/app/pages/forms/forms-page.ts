@@ -20,12 +20,13 @@ import {
   MkNumberInput,
   MkSelect,
   type MkSelectOption,
+  MkSubmitInput,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the FORM structure components of `@mkornas/ui`:
- * FormField, Form error summary, Select, File upload and Code editor.
+ * FormField, Form error summary, Select, Submit input, File upload and Code editor.
  */
 @Component({
   selector: 'docs-forms-page',
@@ -42,6 +43,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkFileUpload,
     MkCodeEditor,
     MkButton,
+    MkSubmitInput,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -49,8 +51,8 @@ import { DocsExample } from '../../shared/docs-example';
       <p class="docs-lead">
         Form structure and composite fields: the accessible
         <code class="docs-inline">&lt;mk-form-field&gt;</code> wrapper, a
-        submit-time error summary, a custom select, a file-upload dropzone and a
-        code editor. Every control implements
+        submit-time error summary, a custom select, a code-and-apply submit
+        input, a file-upload dropzone and a code editor. Every control implements
         <code class="docs-inline">ControlValueAccessor</code> and exposes a
         two-way model, so it works with <code class="docs-inline">[(ngModel)]</code>,
         reactive forms and native <code class="docs-inline">[(value)]</code>
@@ -225,6 +227,72 @@ import { DocsExample } from '../../shared/docs-example';
       </table>
 
       <!-- ============================================================ -->
+      <!-- SUBMIT INPUT -->
+      <!-- ============================================================ -->
+      <h2>Submit input</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-submit-input&gt;</code> is the
+        "type a code and apply it" pattern as one connected control — discount
+        codes, gift cards, invite codes, newsletter sign-up, quick search. The
+        input and its action button share a single frame; the button is disabled
+        while the value is blank and shows a spinner while
+        <code class="docs-inline">loading</code>.
+        <code class="docs-inline">(submitted)</code> emits the
+        <strong>trimmed</strong> value on click or on Enter.
+      </p>
+      <p>
+        These controls almost always sit inside a bigger form, so Enter must not
+        trigger <em>that</em> form's submit: the action is a
+        <code class="docs-inline">type="button"</code> and the Enter keydown is
+        <code class="docs-inline">preventDefault()</code>-ed, which suppresses
+        the browser's implicit submission. Pass
+        <code class="docs-inline">[submitOnEnter]="false"</code> to hand Enter
+        back to the enclosing form.
+      </p>
+      <p>
+        The button is configured, not projected:
+        <code class="docs-inline">buttonLabel</code> sets its caption, and adding
+        <code class="docs-inline">buttonIcon</code> switches it to the square
+        icon-only variant where the same label becomes its
+        <code class="docs-inline">aria-label</code> — so the action is always
+        named for assistive tech.
+      </p>
+
+      <docs-example [code]="submitInputCode" [column]="true">
+        <mk-form-field label="Discount code" hint="Try SUMMER10">
+          <mk-submit-input
+            buttonLabel="Apply"
+            placeholder="SUMMER10"
+            clearable
+            [loading]="applying()"
+            [(value)]="discountCode"
+            (submitted)="applyCode($event)"
+          />
+        </mk-form-field>
+        <p class="echo">Applied: {{ appliedCode() || '—' }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way value ([(value)] / [(ngModel)] / formControl).</td></tr>
+          <tr><td>buttonLabel</td><td>string</td><td>i18n 'Submit'</td><td>Button caption — or its aria-label in the icon variant.</td></tr>
+          <tr><td>buttonIcon</td><td>string</td><td>''</td><td>Registered icon name; switches to the icon-only button.</td></tr>
+          <tr><td>buttonVariant / buttonTone</td><td>MkVariant / MkTone</td><td>'solid' / 'primary'</td><td>Button styling, forwarded to mkButton.</td></tr>
+          <tr><td>loading</td><td>boolean</td><td>false</td><td>Spinner in the button; blocks submitting while an action runs.</td></tr>
+          <tr><td>clearable</td><td>boolean</td><td>false</td><td>Show a clear affix while the value is non-empty.</td></tr>
+          <tr><td>submitOnEnter</td><td>boolean</td><td>true</td><td>Enter submits the control without submitting the enclosing form.</td></tr>
+          <tr><td>label</td><td>string</td><td>''</td><td>Accessible name for the input when used outside an mk-form-field.</td></tr>
+          <tr><td>placeholder / type / autocomplete</td><td>string</td><td>'' / 'text' / 'off'</td><td>Passed through to the inner input.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
+          <tr><td>invalid / disabled</td><td>boolean</td><td>false</td><td>Force invalid styling / disable input + button.</td></tr>
+          <tr><td>(submitted)</td><td>string</td><td>—</td><td>Emits the trimmed value on click or Enter.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
       <!-- FILE UPLOAD -->
       <!-- ============================================================ -->
       <h2>File upload</h2>
@@ -391,6 +459,21 @@ export class FormsPage {
   ];
   protected readonly role = signal<unknown>(null);
 
+  // --- Submit input ---------------------------------------------------------
+  protected readonly discountCode = signal('');
+  protected readonly appliedCode = signal('');
+  protected readonly applying = signal(false);
+
+  /** Demo action: fakes a round-trip to the server, then echoes the code. */
+  protected applyCode(code: string): void {
+    this.applying.set(true);
+    setTimeout(() => {
+      this.applying.set(false);
+      this.appliedCode.set(code.toUpperCase());
+      this.discountCode.set('');
+    }, 900);
+  }
+
   // --- File upload ----------------------------------------------------------
   protected readonly uploads = signal<MkUploadFile[]>([]);
   protected readonly uploadSummary = computed(() => {
@@ -486,6 +569,19 @@ onSubmit() {
 ];
 
 <mk-select placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />`;
+
+  protected readonly submitInputCode = `<mk-form-field label="Discount code" hint="Try SUMMER10">
+  <mk-submit-input
+    buttonLabel="Apply"
+    placeholder="SUMMER10"
+    clearable
+    [loading]="applying()"
+    [(value)]="discountCode"
+    (submitted)="applyCode($event)" />
+</mk-form-field>
+
+// Icon-only variant — buttonLabel becomes the aria-label:
+<mk-submit-input buttonIcon="search" buttonLabel="Search" [(value)]="query" />`;
 
   protected readonly fileUploadCode = `<mk-file-upload
   accept="image/*"

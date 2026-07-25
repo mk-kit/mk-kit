@@ -1,0 +1,55 @@
+<mk-input-group
+  [size]="effectiveSize()"
+  [invalid]="isInvalid()"
+  [disabled]="isDisabled()"
+>
+  <input
+    #input
+    class="mk-submit-input__field"
+    [id]="inputId"
+    [type]="type()"
+    [value]="value()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    [attr.autocomplete]="autocomplete()"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-label]="inputLabel()"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (blur)="onBlur()"
+  />
+
+  @if (showClear()) {
+    <button
+      type="button"
+      class="mk-submit-input__clear"
+      [attr.aria-label]="i18n.clear"
+      tabindex="-1"
+      (mousedown)="$event.preventDefault()"
+      (click)="clear()"
+    ></button>
+  }
+
+  <button
+    mkButton
+    type="button"
+    class="mk-submit-input__button"
+    [size]="effectiveSize()"
+    [variant]="buttonVariant()"
+    [tone]="buttonTone()"
+    [iconOnly]="!!buttonIcon()"
+    [loading]="loading()"
+    [disabled]="!canSubmit()"
+    [attr.aria-label]="buttonIcon() ? actionLabel() : null"
+    (click)="submit()"
+  >
+    @if (buttonIcon()) {
+      <mk-icon [name]="buttonIcon()" [size]="effectiveSize()" />
+    } @else {
+      {{ actionLabel() }}
+    }
+  </button>
+</mk-input-group>

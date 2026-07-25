@@ -6,6 +6,7 @@ export * from './form-field';
 export * from './form-error-summary';
 export * from './input';
 export * from './input-group';
+export * from './submit-input';
 export * from './i18n-input';
 export * from './select';
 export * from './autocomplete';

@@ -44,6 +44,7 @@ import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
+import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
 import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
@@ -91,6 +92,7 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkCardNumberInput,
     MkIbanInput,
     MkTaxIdInput,
+    MkSubmitInput,
     MkSignaturePad,
     MkJsonViewer,
     MkImage,
@@ -164,6 +166,9 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       </mk-form-field>
       <mk-form-field label="NIP">
         <mk-tax-id-input country="PL" value="1234563218" />
+      </mk-form-field>
+      <mk-form-field label="Discount code">
+        <mk-submit-input buttonLabel="Apply" value="SUMMER10" clearable />
       </mk-form-field>
       <mk-form-field label="Signature">
         <mk-signature-pad />
@@ -299,6 +304,7 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-card-number-input',
       'mk-iban-input',
       'mk-tax-id-input',
+      'mk-submit-input',
       'mk-signature-pad',
       'mk-json-viewer',
       'mk-image',

@@ -4,6 +4,34 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.21.0] — 2026-07-25
+
+### Added
+
+- **`MkSubmitInput`** (`mk-submit-input`) — the "type a code and apply it"
+  pattern as one connected control: discount codes, gift cards, invite codes,
+  newsletter sign-up, quick search. The inner input and its action button share
+  a single `mk-input-group` frame; the button is disabled while the value is
+  empty or blank, while `disabled`, and while `loading` (where it delegates to
+  `mkButton`'s spinner). **`(submitted)` emits the trimmed value** on click or
+  on Enter.
+
+  Because this control almost always sits inside a *bigger* form, Enter must
+  never trigger that form's submit: the action is a `type="button"` and, while
+  `submitOnEnter` (default `true`) is on, the Enter keydown is
+  `preventDefault()`-ed — the browser's implicit form submission never fires.
+  `[submitOnEnter]="false"` hands Enter back to the enclosing form.
+
+  The button is configured, not projected: `buttonLabel` sets its caption, and
+  `buttonIcon` switches it to the square icon-only variant where that same
+  label becomes its `aria-label`, so the action always has an accessible name.
+  `buttonVariant` / `buttonTone` forward to `mkButton`; `clearable` adds a
+  clear affix; `label` names the input itself when used outside an
+  `mk-form-field` (inside one, the field's `<label for>` still targets the
+  inner input). Implements `ControlValueAccessor` with a two-way `value` model,
+  so `[(value)]`, `[(ngModel)]` and reactive forms all work.
+- **i18n** — new `submit` string (`'Submit'`), the default action caption.
+
 ## [0.20.0] — 2026-07-25
 
 ### Added

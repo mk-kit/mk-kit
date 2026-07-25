@@ -250,6 +250,8 @@ export interface MkI18nStrings {
   ok: string;
   /** Generic save action (inline edit). */
   save: string;
+  /** Default action-button caption (submit input). */
+  submit: string;
   /** Generic edit affordance (inline edit trigger). */
   edit: string;
   /** Generic remove control (chip). */
@@ -588,6 +590,7 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   cancel: 'Cancel',
   ok: 'OK',
   save: 'Save',
+  submit: 'Submit',
   edit: 'Edit',
   remove: 'Remove',
   removeItem: (name) => `Remove ${name}`,

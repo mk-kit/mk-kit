@@ -1,0 +1,83 @@
+:host {
+  display: block;
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+/* The group owns the frame + focus ring; the input is bare inside it. */
+.mk-submit-input__field {
+  flex: 1;
+  min-width: 0;
+  height: 100%;
+  padding-inline: var(--mk-space-3);
+  font-family: inherit;
+  font-size: var(--mk-font-size-md);
+  color: var(--mk-text);
+  background-color: transparent;
+  border: none;
+  border-radius: inherit;
+  outline: none;
+}
+:host(.mk-submit-input--sm) .mk-submit-input__field {
+  padding-inline: var(--mk-space-2);
+  font-size: var(--mk-font-size-sm);
+}
+:host(.mk-submit-input--lg) .mk-submit-input__field {
+  font-size: var(--mk-font-size-lg);
+}
+
+.mk-submit-input__field::placeholder {
+  color: var(--mk-text-subtle);
+}
+.mk-submit-input__field:disabled {
+  color: var(--mk-text-disabled);
+  cursor: not-allowed;
+}
+
+/* Clear affix — a small ✕ glyph drawn with borders, no icon dependency. */
+.mk-submit-input__clear {
+  flex: none;
+  width: 1.25rem;
+  height: 1.25rem;
+  margin-inline-end: var(--mk-space-1);
+  padding: 0;
+  color: var(--mk-text-muted);
+  background: none;
+  border: none;
+  border-radius: var(--mk-radius-circle);
+  cursor: pointer;
+  position: relative;
+}
+.mk-submit-input__clear:hover {
+  color: var(--mk-text);
+  background-color: var(--mk-surface-2);
+}
+.mk-submit-input__clear::before,
+.mk-submit-input__clear::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 50%;
+  top: 50%;
+  width: 0.625rem;
+  border-top: 1.5px solid currentColor;
+}
+.mk-submit-input__clear::before {
+  transform: translate(-50%, -50%) rotate(45deg);
+}
+.mk-submit-input__clear::after {
+  transform: translate(-50%, -50%) rotate(-45deg);
+}
+
+/*
+ * The action button hugs the frame: negative margins pull it over the group's
+ * border so the two read as one unit, and the leading corners are squared.
+ */
+.mk-submit-input__button {
+  flex: none;
+  align-self: stretch;
+  height: auto;
+  margin-block: calc(var(--mk-border-width) * -1);
+  margin-inline-end: calc(var(--mk-border-width) * -1);
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+}

@@ -21,6 +21,7 @@ import { MkChip } from '@mkornas/ui/chip';
 import { MkFormField } from '@mkornas/ui/forms/form-field';
 import { MkInput } from '@mkornas/ui/forms/input';
 import { MkInputGroup } from '@mkornas/ui/forms/input-group';
+import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
 import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
 import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
@@ -187,6 +188,17 @@ class CardNumberInputHost {}
   `,
 })
 class IbanInputHost {}
+
+@Component({
+  imports: [MkFormField, MkSubmitInput],
+  template: `
+    <mk-form-field label="Discount code">
+      <mk-submit-input buttonLabel="Apply" value="SUMMER10" clearable />
+    </mk-form-field>
+    <mk-submit-input buttonIcon="search" buttonLabel="Search" label="Quick search" value="ramen" />
+  `,
+})
+class SubmitInputHost {}
 
 @Component({
   imports: [MkFormField, MkTaxIdInput],
@@ -434,6 +446,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'card number input', host: CardNumberInputHost },
   { name: 'iban input', host: IbanInputHost },
   { name: 'tax id input', host: TaxIdInputHost },
+  { name: 'submit input', host: SubmitInputHost },
   { name: 'signature pad', host: SignaturePadHost },
   { name: 'json viewer', host: JsonViewerHost },
   { name: 'image', host: ImageHost },

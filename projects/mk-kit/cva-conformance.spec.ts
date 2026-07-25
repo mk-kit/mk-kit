@@ -44,6 +44,7 @@ import { MkRating } from '@mkornas/ui/forms/rating';
 import { MkSelect } from '@mkornas/ui/forms/select';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
 import { MkSlider } from '@mkornas/ui/forms/slider';
+import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
 import { MkSwitch } from '@mkornas/ui/forms/switch';
 import { MkTagInput } from '@mkornas/ui/forms/tag-input';
 import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
@@ -131,6 +132,13 @@ const CASES: readonly CvaCase[] = [
     type: MkIbanInput,
     tag: 'mk-iban-input',
     value: 'DE89370400440532013000',
+    read: readValue,
+  },
+  {
+    name: 'mk-submit-input',
+    type: MkSubmitInput,
+    tag: 'mk-submit-input',
+    value: 'SUMMER10',
     read: readValue,
   },
   {
