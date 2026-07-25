@@ -4,6 +4,25 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.25.1] — 2026-07-25
+
+### Fixed
+
+- **`MkNavItem` sub-lists actually collapse now.** The template hides the
+  nested `<ul>` with the `hidden` attribute, but the stylesheet's
+  `.mk-nav-item__sub { display: flex }` outweighs the UA's
+  `[hidden] { display: none }`, so `expanded=false` was silently ignored and
+  every parent item rendered permanently expanded. An explicit
+  `.mk-nav-item__sub[hidden] { display: none }` restores the collapse —
+  the same guard `MkNavGroup` already shipped for its items region.
+
+- **No more stray focus ring around overlay panels.** With
+  `autoFocus: false` the focus trap focuses the panel itself
+  (`tabindex="-1"`), and the UA focus ring rendered as a blue outline around
+  the whole bottom sheet / dialog. The panel's programmatic focus is pure Tab
+  containment, so `.mk-overlay-panel` now suppresses its own outline;
+  controls inside keep their rings.
+
 ## [0.25.0] — 2026-07-25
 
 ### Fixed

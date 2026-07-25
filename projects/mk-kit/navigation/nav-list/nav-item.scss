@@ -102,7 +102,14 @@
   transform: rotate(-90deg) scaleX(-1);
 }
 
-/* Nested sub-list */
+/* Nested sub-list. The [hidden] rule must exist explicitly: `display: flex`
+   on the class outweighs the UA's `[hidden] { display: none }`, so without
+   it the collapsed state set by the template was silently ignored and
+   sub-items rendered permanently expanded. */
+.mk-nav-item__sub[hidden] {
+  display: none;
+}
+
 .mk-nav-item__sub {
   display: flex;
   flex-direction: column;
