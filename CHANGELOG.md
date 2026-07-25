@@ -4,6 +4,27 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.24.0] — 2026-07-25
+
+### Added
+
+- **`MkImage` gains `priority`, `srcset` and `sizes`** — the LCP path. The
+  component already reserved layout with `aspectRatio` and deferred with
+  `lazy`, but lazy is exactly wrong for a hero: deferring the largest
+  above-the-fold image is what pushes LCP past 2.5s. `priority` fetches
+  eagerly at `fetchpriority="high"` with `decoding="sync"`, and deliberately
+  overrides `lazy` so a lazy default cannot silently defeat it. Use it on ONE
+  image per page — several compete for the bandwidth the real LCP image needs.
+
+  `srcset`/`sizes` pass through verbatim. Serving a 2048px file into a 600px
+  slot is one of the most common LCP mistakes and there was previously no way
+  to avoid it through this component.
+
+  Note what `priority` does NOT do: emit `<link rel=preload>`. That tag has to
+  be in the HTML the server sends in order to beat the browser's preload
+  scanner, which a component rendered later cannot guarantee. For a CSS
+  background or a late-rendered hero, pair this with a preload hint.
+
 ## [0.23.0] — 2026-07-25
 
 ### Fixed

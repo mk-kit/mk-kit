@@ -114,3 +114,56 @@ describe('MkImage', () => {
     expect(query('figcaption')!.textContent!.trim()).toBe('The old harbour');
   });
 });
+
+/**
+ * The LCP path. `priority` exists because the default (lazy) is exactly wrong
+ * for a hero: deferring the largest above-the-fold image is what pushes LCP
+ * past 2.5s. It has to beat `lazy` when both are set, or a component that
+ * defaults `lazy` on would silently defeat it.
+ */
+describe('MkImage priority', () => {
+  function mount(inputs: Record<string, unknown> = {}) {
+    // Each mount is its own module: the suite calls this more than once per
+    // test, and reconfiguring a live TestBed throws.
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const f = TestBed.createComponent(MkImage);
+    f.componentRef.setInput('src', '/a.jpg');
+    for (const [k, v] of Object.entries(inputs)) f.componentRef.setInput(k, v);
+    f.detectChanges();
+    return (f.nativeElement as HTMLElement).querySelector('img')!;
+  }
+
+  it('defaults to lazy with no priority hints', () => {
+    const img = mount();
+    expect(img.getAttribute('loading')).toBe('lazy');
+    expect(img.getAttribute('fetchpriority')).toBeNull();
+    expect(img.getAttribute('decoding')).toBe('async');
+  });
+
+  it('fetches eagerly at high priority when marked', () => {
+    const img = mount({ priority: true });
+    expect(img.getAttribute('loading')).toBe('eager');
+    expect(img.getAttribute('fetchpriority')).toBe('high');
+    expect(img.getAttribute('decoding')).toBe('sync');
+  });
+
+  it('wins over lazy, so a lazy default cannot defeat the hero', () => {
+    const img = mount({ priority: true, lazy: true });
+    expect(img.getAttribute('loading')).toBe('eager');
+  });
+
+  it('passes srcset/sizes through, and omits them when unset', () => {
+    expect(mount().getAttribute('srcset')).toBeNull();
+    expect(mount().getAttribute('sizes')).toBeNull();
+
+    const responsive = mount({
+      srcset: '/a-800.jpg 800w, /a-1600.jpg 1600w',
+      sizes: '100vw',
+    });
+    expect(responsive.getAttribute('srcset')).toContain('800w');
+    expect(responsive.getAttribute('sizes')).toBe('100vw');
+  });
+});

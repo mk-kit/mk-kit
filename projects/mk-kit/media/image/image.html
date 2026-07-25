@@ -5,7 +5,11 @@
         class="mk-image__img"
         [src]="src()"
         [alt]="alt()"
-        [attr.loading]="lazy() ? 'lazy' : 'eager'"
+        [attr.srcset]="srcset() || null"
+        [attr.sizes]="sizes() || null"
+        [attr.loading]="loadingAttr()"
+        [attr.fetchpriority]="priority() ? 'high' : null"
+        [attr.decoding]="priority() ? 'sync' : 'async'"
         (load)="onLoad()"
         (error)="onError()"
       />
