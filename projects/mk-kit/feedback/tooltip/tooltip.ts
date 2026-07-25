@@ -69,6 +69,11 @@ export class MkTooltipPanel {
     '(focusin)': 'onFocus()',
     '(focusout)': 'hide()',
     '(keydown.escape)': 'hide()',
+    // A tooltip must not outlive the interaction that spawned it. Without
+    // this, tapping a tooltipped control leaves the tip on screen — and since
+    // tooltips deliberately sit ABOVE dialogs (so a tip inside a modal is
+    // visible), a stale one floats over whatever the tap just opened.
+    '(pointerdown)': 'onPointerDown()',
   },
 })
 export class MkTooltip {
@@ -77,6 +82,8 @@ export class MkTooltip {
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  /** Set by pointerdown so the focusin it causes doesn't re-open the tip. */
+  private suppressFocusShow = false;
 
   /** Tooltip text. When empty the tooltip is suppressed. */
   readonly mkTooltip = input('');
@@ -93,7 +100,18 @@ export class MkTooltip {
   }
 
   protected onFocus(): void {
+    // Pointer-driven focus already dismissed the tip on pointerdown; showing
+    // it again here would defeat that. Keyboard focus still gets a tooltip.
+    if (this.suppressFocusShow) {
+      this.suppressFocusShow = false;
+      return;
+    }
     this.scheduleShow(0);
+  }
+
+  protected onPointerDown(): void {
+    this.suppressFocusShow = true;
+    this.hide();
   }
 
   private scheduleShow(delay: number): void {

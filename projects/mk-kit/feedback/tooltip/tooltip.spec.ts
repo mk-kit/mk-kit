@@ -167,3 +167,61 @@ describe('MkTooltip', () => {
     expect(document.querySelectorAll('mk-tooltip').length).toBe(1);
   });
 });
+
+/**
+ * Tooltips deliberately sit ABOVE dialogs (--mk-z-tooltip 1300 vs
+ * --mk-z-dialog 1100) so a tip on a control INSIDE a modal is visible. The
+ * cost of that ordering is that a tooltip which outlives its interaction
+ * floats over whatever the interaction opened — so it must dismiss on
+ * pointer input.
+ */
+describe('MkTooltip dismissal on pointer input', () => {
+  function mount() {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const f = TestBed.createComponent(Host);
+    f.detectChanges();
+    return f;
+  }
+
+  const tips = () => document.querySelectorAll('.mk-tooltip').length;
+
+  afterEach(() =>
+    document.querySelectorAll('.mk-tooltip').forEach((t) => t.remove()),
+  );
+
+  it('hides on pointerdown, so it cannot linger over what the tap opens', async () => {
+    const f = mount();
+    const el = (f.nativeElement as HTMLElement).querySelector('button')!;
+
+    el.dispatchEvent(new MouseEvent('mouseenter'));
+    await new Promise((r) => setTimeout(r, 400));
+    expect(tips()).toBe(1);
+
+    el.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    expect(tips()).toBe(0);
+  });
+
+  it('does not reopen via the focus that the same pointerdown causes', async () => {
+    const f = mount();
+    const el = (f.nativeElement as HTMLElement).querySelector('button')!;
+
+    el.dispatchEvent(new Event('pointerdown', { bubbles: true }));
+    el.dispatchEvent(new Event('focusin', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(tips()).toBe(0);
+  });
+
+  it('still shows for keyboard focus, which has no preceding pointerdown', async () => {
+    const f = mount();
+    const el = (f.nativeElement as HTMLElement).querySelector('button')!;
+
+    el.dispatchEvent(new Event('focusin', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 50));
+
+    expect(tips()).toBe(1);
+  });
+});

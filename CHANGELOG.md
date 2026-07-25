@@ -4,6 +4,21 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.25.0] — 2026-07-25
+
+### Fixed
+
+- **`MkTooltip` now dismisses on pointer input.** Tooltips deliberately sit
+  above dialogs (`--mk-z-tooltip` 1300 vs `--mk-z-dialog` 1100) so a tip on a
+  control INSIDE a modal stays visible. The cost of that ordering is that a
+  tooltip which outlives the interaction that spawned it floats over whatever
+  the interaction opened — tap a tooltipped element that also opens a dialog
+  and the tip hung there on top of it.
+
+  `pointerdown` now hides the tip, and suppresses the `focusin` that the same
+  press causes so it cannot immediately reopen. Keyboard focus, which has no
+  preceding pointerdown, still shows a tooltip as before.
+
 ## [0.24.0] — 2026-07-25
 
 ### Added
