@@ -165,12 +165,29 @@ import { DocsExample } from '../../shared/docs-example';
         <p class="echo">Canonical value: {{ time12() ?? '—' }}</p>
       </docs-example>
 
+      <p>
+        With <code class="docs-inline">valueFormat="date"</code> the value is a
+        <code class="docs-inline">Date</code> whose <em>local</em> hours and
+        minutes carry the time (seconds and milliseconds zeroed) — for hosts
+        whose model is a datetime. Either shape may be written back in either
+        mode; only the emitted value changes. The date part comes from the
+        current value when that is already a
+        <code class="docs-inline">Date</code> (so repeated edits never drift the
+        day), otherwise from today.
+      </p>
+
+      <docs-example [code]="timePickerDateCode" [column]="true">
+        <mk-time-picker valueFormat="date" [(value)]="timeAsDate" [step]="15" clearable />
+        <p class="echo">Date value: {{ timeAsDateLabel() }}</p>
+      </docs-example>
+
       <table class="docs-props">
         <thead>
           <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td>value</td><td>model&lt;string | null&gt;</td><td>null</td><td>Two-way time as canonical 'HH:mm' (24h).</td></tr>
+          <tr><td>value</td><td>model&lt;string | Date | null&gt;</td><td>null</td><td>Two-way time: canonical 'HH:mm' (24h), or a Date in date mode.</td></tr>
+          <tr><td>valueFormat</td><td>'string' | 'date'</td><td>'string'</td><td>Shape of the emitted value.</td></tr>
           <tr><td>min</td><td>string | null</td><td>null</td><td>Earliest selectable time 'HH:mm' (inclusive).</td></tr>
           <tr><td>max</td><td>string | null</td><td>null</td><td>Latest selectable time 'HH:mm' (inclusive).</td></tr>
           <tr><td>step</td><td>number</td><td>30</td><td>Interval between generated options, in minutes.</td></tr>
@@ -420,6 +437,14 @@ export class DateTimePage {
   // --- Time picker ----------------------------------------------------------
   protected readonly time = signal<string | null>('09:15');
   protected readonly time12 = signal<string | null>('14:30');
+  protected readonly timeAsDate = signal<string | Date | null>(new Date());
+  protected readonly timeAsDateLabel = computed(() => {
+    const v = this.timeAsDate();
+    if (!(v instanceof Date)) return '—';
+    const p = (n: number) => `${n}`.padStart(2, '0');
+    const time = `${p(v.getHours())}:${p(v.getMinutes())}:${p(v.getSeconds())}`;
+    return `${formatDate(v, 'MMM d, yyyy')} ${time}`;
+  });
 
   // --- Month / year picker --------------------------------------------------
   protected readonly month = signal<Date | null>(null);
@@ -490,6 +515,11 @@ inThirtyDays = new Date(this.today.getTime() + 30 * 864e5);
 
 <!-- Displayed as 12-hour AM/PM; the model stays canonical 24h 'HH:mm'. -->
 <mk-time-picker [(value)]="time12" [step]="30" hour12 clearable />`;
+
+  protected readonly timePickerDateCode = `pickupAt = signal<Date | null>(new Date());
+
+<!-- The value is a Date; its local hours/minutes carry the picked time. -->
+<mk-time-picker valueFormat="date" [(value)]="pickupAt" [step]="15" clearable />`;
 
   protected readonly rangePickerCode = `range = signal<MkDateRange>({ start: null, end: null });
 

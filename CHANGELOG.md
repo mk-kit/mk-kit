@@ -4,6 +4,27 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.20.0] — 2026-07-25
+
+### Added
+
+- **Time picker `valueFormat`** (`mk-time-picker`) — the form value can now be
+  a `Date` instead of a `HH:mm` string, for hosts whose model is a datetime
+  (migrating off Angular Material's `mat-timepicker`, feeding an order's pickup
+  instant, …). `valueFormat="date"` emits a `Date` whose **local** hours and
+  minutes carry the picked time, with seconds and milliseconds zeroed; the date
+  part is taken from the current value when that is already a `Date` — so
+  editing the time repeatedly never drifts the day — and otherwise from today.
+  Like `mk-phone-input`, **both** modes read either shape back: `writeValue`
+  (and `[(value)]`) accept a `Date`, a `HH:mm` string or `null` regardless of
+  the mode and normalise to the configured one; only the *emitted* value
+  changes. Internally the time is always canonical `HH:mm`, which is what
+  `[min]` / `[max]` and the `mkMinTime` / `mkMaxTime` validators compare — so
+  bounds work unchanged against a `Date` model. Clearing still emits `null` in
+  both modes. **The default (`'string'`) is unchanged**: the value stays a
+  `HH:mm` string and existing consumers need no edit; `value` is merely widened
+  to `string | Date | null`.
+
 ## [0.19.0] — 2026-07-25
 
 ### Added
