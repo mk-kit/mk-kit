@@ -4,6 +4,16 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.25.2] — 2026-07-26
+
+### Fixed
+
+- **`MkAppShell` mobile drawer no longer hides behind its own scrim.** The
+  sidebar sits earlier in the DOM than the scrim and both were at
+  `--mk-z-drawer`, so with equal z-index the scrim painted on top and the
+  open drawer was dimmed and unclickable. The mobile sidebar now sits at
+  `calc(var(--mk-z-drawer) + 1)`.
+
 ## [0.25.1] — 2026-07-25
 
 ### Fixed

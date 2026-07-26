@@ -92,7 +92,11 @@
   top: var(--mk-header-height);
   bottom: 0;
   inset-inline-start: 0;
-  z-index: var(--mk-z-drawer);
+  /* One above the scrim, NOT a hard-coded four-digit value: the sidebar sits
+     earlier in the DOM than the scrim, so at the same z-index the scrim
+     painted over the open drawer and the whole nav sat dimmed and
+     unclickable behind its own backdrop. */
+  z-index: calc(var(--mk-z-drawer) + 1);
   width: var(--mk-sidebar-width);
   transform: translateX(-100%);
   box-shadow: var(--mk-shadow-xl);
