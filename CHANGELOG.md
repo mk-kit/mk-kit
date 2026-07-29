@@ -4,6 +4,16 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.27.1] — 2026-07-29
+
+### Fixed
+
+- **`MkAppShell` no longer spends 12% of a phone screen on gutters.**
+  `.mk-app-shell__main` had `padding: var(--mk-space-6)` — 24px each side —
+  with no media query, on every screen of every app built on the shell. Below
+  640px it is now `--mk-space-4`, giving 16px back to the content the user
+  actually came for.
+
 ## [0.27.0] — 2026-07-29
 
 ### Added
