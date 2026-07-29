@@ -1,6 +1,11 @@
 <div class="mk-table__scroll">
-  <table class="mk-table__table">
-    <thead class="mk-table__head">
+  <!-- Explicit roles ONLY while stacked: `display: block` strips a table
+       element of its implicit role, so without these a card layout stops
+       being announced as tabular data at all. Redundant in the grid, so
+       they are left off there rather than duplicating what the element
+       already says. -->
+  <table class="mk-table__table" [attr.role]="stacked() ? 'table' : null">
+    <thead class="mk-table__head" [attr.role]="stacked() ? 'rowgroup' : null">
       <tr>
         @if (expandable()) {
           <th scope="col" class="mk-table__th mk-table__th--expand">
@@ -71,7 +76,7 @@
         }
       </tr>
     </thead>
-    <tbody class="mk-table__body">
+    <tbody class="mk-table__body" [attr.role]="stacked() ? 'rowgroup' : null">
       @for (item of displayItems(); track trackItem(item); let i = $index) {
         @if (item.kind === 'group') {
           <tr class="mk-table__group-row">
@@ -106,6 +111,7 @@
         <ng-container>
         <tr
           class="mk-table__row"
+          [attr.role]="stacked() ? 'row' : null"
           [class]="rowClassFor(item.row)"
           [class.mk-table__row--selected]="selectable() && isSelected(item.row)"
           [class.mk-table__row--expanded]="expandable() && isExpanded(item.row)"
@@ -143,44 +149,35 @@
               />
             </td>
           }
-          @for (col of orderedColumns(); track col.key) {
-            <td
-              class="mk-table__td"
-              [class.mk-table__td--pinned]="col.pinned"
-              [class.mk-table__td--pinned-right]="col.pinned === 'right'"
-              [class.mk-table__td--editable]="col.editable"
-              [style.width]="colStyleWidth(col)"
-              [style.inset-inline-start.px]="col.pinned === 'left' ? pinnedOffset(col) : null"
-              [style.inset-inline-end.px]="col.pinned === 'right' ? pinnedOffset(col) : null"
-              [attr.data-align]="col.align ?? 'start'"
-              [attr.tabindex]="col.editable ? 0 : null"
-              (dblclick)="startEdit(i, col, $event)"
-              (keydown)="onCellKeydown($event, i, col)"
-            >
-              @if (isEditing(i, col)) {
-                <input
-                  class="mk-table__cell-input"
-                  [value]="cellText(item.row, col)"
-                  (click)="$event.stopPropagation()"
-                  (keydown)="onEditKeydown($event, item.row, col)"
-                  (blur)="commitEdit(item.row, col, $any($event.target).value)"
-                  autofocus
-                />
-              } @else if (cellTemplateFor(col.key); as tpl) {
-                <ng-container
-                  [ngTemplateOutlet]="tpl"
-                  [ngTemplateOutletContext]="{
-                    $implicit: cellValue(item.row, col),
-                    row: item.row,
-                  }"
-                />
-              } @else {
-                {{ cellText(item.row, col) }}
-                @if (col.editable) {
-                  <span class="mk-visually-hidden">{{ i18n.editCell }}</span>
-                }
-              }
-            </td>
+          @if (!stacked()) {
+            @for (col of orderedColumns(); track col.key) {
+              <ng-container
+                [ngTemplateOutlet]="cellTpl"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: null }"
+              />
+            }
+          } @else {
+            <!-- Card layout. Same <td> elements, restyled — keeping the table
+                 DOM means selection, expansion, inline edit and every cell
+                 template keep working, since all of them reach for a `td`. -->
+            @for (col of stackTitleColumns(); track col.key) {
+              <ng-container
+                [ngTemplateOutlet]="cellTpl"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'title' }"
+              />
+            }
+            @for (col of stackFieldColumns(); track col.key) {
+              <ng-container
+                [ngTemplateOutlet]="cellTpl"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'field' }"
+              />
+            }
+            @for (col of stackFooterColumns(); track col.key) {
+              <ng-container
+                [ngTemplateOutlet]="cellTpl"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'footer' }"
+              />
+            }
           }
         </tr>
         @if (expandable() && isExpanded(item.row) && rowDetail()) {
@@ -207,3 +204,56 @@
     </tbody>
   </table>
 </div>
+
+<!-- One cell, rendered by both layouts. `slot` is null in the grid and
+     'title' | 'field' | 'footer' in a card; everything else — the editor, the
+     consumer's mkTableCell template, the formatted fallback — is identical, so
+     a card can never drift from the grid it replaces. -->
+<ng-template #cellTpl let-col="col" let-row="row" let-i="i" let-slot="slot">
+  <td
+    class="mk-table__td"
+    [class.mk-table__td--pinned]="isPinned(col, 'left') || isPinned(col, 'right')"
+    [class.mk-table__td--pinned-right]="isPinned(col, 'right')"
+    [class.mk-table__td--editable]="col.editable"
+    [class.mk-table__td--stack-title]="slot === 'title'"
+    [class.mk-table__td--stack-field]="slot === 'field'"
+    [class.mk-table__td--stack-footer]="slot === 'footer'"
+    [style.width]="colStyleWidth(col)"
+    [style.inset-inline-start.px]="isPinned(col, 'left') ? pinnedOffset(col) : null"
+    [style.inset-inline-end.px]="isPinned(col, 'right') ? pinnedOffset(col) : null"
+    [attr.data-align]="col.align ?? 'start'"
+    [attr.tabindex]="col.editable ? 0 : null"
+    [attr.role]="stacked() ? 'cell' : null"
+    (dblclick)="startEdit(i, col, $event)"
+    (keydown)="onCellKeydown($event, i, col)"
+  >
+    @if (slot === 'field' && hasStackLabel(col)) {
+      <!-- The column header, moved beside the value. Not aria-hidden: the
+           <thead> is display:none while stacked, so this label is the only
+           thing naming the value for a screen reader. -->
+      <span class="mk-table__cell-label">{{ col.header }}</span>
+    }
+    <span class="mk-table__cell-value">
+      @if (isEditing(i, col)) {
+        <input
+          class="mk-table__cell-input"
+          [value]="cellText(row, col)"
+          (click)="$event.stopPropagation()"
+          (keydown)="onEditKeydown($event, row, col)"
+          (blur)="commitEdit(row, col, $any($event.target).value)"
+          autofocus
+        />
+      } @else if (cellTemplateFor(col.key); as tpl) {
+        <ng-container
+          [ngTemplateOutlet]="tpl"
+          [ngTemplateOutletContext]="{ $implicit: cellValue(row, col), row }"
+        />
+      } @else {
+        {{ cellText(row, col) }}
+        @if (col.editable) {
+          <span class="mk-visually-hidden">{{ i18n.editCell }}</span>
+        }
+      }
+    </span>
+  </td>
+</ng-template>

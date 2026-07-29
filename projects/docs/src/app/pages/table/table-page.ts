@@ -4,9 +4,12 @@ import {
   MkDescriptionList,
   MkInlineEdit,
   MkTable,
+  MkTableCell,
   MkTableRowDetail,
+  MkTag,
   type MkSortChange,
   type MkTableColumn,
+  type MkTone,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -31,7 +34,9 @@ interface DemoUser {
     MkDescriptionList,
     MkInlineEdit,
     MkTable,
+    MkTableCell,
     MkTableRowDetail,
+    MkTag,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -164,6 +169,37 @@ interface DemoUser {
         <code class="docs-inline">format</code> callback.
       </p>
 
+      <h2>Custom cell templates</h2>
+      <p>
+        A <code class="docs-inline">format</code> callback can only return a
+        string. For anything richer — a status tag, an avatar, a progress bar, an
+        action button — project an
+        <code class="docs-inline">&lt;ng-template mkTableCell="key"&gt;</code>
+        named after the column
+        <code class="docs-inline">key</code>. The cell value is the template's
+        implicit context (<code class="docs-inline">let-value</code>) and the whole
+        row is available as <code class="docs-inline">let-row="row"</code>. A column
+        that has both a template and a <code class="docs-inline">format</code> uses
+        the template for display; <code class="docs-inline">format</code> still
+        feeds the sort and export paths that need a string.
+      </p>
+      <docs-example [code]="cellTemplateCode" column>
+        <mk-table
+          [columns]="columns"
+          [data]="users"
+          hover
+          style="width: 100%"
+        >
+          <ng-template mkTableCell="status" let-value>
+            <mk-tag [tone]="statusTone(value)">{{ value }}</mk-tag>
+          </ng-template>
+          <ng-template mkTableCell="orders" let-value let-row="row">
+            <strong>{{ value }}</strong>
+            <span style="color: var(--mk-text-muted)"> · {{ row.name }}</span>
+          </ng-template>
+        </mk-table>
+      </docs-example>
+
       <h2>Expandable rows</h2>
       <p>
         Set <code class="docs-inline">expandable</code> to add a leading expander
@@ -230,6 +266,44 @@ interface DemoUser {
           <mk-inline-edit multiline [(value)]="editNotes" ariaLabel="Edit notes" />
           <p class="echo">Title: {{ editTitle() || '—' }}</p>
         </div>
+      </docs-example>
+
+      <h2>Stacked cards on narrow screens</h2>
+      <p>
+        Set <code class="docs-inline">stackAt</code> to a pixel width and each
+        row becomes a <strong>card</strong> below it: the column header moves
+        beside its value, and the table stops being a grid nobody can read on a
+        phone. The threshold is measured on the table's own box, not the
+        window — a table in a narrow sidebar stacks while the screen around it
+        is enormous.
+      </p>
+      <p>
+        Each column says what it becomes via
+        <code class="docs-inline">stack</code>:
+        <code class="docs-inline">'title'</code> for the card's heading (no
+        label — the value identifies the record),
+        <code class="docs-inline">'footer'</code> for an actions cell, and
+        <code class="docs-inline">'hide'</code> to drop it entirely. Hidden
+        columns are not rendered at all, so a screen reader does not read them
+        either — which is the difference between this and hiding cells in CSS.
+      </p>
+      <p>
+        The DOM stays a real <code class="docs-inline">&lt;table&gt;</code>, so
+        selection, expandable rows, inline edit and your own
+        <code class="docs-inline">mkTableCell</code> templates keep working
+        unchanged. Because <code class="docs-inline">display: block</code>
+        strips a table of its implicit roles, the component re-applies
+        <code class="docs-inline">role="table|rowgroup|row|cell"</code> while
+        stacked; axe passes in both layouts.
+      </p>
+      <p>
+        <strong>Resize this page narrower than 640px</strong> to see the table
+        below flip. Pair it with
+        <code class="docs-inline">data-mk-density="touch"</code> on a tablet or
+        kiosk so the controls inside the cards are finger-sized too.
+      </p>
+      <docs-example [code]="stackCode" column>
+        <mk-table [columns]="stackColumns" [data]="stackRows" [stackAt]="640" />
       </docs-example>
 
       <h2>Data-grid pro</h2>
@@ -329,6 +403,29 @@ export class TablePage {
     this.tableStatus.set(`clicked ${row.name}`);
   }
 
+  // ----- Custom cell templates ----------------------------------------
+  protected statusTone(status: string): MkTone {
+    switch (status) {
+      case 'active':
+        return 'success';
+      case 'invited':
+        return 'info';
+      case 'suspended':
+        return 'danger';
+      default:
+        return 'neutral';
+    }
+  }
+
+  protected readonly cellTemplateCode = `<mk-table [columns]="columns" [data]="users">
+  <ng-template mkTableCell="status" let-value>
+    <mk-tag [tone]="statusTone(value)">{{ value }}</mk-tag>
+  </ng-template>
+  <ng-template mkTableCell="orders" let-value let-row="row">
+    <strong>{{ value }}</strong> · {{ row.name }}
+  </ng-template>
+</mk-table>`;
+
   // ----- Inline edit ---------------------------------------------------
   protected readonly editTitle = signal('Q3 marketing plan');
   protected readonly editNotes = signal('Draft — review before sending.');
@@ -384,6 +481,44 @@ export class TablePage {
   clickableRows
   (sortChange)="onSort($event)"
   (rowClick)="onRowClick($event)" />`;
+
+  protected readonly stackColumns: MkTableColumn<Record<string, unknown>>[] = [
+    { key: 'order', header: 'Order', stack: 'title' },
+    { key: 'total', header: 'Total', align: 'end', stack: 'title' },
+    { key: 'customer', header: 'Customer' },
+    { key: 'placed', header: 'Placed' },
+    { key: 'payment', header: 'Payment' },
+    { key: 'id', header: 'Internal id', stack: 'hide' },
+  ];
+  protected readonly stackRows = [
+    {
+      order: '#1042',
+      total: '86,00 zł',
+      customer: 'Anna Kowalska',
+      placed: 'Today, 18:24',
+      payment: 'BLIK',
+      id: 'ord_9f2c',
+    },
+    {
+      order: '#1041',
+      total: '32,50 zł',
+      customer: 'Marek Wiśniewski',
+      placed: 'Today, 18:02',
+      payment: 'Cash',
+      id: 'ord_9f2b',
+    },
+  ];
+
+  protected readonly stackCode = `columns: MkTableColumn<Order>[] = [
+  { key: 'order',    header: 'Order', stack: 'title' },   // card heading
+  { key: 'total',    header: 'Total', stack: 'title' },   // beside it
+  { key: 'customer', header: 'Customer' },                // label + value
+  { key: 'actions',  header: '',      stack: 'footer' },  // buttons, no label
+  { key: 'id',       header: 'Internal id', stack: 'hide' },
+];
+
+<mk-table [columns]="columns" [data]="rows()" [stackAt]="640" />
+// Below 640px of TABLE width each row becomes a card.`;
 
   protected readonly gridProCode = `columns: MkTableColumn<User>[] = [
   { key: 'name',  header: 'Name',  pinned: 'left', resizable: true, sortable: true },

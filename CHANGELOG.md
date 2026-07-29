@@ -4,6 +4,37 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.27.0] — 2026-07-29
+
+### Added
+
+- **`MkTable[stackAt]` — rows become cards on narrow screens.** A grid cannot
+  survive a phone: eight columns become eight unreadable slivers, and
+  horizontal scrolling loses the row you were reading. Set a pixel width and
+  below it each row renders as a card with the column header beside its value.
+
+  The threshold is measured on the **table's own box**, via `ResizeObserver`,
+  not the viewport — a table in a narrow sidebar should stack while the window
+  around it is enormous, and one on a tablet in landscape should not.
+
+  Per-column behaviour is one field, `MkTableColumn.stack`:
+  `'title'` (card heading, unlabelled — the value identifies the record),
+  `'footer'` (actions, unlabelled, along the bottom), `'hide'` (not rendered at
+  all, so a screen reader does not read it either — unlike hiding cells in CSS).
+  Anything unset becomes a labelled `header / value` row.
+
+  **The DOM stays a real `<table>`.** Selection, expandable rows, inline edit,
+  grouping and consumer `mkTableCell` templates all reach for a `td`, so
+  swapping in different elements would have broken every one of them. Because
+  `display: block` strips a table of its implicit ARIA roles, the component
+  re-applies `role="table|rowgroup|row|cell"` *while stacked only* — axe passes
+  in both layouts, and the grid keeps the semantics the elements already carry.
+
+  Grid-only chrome is suppressed when stacked: per-column widths (configured or
+  dragged), pinned offsets, and zebra striping, none of which describe a card.
+
+  Opt-in — `stackAt` defaults to `0`, so no existing table changes shape.
+
 ## [0.26.1] — 2026-07-29
 
 ### Fixed
