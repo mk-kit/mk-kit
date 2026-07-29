@@ -54,6 +54,15 @@
   overflow-x: auto;
 }
 
+/* 24px gutters each side cost 12% of a 390px phone, on every screen in the
+   app — and the content inside is what the user came for. Narrow the gutter
+   rather than the content. */
+@media (max-width: 640px) {
+  .mk-app-shell__main {
+    padding: var(--mk-space-4);
+  }
+}
+
 .mk-app-shell__main:focus-visible {
   @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
