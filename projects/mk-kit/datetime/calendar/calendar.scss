@@ -17,6 +17,33 @@
   box-shadow: var(--mk-shadow-xs);
 }
 
+/* Full-width — opt in with `fullWidth`.
+ *
+ * The default above sizes to content, which is right for a date-picker popover
+ * and wrong for a calendar placed in a page column or sidebar: it sat at its
+ * intrinsic width with the container's space unused beside it. Here the grid
+ * stretches and the cells share the width evenly, while `--_cell-size` becomes
+ * a FLOOR rather than a fixed size — so it grows with the container but never
+ * squashes below a usable tap target. */
+:host(.mk-calendar--full) {
+  display: block;
+  width: 100%;
+  /* Below the seven columns' minimum the container, not the calendar, should
+     scroll — squeezing the cells makes the dates unreadable. */
+  min-width: min-content;
+}
+:host(.mk-calendar--full) .mk-calendar__grid {
+  width: 100%;
+}
+:host(.mk-calendar--full) .mk-calendar__weekday {
+  width: auto;
+  min-width: var(--_cell-size);
+}
+:host(.mk-calendar--full) .mk-calendar__day {
+  width: 100%;
+  min-width: var(--_cell-size);
+}
+
 :host(.mk-calendar--sm) {
   --_cell-size: 2.1rem;
   padding: var(--mk-space-3);
@@ -128,8 +155,17 @@
   color: var(--mk-text-disabled);
 }
 
-/* Today — not signalled by color alone: underline dot + aria-current. */
-.mk-calendar__day--today .mk-calendar__day-num::after {
+/* Today — not signalled by color alone: underline dot + aria-current.
+ *
+ * The dot hangs off the day BUTTON, not the number span. The span is
+ * `line-height: 1`, so its box is only as tall as the glyphs; anchoring an
+ * absolutely-positioned dot to it put `bottom: 4px` in the middle of the
+ * digits instead of under them. On today+selected that was a
+ * primary-contrast dot over primary-contrast text — a white smudge across
+ * the number. The button is the full cell and is already positioned, so the
+ * dot lands where the design intended. Out of flow, so it does not become a
+ * flex item of the centred button either. */
+.mk-calendar__day--today::after {
   content: '';
   position: absolute;
   left: 50%;
@@ -168,9 +204,9 @@
   border-start-start-radius: 0;
   border-end-start-radius: 0;
 }
-.mk-calendar__day--today.mk-calendar__day--selected .mk-calendar__day-num::after,
-.mk-calendar__day--today.mk-calendar__day--range-start .mk-calendar__day-num::after,
-.mk-calendar__day--today.mk-calendar__day--range-end .mk-calendar__day-num::after {
+.mk-calendar__day--today.mk-calendar__day--selected::after,
+.mk-calendar__day--today.mk-calendar__day--range-start::after,
+.mk-calendar__day--today.mk-calendar__day--range-end::after {
   background-color: var(--mk-primary-contrast);
 }
 
@@ -181,7 +217,8 @@
 }
 
 .mk-calendar__day-num {
-  position: relative;
+  /* No `position: relative` — it existed only to anchor the today dot, and
+     anchoring the dot here is what mispositioned it. */
   line-height: 1;
 }
 

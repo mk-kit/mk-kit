@@ -4,6 +4,32 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.26.1] — 2026-07-29
+
+### Fixed
+
+- **`MkCalendar`'s today dot no longer lands on top of the date.** The dot is
+  an `::after` that was anchored to the day-number `<span>`, which is
+  `line-height: 1` — so its box is only as tall as the glyphs and
+  `bottom: 4px` fell across the digits rather than beneath them. Worst on
+  today-**and**-selected, where dot and text are both `--mk-primary-contrast`
+  and it read as a white smudge over the number. The dot now hangs off the day
+  button, whose box is the whole cell and which was already positioned; the
+  span's now-purposeless `position: relative` is gone.
+
+### Added
+
+- **`MkCalendar[fullWidth]`.** The host sizes to content, which is right for a
+  date-picker popover and wrong for a calendar laid out in a page column or
+  sidebar — it sat at its intrinsic width and left the space beside it empty.
+  Opting in stretches the grid and shares the width evenly between cells, with
+  `--_cell-size` becoming their *minimum* rather than a fixed size, so the
+  calendar grows with its container but never squashes the dates below a
+  usable target. Default stays off; popovers are unaffected.
+
+- First tests for `MkCalendar`'s layout wiring. Note the dot's pixel placement
+  is CSS and jsdom has no layout engine, so that part is structural only.
+
 ## [0.26.0] — 2026-07-29
 
 ### Added

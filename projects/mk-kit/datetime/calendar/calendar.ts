@@ -95,6 +95,7 @@ interface MkWeekdayHeader {
     '[class.mk-calendar--sm]': "size() === 'sm'",
     '[class.mk-calendar--md]': "size() === 'md'",
     '[class.mk-calendar--lg]': "size() === 'lg'",
+    '[class.mk-calendar--full]': 'fullWidth()',
     '[class.mk-calendar--range]': 'rangeMode()',
     '[class.mk-calendar--invalid]': 'isInvalid()',
     '[attr.aria-invalid]': 'isInvalid() || null',
@@ -122,6 +123,16 @@ export class MkCalendar implements ControlValueAccessor, Validator {
   readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Control size. */
   readonly size = input<MkSize>('md');
+  /**
+   * Stretch to fill the container instead of sizing to content.
+   *
+   * Off by default, because the common host is a date-picker popover that must
+   * stay a compact widget. Turn it on when the calendar is laid out as part of
+   * a page — a sidebar or a column — where sizing to content leaves the space
+   * beside it empty. Cells share the width evenly and `--_cell-size` becomes
+   * their minimum rather than their fixed size.
+   */
+  readonly fullWidth = input(false, { transform: booleanAttribute });
 
   // --- Range mode (additive; does not affect single-date use) --------------
   /** Enable range highlighting. Hosts drive selection via `dateSelected`. */
