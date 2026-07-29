@@ -38,14 +38,34 @@ interface TokenGroup {
 
       <h2>Density</h2>
       <p>
-        The kit ships a global <strong>density</strong> mode: setting
-        <code class="docs-inline">data-mk-density="compact"</code> on
-        <code class="docs-inline">&lt;html&gt;</code> tightens control heights and
-        the two spacing tokens most components use for padding — every control,
-        table and picker follows automatically. Toggle it programmatically via
-        <code class="docs-inline">MkThemeService.setDensity('compact')</code>
-        (persisted, SSR-safe), or try the density button in this site's header.
+        Setting <code class="docs-inline">data-mk-density</code> retunes control
+        heights and the two spacing tokens most components use for padding —
+        every control, table and picker follows automatically, because they all
+        read the same tokens.
       </p>
+      <ul>
+        <li>
+          <code class="docs-inline">compact</code> — 32px default control, for
+          dense data screens.
+        </li>
+        <li>
+          <code class="docs-inline">touch</code> — 48px default control and
+          roomier spacing, for tablets and kiosks. The default 38px is
+          comfortable under a cursor and too small for a finger; 48px is the
+          WCAG 2.5.5 target.
+        </li>
+      </ul>
+      <p>
+        Put it on <code class="docs-inline">&lt;html&gt;</code> for a global
+        mode — <code class="docs-inline">MkThemeService.setDensity('compact')</code>
+        (persisted, SSR-safe), or the density button in this site's header — or
+        on <strong>any element</strong> to rescale just that subtree. These are
+        plain custom properties, so they inherit: a touch-sized dialog inside an
+        otherwise mouse-sized admin is one attribute, not a stylesheet.
+      </p>
+      <pre class="tp-code"><code>&lt;div data-mk-density="touch"&gt;
+  &lt;!-- every mk control in here is finger-sized --&gt;
+&lt;/div&gt;</code></pre>
 
       <h2>Live playground</h2>
       <p>

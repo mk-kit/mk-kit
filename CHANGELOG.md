@@ -4,6 +4,34 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.26.0] — 2026-07-29
+
+### Added
+
+- **`data-mk-density="touch"` — a density mode for fingers.** The density axis
+  only went one way: `compact` tightened controls, and there was nothing for
+  tablets and kiosks. The default 38px control is comfortable under a cursor
+  and too small for a finger, so touch screens ended up re-implementing sizes
+  in application CSS. `touch` sets 40/48/56px controls (48px is the WCAG 2.5.5
+  target) and grows `--mk-space-3`/`--mk-space-4` with them, since adjacent
+  targets are as much of a mis-tap problem as small ones.
+
+  It composes per-subtree, which is the point: these are plain custom
+  properties, so `data-mk-density="touch"` on any element rescales everything
+  inside it. A touch-sized dialog inside an otherwise mouse-sized admin needs
+  one attribute, not a stylesheet.
+
+### Changed
+
+- **`MkDensity` gains `'touch'`**, and `MkThemeService` no longer special-cases
+  a single mode when writing `data-mk-density`: `comfortable` is the token
+  default and so remains the *absence* of the attribute, while every other mode
+  writes its own name. `toggleDensity()` still flips comfortable ↔ compact, and
+  now returns to comfortable from `touch` rather than cycling into it — a
+  mouse user pressing a density button must never land on finger-sized
+  controls.
+- First tests for `MkThemeService`, covering the above.
+
 ## [0.25.2] — 2026-07-26
 
 ### Fixed

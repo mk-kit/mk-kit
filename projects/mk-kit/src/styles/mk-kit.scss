@@ -525,9 +525,20 @@ body.mk-app {
 }
 
 /* ---------------------------------------------------------------------------
- * Density — `data-mk-density="compact"` on <html> tightens control heights
- * and the two spacing steps most controls use for padding. Components need no
- * changes: everything reads these tokens. Toggle via MkThemeService.setDensity.
+ * Density — `data-mk-density` retunes control heights and the two spacing
+ * steps most controls use for padding. Components need no changes: everything
+ * reads these tokens.
+ *
+ * Set it on <html> for a global mode (MkThemeService.setDensity), or on ANY
+ * element to rescale just that subtree — these are plain custom properties, so
+ * they inherit. That is what makes a touch-sized dialog inside an otherwise
+ * mouse-sized admin possible.
+ *
+ * `compact` tightens for dense data screens. `touch` goes the other way, for
+ * tablets and kiosks: the default 38px control is comfortable under a cursor
+ * and too small for a finger. 48px is the WCAG 2.5.5 / Material target, and
+ * the spacing steps grow with it so controls do not end up shoulder to
+ * shoulder — adjacent targets are as much of a mis-tap problem as small ones.
  * ------------------------------------------------------------------------- */
 [data-mk-density='compact'] {
   --mk-control-height-sm: 26px;
@@ -535,6 +546,14 @@ body.mk-app {
   --mk-control-height-lg: 38px;
   --mk-space-3: 0.5rem;   /* 8  — was 12 */
   --mk-space-4: 0.75rem;  /* 12 — was 16 */
+}
+
+[data-mk-density='touch'] {
+  --mk-control-height-sm: 40px;
+  --mk-control-height-md: 48px;
+  --mk-control-height-lg: 56px;
+  --mk-space-3: 1rem;     /* 16 — was 12 */
+  --mk-space-4: 1.25rem;  /* 20 — was 16 */
 }
 
 /* ==========================================================================

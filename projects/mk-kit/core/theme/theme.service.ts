@@ -16,8 +16,15 @@ const THEME_ATTR = 'data-mk-theme';
 const DENSITY_STORAGE_KEY = 'mk-kit-density';
 const DENSITY_ATTR = 'data-mk-density';
 
-/** Global control-density mode. */
-export type MkDensity = 'comfortable' | 'compact';
+/**
+ * Global control-density mode.
+ *
+ * `touch` sizes controls for fingers (48px default) rather than a cursor —
+ * tablets, kiosks, order screens. It is usually applied per-subtree with the
+ * `data-mk-density` attribute rather than globally, since one app often has
+ * both a mouse-driven admin and a touch-driven screen.
+ */
+export type MkDensity = 'comfortable' | 'compact' | 'touch';
 
 /**
  * Reactive theme controller for mk-kit.
@@ -57,8 +64,13 @@ export class MkThemeService {
   private readonly _density = signal<MkDensity>(this.readInitialDensity());
   /**
    * The global density mode. `compact` tightens control heights and the core
-   * spacing steps via the `data-mk-density` attribute — every component
-   * follows automatically because they read the same tokens.
+   * spacing steps via the `data-mk-density` attribute, `touch` enlarges them —
+   * every component follows automatically because they read the same tokens.
+   *
+   * This signal is the GLOBAL mode only. To make one screen or dialog touch-
+   * sized inside an otherwise comfortable app, put `data-mk-density="touch"`
+   * on that element instead; the tokens inherit and this service stays out of
+   * it.
    */
   readonly density = this._density.asReadonly();
 
@@ -90,10 +102,13 @@ export class MkThemeService {
       const density = this._density();
       if (!this.isBrowser) return;
       const root = this.document.documentElement;
-      if (density === 'compact') {
-        root.setAttribute(DENSITY_ATTR, density);
-      } else {
+      // `comfortable` is the token default, so it is the ABSENCE of the
+      // attribute — anything else names itself. Written this way so a new mode
+      // needs no change here.
+      if (density === 'comfortable') {
         root.removeAttribute(DENSITY_ATTR);
+      } else {
+        root.setAttribute(DENSITY_ATTR, density);
       }
       try {
         localStorage.setItem(DENSITY_STORAGE_KEY, density);
@@ -108,16 +123,23 @@ export class MkThemeService {
     this._density.set(density);
   }
 
-  /** Toggle between comfortable and compact density. */
+  /**
+   * Toggle between comfortable and compact — the two modes a density switch in
+   * a UI offers. `touch` is a deliberate choice for a specific screen, not
+   * something to land on by toggling, so from `touch` this returns to
+   * comfortable rather than cycling.
+   */
   toggleDensity(): void {
-    this._density.update((d) => (d === 'compact' ? 'comfortable' : 'compact'));
+    this._density.update((d) => (d === 'comfortable' ? 'compact' : 'comfortable'));
   }
 
   private readInitialDensity(): MkDensity {
     if (!this.isBrowser) return 'comfortable';
     try {
       const stored = localStorage.getItem(DENSITY_STORAGE_KEY);
-      if (stored === 'compact' || stored === 'comfortable') return stored;
+      if (stored === 'compact' || stored === 'comfortable' || stored === 'touch') {
+        return stored;
+      }
     } catch {
       /* ignore */
     }
