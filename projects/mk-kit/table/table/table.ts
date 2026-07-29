@@ -1,8 +1,10 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   ElementRef,
   Injector,
+  PLATFORM_ID,
   afterNextRender,
   booleanAttribute,
   computed,
@@ -12,10 +14,11 @@ import {
   inject,
   input,
   model,
+  numberAttribute,
   output,
   signal,
 } from '@angular/core';
-import { DOCUMENT, NgTemplateOutlet } from '@angular/common';
+import { DOCUMENT, NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
 import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
@@ -52,6 +55,23 @@ export interface MkTableColumn<T = Record<string, unknown>> {
   pinned?: 'left' | 'right';
   /** Minimum width in px when resizing (default 60). */
   minWidth?: number;
+  /**
+   * What becomes of this column when the table stacks into cards
+   * (see {@link MkTable.stackAt}). Omitted, the column renders as a labelled
+   * field: its `header` on one side, its value on the other.
+   *
+   * - `'title'` — the card's heading. No label; the value identifies the
+   *   record at a glance (an order number, a product name). Mark one, or two
+   *   if something short belongs beside it such as a status or a total.
+   * - `'footer'` — pinned to the bottom of the card, full width and unlabelled.
+   *   Where an actions cell belongs: buttons read as buttons, rather than as
+   *   the answer to a label.
+   * - `'hide'` — not rendered at all. Not merely invisible: the cell is never
+   *   created, so a screen reader does not read it either. For columns that
+   *   only earn their place while scanning a grid, and especially for anything
+   *   an expandable row detail already repeats.
+   */
+  stack?: 'title' | 'footer' | 'hide';
 }
 
 /** Payload emitted by {@link MkTable.sortChange}. */
@@ -135,6 +155,7 @@ type MkTableItem<T> =
     '[class.mk-table--selectable]': 'selectable()',
     '[class.mk-table--expandable]': 'expandable()',
     '[class.mk-table--grouped]': 'groupBy() !== null',
+    '[class.mk-table--stacked]': 'stacked()',
   },
 })
 export class MkTable<T = Record<string, unknown>> {
@@ -143,6 +164,18 @@ export class MkTable<T = Record<string, unknown>> {
   private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
+  private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * True while the table is narrower than {@link stackAt} and rendering cards.
+   *
+   * Driven by the element's own width rather than the viewport's: the question
+   * "do these columns fit" is about the space the table HAS, not the size of
+   * the screen. A table in a sidebar or a dialog should stack while the window
+   * around it is enormous.
+   */
+  protected readonly stacked = signal(false);
 
   constructor() {
     // Keep the sticky group-header offset in sync with the rendered thead
@@ -156,6 +189,27 @@ export class MkTable<T = Record<string, unknown>> {
         { injector: this.injector },
       );
     });
+
+    // Watch the host's width against `stackAt`. ResizeObserver rather than
+    // matchMedia because the trigger is the element's width, not the window's.
+    // Skipped entirely on the server and wherever the API is missing, leaving
+    // `stacked` false — the grid is the safe fallback, since it renders the
+    // same data with nothing dropped.
+    afterNextRender(
+      {
+        read: () => {
+          if (!this.isBrowser || typeof ResizeObserver === 'undefined') return;
+          const el = this.host.nativeElement;
+          const observer = new ResizeObserver(([entry]) => {
+            const limit = this.stackAt();
+            this.stacked.set(limit > 0 && entry.contentRect.width < limit);
+          });
+          observer.observe(el);
+          this.destroyRef.onDestroy(() => observer.disconnect());
+        },
+      },
+      { injector: this.injector },
+    );
   }
 
   /** Measures the thead and exposes it as the group rows' sticky offset. */
@@ -182,6 +236,20 @@ export class MkTable<T = Record<string, unknown>> {
   readonly hover = input(true, { transform: booleanAttribute });
   /** Row density. */
   readonly density = input<MkTableDensity>('comfortable');
+  /**
+   * Width in px below which each row renders as a CARD instead of a table row.
+   * `0` (default) never stacks.
+   *
+   * Measured on the table's own container, not the viewport — a table in a
+   * narrow sidebar should stack on a desktop, and a table on a tablet in
+   * landscape should not. Per-column behaviour is set with
+   * {@link MkTableColumn.stack}.
+   *
+   * A grid cannot survive a phone: eight columns become eight unreadable
+   * slivers, and horizontal scrolling loses the row you were reading. Cards
+   * keep one record together and put its header beside each value.
+   */
+  readonly stackAt = input(0, { transform: numberAttribute });
   /** Style rows as clickable and emit `rowClick`. */
   readonly clickableRows = input(false, { transform: booleanAttribute });
   /** Message shown when there are no rows. */
@@ -275,8 +343,40 @@ export class MkTable<T = Record<string, unknown>> {
     return ordered;
   });
 
+  // ── Stacked (card) layout ────────────────────────────────────────────────
+  // Three slots, so a card reads as a record rather than as a form: a heading
+  // line, labelled fields, and actions along the bottom. Columns keep their
+  // configured order within each slot.
+
+  /** Columns forming the card's heading line. */
+  protected readonly stackTitleColumns = computed(() =>
+    this.orderedColumns().filter((c) => c.stack === 'title'),
+  );
+  /** Columns rendered as `label / value` rows in the card body. */
+  protected readonly stackFieldColumns = computed(() =>
+    this.orderedColumns().filter((c) => !c.stack),
+  );
+  /** Columns pinned to the bottom of the card, unlabelled. */
+  protected readonly stackFooterColumns = computed(() =>
+    this.orderedColumns().filter((c) => c.stack === 'footer'),
+  );
+
+  /**
+   * Whether a stacked cell should show its column header as a label.
+   *
+   * An empty header means the column never had a name to show — an actions or
+   * chevron column — and an empty label box would just be a gap the reader has
+   * to account for.
+   */
+  protected hasStackLabel(col: MkTableColumn<T>): boolean {
+    return !!col.header?.trim();
+  }
+
   /** The rendered width for a column, if the user resized it. */
   protected colStyleWidth(col: MkTableColumn<T>): string | null {
+    // A card has one column, so a per-column width — configured or dragged —
+    // would pin the value box to a grid width that no longer exists.
+    if (this.stacked()) return null;
     const w = this.colWidths()[col.key];
     if (w != null) return `${w}px`;
     return col.width ?? null;
@@ -307,6 +407,12 @@ export class MkTable<T = Record<string, unknown>> {
   /** Sticky offset (px) for a pinned column. */
   protected pinnedOffset(col: MkTableColumn<T>): number {
     return this.pinnedOffsets().get(col.key) ?? 0;
+  }
+
+  /** Pinning freezes a column against horizontal scroll. Cards do not scroll
+   *  sideways, so both the class and its inline offset are suppressed. */
+  protected isPinned(col: MkTableColumn<T>, side: 'left' | 'right'): boolean {
+    return !this.stacked() && col.pinned === side;
   }
 
   private numericWidth(col: MkTableColumn<T>): number {
