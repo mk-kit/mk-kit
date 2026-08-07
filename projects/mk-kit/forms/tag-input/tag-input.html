@@ -7,7 +7,7 @@
           [removable]="!isDisabled()"
           [disabled]="isDisabled()"
           [removeLabel]="i18n.removeItem(tag)"
-          (removed)="removeAt(i)"
+          (removed)="removeChipAt(i)"
         >
           {{ tag }}
         </mk-chip>
@@ -22,7 +22,9 @@
         [id]="inputId"
         [value]="query()"
         [placeholder]="value().length ? '' : placeholder()"
-        [disabled]="isDisabled() || atMax()"
+        [disabled]="isDisabled()"
+        [readonly]="atMax()"
+        [attr.aria-disabled]="atMax() || null"
         [attr.aria-labelledby]="labelledBy()"
         [attr.aria-describedby]="describedBy()"
         [attr.aria-invalid]="isInvalid() || null"

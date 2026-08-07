@@ -31,10 +31,10 @@
   border-color: var(--mk-primary);
 }
 :host(.mk-code-editor--invalid) .mk-code-editor__frame {
-  border-color: var(--mk-danger);
+  border-color: var(--mk-danger-text);
 }
 :host(.mk-code-editor--invalid) .mk-code-editor__frame:focus-within {
-  outline-color: var(--mk-danger);
+  outline-color: var(--mk-danger-text);
 }
 :host(.mk-code-editor--disabled) .mk-code-editor__frame {
   background-color: var(--mk-surface-2);
@@ -160,7 +160,7 @@
 .mk-code-editor__error {
   margin: var(--mk-space-1) 0 0;
   font-size: var(--mk-font-size-sm);
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 
 @media (prefers-reduced-motion: reduce) {

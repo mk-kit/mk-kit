@@ -1,18 +1,11 @@
-<div
-  class="mk-fab__actions"
-  [attr.hidden]="hasActions() && open() ? null : ''"
-  (keydown)="onKeydown($event)"
->
-  <ng-content select="[mkFabAction]" />
-</div>
-
 <button
+  #trigger
   type="button"
   class="mk-fab__button"
   [attr.data-tone]="tone()"
   [attr.aria-label]="label()"
-  [attr.aria-haspopup]="hasActions() ? 'menu' : null"
   [attr.aria-expanded]="hasActions() ? open() : null"
+  [attr.aria-controls]="hasActions() ? actionsId : null"
   [disabled]="disabled()"
   (click)="onClick()"
   (keydown)="onKeydown($event)"
@@ -22,3 +15,14 @@
     <span class="mk-fab__label">{{ label() }}</span>
   }
 </button>
+
+<!-- After the trigger in DOM so Tab reaches the revealed actions next;
+     the visual stacking is restored with flex column-reverse in fab.scss. -->
+<div
+  class="mk-fab__actions"
+  [id]="actionsId"
+  [attr.hidden]="hasActions() && open() ? null : ''"
+  (keydown)="onKeydown($event)"
+>
+  <ng-content select="[mkFabAction]" />
+</div>

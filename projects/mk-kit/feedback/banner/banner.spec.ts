@@ -33,4 +33,27 @@ describe('MkBanner', () => {
     fixture.componentRef.setInput('tone', 'info');
     expect((banner as any).role()).toBe('status');
   });
+
+  it('scopes the live region to the body, not the whole banner', () => {
+    fixture.componentRef.setInput('dismissible', true);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+
+    const region = el.querySelector('[role]')!;
+    expect(region.classList.contains('mk-banner__body')).toBe(true);
+    expect(region.getAttribute('role')).toBe('status');
+    expect(el.querySelector('.mk-banner__box')!.getAttribute('role')).toBeNull();
+
+    // Actions and the dismiss button must sit outside the live region.
+    expect(region.querySelector('.mk-banner__actions')).toBeNull();
+    expect(region.querySelector('.mk-banner__close')).toBeNull();
+    expect(el.querySelector('.mk-banner__close')).toBeTruthy();
+  });
+
+  it('hides the icon slot from assistive tech', () => {
+    const icon = (fixture.nativeElement as HTMLElement).querySelector(
+      '.mk-banner__icon',
+    )!;
+    expect(icon.getAttribute('aria-hidden')).toBe('true');
+  });
 });

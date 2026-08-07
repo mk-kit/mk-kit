@@ -9,7 +9,7 @@
       size="sm"
       [removable]="!isDisabled()"
       [disabled]="isDisabled()"
-      [removeLabel]="'Remove ' + chip.label"
+      [removeLabel]="i18n.removeItem(chip.label)"
       (removed)="removeChip(chip.value)"
     >
       {{ chip.label }}
@@ -73,6 +73,11 @@
           [attr.aria-selected]="isSelected(opt.value)"
           [attr.aria-disabled]="
             opt.disabled || (atMax() && !isSelected(opt.value)) || null
+          "
+          [attr.title]="
+            atMax() && !isSelected(opt.value) && !opt.disabled
+              ? atMaxHint()
+              : null
           "
           [class.mk-multi-select__option--active]="i === activeIndex()"
           [class.mk-multi-select__option--selected]="isSelected(opt.value)"

@@ -126,7 +126,7 @@
   /* Text */
   --mk-text: #1a1d23;
   --mk-text-muted: #56606e;
-  --mk-text-subtle: #8b95a3;
+  --mk-text-subtle: #687280;
   --mk-text-inverse: #ffffff;
   --mk-text-disabled: #adb5c0;
 
@@ -168,6 +168,9 @@
   --mk-danger: #dc2626;
   --mk-danger-hover: #b91c1c;
   --mk-danger-contrast: #ffffff;
+  /* Danger as TEXT on surfaces. Same as --mk-danger in light; lighter in dark,
+     where the button-label-safe base falls below 4.5:1 as body text. */
+  --mk-danger-text: #dc2626;
   --mk-danger-subtle: #fdeaea;
   --mk-danger-subtle-text: #b3201a;
 
@@ -184,7 +187,7 @@
   --mk-neutral-subtle-text: #3a424e;
 
   /* Focus ring color */
-  --mk-focus-ring: rgba(79, 70, 229, 0.5);
+  --mk-focus-ring: #4f46e5;
 
   /* Elevation shadows */
   --mk-shadow-xs: 0 1px 2px rgba(17, 20, 26, 0.06);
@@ -229,7 +232,7 @@ $mk-dark: (
 
   'text': '#e6edf3',
   'text-muted': '#9aa5b1',
-  'text-subtle': '#6e7a8a',
+  'text-subtle': '#788494',
   'text-inverse': '#0d1117',
   'text-disabled': '#4b545f',
 
@@ -242,7 +245,7 @@ $mk-dark: (
   'selected-bg': '#1e2540',
   'selected-text': '#c7d2fe',
 
-  'primary': '#6366f1',
+  'primary': '#6164f0',
   'primary-hover': '#7c7ff4',
   'primary-active': '#9599f7',
   'primary-contrast': '#ffffff',
@@ -262,9 +265,10 @@ $mk-dark: (
   'warning-subtle': '#2a2010',
   'warning-subtle-text': '#fcd34d',
 
-  'danger': '#f04747',
+  'danger': '#db3636',
   'danger-hover': '#f56b6b',
   'danger-contrast': '#ffffff',
+  'danger-text': '#f56b6b',
   'danger-subtle': '#2c1416',
   'danger-subtle-text': '#fca5a5',
 
@@ -278,7 +282,7 @@ $mk-dark: (
   'neutral-subtle-hover': '#2c3540',
   'neutral-subtle-text': '#c4ccd6',
 
-  'focus-ring': 'rgba(129, 140, 248, 0.6)',
+  'focus-ring': '#818cf8',
 
   'shadow-xs': '0 1px 2px rgba(0, 0, 0, 0.4)',
   'shadow-sm': '0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3)',

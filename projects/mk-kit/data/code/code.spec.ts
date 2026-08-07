@@ -33,6 +33,20 @@ describe('MkCode', () => {
     expect((code as any).lines()).toEqual([1, 2, 3]);
   });
 
+  it('exposes the scroller as a focusable named region (keyboard scrolling)', () => {
+    fixture.detectChanges();
+    const scroll = (fixture.nativeElement as HTMLElement).querySelector(
+      '.mk-code__scroll',
+    )!;
+    expect(scroll.getAttribute('tabindex')).toBe('0');
+    expect(scroll.getAttribute('role')).toBe('region');
+    expect(scroll.getAttribute('aria-label')).toBe('Code');
+
+    fixture.componentRef.setInput('filename', 'config.json');
+    fixture.detectChanges();
+    expect(scroll.getAttribute('aria-label')).toBe('config.json');
+  });
+
   it('shows a header when a filename or copy button is present', () => {
     fixture.componentRef.setInput('copyable', false);
     fixture.componentRef.setInput('filename', '');

@@ -295,6 +295,24 @@ export class MkCalendar implements ControlValueAccessor, Validator {
     return isAfter(day, startOfDay(lo)) && isBefore(day, startOfDay(hi));
   }
 
+  /**
+   * `aria-selected` state of a day's gridcell. Single-date mode mirrors
+   * `isSelected`; range mode exposes the committed endpoints and the days
+   * between them (hover previews stay visual-only so the accessibility tree
+   * doesn't churn while the pointer moves).
+   */
+  protected isAriaSelected(d: Date): boolean {
+    if (!this.rangeMode()) return this.isSelected(d);
+    const s = this.rangeStart();
+    const e = this.rangeEnd();
+    if (s && isSameDay(d, s)) return true;
+    if (e && isSameDay(d, e)) return true;
+    if (!s || !e) return false;
+    const [lo, hi] = isAfter(e, s) ? [s, e] : [e, s];
+    const day = startOfDay(d);
+    return isAfter(day, startOfDay(lo)) && isBefore(day, startOfDay(hi));
+  }
+
   protected dayLabel(d: Date): string {
     return formatDate(d, 'MMMM d, yyyy', this.i18n.dateNames);
   }

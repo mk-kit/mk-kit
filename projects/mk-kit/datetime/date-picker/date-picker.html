@@ -66,6 +66,8 @@
     [id]="panelId"
     role="dialog"
     [attr.aria-label]="i18n.chooseDate"
+    (keydown.escape)="onPanelEscape($event)"
+    (focusout)="onPanelFocusout($event)"
   >
     <mk-calendar
       [value]="value()"

@@ -48,6 +48,7 @@ interface MkInlineTool {
 })
 export class MkRichText {
   private readonly document = inject(DOCUMENT);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly editableRef = viewChild.required<ElementRef<HTMLElement>>('editable');
   protected readonly i18n = inject(MK_I18N);
 
@@ -124,8 +125,13 @@ export class MkRichText {
 
   protected onBlur(): void {
     this.focusChange.emit(false);
-    // Hide the toolbar on the next tick so toolbar clicks still register.
-    setTimeout(() => this.toolbar.update((t) => ({ ...t, visible: false })), 150);
+    // Hide the toolbar on a delay, but only if focus really left the
+    // component — Tabbing into the toolbar itself must not dismiss it.
+    setTimeout(() => {
+      const active = this.document.activeElement;
+      if (active && this.host.nativeElement.contains(active)) return;
+      this.toolbar.update((t) => (t.visible ? { ...t, visible: false } : t));
+    }, 150);
   }
 
   protected onSelectionChange(): void {
@@ -166,9 +172,28 @@ export class MkRichText {
     }
   }
 
+  /** Escape inside the toolbar returns focus to the text; arrows move tools. */
+  protected onToolbarKeydown(event: KeyboardEvent): void {
+    if (event.key === 'Escape') {
+      event.preventDefault();
+      event.stopPropagation();
+      this.toolbar.update((t) => ({ ...t, visible: false }));
+      this.editableRef().nativeElement.focus();
+      return;
+    }
+    if (event.key === 'ArrowRight' || event.key === 'ArrowLeft') {
+      const bar = event.currentTarget as HTMLElement;
+      const buttons = Array.from(bar.querySelectorAll<HTMLButtonElement>('.mk-rich-text__tool'));
+      const current = buttons.indexOf(this.document.activeElement as HTMLButtonElement);
+      if (current === -1 || buttons.length === 0) return;
+      event.preventDefault();
+      const delta = event.key === 'ArrowRight' ? 1 : -1;
+      buttons[(current + delta + buttons.length) % buttons.length].focus();
+    }
+  }
+
   /** Runs a toolbar command, keeping the model + toolbar state in sync. */
-  protected runTool(id: string, event?: Event): void {
-    event?.preventDefault();
+  protected runTool(id: string): void {
     const el = this.editableRef().nativeElement;
     el.focus();
     switch (id) {

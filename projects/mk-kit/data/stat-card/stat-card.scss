@@ -59,7 +59,7 @@
   color: var(--mk-text-muted);
 }
 .mk-stat-card__delta[data-trend='up'] { color: var(--mk-success); }
-.mk-stat-card__delta[data-trend='down'] { color: var(--mk-danger); }
+.mk-stat-card__delta[data-trend='down'] { color: var(--mk-danger-text); }
 
 .mk-stat-card__arrow {
   font-size: 1em;

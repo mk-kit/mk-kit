@@ -21,6 +21,12 @@ class Host {
   removedCount = 0;
 }
 
+@Component({
+  imports: [MkChip],
+  template: `<mk-chip removable removeLabel="Dismiss tag">Angular</mk-chip>`,
+})
+class ExplicitLabelHost {}
+
 describe('MkChip', () => {
   function mount() {
     TestBed.configureTestingModule({
@@ -98,11 +104,58 @@ describe('MkChip', () => {
     fixture.detectChanges();
 
     const remove = el.querySelector<HTMLButtonElement>('.mk-chip__remove')!;
-    expect(remove.getAttribute('aria-label')).toBeTruthy();
+    expect(remove.getAttribute('aria-labelledby')).toBeTruthy();
 
     remove.click();
     fixture.detectChanges();
     expect(host.removedCount).toBe(1);
+  });
+
+  it("names the remove button after the chip's text by default", () => {
+    const { fixture, el, host } = mount();
+    host.removable.set(true);
+    fixture.detectChanges();
+
+    const remove = el.querySelector<HTMLButtonElement>('.mk-chip__remove')!;
+    // aria-labelledby beats aria-label in the accname algorithm, so the
+    // default must not also set aria-label.
+    expect(remove.getAttribute('aria-label')).toBeNull();
+
+    const name = remove
+      .getAttribute('aria-labelledby')!
+      .split(' ')
+      .map((id) => document.getElementById(id)?.textContent?.trim())
+      .join(' ');
+    expect(name).toBe('Remove Angular');
+  });
+
+  it('lets an explicit removeLabel win over the composed default', () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(ExplicitLabelHost);
+    fixture.detectChanges();
+
+    const remove = (fixture.nativeElement as HTMLElement).querySelector(
+      '.mk-chip__remove',
+    )!;
+    expect(remove.getAttribute('aria-label')).toBe('Dismiss tag');
+    expect(remove.getAttribute('aria-labelledby')).toBeNull();
+  });
+
+  it('is focusable when removable but not selectable', () => {
+    const { fixture, chip, host } = mount();
+    host.removable.set(true);
+    fixture.detectChanges();
+
+    expect(chip.getAttribute('tabindex')).toBe('0');
+    // Removal keys are advertised, so the host must be reachable — but it is
+    // still not a toggle button.
+    expect(chip.getAttribute('role')).toBeNull();
+
+    host.disabled.set(true);
+    fixture.detectChanges();
+    expect(chip.getAttribute('tabindex')).toBeNull();
   });
 
   it('removes on Delete and Backspace', () => {

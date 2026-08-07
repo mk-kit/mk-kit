@@ -87,9 +87,9 @@
           }
         </span>
 
-        <span class="mk-file-upload__status" aria-hidden="true">
+        <span class="mk-file-upload__status">
           @if (item.status === 'success') {
-            <span class="mk-file-upload__check"></span>
+            <span class="mk-file-upload__check" aria-hidden="true"></span>
           } @else if (item.status === 'error') {
             <button
               type="button"
@@ -97,7 +97,7 @@
               [attr.aria-label]="i18n.retryUpload"
               (click)="retry(item)"
             >
-              ↻
+              <span aria-hidden="true">↻</span>
             </button>
           }
         </span>

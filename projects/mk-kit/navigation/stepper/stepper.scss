@@ -72,7 +72,7 @@
   color: var(--mk-primary-subtle-text);
 }
 .mk-stepper__step--error .mk-stepper__marker {
-  background-color: var(--mk-danger);
+  background-color: var(--mk-danger-text);
   color: var(--mk-danger-contrast);
 }
 
@@ -103,7 +103,7 @@
   font-weight: var(--mk-font-weight-medium);
 }
 .mk-stepper__step--error .mk-stepper__label {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 .mk-stepper__optional {
   font-size: var(--mk-font-size-xs);

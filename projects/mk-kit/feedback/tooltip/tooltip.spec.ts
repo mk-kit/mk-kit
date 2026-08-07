@@ -151,6 +151,89 @@ describe('MkTooltip', () => {
     expect(mine.isConnected).toBe(false);
   });
 
+  it('survives the pointer moving from the trigger onto the panel', () => {
+    const { fixture, trigger } = mount();
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(400);
+    fixture.detectChanges();
+    const tip = panel()!;
+    expect(tip).toBeTruthy();
+
+    // Leaving the trigger only SCHEDULES the hide (WCAG 1.4.13 hoverable) —
+    // the pointer needs time to cross the gap onto the panel.
+    trigger.dispatchEvent(new MouseEvent('mouseleave'));
+    fixture.detectChanges();
+    expect(panel()).toBeTruthy();
+
+    // Entering the panel cancels the pending hide for good.
+    tip.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(5000);
+    fixture.detectChanges();
+    expect(panel()).toBeTruthy();
+
+    // Leaving the panel hides it after the same grace period.
+    tip.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(150);
+    fixture.detectChanges();
+    expect(panel()).toBeNull();
+  });
+
+  it('hides after the grace period when the pointer leaves and never reaches the panel', () => {
+    const { fixture, trigger } = mount();
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(400);
+    fixture.detectChanges();
+    expect(panel()).toBeTruthy();
+
+    trigger.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(150);
+    fixture.detectChanges();
+    expect(panel()).toBeNull();
+  });
+
+  it('re-entering the trigger during the grace period keeps the tooltip up', () => {
+    const { fixture, trigger } = mount();
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(400);
+    fixture.detectChanges();
+
+    trigger.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(100);
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(5000);
+    fixture.detectChanges();
+    expect(panel()).toBeTruthy();
+  });
+
+  it('Escape pressed anywhere in the document dismisses a visible tooltip', () => {
+    const { fixture, trigger } = mount();
+    focusIn(fixture, trigger);
+    expect(panel()).toBeTruthy();
+
+    // Focus is elsewhere — the listener is document-level while visible.
+    const e = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(e);
+    fixture.detectChanges();
+
+    expect(e.defaultPrevented).toBe(true);
+    expect(panel()).toBeNull();
+  });
+
+  it('leaves Escape alone when no tooltip is visible', () => {
+    mount();
+    const e = new KeyboardEvent('keydown', {
+      key: 'Escape',
+      bubbles: true,
+      cancelable: true,
+    });
+    document.body.dispatchEvent(e);
+    expect(e.defaultPrevented).toBe(false);
+  });
+
   it('does not open for empty or whitespace-only text', () => {
     const { fixture, trigger, host } = mount();
     host.text.set('   ');

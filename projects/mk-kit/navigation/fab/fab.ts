@@ -2,6 +2,9 @@ import {
   ChangeDetectionStrategy,
   Component,
   Directive,
+  ElementRef,
+  Injector,
+  afterNextRender,
   booleanAttribute,
   computed,
   contentChildren,
@@ -9,8 +12,9 @@ import {
   input,
   model,
   output,
+  viewChild,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
 
 /** Corner placement for a fixed {@link MkFab}. `static` renders it inline. */
@@ -26,7 +30,9 @@ export type MkFabPosition =
   selector: '[mkFabAction]',
   host: { class: 'mk-fab__action', type: 'button' },
 })
-export class MkFabAction {}
+export class MkFabAction {
+  readonly el = inject<ElementRef<HTMLElement>>(ElementRef);
+}
 
 /**
  * FAB — a floating action button, fixed to a corner (or `static` for inline
@@ -56,7 +62,13 @@ export class MkFabAction {}
 })
 export class MkFab {
   private readonly actions = contentChildren(MkFabAction);
+  private readonly trigger =
+    viewChild<ElementRef<HTMLButtonElement>>('trigger');
+  private readonly injector = inject(Injector);
   protected readonly i18n = inject(MK_I18N);
+
+  /** Id of the actions container, referenced by the trigger's aria-controls. */
+  protected readonly actionsId = mkUniqueId('mk-fab-actions');
 
   /** Corner placement (or `static` to render inline). */
   readonly position = input<MkFabPosition>('bottom-end');
@@ -81,7 +93,16 @@ export class MkFab {
   protected onClick(): void {
     if (this.disabled()) return;
     if (this.hasActions()) {
-      this.open.set(!this.open());
+      const opening = !this.open();
+      this.open.set(opening);
+      if (opening) {
+        // The actions container un-hides on the next render (zoneless);
+        // only then can the first action receive focus.
+        afterNextRender(
+          () => this.actions()[0]?.el.nativeElement.focus(),
+          { injector: this.injector },
+        );
+      }
     } else {
       this.action.emit();
     }
@@ -91,6 +112,9 @@ export class MkFab {
     if (event.key === 'Escape' && this.open()) {
       event.preventDefault();
       this.open.set(false);
+      // Focus may sit on an action inside the now-hidden container —
+      // return it to the trigger instead of letting it drop to <body>.
+      this.trigger()?.nativeElement.focus();
     }
   }
 }

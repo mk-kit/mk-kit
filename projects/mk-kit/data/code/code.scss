@@ -59,6 +59,10 @@
   display: flex;
   overflow: auto;
 }
+.mk-code__scroll:focus-visible {
+  /* Inset ring — the host clips overflow, so an outset outline would be cut. */
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
 
 .mk-code__gutter {
   flex: none;

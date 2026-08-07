@@ -44,7 +44,28 @@ describe('MkSlider', () => {
     return e;
   }
 
-  afterEach(() => TestBed.resetTestingModule());
+  /**
+   * Renders the track right-to-left. jsdom's UA stylesheet resolves
+   * `[dir=rtl]` set on the element itself via getComputedStyle; if that ever
+   * stops holding, fall back to mocking the resolution for this element.
+   */
+  function forceRtl(track: HTMLElement) {
+    track.setAttribute('dir', 'rtl');
+    if (getComputedStyle(track).direction !== 'rtl') {
+      const orig = window.getComputedStyle.bind(window);
+      vi.spyOn(window, 'getComputedStyle').mockImplementation(
+        ((el: Element) =>
+          el === track
+            ? ({ direction: 'rtl' } as CSSStyleDeclaration)
+            : orig(el)) as typeof window.getComputedStyle,
+      );
+    }
+  }
+
+  afterEach(() => {
+    vi.restoreAllMocks();
+    TestBed.resetTestingModule();
+  });
 
   it('implements the ARIA slider pattern', () => {
     const { thumb } = mount();
@@ -125,6 +146,30 @@ describe('MkSlider', () => {
     host.value.set(50);
     fixture.detectChanges();
     expect(fill.style.width).toBe('25%');
+  });
+
+  it('flips ArrowLeft/ArrowRight in RTL to follow the visual direction', () => {
+    const { fixture, el, thumb, host } = mount();
+    forceRtl(el.querySelector<HTMLElement>('.mk-slider__track')!);
+
+    press(fixture, thumb, 'ArrowRight'); // visually right = towards min
+    expect(host.value()).toBe(49);
+    press(fixture, thumb, 'ArrowLeft'); // visually left = towards max
+    expect(host.value()).toBe(50);
+  });
+
+  it('keeps Up/Down and Home/End direction-agnostic in RTL', () => {
+    const { fixture, el, thumb, host } = mount();
+    forceRtl(el.querySelector<HTMLElement>('.mk-slider__track')!);
+
+    press(fixture, thumb, 'ArrowUp');
+    expect(host.value()).toBe(51);
+    press(fixture, thumb, 'ArrowDown');
+    expect(host.value()).toBe(50);
+    press(fixture, thumb, 'End');
+    expect(host.value()).toBe(100);
+    press(fixture, thumb, 'Home');
+    expect(host.value()).toBe(0);
   });
 
   it('ignores keys and drops out of the tab order while disabled', () => {

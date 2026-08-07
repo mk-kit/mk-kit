@@ -165,6 +165,21 @@ export class MkTree {
     this.selectionChange.emit(value);
   }
 
+  /**
+   * Click on a parent row's chevron: toggle expansion WITHOUT selecting, so
+   * mouse users can open a branch without committing it (hosts like
+   * `mk-tree-select` close on any selection, which would make children
+   * unreachable by mouse otherwise). On leaf rows the click falls through to
+   * the row handler and behaves as a normal row click.
+   */
+  protected onToggleClick(event: Event, index: number): void {
+    const row = this.rows()[index];
+    if (!row?.expandable) return;
+    event.stopPropagation();
+    this.activeIndex.set(index);
+    this.toggle(row.node);
+  }
+
   /** Click a row: toggle expansion for parents, select when selectable. */
   protected onRowClick(index: number): void {
     const row = this.rows()[index];

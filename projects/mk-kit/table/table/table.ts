@@ -17,6 +17,7 @@ import {
   numberAttribute,
   output,
   signal,
+  viewChild,
 } from '@angular/core';
 import { DOCUMENT, NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
 import { MkLiveAnnouncer } from '@mkornas/ui/core';
@@ -117,6 +118,11 @@ export interface MkGroupToggle {
   /** Whether the group is now collapsed. */
   collapsed: boolean;
 }
+
+/** Hard floor (px) for column resize when a column sets no `minWidth`. */
+const MIN_COL_WIDTH = 60;
+/** Upper bound advertised on resize separators (`aria-valuemax`). */
+const MAX_COL_WIDTH = 2000;
 
 /** One rendered tbody entry: either a group header or a data row. */
 type MkTableItem<T> =
@@ -424,7 +430,7 @@ export class MkTable<T = Record<string, unknown>> {
   private resizeKey: string | null = null;
   private resizeStartX = 0;
   private resizeStartW = 0;
-  private resizeMin = 60;
+  private resizeMin = MIN_COL_WIDTH;
   /** +1 in LTR, -1 in RTL — dragging toward the inline-end always widens. */
   private resizeSign: 1 | -1 = 1;
 
@@ -449,7 +455,7 @@ export class MkTable<T = Record<string, unknown>> {
     this.resizeSign = this.isRtl() ? -1 : 1;
     this.resizeStartW =
       this.colWidths()[col.key] ?? th?.getBoundingClientRect().width ?? this.numericWidth(col);
-    this.resizeMin = col.minWidth ?? 60;
+    this.resizeMin = col.minWidth ?? MIN_COL_WIDTH;
     this.document.addEventListener('pointermove', this.onResizeMove);
     this.document.addEventListener('pointerup', this.onResizeEnd);
     this.document.addEventListener('pointercancel', this.onResizeEnd);
@@ -510,7 +516,7 @@ export class MkTable<T = Record<string, unknown>> {
     if (this.isRtl()) delta = -delta;
     event.preventDefault();
     event.stopPropagation();
-    const min = col.minWidth ?? 60;
+    const min = col.minWidth ?? MIN_COL_WIDTH;
     const th = (event.target as HTMLElement).closest('th');
     const current =
       this.colWidths()[col.key] ??
@@ -526,6 +532,14 @@ export class MkTable<T = Record<string, unknown>> {
   protected resizeValueNow(col: MkTableColumn<T>): number {
     return Math.round(this.colWidths()[col.key] ?? this.numericWidth(col));
   }
+
+  /** The resize floor for a column, for the separator's aria-valuemin. */
+  protected resizeValueMin(col: MkTableColumn<T>): number {
+    return col.minWidth ?? MIN_COL_WIDTH;
+  }
+
+  /** Advertised resize ceiling (aria-valuemax) — a sane constant bound. */
+  protected readonly resizeValueMax = MAX_COL_WIDTH;
 
   ngOnDestroy(): void {
     if (this.resizeRaf != null) {
@@ -586,13 +600,16 @@ export class MkTable<T = Record<string, unknown>> {
   /** Keyboard column reorder: Alt+Arrow moves the focused header. */
   protected onReorderKeydown(event: KeyboardEvent, col: MkTableColumn<T>): void {
     if (!this.reorderableColumns() || col.pinned || !event.altKey) return;
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    // Swallow the combo even when the move is a no-op (first column moved
+    // further left, last moved right) — otherwise Alt+Arrow falls through to
+    // the browser's history Back/Forward and navigates away from the grid.
+    event.preventDefault();
     const order = this.orderedColumns().map((c) => c.key);
     const idx = order.indexOf(col.key);
     if (event.key === 'ArrowLeft' && idx > 0) {
-      event.preventDefault();
       this.moveColumn(col.key, idx - 1);
     } else if (event.key === 'ArrowRight' && idx < order.length - 1) {
-      event.preventDefault();
       this.moveColumn(col.key, idx + 1);
     }
   }
@@ -606,6 +623,10 @@ export class MkTable<T = Record<string, unknown>> {
   /** The cell element being edited, so focus can be restored after. */
   private editingCell: HTMLElement | null = null;
 
+  /** The inline-edit input, focused once it renders. */
+  private readonly editInput =
+    viewChild<ElementRef<HTMLInputElement>>('editInput');
+
   protected startEdit(index: number, col: MkTableColumn<T>, event?: Event): void {
     if (!col.editable) return;
     event?.stopPropagation();
@@ -613,6 +634,11 @@ export class MkTable<T = Record<string, unknown>> {
       ((event?.target as HTMLElement | null)?.closest('td') as HTMLElement | null) ??
       null;
     this.editing.set({ index, key: col.key });
+    // Explicit focus once the input exists — a dynamically inserted
+    // `autofocus` attribute is not honoured after initial page load.
+    afterNextRender(() => this.editInput()?.nativeElement.focus(), {
+      injector: this.injector,
+    });
   }
 
   /** Keyboard path into edit mode (Enter / F2 on a focused editable cell). */

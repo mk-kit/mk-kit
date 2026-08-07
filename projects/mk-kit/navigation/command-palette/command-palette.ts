@@ -14,7 +14,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { isPlatformBrowser } from '@angular/common';
+import { NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MkFocusTrap } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
@@ -67,7 +67,7 @@ interface Group {
   templateUrl: './command-palette.html',
   styleUrl: './command-palette.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MkIcon],
+  imports: [MkIcon, NgTemplateOutlet],
   host: {
     class: 'mk-command-palette',
     '[class.mk-command-palette--open]': 'open()',
@@ -78,7 +78,7 @@ interface Group {
 export class MkCommandPalette {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
-  private readonly i18n = inject(MK_I18N);
+  protected readonly i18n = inject(MK_I18N);
   private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
@@ -137,10 +137,24 @@ export class MkCommandPalette {
       if (!this.isBrowser) return;
       queueMicrotask(() => this.sync(isOpen));
     });
+    // Keep the active option visible while the list scrolls under 70vh.
+    effect(() => {
+      const index = this.activeIndex();
+      if (!this.isBrowser || !this.open() || index < 0) return;
+      queueMicrotask(() => {
+        this.document
+          .getElementById(this.optionId(index))
+          ?.scrollIntoView?.({ block: 'nearest' });
+      });
+    });
   }
 
   protected optionId(index: number): string {
     return `${this.listId}-opt-${index}`;
+  }
+
+  protected groupId(index: number): string {
+    return `${this.listId}-group-${index}`;
   }
 
   private sync(isOpen: boolean): void {

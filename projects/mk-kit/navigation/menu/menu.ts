@@ -71,14 +71,19 @@ export class MkMenu implements OnDestroy {
   private typeahead = '';
   private typeaheadTimer?: ReturnType<typeof setTimeout>;
 
-  /** Open the menu anchored to `trigger`. */
-  open(trigger: HTMLElement, focusFirst = true): void {
+  /**
+   * Open the menu anchored to `trigger`. `focus` picks the item that receives
+   * focus once the panel is painted: `true`/`'first'` for the first enabled
+   * item, `'last'` for the last (ArrowUp on a menu button, per the APG
+   * menu-button pattern), `false` to leave focus where it is (mouse open).
+   */
+  open(trigger: HTMLElement, focus: boolean | 'first' | 'last' = true): void {
     if (!this.isBrowser || this._open()) return;
     this.triggerEl = trigger;
     this.anchorEl.set(trigger);
     this.anchorPoint.set(undefined);
     this._open.set(true);
-    if (focusFirst) this.focusAfterOpen();
+    if (focus) this.focusAfterOpen(focus === 'last' ? 'last' : 'first');
   }
 
   /**
@@ -93,7 +98,7 @@ export class MkMenu implements OnDestroy {
     this.anchorEl.set(undefined);
     this.anchorPoint.set({ x, y });
     this._open.set(true);
-    this.focusAfterOpen();
+    this.focusAfterOpen('first');
   }
 
   /** Close the menu; optionally restore focus to the trigger. */
@@ -116,10 +121,29 @@ export class MkMenu implements OnDestroy {
     }
   }
 
-  /** Focus the first item once the panel is in the top layer and painted. */
-  private focusAfterOpen(): void {
+  /**
+   * Move focus to the first enabled item. Used by the trigger when the menu is
+   * already open (e.g. ArrowDown after a mouse open), so arrow keys always
+   * reach the items even though focus never left the trigger.
+   */
+  focusFirstItem(): void {
+    this.focusFirst();
+  }
+
+  /** Move focus to the last enabled item (ArrowUp from the trigger). */
+  focusLastItem(): void {
+    this.focusLast();
+  }
+
+  /** Focus an item once the panel is in the top layer and painted. */
+  private focusAfterOpen(which: 'first' | 'last'): void {
     afterNextRender(
-      { write: () => this.focusFirst() },
+      {
+        write: () => {
+          if (which === 'last') this.focusLast();
+          else this.focusFirst();
+        },
+      },
       { injector: this.injector },
     );
   }

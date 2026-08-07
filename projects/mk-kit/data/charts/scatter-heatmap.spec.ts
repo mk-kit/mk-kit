@@ -111,6 +111,17 @@ describe('MkHeatmap', () => {
     expect(scale.swatches).toHaveLength(5);
   });
 
+  it('exposes the scroll wrapper as a focusable named region', () => {
+    const scroll = (fixture.nativeElement as HTMLElement).querySelector(
+      '.mk-heatmap__scroll',
+    )!;
+    expect(scroll.getAttribute('tabindex')).toBe('0');
+    expect(scroll.getAttribute('role')).toBe('region');
+    expect(scroll.getAttribute('aria-label')).toBe(
+      'Heatmap, 2 rows by 2 columns',
+    );
+  });
+
   it('exposes cell values to AT even when showValues is off', () => {
     const el: HTMLElement = fixture.nativeElement;
     // showValues defaults to false → values live in visually-hidden spans.

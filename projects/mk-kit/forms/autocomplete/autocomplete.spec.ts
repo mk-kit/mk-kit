@@ -1,5 +1,6 @@
 import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkAutocomplete, type MkAutocompleteOption } from './autocomplete';
 
 const OPTIONS: MkAutocompleteOption[] = [
@@ -75,7 +76,12 @@ describe('MkAutocomplete', () => {
     return e;
   }
 
-  afterEach(() => TestBed.resetTestingModule());
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    // MkAutocomplete announces via MkLiveAnnouncer, which appends a body-level
+    // region; remove it so it can't pollute other specs sharing this jsdom.
+    document.querySelectorAll('.mk-visually-hidden').forEach((el) => el.remove());
+  });
 
   it('implements the ARIA combobox pattern', () => {
     const { input } = mount();
@@ -259,6 +265,52 @@ describe('MkAutocomplete', () => {
     // The value went null while typing, so nothing is committed and the free
     // text is simply left alone unless requireSelection says otherwise.
     expect(host.value()).toBeNull();
+  });
+
+  it('announces the result count on meaningful change only', async () => {
+    const { fixture, input } = mount();
+    const spy = vi.spyOn(TestBed.inject(MkLiveAnnouncer), 'announce');
+
+    input.focus();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('4 results');
+
+    type(fixture, input, 'an');
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('2 results');
+
+    type(fixture, input, 'ana');
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('1 result');
+    const calls = spy.mock.calls.length;
+
+    // Another keystroke with the same count stays quiet.
+    type(fixture, input, 'anal');
+    await fixture.whenStable();
+    expect(spy.mock.calls.length).toBe(calls);
+
+    type(fixture, input, 'zzz');
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('0 results');
+  });
+
+  it('announces async (search) results arriving while open', async () => {
+    const { fixture, input, host } = mount();
+    host.filterMode.set('none');
+    fixture.detectChanges();
+    const spy = vi.spyOn(TestBed.inject(MkLiveAnnouncer), 'announce');
+
+    input.focus();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('4 results');
+
+    // The async source answers a (search) emission with a new list.
+    host.options.set([{ label: 'Vue', value: 'vue' }]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(spy).toHaveBeenLastCalledWith('1 result');
   });
 
   it('drops unmatched free text on blur when requireSelection is set', () => {

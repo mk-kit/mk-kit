@@ -133,4 +133,46 @@ describe('MkHovercard', () => {
     (card as any).onEscape(new KeyboardEvent('keydown', { key: 'Escape' }));
     expect(card.opened()).toBe(false);
   });
+
+  it('stays open when keyboard focus enters the real panel element', () => {
+    card.open(trigger);
+    fixture.detectChanges();
+
+    // The panel is teleported to document.body by mkAnchoredPanel; its Angular
+    // listeners move with it, so a real focusin must cancel the close that the
+    // trigger's blur scheduled.
+    const panel = document.getElementById(card.panelId)!;
+    expect(panel).toBeTruthy();
+
+    trigger.dispatchEvent(new FocusEvent('blur'));
+    panel.dispatchEvent(new FocusEvent('focusin', { bubbles: true }));
+    vi.advanceTimersByTime(1000);
+    expect(card.opened()).toBe(true);
+  });
+
+  it('pointer entering the real panel cancels the scheduled close', () => {
+    card.open(trigger);
+    fixture.detectChanges();
+    const panel = document.getElementById(card.panelId)!;
+
+    trigger.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(100);
+    panel.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(1000);
+    expect(card.opened()).toBe(true);
+
+    // Leaving the panel re-schedules the close.
+    panel.dispatchEvent(new MouseEvent('mouseleave'));
+    vi.advanceTimersByTime(200);
+    expect(card.opened()).toBe(false);
+  });
+
+  it('Escape from inside the panel closes and returns focus to the trigger', () => {
+    card.open(trigger);
+    fixture.detectChanges();
+
+    (card as any).onEscape(new KeyboardEvent('keydown', { key: 'Escape' }));
+    expect(card.opened()).toBe(false);
+    expect(document.activeElement).toBe(trigger);
+  });
 });

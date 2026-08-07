@@ -141,8 +141,25 @@ export class MkTreeSelect implements ControlValueAccessor {
   protected onPanelKeydown(event: KeyboardEvent): void {
     if (event.key === 'Escape') {
       event.preventDefault();
+      event.stopPropagation();
       this.close(true);
     }
+  }
+
+  /**
+   * Focus left the teleported panel. The host `(focusout)` never sees this —
+   * the panel lives under `document.body` — so Tab-out of the tree is handled
+   * here: close unless focus moved back into the field or the panel.
+   */
+  protected onPanelFocusout(event: FocusEvent): void {
+    const related = event.relatedTarget as Node | null;
+    // Focus fell to a non-focusable spot (body) — keep open; an outside
+    // pointerdown is dismissed by the anchored panel itself.
+    if (!related) return;
+    if (this.host.nativeElement.contains(related)) return;
+    if (this.panelRef()?.nativeElement.contains(related)) return;
+    this.close();
+    this.onTouched();
   }
 
   /** Handle a selection emitted by the tree (a value) or a node passed directly. */

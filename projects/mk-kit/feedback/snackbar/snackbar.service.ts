@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkSnackbarContainer } from './snackbar-container';
 
 /** Semantic tone of a snackbar. `neutral` is the default dark bar. */
@@ -32,7 +31,11 @@ export interface MkSnackbarConfig {
   duration?: number;
   /** Show a close (×) button. Default `false` (dismiss via action/timeout). */
   dismissible?: boolean;
-  /** Live-region politeness for the announcement. Default `polite`. */
+  /**
+   * @deprecated The snackbar element is itself the live region — its
+   * politeness is derived from `tone` (`alert` for danger/warning, else
+   * `status`). This option is ignored.
+   */
   politeness?: 'polite' | 'assertive';
 }
 
@@ -111,7 +114,6 @@ export class MkSnackbarService {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
-  private readonly announcer = inject(MkLiveAnnouncer);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _active = signal<MkSnackbarItem | null>(null);
@@ -151,8 +153,9 @@ export class MkSnackbarService {
 
     this.ensureContainer();
     this.refs.set(id, ref);
+    // The snackbar element itself carries role="alert"/"status" — no separate
+    // live-announcer call, or screen readers would read everything twice.
     this._active.set(item);
-    this.announcer.announce(message, config.politeness ?? 'polite');
 
     const duration = config.duration ?? DEFAULT_DURATION;
     if (duration > 0) this.startTimer(id, duration);

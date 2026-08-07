@@ -21,7 +21,11 @@
       (click)="onRowClick(i)"
       (keydown)="onKeydown($event, i)"
     >
-      <span class="mk-tree__toggle" aria-hidden="true">
+      <span
+        class="mk-tree__toggle"
+        aria-hidden="true"
+        (click)="onToggleClick($event, i)"
+      >
         @if (row.expandable) {
           <span
             class="mk-tree__caret"

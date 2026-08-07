@@ -107,7 +107,7 @@
   /* Text */
   --mk-text: #1a1d23;
   --mk-text-muted: #56606e;
-  --mk-text-subtle: #8b95a3;
+  --mk-text-subtle: #687280;
   --mk-text-inverse: #ffffff;
   --mk-text-disabled: #adb5c0;
   /* Borders / dividers */
@@ -143,6 +143,9 @@
   --mk-danger: #dc2626;
   --mk-danger-hover: #b91c1c;
   --mk-danger-contrast: #ffffff;
+  /* Danger as TEXT on surfaces. Same as --mk-danger in light; lighter in dark,
+     where the button-label-safe base falls below 4.5:1 as body text. */
+  --mk-danger-text: #dc2626;
   --mk-danger-subtle: #fdeaea;
   --mk-danger-subtle-text: #b3201a;
   /* Semantic — info */
@@ -156,7 +159,7 @@
   --mk-neutral-subtle-hover: #e5e8ec;
   --mk-neutral-subtle-text: #3a424e;
   /* Focus ring color */
-  --mk-focus-ring: rgba(79, 70, 229, 0.5);
+  --mk-focus-ring: #4f46e5;
   /* Elevation shadows */
   --mk-shadow-xs: 0 1px 2px rgba(17, 20, 26, 0.06);
   --mk-shadow-sm: 0 1px 3px rgba(17, 20, 26, 0.08), 0 1px 2px rgba(17, 20, 26, 0.04);
@@ -200,7 +203,7 @@
     --mk-overlay-scrim: rgba(1, 4, 9, 0.6);
     --mk-text: #e6edf3;
     --mk-text-muted: #9aa5b1;
-    --mk-text-subtle: #6e7a8a;
+    --mk-text-subtle: #788494;
     --mk-text-inverse: #0d1117;
     --mk-text-disabled: #4b545f;
     --mk-border: #2a323c;
@@ -210,7 +213,7 @@
     --mk-active-overlay: rgba(255, 255, 255, 0.09);
     --mk-selected-bg: #1e2540;
     --mk-selected-text: #c7d2fe;
-    --mk-primary: #6366f1;
+    --mk-primary: #6164f0;
     --mk-primary-hover: #7c7ff4;
     --mk-primary-active: #9599f7;
     --mk-primary-contrast: #ffffff;
@@ -227,9 +230,10 @@
     --mk-warning-contrast: #2a1a02;
     --mk-warning-subtle: #2a2010;
     --mk-warning-subtle-text: #fcd34d;
-    --mk-danger: #f04747;
+    --mk-danger: #db3636;
     --mk-danger-hover: #f56b6b;
     --mk-danger-contrast: #ffffff;
+    --mk-danger-text: #f56b6b;
     --mk-danger-subtle: #2c1416;
     --mk-danger-subtle-text: #fca5a5;
     --mk-info: #38bdf8;
@@ -240,7 +244,7 @@
     --mk-neutral-subtle: #232b34;
     --mk-neutral-subtle-hover: #2c3540;
     --mk-neutral-subtle-text: #c4ccd6;
-    --mk-focus-ring: rgba(129, 140, 248, 0.6);
+    --mk-focus-ring: #818cf8;
     --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
     --mk-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
     --mk-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35);
@@ -272,7 +276,7 @@
   --mk-overlay-scrim: rgba(1, 4, 9, 0.6);
   --mk-text: #e6edf3;
   --mk-text-muted: #9aa5b1;
-  --mk-text-subtle: #6e7a8a;
+  --mk-text-subtle: #788494;
   --mk-text-inverse: #0d1117;
   --mk-text-disabled: #4b545f;
   --mk-border: #2a323c;
@@ -282,7 +286,7 @@
   --mk-active-overlay: rgba(255, 255, 255, 0.09);
   --mk-selected-bg: #1e2540;
   --mk-selected-text: #c7d2fe;
-  --mk-primary: #6366f1;
+  --mk-primary: #6164f0;
   --mk-primary-hover: #7c7ff4;
   --mk-primary-active: #9599f7;
   --mk-primary-contrast: #ffffff;
@@ -299,9 +303,10 @@
   --mk-warning-contrast: #2a1a02;
   --mk-warning-subtle: #2a2010;
   --mk-warning-subtle-text: #fcd34d;
-  --mk-danger: #f04747;
+  --mk-danger: #db3636;
   --mk-danger-hover: #f56b6b;
   --mk-danger-contrast: #ffffff;
+  --mk-danger-text: #f56b6b;
   --mk-danger-subtle: #2c1416;
   --mk-danger-subtle-text: #fca5a5;
   --mk-info: #38bdf8;
@@ -312,7 +317,7 @@
   --mk-neutral-subtle: #232b34;
   --mk-neutral-subtle-hover: #2c3540;
   --mk-neutral-subtle-text: #c4ccd6;
-  --mk-focus-ring: rgba(129, 140, 248, 0.6);
+  --mk-focus-ring: #818cf8;
   --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
   --mk-shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5), 0 1px 2px rgba(0, 0, 0, 0.3);
   --mk-shadow-md: 0 4px 12px rgba(0, 0, 0, 0.55), 0 2px 4px rgba(0, 0, 0, 0.35);

@@ -4,7 +4,9 @@
   position: fixed;
   z-index: var(--mk-z-sticky, 100);
   display: flex;
-  flex-direction: column;
+  /* The trigger precedes the actions in DOM (for a sane Tab order);
+     column-reverse keeps the speed-dial stacked above the button. */
+  flex-direction: column-reverse;
   align-items: flex-end;
   gap: var(--mk-space-2);
 }
@@ -20,13 +22,13 @@
 :host([data-position='top-end']) {
   top: var(--mk-space-5);
   inset-inline-end: var(--mk-space-5);
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 :host([data-position='top-start']) {
   top: var(--mk-space-5);
   inset-inline-start: var(--mk-space-5);
   align-items: flex-start;
-  flex-direction: column-reverse;
+  flex-direction: column;
 }
 :host([data-position='static']) {
   position: static;

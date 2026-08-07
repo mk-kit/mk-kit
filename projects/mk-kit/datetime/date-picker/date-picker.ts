@@ -253,6 +253,35 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
     this.onTouched();
   }
 
+  /**
+   * Escape pressed inside the (teleported) calendar panel — close and return
+   * focus to the input. `preventDefault` + `stopPropagation` keep any outer
+   * Escape handling (e.g. a containing dialog) from also firing.
+   */
+  protected onPanelEscape(event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.close();
+    this.inputRef()?.nativeElement.focus();
+  }
+
+  /**
+   * Focus left the teleported panel. The host `(focusout)` never sees this —
+   * the panel lives under `document.body` — so Tab-out of the calendar is
+   * handled here: close unless focus moved back into the field or the panel.
+   */
+  protected onPanelFocusout(event: FocusEvent): void {
+    const related = event.relatedTarget as Node | null;
+    // Focus fell to a non-focusable spot (body) — keep open; an outside
+    // pointerdown is dismissed by the anchored panel itself.
+    if (!related) return;
+    if (this.host.nativeElement.contains(related)) return;
+    if (this.panelRef()?.nativeElement.contains(related)) return;
+    this.commitInput();
+    this.close();
+    this.onTouched();
+  }
+
   // --- ControlValueAccessor -------------------------------------------------
   writeValue(value: Date | null): void {
     this.value.set(value ?? null);

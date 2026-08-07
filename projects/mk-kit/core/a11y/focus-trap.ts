@@ -10,14 +10,20 @@ const FOCUSABLE_SELECTOR = [
 
 /** Returns the tabbable elements inside `root`, in DOM order. */
 export function mkGetFocusable(root: HTMLElement): HTMLElement[] {
+  const win = root.ownerDocument.defaultView;
   return Array.from(
     root.querySelectorAll<HTMLElement>(FOCUSABLE_SELECTOR),
-  ).filter(
-    (el) =>
-      el.offsetWidth > 0 ||
-      el.offsetHeight > 0 ||
-      el === root.ownerDocument.activeElement,
-  );
+  ).filter((el) => {
+    if (el === root.ownerDocument.activeElement) return true;
+    if (el.offsetWidth <= 0 && el.offsetHeight <= 0) return false;
+    // `visibility:hidden` elements keep their box, so the size check above
+    // passes — yet they are NOT tabbable, and counting one as a Tab-wrap
+    // boundary makes the wrap focus a dead element. `getComputedStyle`
+    // degrades safely in jsdom, where visibility resolves 'visible' by
+    // default, so test environments without layout keep working.
+    const visibility = win?.getComputedStyle(el).visibility;
+    return visibility !== 'hidden' && visibility !== 'collapse';
+  });
 }
 
 /**
@@ -58,8 +64,17 @@ export class MkFocusTrap {
   release(): void {
     this.active = false;
     this.root.removeEventListener('keydown', this.keydownHandler, true);
-    this.previouslyFocused?.focus?.();
+    const previous = this.previouslyFocused;
     this.previouslyFocused = null;
+    if (!previous) return;
+    if (previous.isConnected) {
+      previous.focus?.();
+    } else {
+      // The trigger left the DOM while the trap was active (a deleted row, a
+      // route change). Focusing a detached node is a silent no-op at best —
+      // land on the body instead so focus has a real, connected home.
+      this.root.ownerDocument.body?.focus?.();
+    }
   }
 
   private onKeydown(e: KeyboardEvent): void {

@@ -4,6 +4,7 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
+  effect,
   forwardRef,
   inject,
   input,
@@ -17,6 +18,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
@@ -88,7 +90,30 @@ export class MkAutocomplete implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
+  private readonly announcer = inject(MkLiveAnnouncer);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
+
+  /** Last announced result count (guards repeat announcements). */
+  private lastAnnouncedCount = -1;
+
+  constructor() {
+    // Announce the suggestion count while the list is open (WCAG 4.1.3):
+    // covers both built-in filtering and async `options` arriving via
+    // `(search)`. Only a changed count is announced, so keystrokes that don't
+    // narrow the list stay quiet.
+    effect(() => {
+      const open = this.open();
+      const loading = this.loading();
+      const count = this.filtered().length;
+      if (!open || loading) {
+        this.lastAnnouncedCount = -1;
+        return;
+      }
+      if (count === this.lastAnnouncedCount) return;
+      this.lastAnnouncedCount = count;
+      this.announcer.announce(this.i18n.resultsCount(count));
+    });
+  }
 
   /** The list of suggestions. Update it from `search` for async sources. */
   readonly options = input<readonly MkAutocompleteOption[]>([]);

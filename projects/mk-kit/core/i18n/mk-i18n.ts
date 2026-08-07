@@ -280,6 +280,8 @@ export interface MkI18nStrings {
   noResults: string;
   /** Empty data table / list. */
   noData: string;
+  /** Announced when a filterable list updates (autocomplete, multi-select, command palette). */
+  resultsCount: (count: number) => string;
 
   // --- Pagination / carousel ---------------------------------------------------
   /** Pagination: previous page control. */
@@ -298,6 +300,11 @@ export interface MkI18nStrings {
   goToSlide: (slide: number) => string;
   /** Carousel region label. */
   carouselLabel: string;
+  /** Carousel: pause / resume automatic rotation. */
+  pauseSlideshow: string;
+  playSlideshow: string;
+  /** Carousel: slide position (slide labels + live announcements). */
+  slideOf: (slide: number, total: number) => string;
 
   // --- Dates & pickers ---------------------------------------------------------
   /** Localised month/weekday name tables (deep-merged by provideMkI18n). */
@@ -476,6 +483,17 @@ export interface MkI18nStrings {
   // --- Misc components -------------------------------------------------------
   /** Command palette input placeholder. */
   commandPalettePlaceholder: string;
+  /** Command palette dialog label. */
+  commandPaletteLabel: string;
+  /** Stepper: step state, appended to the step's accessible name. */
+  stepCompleted: string;
+  stepError: string;
+  /** Diff: screen-reader prefix for changed lines. */
+  diffAddedLine: string;
+  diffRemovedLine: string;
+  /** Chip collections (tag input, multi-select): announced on add/remove. */
+  itemAdded: (name: string) => string;
+  itemRemoved: (name: string) => string;
   /** Splitter separator label. */
   resizePanes: string;
   /** Back-to-top button label. */
@@ -605,6 +623,7 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   noOptions: 'No options',
   noResults: 'No results',
   noData: 'No data to display',
+  resultsCount: (count) => (count === 1 ? '1 result' : `${count} results`),
 
   previousPage: 'Go to previous page',
   nextPage: 'Go to next page',
@@ -614,6 +633,9 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   nextSlide: 'Next slide',
   goToSlide: (slide) => `Go to slide ${slide}`,
   carouselLabel: 'Carousel',
+  pauseSlideshow: 'Pause slideshow',
+  playSlideshow: 'Play slideshow',
+  slideOf: (slide, total) => `Slide ${slide} of ${total}`,
 
   dateNames: MK_DEFAULT_DATE_NAMES,
   previousMonth: 'Previous month',
@@ -731,6 +753,13 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   tourDone: 'Done',
 
   commandPalettePlaceholder: 'Type a command or search…',
+  commandPaletteLabel: 'Command palette',
+  stepCompleted: 'Completed',
+  stepError: 'Has errors',
+  diffAddedLine: 'Added:',
+  diffRemovedLine: 'Removed:',
+  itemAdded: (name) => `${name} added`,
+  itemRemoved: (name) => `${name} removed`,
   resizePanes: 'Resize panes',
   backToTop: 'Back to top',
   breadcrumbLabel: 'Breadcrumb',

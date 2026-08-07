@@ -85,7 +85,7 @@
 
 .mk-image-block__error {
   margin: 0;
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   font-size: var(--mk-font-size-sm);
 }
 
@@ -147,7 +147,7 @@
   border: none;
   border-radius: var(--mk-radius-sm);
   background: transparent;
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   font: inherit;
   font-size: var(--mk-font-size-sm);
   cursor: pointer;

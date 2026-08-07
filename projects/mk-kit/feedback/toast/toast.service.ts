@@ -10,7 +10,6 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkToastContainer } from './toast-container';
 
 /** Semantic tones supported by toasts. */
@@ -63,8 +62,9 @@ interface ToastTimer {
 /**
  * Toast service — enqueues transient notifications rendered by a single,
  * lazily-mounted {@link MkToastContainer} at the bottom-right of the viewport.
- * Each toast is announced to assistive tech (`assertive` for `danger`, else
- * `polite`) and auto-dismisses after `duration` ms unless it is `0`.
+ * Each rendered toast is itself a live region (`role="alert"` for `danger`,
+ * else `role="status"`), so assistive tech announces it exactly once. Toasts
+ * auto-dismiss after `duration` ms unless it is `0`.
  *
  * ```ts
  * toasts.success('Saved');
@@ -77,7 +77,6 @@ export class MkToastService {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
-  private readonly announcer = inject(MkLiveAnnouncer);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _toasts = signal<readonly MkToastItem[]>([]);
@@ -102,12 +101,9 @@ export class MkToastService {
     if (!this.isBrowser) return item.id;
 
     this.ensureContainer();
+    // The toast element itself carries role="alert"/"status" — no separate
+    // live-announcer call, or screen readers would read everything twice.
     this._toasts.update((list) => [...list, item]);
-
-    this.announcer.announce(
-      item.title ? `${item.title}. ${item.message}` : item.message,
-      item.tone === 'danger' ? 'assertive' : 'polite',
-    );
 
     if (item.duration > 0) this.startTimer(item.id, item.duration);
     return item.id;

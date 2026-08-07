@@ -1,7 +1,11 @@
 @if (open()) {
-  <div class="mk-banner__box" [attr.role]="role()">
-    <span class="mk-banner__icon"><ng-content select="[mkBannerIcon]" /></span>
-    <div class="mk-banner__body">
+  <div class="mk-banner__box">
+    <span class="mk-banner__icon" aria-hidden="true"
+      ><ng-content select="[mkBannerIcon]"
+    /></span>
+    <!-- The live region wraps only the title + message, keeping the actions
+         and the dismiss button out of what gets announced. -->
+    <div class="mk-banner__body" [attr.role]="role()">
       @if (title()) {
         <p class="mk-banner__title">{{ title() }}</p>
       }

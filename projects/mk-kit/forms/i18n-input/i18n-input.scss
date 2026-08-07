@@ -12,7 +12,7 @@
  * colour — colour alone would not survive a monochrome or colour-blind read. */
 .mk-i18n-input__marker {
   margin-inline-start: 0.25rem;
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   font-weight: var(--mk-font-weight-bold);
   line-height: 1;
 }

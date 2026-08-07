@@ -1,5 +1,7 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MkFormField } from '../form-field/form-field';
 import { MkOtp } from './otp';
 
 describe('MkOtp', () => {
@@ -61,5 +63,64 @@ describe('MkOtp', () => {
     expect((otp as any).charAt(0)).toBe('4');
     expect((otp as any).charAt(1)).toBe('2');
     expect((otp as any).charAt(2)).toBe('');
+  });
+
+  it('cells carry no field wiring when standalone', () => {
+    const cell = fixture.nativeElement.querySelector(
+      '.mk-otp__cell',
+    ) as HTMLInputElement;
+    expect(cell.getAttribute('aria-required')).toBeNull();
+    expect(cell.getAttribute('aria-describedby')).toBeNull();
+  });
+});
+
+@Component({
+  imports: [FormsModule, MkFormField, MkOtp],
+  template: `
+    <mk-form-field label="Code" hint="Check your phone" [error]="error()" required>
+      <mk-otp [(ngModel)]="code" [length]="4" />
+    </mk-form-field>
+  `,
+})
+class FieldHost {
+  code = '';
+  readonly error = signal<string | null>(null);
+}
+
+describe('MkOtp inside mk-form-field', () => {
+  it('resolves the field label to the first cell and describes the group', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(FieldHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const label = fixture.nativeElement.querySelector(
+      'label',
+    ) as HTMLLabelElement;
+    const group = fixture.nativeElement.querySelector('mk-otp') as HTMLElement;
+    const cells = Array.from(
+      fixture.nativeElement.querySelectorAll('.mk-otp__cell'),
+    ) as HTMLInputElement[];
+
+    // The `<label for>` must point at a real element — the first cell.
+    expect(label.getAttribute('for')).toBeTruthy();
+    expect(cells[0].id).toBe(label.getAttribute('for'));
+    expect(group.getAttribute('aria-labelledby')).toBe(label.id);
+
+    // Required + description propagate onto the cells.
+    for (const cell of cells) {
+      expect(cell.getAttribute('aria-required')).toBe('true');
+      expect(cell.getAttribute('aria-describedby')).toBeTruthy();
+    }
+
+    fixture.componentInstance.error.set('Wrong code');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(cells[0].getAttribute('aria-invalid')).toBe('true');
+
+    fixture.destroy();
   });
 });

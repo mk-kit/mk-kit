@@ -77,3 +77,7 @@
 .mk-tag-input__input:disabled {
   cursor: not-allowed;
 }
+/* At max the input stays focusable (readonly) so Backspace-delete still works. */
+.mk-tag-input__input[readonly] {
+  cursor: default;
+}

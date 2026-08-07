@@ -131,4 +131,36 @@ describe('MkFileUpload', () => {
     expect(fmt(1536)).toBe('1.5 KB');
     expect(fmt(5 * 1024 * 1024)).toBe('5.0 MB');
   });
+
+  it('keeps the retry button outside any aria-hidden subtree', async () => {
+    // A focusable control inside aria-hidden="true" is an axe
+    // aria-hidden-focus violation (WCAG 4.1.2) — it can be tabbed to but is
+    // invisible to assistive technology.
+    const uploadFn = vi.fn(async () => {
+      throw new Error('boom');
+    });
+    fixture.componentRef.setInput('uploadFn', uploadFn);
+    fixture.detectChanges();
+    add([file('a.png', 'image/png', 10)]);
+    await Promise.resolve();
+    await Promise.resolve();
+    fixture.detectChanges();
+
+    const retry = fixture.nativeElement.querySelector(
+      '.mk-file-upload__retry',
+    ) as HTMLElement | null;
+    expect(retry).toBeTruthy();
+    expect(retry!.getAttribute('aria-label')).toBeTruthy();
+    for (let el: HTMLElement | null = retry; el; el = el.parentElement) {
+      expect(el.getAttribute('aria-hidden')).not.toBe('true');
+    }
+  });
+
+  it('still hides the decorative success check from assistive tech', () => {
+    add([file('a.png', 'image/png', 10)]);
+    (fu as any).patch(fu.files()[0].id, { status: 'success' });
+    fixture.detectChanges();
+    const check = fixture.nativeElement.querySelector('.mk-file-upload__check');
+    expect(check?.getAttribute('aria-hidden')).toBe('true');
+  });
 });

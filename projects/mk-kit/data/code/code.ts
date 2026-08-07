@@ -57,4 +57,11 @@ export class MkCode {
   protected readonly hasHeader = computed(
     () => !!this.filename() || this.copyable(),
   );
+
+  /**
+   * Accessible name of the focusable scroll region: the filename when set,
+   * else a generic "Code". (No MK_I18N key covers this today — the block
+   * editor's `blockCode` string is scoped to the editor palette.)
+   */
+  protected readonly scrollLabel = computed(() => this.filename() || 'Code');
 }

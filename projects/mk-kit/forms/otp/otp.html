@@ -2,7 +2,7 @@
   <input
     #cell
     class="mk-otp__cell"
-    [id]="cellId + '-' + i"
+    [id]="cellIdFor(i)"
     [type]="mask() ? 'password' : 'text'"
     [attr.inputmode]="inputMode()"
     autocomplete="one-time-code"
@@ -11,6 +11,8 @@
     [disabled]="isDisabled()"
     [attr.aria-label]="i18n.otpDigit(i + 1)"
     [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [attr.aria-describedby]="describedBy()"
     (input)="onCellInput(i, $event)"
     (keydown)="onCellKeydown(i, $event)"
     (paste)="onPaste(i, $event)"

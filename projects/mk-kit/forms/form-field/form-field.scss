@@ -25,7 +25,7 @@
 }
 
 .mk-form-field__required {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   font-weight: var(--mk-font-weight-bold);
   line-height: 1;
 }
@@ -47,7 +47,7 @@
 }
 
 .mk-form-field__error {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   font-weight: var(--mk-font-weight-medium);
 }
 

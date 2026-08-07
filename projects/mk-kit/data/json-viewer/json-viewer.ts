@@ -98,6 +98,10 @@ export function mkBuildJsonTree(value: unknown): MkJsonNode {
   imports: [NgTemplateOutlet],
   host: {
     class: 'mk-json-viewer',
+    // The host scrolls horizontally; make it keyboard-scrollable (WCAG 2.1.1).
+    role: 'region',
+    tabindex: '0',
+    '[attr.aria-label]': 'ariaLabel()',
   },
 })
 export class MkJsonViewer {

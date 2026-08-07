@@ -145,6 +145,10 @@ describe('MkStepper', () => {
     const first = el.querySelector('[role=tab]')!;
     expect(first.classList.contains('mk-stepper__step--completed')).toBe(true);
     expect(first.querySelector('.mk-stepper__check')).toBeTruthy();
+    // The check lives in an aria-hidden marker, so the state also needs text.
+    expect(first.querySelector('.mk-visually-hidden')?.textContent).toContain(
+      'Completed',
+    );
   });
 
   it('shows the error state ahead of completion', () => {
@@ -155,6 +159,15 @@ describe('MkStepper', () => {
     const third = [...el.querySelectorAll('[role=tab]')][2];
     expect(third.classList.contains('mk-stepper__step--error')).toBe(true);
     expect(third.querySelector('.mk-stepper__bang')).toBeTruthy();
+    expect(third.querySelector('.mk-visually-hidden')?.textContent).toContain(
+      'Has errors',
+    );
+  });
+
+  it('adds no state text to a step that is neither completed nor errored', () => {
+    const { el } = mount();
+    const first = el.querySelector('[role=tab]')!;
+    expect(first.querySelector('.mk-visually-hidden')).toBeNull();
   });
 
   describe('linear mode', () => {

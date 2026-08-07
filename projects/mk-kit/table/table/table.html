@@ -66,7 +66,9 @@
                 tabindex="0"
                 aria-orientation="vertical"
                 [attr.aria-label]="i18n.resizeColumn"
+                [attr.aria-valuemin]="resizeValueMin(col)"
                 [attr.aria-valuenow]="resizeValueNow(col)"
+                [attr.aria-valuemax]="resizeValueMax"
                 (pointerdown)="startResize($event, col)"
                 (keydown)="onResizeKeydown($event, col)"
                 (click)="$event.stopPropagation()"
@@ -79,10 +81,11 @@
     <tbody class="mk-table__body" [attr.role]="stacked() ? 'rowgroup' : null">
       @for (item of displayItems(); track trackItem(item); let i = $index) {
         @if (item.kind === 'group') {
-          <tr class="mk-table__group-row">
+          <tr class="mk-table__group-row" [attr.role]="stacked() ? 'row' : null">
             <th
               class="mk-table__group"
               scope="colgroup"
+              [attr.role]="stacked() ? 'rowheader' : null"
               [attr.colspan]="totalColumns()"
             >
               <button
@@ -122,6 +125,7 @@
           @if (expandable()) {
             <td
               class="mk-table__td mk-table__td--expand"
+              [attr.role]="stacked() ? 'cell' : null"
               (click)="$event.stopPropagation()"
             >
               <button
@@ -140,6 +144,7 @@
           @if (selectable()) {
             <td
               class="mk-table__td mk-table__td--select"
+              [attr.role]="stacked() ? 'cell' : null"
               (click)="$event.stopPropagation()"
             >
               <mk-checkbox
@@ -181,8 +186,13 @@
           }
         </tr>
         @if (expandable() && isExpanded(item.row) && rowDetail()) {
-          <tr class="mk-table__detail-row">
-            <td class="mk-table__detail" [id]="detailId(i)" [attr.colspan]="totalColumns()">
+          <tr class="mk-table__detail-row" [attr.role]="stacked() ? 'row' : null">
+            <td
+              class="mk-table__detail"
+              [id]="detailId(i)"
+              [attr.role]="stacked() ? 'cell' : null"
+              [attr.colspan]="totalColumns()"
+            >
               <div class="mk-table__detail-inner">
                 <ng-container
                   [ngTemplateOutlet]="rowDetail()!.template"
@@ -195,8 +205,12 @@
         </ng-container>
         }
       } @empty {
-        <tr class="mk-table__row mk-table__row--empty">
-          <td class="mk-table__empty" [attr.colspan]="totalColumns()">
+        <tr class="mk-table__row mk-table__row--empty" [attr.role]="stacked() ? 'row' : null">
+          <td
+            class="mk-table__empty"
+            [attr.role]="stacked() ? 'cell' : null"
+            [attr.colspan]="totalColumns()"
+          >
             <ng-content select="[mkTableEmpty]">{{ emptyMessage() }}</ng-content>
           </td>
         </tr>
@@ -236,12 +250,13 @@
     <span class="mk-table__cell-value">
       @if (isEditing(i, col)) {
         <input
+          #editInput
           class="mk-table__cell-input"
           [value]="cellText(row, col)"
+          [attr.aria-label]="col.header"
           (click)="$event.stopPropagation()"
           (keydown)="onEditKeydown($event, row, col)"
           (blur)="commitEdit(row, col, $any($event.target).value)"
-          autofocus
         />
       } @else if (cellTemplateFor(col.key); as tpl) {
         <ng-container

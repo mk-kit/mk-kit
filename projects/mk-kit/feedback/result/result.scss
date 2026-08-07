@@ -27,7 +27,7 @@
   color: var(--mk-success);
 }
 :host([data-tone='danger']) .mk-result__icon {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 :host([data-tone='warning']) .mk-result__icon {
   color: var(--mk-warning);
