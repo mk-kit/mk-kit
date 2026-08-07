@@ -87,4 +87,16 @@ describe('MkPasswordInput', () => {
     cmp.setDisabledState(true);
     expect((cmp as any).isDisabled()).toBe(true);
   });
+
+  it('defaults autocomplete to current-password and binds the input through', () => {
+    const input = (): HTMLInputElement =>
+      fixture.nativeElement.querySelector('.mk-password-input__input');
+    expect(input().getAttribute('autocomplete')).toBe('current-password');
+
+    // Signup / change-password forms want the browser to offer a generated
+    // password rather than the saved one.
+    fixture.componentRef.setInput('autocomplete', 'new-password');
+    fixture.detectChanges();
+    expect(input().getAttribute('autocomplete')).toBe('new-password');
+  });
 });

@@ -45,7 +45,11 @@ export class MkBackToTop {
   readonly target = input<HTMLElement | null>(null);
   /** Accessible label. */
   readonly ariaLabel = input(this.i18n.backToTop);
-  /** Smooth-scroll on click (respects reduced-motion by browser). */
+  /**
+   * Smooth-scroll on click. Ignored under `prefers-reduced-motion: reduce`
+   * (programmatic `scrollTo` is not toned down by browsers, so the component
+   * falls back to an instant jump itself).
+   */
   readonly smooth = input(true, { transform: booleanAttribute });
 
   private readonly scrollY = signal(0);
@@ -77,12 +81,37 @@ export class MkBackToTop {
 
   protected scrollToTop(): void {
     const el = this.target();
-    const behavior: ScrollBehavior = this.smooth() ? 'smooth' : 'auto';
+    const behavior: ScrollBehavior =
+      this.smooth() && !this.prefersReducedMotion() ? 'smooth' : 'auto';
     if (el) {
       el.scrollTo({ top: 0, behavior });
+      this.focusScrollTarget(el);
     } else {
       this.document.defaultView?.scrollTo({ top: 0, behavior });
+      const doc = (this.document.scrollingElement ??
+        this.document.documentElement) as HTMLElement | null;
+      if (doc) this.focusScrollTarget(doc);
     }
+  }
+
+  /**
+   * Once the page is back at the top the button hides itself, which would
+   * silently drop keyboard focus on `<body>` (WCAG 2.4.3). Move focus to the
+   * scroll container instead, so the tab sequence resumes from the top.
+   */
+  private focusScrollTarget(el: HTMLElement): void {
+    if (!el.hasAttribute('tabindex')) el.setAttribute('tabindex', '-1');
+    el.focus({ preventScroll: true });
+  }
+
+  /** `prefers-reduced-motion: reduce`, SSR-safe. */
+  private prefersReducedMotion(): boolean {
+    const win = this.document.defaultView;
+    return (
+      !!win &&
+      typeof win.matchMedia === 'function' &&
+      win.matchMedia('(prefers-reduced-motion: reduce)').matches
+    );
   }
 
   ngOnDestroy(): void {

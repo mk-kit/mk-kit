@@ -1,9 +1,19 @@
-<span class="mk-sort-header__label"><ng-content /></span>
-@if (!isDisabled()) {
-  <span
-    class="mk-sort-header__arrow"
-    [class.mk-sort-header__arrow--active]="isActive()"
-    [class.mk-sort-header__arrow--desc]="direction() === 'desc'"
-    aria-hidden="true"
-  ></span>
-}
+<!-- A real <button> rather than a clickable th: the cell keeps aria-sort,
+     the button provides the operable-control semantics (and native
+     Enter/Space activation) a screen-reader user expects. -->
+<button
+  type="button"
+  class="mk-sort-header__button"
+  [disabled]="isDisabled()"
+  (click)="toggle()"
+>
+  <span class="mk-sort-header__label"><ng-content /></span>
+  @if (!isDisabled()) {
+    <span
+      class="mk-sort-header__arrow"
+      [class.mk-sort-header__arrow--active]="isActive()"
+      [class.mk-sort-header__arrow--desc]="direction() === 'desc'"
+      aria-hidden="true"
+    ></span>
+  }
+</button>

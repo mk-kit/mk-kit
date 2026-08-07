@@ -107,9 +107,24 @@ export class MkOtp implements ControlValueAccessor, Validator {
     () => this.invalid() || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
+  /** Required state from the surrounding field (`aria-required` on the cells). */
+  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  /** Hint/error ids from the surrounding field (`aria-describedby` on the cells). */
+  protected readonly describedBy = computed(
+    () => this.field?.describedBy() ?? null,
+  );
   protected readonly inputMode = computed(() =>
     this.type() === 'number' ? 'numeric' : 'text',
   );
+
+  /**
+   * Cell ids. The first cell adopts the surrounding field's `controlId` so the
+   * field's `<label for>` resolves to a real element.
+   */
+  protected cellIdFor(i: number): string {
+    if (i === 0 && this.field) return this.field.controlId;
+    return `${this.cellId}-${i}`;
+  }
 
   constructor() {
     // Keep the boxes in sync with external value / length changes.

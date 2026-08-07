@@ -90,6 +90,14 @@ export class MkPasswordInput implements ControlValueAccessor, Validator {
   readonly showRules = input(false, { transform: booleanAttribute });
   /** Minimum length used by the strength score and rules. */
   readonly minLength = input(8, { transform: numberAttribute });
+  /**
+   * `autocomplete` for the native input. Use `'new-password'` on signup /
+   * change-password forms (where the strength meter and rules belong) so the
+   * browser offers a generated password instead of the saved one.
+   */
+  readonly autocomplete = input<'current-password' | 'new-password' | (string & {})>(
+    'current-password',
+  );
 
   protected readonly inputId =
     this.field?.controlId ?? mkUniqueId('mk-password');

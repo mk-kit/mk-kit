@@ -51,5 +51,5 @@
 }
 /* Invalid (forced via [invalid], or an error on a wrapping mk-form-field) */
 :host(.mk-rating--invalid) .mk-rating__star {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }

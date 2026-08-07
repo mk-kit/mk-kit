@@ -159,7 +159,12 @@ export class MkHovercard implements OnDestroy {
     if (!this.closeOnEscape()) return;
     event.preventDefault();
     event.stopPropagation();
+    // Escape may be pressed while focus is INSIDE the panel; closing destroys
+    // it, which would otherwise drop focus on <body>. Hand it back to the
+    // trigger so the keyboard user keeps their place.
+    const trigger = this.triggerEl;
     this.close();
+    trigger?.focus();
   }
 
   private setTimer(fn: () => void, delay: number): number | null {

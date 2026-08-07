@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
   Directive,
   ElementRef,
   PLATFORM_ID,
@@ -56,6 +57,7 @@ export class MkCarouselSlide {
 })
 export class MkCarousel {
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly slides = contentChildren(MkCarouselSlide);
   /** Localised strings (override globally via `provideMkI18n`). */
@@ -71,12 +73,26 @@ export class MkCarousel {
   readonly showDots = input(true, { transform: booleanAttribute });
   /** Show the prev/next arrows. */
   readonly showArrows = input(true, { transform: booleanAttribute });
-  /** Advance automatically (pauses on hover/focus). */
+  /**
+   * Advance automatically. Pauses transiently on hover/focus/pointer-down and
+   * shows a persistent pause/play toggle (`userPaused`). Never runs when the
+   * user prefers reduced motion.
+   */
   readonly autoplay = input(false, { transform: booleanAttribute });
   /** Autoplay interval in ms. */
   readonly interval = input(5000, { transform: numberAttribute });
 
+  /**
+   * Persistent, user-controlled pause (WCAG 2.2.2). Latched by the pause/play
+   * toggle; the transient hover/focus pause never overrides it. Two-way so
+   * consumers can bind or preset it.
+   */
+  readonly userPaused = model(false);
+
+  /** Transient pause (hover / focus / pointer held down inside the viewport). */
   protected readonly paused = signal(false);
+  /** True while the autoplay interval is actually running. */
+  protected readonly playing = signal(false);
   private timer?: ReturnType<typeof setInterval>;
 
   protected readonly count = computed(() => this.slides().length);
@@ -84,8 +100,14 @@ export class MkCarousel {
     Array.from({ length: this.count() }, (_, i) => i),
   );
   protected readonly liveText = computed(() =>
-    this.count() ? `Slide ${this.index() + 1} of ${this.count()}` : '',
+    this.count() ? this.i18n.slideOf(this.index() + 1, this.count()) : '',
   );
+  /**
+   * Silence the live region while the slideshow is auto-advancing — otherwise
+   * every auto-advance is announced forever. Announce again as soon as the
+   * user is in control (paused, latched, or autoplay off).
+   */
+  protected readonly liveMode = computed(() => (this.playing() ? 'off' : 'polite'));
 
   /** Resolved text direction ('ltr' until measured in the browser). */
   private readonly dir = signal<'ltr' | 'rtl'>('ltr');
@@ -112,14 +134,18 @@ export class MkCarousel {
         el.setAttribute('aria-hidden', String(hidden));
         if (hidden) el.setAttribute('inert', '');
         else el.removeAttribute('inert');
-        el.setAttribute('aria-label', `${i + 1} of ${this.slides().length}`);
+        el.setAttribute('aria-label', this.i18n.slideOf(i + 1, this.slides().length));
       });
     });
-    // Autoplay lifecycle.
+    // Autoplay lifecycle. Never starts under prefers-reduced-motion — the
+    // motion itself must stop, not just the CSS transition.
     effect(() => {
-      const on = this.autoplay() && !this.paused() && this.count() > 1;
+      const on =
+        this.autoplay() && !this.paused() && !this.userPaused() && this.count() > 1;
       this.stopTimer();
-      if (on && this.isBrowser) {
+      const start = on && this.isBrowser && !this.prefersReducedMotion();
+      this.playing.set(start);
+      if (start) {
         this.timer = setInterval(() => this.next(), this.interval());
       }
     });
@@ -159,6 +185,27 @@ export class MkCarousel {
   }
   protected resume(): void {
     this.paused.set(false);
+  }
+
+  /** Latches / releases the persistent pause (the toolbar toggle button). */
+  protected toggleUserPause(): void {
+    this.userPaused.update((v) => !v);
+  }
+
+  /** Touch users can't hover — holding a pointer down pauses transiently. */
+  protected onPointerDown(): void {
+    this.pause();
+  }
+  protected onPointerUp(event: PointerEvent): void {
+    // A mouse release while still hovering must not undo the hover pause.
+    if (event.pointerType !== 'mouse') this.resume();
+  }
+
+  private prefersReducedMotion(): boolean {
+    return (
+      this.document.defaultView?.matchMedia?.('(prefers-reduced-motion: reduce)')
+        .matches ?? false
+    );
   }
 
   private stopTimer(): void {

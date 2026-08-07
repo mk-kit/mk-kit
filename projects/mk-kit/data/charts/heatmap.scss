@@ -1,3 +1,5 @@
+@use '../../src/styles/mixins' as mk;
+
 :host {
   display: block;
   font-family: var(--mk-font-sans);
@@ -6,6 +8,9 @@
 .mk-heatmap__scroll {
   width: 100%;
   overflow-x: auto;
+}
+.mk-heatmap__scroll:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 .mk-heatmap__grid {

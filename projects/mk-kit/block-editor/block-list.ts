@@ -244,6 +244,14 @@ export class MkBlockList {
     this.menuOpen.update((i) => (i === index ? -1 : index));
   }
 
+  /** Escape inside the options popup closes it and restores the toggle's focus. */
+  protected closeMenu(trigger: HTMLElement, event: Event): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.menuOpen.set(-1);
+    trigger.focus();
+  }
+
   protected transformsFor(type: string): string[] {
     return this.definition(type)?.transforms ?? [];
   }

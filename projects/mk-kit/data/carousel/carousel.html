@@ -9,7 +9,21 @@
   (mouseleave)="resume()"
   (focusin)="pause()"
   (focusout)="resume()"
+  (pointerdown)="onPointerDown()"
+  (pointerup)="onPointerUp($event)"
+  (pointercancel)="onPointerUp($event)"
 >
+  @if (autoplay()) {
+    <button
+      type="button"
+      class="mk-carousel__playpause"
+      [attr.aria-label]="userPaused() ? i18n.playSlideshow : i18n.pauseSlideshow"
+      [attr.aria-pressed]="userPaused()"
+      (click)="toggleUserPause()"
+    >
+      <span aria-hidden="true">{{ userPaused() ? '▶' : '⏸' }}</span>
+    </button>
+  }
   <div
     class="mk-carousel__track"
     [style.transform]="trackTransform()"
@@ -52,4 +66,4 @@
   </div>
 }
 
-<div class="mk-visually-hidden" aria-live="polite">{{ liveText() }}</div>
+<div class="mk-visually-hidden" [attr.aria-live]="liveMode()">{{ liveText() }}</div>

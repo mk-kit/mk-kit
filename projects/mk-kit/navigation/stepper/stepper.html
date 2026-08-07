@@ -125,5 +125,12 @@
         <span class="mk-stepper__description">{{ step.description() }}</span>
       }
     </span>
+    <!-- The marker above is aria-hidden, so the completed/error state needs a
+         textual counterpart for assistive tech. -->
+    @if (step.hasError()) {
+      <span class="mk-visually-hidden">{{ i18n.stepError }}</span>
+    } @else if (step.completed()) {
+      <span class="mk-visually-hidden">{{ i18n.stepCompleted }}</span>
+    }
   </button>
 </ng-template>

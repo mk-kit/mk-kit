@@ -1,5 +1,12 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import {
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  Validators,
+} from '@angular/forms';
+import { MK_DEFAULT_I18N } from '@mkornas/ui/core';
 import { MkFormErrorSummary, type MkFormError } from './form-error-summary';
 
 const ERRORS: MkFormError[] = [
@@ -71,5 +78,93 @@ describe('MkFormErrorSummary', () => {
 
     expect(document.activeElement).toBe(input);
     input.remove();
+  });
+
+  it('defaults the title to the i18n errorSummaryTitle', () => {
+    fixture.componentRef.setInput('errors', ERRORS);
+    fixture.detectChanges();
+    const title = fixture.nativeElement.querySelector(
+      '.mk-form-error-summary__title',
+    ) as HTMLElement;
+    expect(title.textContent?.trim()).toBe(MK_DEFAULT_I18N.errorSummaryTitle);
+  });
+});
+
+@Component({
+  imports: [ReactiveFormsModule, MkFormErrorSummary],
+  template: `
+    <form [formGroup]="form">
+      <mk-form-error-summary [form]="form" [autoFocus]="autoFocus" />
+      <input formControlName="email" />
+      <button type="submit">Go</button>
+    </form>
+  `,
+})
+class SubmitHost {
+  readonly form = new FormGroup({
+    email: new FormControl('', Validators.required),
+  });
+  autoFocus = true;
+}
+
+describe('MkFormErrorSummary auto-focus on submit', () => {
+  let fixture: ComponentFixture<SubmitHost>;
+
+  function mount(autoFocus: boolean) {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(SubmitHost);
+    fixture.componentInstance.autoFocus = autoFocus;
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+  }
+
+  async function submit() {
+    (fixture.nativeElement.querySelector('form') as HTMLFormElement).dispatchEvent(
+      new Event('submit'),
+    );
+    fixture.detectChanges();
+    await fixture.whenStable();
+  }
+
+  afterEach(() => {
+    fixture.nativeElement.remove();
+    fixture.destroy();
+    TestBed.resetTestingModule();
+  });
+
+  it('moves focus to the summary when a submit surfaces errors', async () => {
+    mount(true);
+    const summary = fixture.nativeElement.querySelector(
+      'mk-form-error-summary',
+    ) as HTMLElement;
+    expect(summary.hasAttribute('hidden')).toBe(true);
+
+    await submit();
+
+    expect(summary.hasAttribute('hidden')).toBe(false);
+    expect(document.activeElement).toBe(summary);
+  });
+
+  it('does not steal focus when autoFocus is off', async () => {
+    mount(false);
+    await submit();
+    const summary = fixture.nativeElement.querySelector(
+      'mk-form-error-summary',
+    ) as HTMLElement;
+    expect(summary.hasAttribute('hidden')).toBe(false);
+    expect(document.activeElement).not.toBe(summary);
+  });
+
+  it('does not move focus when the form is valid on submit', async () => {
+    mount(true);
+    fixture.componentInstance.form.controls.email.setValue('a@b.c');
+    await submit();
+    const summary = fixture.nativeElement.querySelector(
+      'mk-form-error-summary',
+    ) as HTMLElement;
+    expect(summary.hasAttribute('hidden')).toBe(true);
+    expect(document.activeElement).not.toBe(summary);
   });
 });

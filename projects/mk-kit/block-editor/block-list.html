@@ -41,24 +41,29 @@
         </span>
         <div class="mk-block__actions">
           <button
+            #menuTrigger
             type="button"
             class="mk-block__action"
             [attr.aria-expanded]="menuOpen() === i"
-            aria-haspopup="menu"
+            [attr.aria-controls]="'mk-block-menu-' + block.id"
             [attr.aria-label]="i18n.blockEditor.blockOptions"
             (click)="toggleMenu(i)"
           >
             ⋯
           </button>
           @if (menuOpen() === i) {
-            <div class="mk-block__menu" role="menu" [attr.aria-label]="i18n.blockEditor.blockOptions">
-              <button type="button" role="menuitem" (click)="duplicate(i)">{{ i18n.blockEditor.duplicate }}</button>
+            <div
+              class="mk-block__menu"
+              [id]="'mk-block-menu-' + block.id"
+              (keydown.escape)="closeMenu(menuTrigger, $event)"
+            >
+              <button type="button" (click)="duplicate(i)">{{ i18n.blockEditor.duplicate }}</button>
               @for (t of transformsFor(block.type); track t) {
-                <button type="button" role="menuitem" (click)="transform(i, t)">
+                <button type="button" (click)="transform(i, t)">
                   {{ i18n.blockEditor.turnInto(definition(t)?.label ?? t) }}
                 </button>
               }
-              <button type="button" role="menuitem" class="mk-block__menu-danger" (click)="remove(i)">
+              <button type="button" class="mk-block__menu-danger" (click)="remove(i)">
                 {{ i18n.blockEditor.remove }}
               </button>
             </div>

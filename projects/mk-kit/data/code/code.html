@@ -15,7 +15,13 @@
   </div>
 }
 
-<div class="mk-code__scroll">
+<!-- Focusable so keyboard users can scroll the overflowing code (WCAG 2.1.1). -->
+<div
+  class="mk-code__scroll"
+  role="region"
+  tabindex="0"
+  [attr.aria-label]="scrollLabel()"
+>
   @if (lineNumbers()) {
     <div class="mk-code__gutter" aria-hidden="true">
       @for (n of lines(); track n) {

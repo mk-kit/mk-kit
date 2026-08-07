@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  Injector,
+  afterNextRender,
   booleanAttribute,
   computed,
   forwardRef,
@@ -22,6 +24,7 @@ import {
   type Validator,
 } from '@angular/forms';
 import { MK_I18N } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { mkValidatorChange } from '@mkornas/ui/core';
@@ -69,6 +72,9 @@ import { MkChip } from '@mkornas/ui/chip';
 export class MkTagInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
+  private readonly announcer = inject(MkLiveAnnouncer);
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
+  private readonly injector = inject(Injector);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** Two-way list of tags. */
@@ -178,6 +184,7 @@ export class MkTagInput implements ControlValueAccessor, Validator {
     const next = [...this.value(), tag];
     this.setValue(next);
     this.added.emit(tag);
+    this.announcer.announce(this.i18n.itemAdded(tag));
   }
 
   /**
@@ -191,12 +198,34 @@ export class MkTagInput implements ControlValueAccessor, Validator {
     if (el) el.value = '';
   }
 
-  protected removeAt(index: number): void {
-    if (this.isDisabled() || index < 0 || index >= this.value().length) return;
+  protected removeAt(index: number): boolean {
+    if (this.isDisabled() || index < 0 || index >= this.value().length) {
+      return false;
+    }
     const tag = this.value()[index];
     const next = this.value().filter((_, i) => i !== index);
     this.setValue(next);
     this.removed.emit(tag);
+    this.announcer.announce(this.i18n.itemRemoved(tag));
+    return true;
+  }
+
+  /**
+   * Remove a chip via its remove button. The button disappears with the chip,
+   * so keep focus useful: the next chip's remove button, else the previous
+   * one's, else the text input.
+   */
+  protected removeChipAt(index: number): void {
+    if (!this.removeAt(index)) return;
+    afterNextRender(
+      () => {
+        const buttons =
+          this.host.nativeElement.querySelectorAll<HTMLElement>('.mk-chip__remove');
+        const target = buttons[index] ?? buttons[index - 1];
+        (target ?? this.inputRef()?.nativeElement)?.focus();
+      },
+      { injector: this.injector },
+    );
   }
 
   private setValue(next: string[]): void {

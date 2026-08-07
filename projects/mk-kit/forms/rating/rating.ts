@@ -46,7 +46,9 @@ import { MK_I18N } from '@mkornas/ui/core';
     '[class.mk-rating--readonly]': 'readonly() || isDisabled()',
     '[attr.role]': "readonly() || isDisabled() ? 'img' : 'slider'",
     '[attr.tabindex]': 'readonly() || isDisabled() ? null : 0',
-    '[attr.aria-label]': 'ariaLabel()',
+    '[attr.aria-label]': 'effectiveAriaLabel()',
+    '[attr.aria-labelledby]': 'labelledBy()',
+    '[attr.aria-describedby]': 'describedBy()',
     '[attr.aria-valuemin]': "readonly() || isDisabled() ? null : 0",
     '[attr.aria-valuemax]': "readonly() || isDisabled() ? null : max()",
     '[attr.aria-valuenow]': "readonly() || isDisabled() ? null : value()",
@@ -99,7 +101,23 @@ export class MkRating implements ControlValueAccessor, Validator {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isInvalid = computed(() => this.invalid());
+  protected readonly isInvalid = computed(
+    () => this.invalid() || (this.field?.hasError() ?? false),
+  );
+  /** The surrounding field's label labels this control (`aria-labelledby`). */
+  protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
+  /** Hint/error ids from the surrounding field (`aria-describedby`). */
+  protected readonly describedBy = computed(
+    () => this.field?.describedBy() ?? null,
+  );
+  /**
+   * The `aria-label` actually rendered. When an `mk-form-field` provides a
+   * label, `aria-labelledby` wins and the default label is dropped so it
+   * cannot override the field's visible label.
+   */
+  protected readonly effectiveAriaLabel = computed(() =>
+    this.labelledBy() ? null : this.ariaLabel(),
+  );
 
   /** The stars to render (1-based indices). */
   protected readonly stars = computed(() =>

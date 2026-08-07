@@ -5,6 +5,7 @@
     [attr.aria-label]="i18n.blockEditor.textFormatting"
     [style.top.px]="toolbar().top"
     [style.left.px]="toolbar().left"
+    (keydown)="onToolbarKeydown($event)"
   >
     @for (tool of tools; track tool.id) {
       <button
@@ -15,7 +16,8 @@
         [attr.aria-pressed]="isActive(tool.id)"
         [attr.aria-label]="tool.label + (tool.shortcut ? ' (' + tool.shortcut + ')' : '')"
         [title]="tool.label"
-        (mousedown)="runTool(tool.id, $event)"
+        (mousedown)="$event.preventDefault()"
+        (click)="runTool(tool.id)"
       >
         {{ tool.icon }}
       </button>

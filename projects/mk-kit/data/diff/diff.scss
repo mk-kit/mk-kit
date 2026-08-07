@@ -36,7 +36,7 @@
   color: var(--mk-success);
 }
 .mk-diff__stat--del {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 
 .mk-diff__body {
@@ -46,6 +46,12 @@
   font-family: var(--mk-font-mono);
   font-size: var(--mk-font-size-sm);
   line-height: 1.6;
+}
+/* The body is a focusable region (keyboard scrolling); inset ring so the host's
+   overflow: hidden cannot clip it. */
+.mk-diff__body:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
 }
 
 /* ---- Unified ---- */
@@ -126,4 +132,13 @@
 }
 .mk-diff__cell--delete .mk-diff__word {
   background-color: var(--_del-word);
+}
+
+/* Split view reuses the unified gutter marker so a change is not conveyed by
+   background color alone; tint it to match the change kind. */
+.mk-diff__cell--insert .mk-diff__marker {
+  color: var(--mk-success);
+}
+.mk-diff__cell--delete .mk-diff__marker {
+  color: var(--mk-danger-text);
 }

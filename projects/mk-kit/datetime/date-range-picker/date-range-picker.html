@@ -70,6 +70,8 @@
     [id]="panelId"
     role="dialog"
     [attr.aria-label]="i18n.chooseDateRange"
+    (keydown.escape)="onPanelEscape($event)"
+    (focusout)="onPanelFocusout($event)"
   >
     <mk-calendar
       [rangeMode]="true"

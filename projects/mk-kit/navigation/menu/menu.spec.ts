@@ -142,6 +142,34 @@ describe('MkMenu', () => {
     expect(document.activeElement).toBe(items()[0]);
   });
 
+  it('ArrowDown on the trigger of an already-open menu focuses the first item', async () => {
+    const { fixture, trigger } = mount();
+    await open(fixture, trigger);
+    // Mouse open left focus outside the panel; keydown fires on the TRIGGER.
+    expect(panel()!.contains(document.activeElement)).toBe(false);
+
+    expect(press(fixture, trigger, 'ArrowDown').defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(items()[0]);
+  });
+
+  it('ArrowUp on the trigger of an already-open menu focuses the last item', async () => {
+    const { fixture, trigger } = mount();
+    await open(fixture, trigger);
+
+    expect(press(fixture, trigger, 'ArrowUp').defaultPrevented).toBe(true);
+    expect(document.activeElement).toBe(items()[2]);
+  });
+
+  it('opens with ArrowUp on a closed trigger, focusing the last item', async () => {
+    const { fixture, trigger } = mount();
+    expect(press(fixture, trigger, 'ArrowUp').defaultPrevented).toBe(true);
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    expect(panel()).toBeTruthy();
+    expect(document.activeElement).toBe(items()[2]);
+  });
+
   it('moves focus with the arrow keys and wraps', async () => {
     const { fixture, trigger } = mount();
     await openWithKeyboard(fixture, trigger);

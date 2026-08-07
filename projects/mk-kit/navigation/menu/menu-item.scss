@@ -26,7 +26,7 @@
 }
 
 :host(.mk-menu-item--danger) {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 
 :host(.mk-menu-item--danger:hover:not(.mk-menu-item--disabled)),

@@ -19,10 +19,37 @@ describe('MkRangeSlider', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => fixture.destroy());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    fixture.destroy();
+  });
 
   const key = (thumb: 0 | 1, k: string) =>
-    (rs as any).onKeydown(thumb, new KeyboardEvent('keydown', { key: k }));
+    (rs as any).onKeydown(
+      thumb,
+      new KeyboardEvent('keydown', { key: k, cancelable: true }),
+    );
+
+  /**
+   * Renders the track right-to-left. jsdom's UA stylesheet resolves
+   * `[dir=rtl]` set on the element itself via getComputedStyle; if that ever
+   * stops holding, fall back to mocking the resolution for this element.
+   */
+  function forceRtl() {
+    const track = (fixture.nativeElement as HTMLElement).querySelector<HTMLElement>(
+      '.mk-range-slider__track',
+    )!;
+    track.setAttribute('dir', 'rtl');
+    if (getComputedStyle(track).direction !== 'rtl') {
+      const orig = window.getComputedStyle.bind(window);
+      vi.spyOn(window, 'getComputedStyle').mockImplementation(
+        ((el: Element) =>
+          el === track
+            ? ({ direction: 'rtl' } as CSSStyleDeclaration)
+            : orig(el)) as typeof window.getComputedStyle,
+      );
+    }
+  }
 
   it('moves the low thumb with the keyboard and notifies the form', () => {
     const onChange = vi.fn();
@@ -47,6 +74,20 @@ describe('MkRangeSlider', () => {
     expect(rs.value()[0]).toBe(0);
     key(1, 'End');
     expect(rs.value()[1]).toBe(100);
+  });
+
+  it('flips ArrowLeft/ArrowRight in RTL, keeping Up/Down as-is', () => {
+    forceRtl();
+
+    key(0, 'ArrowRight'); // visually right = towards min
+    expect(rs.value()).toEqual([10, 80]);
+    key(0, 'ArrowLeft'); // visually left = towards max
+    expect(rs.value()).toEqual([20, 80]);
+
+    key(1, 'ArrowLeft');
+    expect(rs.value()).toEqual([20, 90]);
+    key(1, 'ArrowUp'); // direction-agnostic
+    expect(rs.value()).toEqual([20, 100]);
   });
 
   it('writeValue normalises a reversed pair', () => {

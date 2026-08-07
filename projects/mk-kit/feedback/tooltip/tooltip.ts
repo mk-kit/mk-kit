@@ -22,6 +22,13 @@ import type { MkPlacement } from '@mkornas/ui/core';
 const OPEN_DELAY = 400;
 
 /**
+ * Grace period (ms) after the pointer leaves the trigger (or the panel) before
+ * the tooltip hides. Long enough to cross the 8px gap onto the panel — WCAG
+ * 1.4.13 "hoverable" — without making the tip feel sticky.
+ */
+const CLOSE_DELAY = 150;
+
+/**
  * Body-level presentation surface for {@link MkTooltip}. Rendered imperatively
  * by the directive; not intended for direct template use.
  */
@@ -51,7 +58,9 @@ export class MkTooltipPanel {
 
 /**
  * Tooltip directive — shows a themed tooltip on hover AND keyboard focus, and
- * hides on blur, mouse-leave, or Escape. The tooltip is appended to
+ * hides on blur, mouse-leave (after a short grace period — the pointer may
+ * move onto the tooltip itself, which keeps it open, per WCAG 1.4.13), or
+ * Escape pressed anywhere while it is visible. The tooltip is appended to
  * `document.body`, positioned relative to the host, and wired to the host via
  * `aria-describedby` for screen-reader users. Respects `prefers-reduced-motion`.
  *
@@ -65,7 +74,7 @@ export class MkTooltipPanel {
   selector: '[mkTooltip]',
   host: {
     '(mouseenter)': 'onPointerEnter()',
-    '(mouseleave)': 'hide()',
+    '(mouseleave)': 'onPointerLeave()',
     '(focusin)': 'onFocus()',
     '(focusout)': 'hide()',
     '(keydown.escape)': 'hide()',
@@ -93,10 +102,47 @@ export class MkTooltip {
   private readonly tooltipId = mkUniqueId('mk-tooltip');
   private ref?: ComponentRef<MkTooltipPanel>;
   private openTimer?: ReturnType<typeof setTimeout>;
+  private hideTimer?: ReturnType<typeof setTimeout>;
   private previousDescribedBy: string | null = null;
 
+  /**
+   * Hovering the tooltip itself keeps it open (WCAG 1.4.13 "hoverable"): the
+   * pointer may cross the gap between trigger and panel, so leaving either one
+   * only SCHEDULES a hide, and entering either one cancels it.
+   */
+  private readonly onPanelEnter = (): void => {
+    clearTimeout(this.hideTimer);
+  };
+  private readonly onPanelLeave = (): void => {
+    this.scheduleHide();
+  };
+
+  /**
+   * WCAG 1.4.13 "dismissible": Escape hides a visible tooltip no matter where
+   * focus is. Attached to the document only while the tooltip is shown, and
+   * preventDefault only fires when a tooltip was actually hidden.
+   */
+  private readonly onDocumentKeydown = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || !this.ref) return;
+    event.preventDefault();
+    this.hide();
+  };
+
   protected onPointerEnter(): void {
+    // Re-entering the trigger during the hide grace period keeps the tip up.
+    clearTimeout(this.hideTimer);
     this.scheduleShow(OPEN_DELAY);
+  }
+
+  protected onPointerLeave(): void {
+    clearTimeout(this.openTimer);
+    this.scheduleHide();
+  }
+
+  private scheduleHide(): void {
+    if (!this.ref) return;
+    clearTimeout(this.hideTimer);
+    this.hideTimer = setTimeout(() => this.hide(), CLOSE_DELAY);
   }
 
   protected onFocus(): void {
@@ -126,7 +172,10 @@ export class MkTooltip {
 
   protected hide(): void {
     clearTimeout(this.openTimer);
+    clearTimeout(this.hideTimer);
     if (!this.ref) return;
+
+    this.document.removeEventListener('keydown', this.onDocumentKeydown, true);
 
     // Restore the trigger's original aria-describedby.
     const el = this.host.nativeElement;
@@ -167,6 +216,15 @@ export class MkTooltip {
     const panel = ref.location.nativeElement as HTMLElement;
     this.document.body.appendChild(panel);
     this.ref = ref;
+
+    // Hoverable (the listeners die with the panel element on hide) …
+    panel.addEventListener('mouseenter', this.onPanelEnter);
+    panel.addEventListener('mouseleave', this.onPanelLeave);
+    // … and dismissible from anywhere while visible (removed in hide()).
+    // Capture phase so the Escape that hides the tooltip is marked
+    // defaultPrevented before any bubbling handler (e.g. a dialog deciding
+    // whether to close) sees it — layered dismissal, tooltip first.
+    this.document.addEventListener('keydown', this.onDocumentKeydown, true);
 
     // Promote into the top layer so the tooltip is never clipped by an
     // ancestor's overflow/transform or hidden behind a stacking context.

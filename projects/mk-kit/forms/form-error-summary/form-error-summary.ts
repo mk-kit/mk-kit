@@ -4,6 +4,9 @@ import {
   DOCUMENT,
   DestroyRef,
   ElementRef,
+  Injector,
+  afterNextRender,
+  booleanAttribute,
   computed,
   effect,
   inject,
@@ -36,8 +39,10 @@ export interface MkFormError {
  * FormErrorSummary — an accessible summary of a form's validation errors,
  * shown at the top of the form on a failed submit. Each entry links to its
  * field and focuses it on click. Following the WAI/GOV.UK pattern it is an
- * `alert` region; call `focus()` after a failed submit to move focus here so
- * screen-reader and keyboard users are taken straight to the problems.
+ * `alert` region and, when the surrounding form is submitted with errors,
+ * focus moves here automatically (opt out with `[autoFocus]="false"`) so
+ * screen-reader and keyboard users are taken straight to the problems. The
+ * public `focus()` remains for manual flows (e.g. server-side errors).
  *
  * ## Automatic collection
  *
@@ -102,7 +107,13 @@ export class MkFormErrorSummary {
   /** When automatic entries appear. Defaults to after the form is submitted. */
   readonly showOn = input<'submit' | 'always'>('submit');
   /** Heading shown above the list. */
-  readonly summaryTitle = input<string>('There is a problem');
+  readonly summaryTitle = input<string>(this.i18n.errorSummaryTitle);
+  /**
+   * Move focus to the summary automatically when the surrounding form is
+   * submitted with errors (the WAI/GOV.UK pattern). Disable to drive focus
+   * yourself via the public `focus()`.
+   */
+  readonly autoFocus = input(true, { transform: booleanAttribute });
 
   readonly titleId = `${this.host.nativeElement.id || 'mk-error-summary'}-title`;
 
@@ -113,8 +124,17 @@ export class MkFormErrorSummary {
     const bump = () => this.formTick.update((n) => n + 1);
     let sub: Subscription | null = null;
 
+    const injector = inject(Injector);
     const submit = this.parentFormGroup?.ngSubmit ?? this.parentForm?.ngSubmit;
-    const submitSub = submit?.subscribe(bump) ?? null;
+    const submitSub =
+      submit?.subscribe(() => {
+        bump();
+        // After the entries have rendered (and [hidden] cleared), take the
+        // user straight to the problems. `focus()` no-ops without errors.
+        if (this.autoFocus()) {
+          afterNextRender(() => this.focus(), { injector });
+        }
+      }) ?? null;
 
     effect(() => {
       const form = this.form();

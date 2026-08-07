@@ -5,7 +5,7 @@
   class="mk-cmdk__panel"
   role="dialog"
   aria-modal="true"
-  aria-label="Command palette"
+  [attr.aria-label]="i18n.commandPaletteLabel"
 >
   <div class="mk-cmdk__search">
     <mk-icon class="mk-cmdk__search-icon" name="search" [size]="18" />
@@ -29,39 +29,65 @@
   </div>
 
   <ul class="mk-cmdk__list" [id]="listId" role="listbox">
-    @for (group of grouped(); track group.name) {
+    @for (group of grouped(); track group.name; let gi = $index) {
       @if (group.name) {
-        <li class="mk-cmdk__group" role="presentation">{{ group.name }}</li>
-      }
-      @for (entry of group.items; track entry.cmd.id) {
         <li
-          class="mk-cmdk__option"
-          [id]="optionId(entry.index)"
-          role="option"
-          [attr.aria-selected]="entry.index === activeIndex()"
-          [attr.aria-disabled]="entry.cmd.disabled || null"
-          [class.mk-cmdk__option--active]="entry.index === activeIndex()"
-          [class.mk-cmdk__option--disabled]="entry.cmd.disabled"
-          (mousemove)="!entry.cmd.disabled && activeIndex.set(entry.index)"
-          (mousedown)="$event.preventDefault()"
-          (click)="select(entry.index)"
+          class="mk-cmdk__group-section"
+          role="group"
+          [attr.aria-labelledby]="groupId(gi)"
         >
-          @if (entry.cmd.icon) {
-            <mk-icon class="mk-cmdk__option-icon" [name]="entry.cmd.icon" [size]="18" />
-          }
-          <span class="mk-cmdk__option-label">
-            {{ entry.cmd.label }}
-            @if (entry.cmd.hint) {
-              <span class="mk-cmdk__option-hint">{{ entry.cmd.hint }}</span>
+          <div class="mk-cmdk__group" [id]="groupId(gi)">{{ group.name }}</div>
+          <ul class="mk-cmdk__group-items" role="none">
+            @for (entry of group.items; track entry.cmd.id) {
+              <ng-container
+                [ngTemplateOutlet]="optionTpl"
+                [ngTemplateOutletContext]="{ $implicit: entry }"
+              />
             }
-          </span>
-          @if (entry.cmd.shortcut) {
-            <kbd class="mk-cmdk__shortcut">{{ entry.cmd.shortcut }}</kbd>
-          }
+          </ul>
         </li>
+      } @else {
+        @for (entry of group.items; track entry.cmd.id) {
+          <ng-container
+            [ngTemplateOutlet]="optionTpl"
+            [ngTemplateOutletContext]="{ $implicit: entry }"
+          />
+        }
       }
     } @empty {
-      <li class="mk-cmdk__empty" role="presentation">{{ emptyMessage() }}</li>
+      <li class="mk-cmdk__empty">{{ emptyMessage() }}</li>
     }
   </ul>
+
+  <div class="mk-cmdk__sr" role="status">
+    {{ i18n.resultsCount(filtered().length) }}
+  </div>
 </div>
+
+<ng-template #optionTpl let-entry>
+  <li
+    class="mk-cmdk__option"
+    [id]="optionId(entry.index)"
+    role="option"
+    [attr.aria-selected]="entry.index === activeIndex()"
+    [attr.aria-disabled]="entry.cmd.disabled || null"
+    [class.mk-cmdk__option--active]="entry.index === activeIndex()"
+    [class.mk-cmdk__option--disabled]="entry.cmd.disabled"
+    (mousemove)="!entry.cmd.disabled && activeIndex.set(entry.index)"
+    (mousedown)="$event.preventDefault()"
+    (click)="select(entry.index)"
+  >
+    @if (entry.cmd.icon) {
+      <mk-icon class="mk-cmdk__option-icon" [name]="entry.cmd.icon" [size]="18" />
+    }
+    <span class="mk-cmdk__option-label">
+      {{ entry.cmd.label }}
+      @if (entry.cmd.hint) {
+        <span class="mk-cmdk__option-hint">{{ entry.cmd.hint }}</span>
+      }
+    </span>
+    @if (entry.cmd.shortcut) {
+      <kbd class="mk-cmdk__shortcut">{{ entry.cmd.shortcut }}</kbd>
+    }
+  </li>
+</ng-template>

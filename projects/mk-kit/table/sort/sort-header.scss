@@ -1,25 +1,41 @@
 @use '../../src/styles/mixins' as mk;
 
 :host {
-  cursor: pointer;
-  user-select: none;
   white-space: nowrap;
-}
-
-:host(.mk-sort-header--disabled) {
-  cursor: default;
 }
 
 :host(.mk-sort-header--active) {
   color: var(--mk-primary);
 }
 
-:host(:focus-visible) {
-  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+/* The real control: a transparent button that fills the cell so the whole
+   header stays the click target while keeping the th's typography. The
+   negative-margin trick (see .mk-table__th-button) stretches the hit area
+   over the cell padding — consumers set the pad vars to their th padding. */
+.mk-sort-header__button {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  width: 100%;
+  margin: calc(-1 * var(--mk-sort-header-pad-y, 0px))
+    calc(-1 * var(--mk-sort-header-pad-x, 0px));
+  padding: var(--mk-sort-header-pad-y, 0px) var(--mk-sort-header-pad-x, 0px);
+  font: inherit;
+  font-weight: inherit;
+  color: inherit;
+  text-align: inherit;
+  background: transparent;
+  border: 0;
+  cursor: pointer;
+  user-select: none;
 }
 
-.mk-sort-header__label {
-  vertical-align: middle;
+.mk-sort-header__button:disabled {
+  cursor: default;
+}
+
+.mk-sort-header__button:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
 }
 
 /* Directional triangle: solid-bottom = points up (asc); rotated for desc. */
@@ -27,8 +43,6 @@
   display: inline-block;
   width: 0;
   height: 0;
-  margin-inline-start: var(--mk-space-1);
-  vertical-align: middle;
   border-left: 4px solid transparent;
   border-right: 4px solid transparent;
   border-bottom: 5px solid currentColor;
@@ -39,8 +53,8 @@
 }
 
 /* Hint the arrow on hover/focus of an inactive header. */
-:host(:hover) .mk-sort-header__arrow,
-:host(:focus-visible) .mk-sort-header__arrow {
+.mk-sort-header__button:hover .mk-sort-header__arrow,
+.mk-sort-header__button:focus-visible .mk-sort-header__arrow {
   opacity: 0.45;
 }
 

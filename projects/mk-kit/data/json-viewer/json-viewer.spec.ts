@@ -57,6 +57,13 @@ describe('MkJsonViewer', () => {
     return (fixture.nativeElement as HTMLElement).textContent ?? '';
   }
 
+  it('is a focusable named region so keyboard users can scroll it', () => {
+    const host = fixture.nativeElement as HTMLElement;
+    expect(host.getAttribute('tabindex')).toBe('0');
+    expect(host.getAttribute('role')).toBe('region');
+    expect(host.getAttribute('aria-label')).toBe('JSON');
+  });
+
   it('renders the root expanded to expandDepth (default 1)', () => {
     expect(text()).toContain('user');
     expect(text()).toContain('active');

@@ -16,7 +16,7 @@
 .mk-form-error-summary__title {
   margin: 0 0 var(--mk-space-2);
   font-weight: var(--mk-font-weight-semibold);
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
 }
 
 .mk-form-error-summary__list {
@@ -28,7 +28,7 @@
 }
 
 .mk-form-error-summary__link {
-  color: var(--mk-danger);
+  color: var(--mk-danger-text);
   text-decoration: underline;
   cursor: pointer;
 }

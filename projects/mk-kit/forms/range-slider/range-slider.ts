@@ -129,13 +129,21 @@ export class MkRangeSlider implements ControlValueAccessor, Validator {
     const e = event as KeyboardEvent;
     if (this.isDisabled()) return;
     const current = this.value()[thumb];
+    // In RTL the track is mirrored, so Left/Right must follow the visual
+    // direction (Right moves the thumb right → towards min). Up/Down,
+    // Page and Home/End are direction-agnostic.
+    const horizontal = this.isRtl() ? -this.step() : this.step();
     let next = current;
     switch (e.key) {
       case 'ArrowRight':
+        next += horizontal;
+        break;
       case 'ArrowUp':
         next += this.step();
         break;
       case 'ArrowLeft':
+        next -= horizontal;
+        break;
       case 'ArrowDown':
         next -= this.step();
         break;
@@ -184,15 +192,22 @@ export class MkRangeSlider implements ControlValueAccessor, Validator {
     this.onTouched();
   }
 
+  /** Whether the rendered track is right-to-left. */
+  private isRtl(): boolean {
+    const track = this.trackRef()[0]?.nativeElement;
+    return (
+      !!track &&
+      typeof getComputedStyle === 'function' &&
+      getComputedStyle(track).direction === 'rtl'
+    );
+  }
+
   private rawFromClientX(clientX: number): number | null {
     const track = this.trackRef()[0]?.nativeElement;
     if (!track) return null;
     const rect = track.getBoundingClientRect();
     if (rect.width <= 0) return null;
-    const rtl =
-      typeof getComputedStyle === 'function' &&
-      getComputedStyle(track).direction === 'rtl';
-    const offset = rtl ? rect.right - clientX : clientX - rect.left;
+    const offset = this.isRtl() ? rect.right - clientX : clientX - rect.left;
     const ratio = Math.min(1, Math.max(0, offset / rect.width));
     return this.min() + ratio * (this.max() - this.min());
   }

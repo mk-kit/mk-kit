@@ -27,6 +27,7 @@ import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { mkValidatorChange } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MkAnchoredPanel } from '@mkornas/ui/core';
 import { MkChip } from '@mkornas/ui/chip';
 import { MkFormField } from '../form-field/form-field';
@@ -103,6 +104,7 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
+  private readonly announcer = inject(MkLiveAnnouncer);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** The list of options to choose from. Update from `search` for async. */
@@ -154,6 +156,14 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
    */
   private readonly seen = signal(new Map<unknown, MkMultiSelectOption>());
 
+  /** Last announced result count (guards repeat announcements). */
+  private lastAnnouncedCount = -1;
+  /**
+   * Skips the next results-count announcement — set when a selection resets
+   * the query, so "x added" is not immediately clobbered by "n results".
+   */
+  private suppressCountAnnouncement = false;
+
   constructor() {
     // Accumulate seen options as `options` changes (untracked read → no loop).
     effect(() => {
@@ -168,6 +178,25 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
         }
       }
       if (changed) this.seen.set(next);
+    });
+
+    // Announce the filtered result count while the list is open (WCAG 4.1.3):
+    // covers both built-in filtering and async `options` arriving. Only a
+    // changed count is announced, so keystrokes that don't narrow the list
+    // stay quiet.
+    effect(() => {
+      const open = this.open();
+      const loading = this.loading();
+      const count = this.filtered().length;
+      const suppress = this.suppressCountAnnouncement;
+      this.suppressCountAnnouncement = false;
+      if (!open || loading) {
+        this.lastAnnouncedCount = -1;
+        return;
+      }
+      if (count === this.lastAnnouncedCount) return;
+      this.lastAnnouncedCount = count;
+      if (!suppress) this.announcer.announce(this.i18n.resultsCount(count));
     });
   }
 
@@ -189,6 +218,14 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
   /** Whether the selection cap has been reached. */
   protected readonly atMax = computed(
     () => this.max() > 0 && this.value().length >= this.max(),
+  );
+
+  /** Why unselected options are unavailable once the cap is reached. */
+  protected readonly atMaxHint = computed(() =>
+    this.i18n.validation.mkMaxItems({
+      max: this.max(),
+      actual: this.value().length,
+    }),
   );
 
   /** The selected values resolved to option objects (for the chips). */
@@ -251,6 +288,11 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
   protected toggleOption(index: number): void {
     const opt = this.filtered()[index];
     if (!opt || opt.disabled) return;
+    // Options blocked by the cap stay focusable (APG); say why nothing happens.
+    if (!this.isSelected(opt.value) && this.atMax()) {
+      this.announcer.announce(this.atMaxHint());
+      return;
+    }
     this.isSelected(opt.value) ? this.remove(opt.value) : this.add(opt);
     this.focusInput();
   }
@@ -263,8 +305,12 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
     this.seen.set(seen);
     this.setValue([...this.value(), opt.value]);
     this.optionAdded.emit(opt);
+    this.announcer.announce(this.i18n.itemAdded(opt.label));
     // Reset the query so the full list is available for the next pick.
     if (this.query()) {
+      // The reset re-expands the filtered list; don't let "n results"
+      // immediately overwrite the "added" announcement.
+      this.suppressCountAnnouncement = true;
       this.query.set('');
       this.search.emit('');
     }
@@ -272,8 +318,10 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
   }
 
   private remove(value: unknown): void {
+    const label = this.seen().get(value)?.label ?? String(value);
     this.setValue(this.value().filter((v) => v !== value));
     this.optionRemoved.emit(value);
+    this.announcer.announce(this.i18n.itemRemoved(label));
   }
 
   /** Remove a chip from its remove button. */

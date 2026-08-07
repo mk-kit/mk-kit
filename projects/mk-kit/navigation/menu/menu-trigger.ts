@@ -4,7 +4,11 @@ import { MkMenu } from './menu';
 /**
  * Turns its host button into a trigger for an `<mk-menu>`. Wires
  * `aria-haspopup="menu"` / `aria-expanded` / `aria-controls`, toggles on click,
- * opens on ArrowDown (focusing the first item) and closes on Escape.
+ * opens on ArrowDown / Enter / Space (focusing the first item) and on ArrowUp
+ * (focusing the last item, per the APG menu-button pattern), and closes on
+ * Escape. When the menu is already open — e.g. after a mouse click, which
+ * deliberately leaves focus on the trigger — ArrowDown moves focus to the
+ * first item and ArrowUp to the last, so the keyboard is never dead.
  *
  * ```html
  * <button mkButton [mkMenuTriggerFor]="menu">Actions</button>
@@ -34,17 +38,32 @@ export class MkMenuTrigger {
   }
 
   protected onKeydown(event: KeyboardEvent): void {
+    const menu = this.menu();
     switch (event.key) {
       case 'ArrowDown':
       case 'Enter':
       case ' ':
         event.preventDefault();
-        this.menu().open(this.host.nativeElement, true);
+        if (menu.opened()) {
+          // Already open (mouse open keeps focus on the trigger) — enter the
+          // menu at the top instead of swallowing the key.
+          menu.focusFirstItem();
+        } else {
+          menu.open(this.host.nativeElement, 'first');
+        }
+        break;
+      case 'ArrowUp':
+        event.preventDefault();
+        if (menu.opened()) {
+          menu.focusLastItem();
+        } else {
+          menu.open(this.host.nativeElement, 'last');
+        }
         break;
       case 'Escape':
-        if (this.menu().opened()) {
+        if (menu.opened()) {
           event.preventDefault();
-          this.menu().close(true);
+          menu.close(true);
         }
         break;
     }

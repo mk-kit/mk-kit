@@ -1,4 +1,10 @@
-<div class="mk-chart__frame mk-heatmap__scroll">
+<!-- Focusable so keyboard users can scroll the overflowing grid (WCAG 2.1.1). -->
+<div
+  class="mk-chart__frame mk-heatmap__scroll"
+  role="region"
+  tabindex="0"
+  [attr.aria-label]="resolvedLabel()"
+>
   <table class="mk-heatmap__grid">
     <caption class="mk-visually-hidden">{{ resolvedLabel() }}</caption>
     <thead>

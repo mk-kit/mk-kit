@@ -2,12 +2,13 @@ import {
   ChangeDetectionStrategy,
   Component,
   booleanAttribute,
+  computed,
   inject,
   input,
   model,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
 
 /** Visual treatment for a {@link MkChip}. */
@@ -66,13 +67,33 @@ export class MkChip {
   /** Accessible label for the remove button. */
   readonly removeLabel = input(this.i18n.remove);
 
+  /** Id of the projected content, so the remove button's name can include it. */
+  protected readonly contentId = mkUniqueId('mk-chip-content');
+  /** Id of the sr-only "Remove" text inside the remove button. */
+  protected readonly removeTextId = mkUniqueId('mk-chip-remove');
+  /**
+   * A consumer-supplied `removeLabel`, or `null` when it is still the i18n
+   * default. With the default the button is named via `aria-labelledby`
+   * ("Remove <chip text>") so N chips don't get N identical names;
+   * `aria-labelledby` would beat `aria-label` in the accname algorithm, so the
+   * two bindings are branched rather than stacked.
+   */
+  protected readonly customRemoveLabel = computed(() => {
+    const label = this.removeLabel();
+    return label === this.i18n.remove ? null : label;
+  });
+
   /** Two-way selected state (only meaningful when `selectable`). */
   readonly selected = model(false);
   /** Emitted when the chip is removed via the button or Delete/Backspace. */
   readonly removed = output<void>();
 
   protected hostTabindex(): number | null {
-    return this.selectable() && !this.disabled() ? 0 : null;
+    // Removable chips advertise Delete/Backspace removal, so they must be
+    // focusable even when they are not selectable.
+    return (this.selectable() || this.removable()) && !this.disabled()
+      ? 0
+      : null;
   }
 
   protected onClick(): void {

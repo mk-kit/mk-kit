@@ -19,8 +19,16 @@
   }
 </ng-template>
 
+<!-- The bodies scroll horizontally, so they are focusable labelled regions to
+     stay keyboard-scrollable. Changed lines carry a visually-hidden
+     "Added:"/"Removed:" prefix — color alone never marks a change. -->
 @if (mode() === 'split') {
-  <div class="mk-diff__body mk-diff__body--split">
+  <div
+    class="mk-diff__body mk-diff__body--split"
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="i18n.diffChanges"
+  >
     @for (row of splitRows(); track $index) {
       <div
         class="mk-diff__cell"
@@ -30,6 +38,12 @@
         @if (lineNumbers()) {
           <span class="mk-diff__num">{{ row.left?.beforeNo ?? '' }}</span>
         }
+        @if (row.left?.op === 'delete') {
+          <span class="mk-visually-hidden">{{ i18n.diffRemovedLine }}</span>
+        }
+        <span class="mk-diff__marker" aria-hidden="true">{{
+          row.left ? marker(row.left.op) : ''
+        }}</span>
         <code class="mk-diff__code">@if (row.left) {
             <ng-container [ngTemplateOutlet]="cell" [ngTemplateOutletContext]="{ $implicit: row.left }" />
           }</code>
@@ -42,6 +56,12 @@
         @if (lineNumbers()) {
           <span class="mk-diff__num">{{ row.right?.afterNo ?? '' }}</span>
         }
+        @if (row.right?.op === 'insert') {
+          <span class="mk-visually-hidden">{{ i18n.diffAddedLine }}</span>
+        }
+        <span class="mk-diff__marker" aria-hidden="true">{{
+          row.right ? marker(row.right.op) : ''
+        }}</span>
         <code class="mk-diff__code">@if (row.right) {
             <ng-container [ngTemplateOutlet]="cell" [ngTemplateOutletContext]="{ $implicit: row.right }" />
           }</code>
@@ -49,7 +69,12 @@
     }
   </div>
 } @else {
-  <div class="mk-diff__body">
+  <div
+    class="mk-diff__body"
+    role="region"
+    tabindex="0"
+    [attr.aria-label]="i18n.diffChanges"
+  >
     @for (row of rows(); track $index) {
       <div
         class="mk-diff__row"
@@ -59,6 +84,11 @@
         @if (lineNumbers()) {
           <span class="mk-diff__num">{{ row.beforeNo ?? '' }}</span>
           <span class="mk-diff__num">{{ row.afterNo ?? '' }}</span>
+        }
+        @if (row.op === 'insert') {
+          <span class="mk-visually-hidden">{{ i18n.diffAddedLine }}</span>
+        } @else if (row.op === 'delete') {
+          <span class="mk-visually-hidden">{{ i18n.diffRemovedLine }}</span>
         }
         <span class="mk-diff__marker" aria-hidden="true">{{ marker(row.op) }}</span>
         <code class="mk-diff__code"><ng-container [ngTemplateOutlet]="cell" [ngTemplateOutletContext]="{ $implicit: row }" /></code>

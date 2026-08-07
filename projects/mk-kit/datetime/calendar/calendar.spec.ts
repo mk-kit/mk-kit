@@ -20,6 +20,21 @@ class Host {
   today = new Date();
 }
 
+/** Host for range-mode aria assertions. */
+@Component({
+  standalone: true,
+  imports: [MkCalendar],
+  template: `<mk-calendar
+    [rangeMode]="true"
+    [rangeStart]="start"
+    [rangeEnd]="end"
+  />`,
+})
+class RangeHost {
+  start: Date | null = null;
+  end: Date | null = null;
+}
+
 describe('MkCalendar layout', () => {
   function render(full: boolean): HTMLElement {
     TestBed.resetTestingModule();
@@ -62,5 +77,69 @@ describe('MkCalendar layout', () => {
       const today = render(false).querySelector('.mk-calendar__day--today');
       expect(today!.classList.contains('mk-calendar__day--selected')).toBe(true);
     });
+  });
+});
+
+/**
+ * Range mode used to hard-return `false` from `isSelected`, so the selected
+ * endpoints carried no `aria-selected` at all (WCAG 4.1.2) — the range state
+ * existed only as CSS classes. The gridcells of the start, end and in-between
+ * days now expose `aria-selected="true"`.
+ */
+describe('MkCalendar range-mode aria-selected', () => {
+  function render(start: Date | null, end: Date | null) {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+      imports: [RangeHost],
+    });
+    const fixture = TestBed.createComponent(RangeHost);
+    fixture.componentInstance.start = start;
+    fixture.componentInstance.end = end;
+    fixture.detectChanges();
+    return {
+      fixture,
+      el: fixture.nativeElement.querySelector('mk-calendar') as HTMLElement,
+    };
+  }
+
+  /** Day numbers of the cells currently exposing aria-selected="true". */
+  function selectedDayNums(el: HTMLElement): number[] {
+    return Array.from(
+      el.querySelectorAll('[role="gridcell"][aria-selected="true"]'),
+    ).map((cell) => Number(cell.textContent!.trim()));
+  }
+
+  // The view shows the current month (range mode has no value to follow), so
+  // pick mid-month days that are always inside it.
+  const now = new Date();
+  const day = (d: number) => new Date(now.getFullYear(), now.getMonth(), d);
+
+  it('exposes aria-selected on the start, end and in-between days', () => {
+    const { el } = render(day(10), day(13));
+    expect(selectedDayNums(el)).toEqual([10, 11, 12, 13]);
+  });
+
+  it('marks only the start while the range is half-picked', () => {
+    const { el } = render(day(10), null);
+    expect(selectedDayNums(el)).toEqual([10]);
+  });
+
+  it('exposes nothing when no range is picked', () => {
+    const { el } = render(null, null);
+    expect(selectedDayNums(el)).toEqual([]);
+  });
+
+  it('hover preview stays visual-only (no aria-selected churn)', () => {
+    const { fixture, el } = render(day(10), null);
+    // Hover a later day: the CSS preview may extend, but the accessibility
+    // tree still reports only the committed endpoint.
+    const buttons = Array.from(
+      el.querySelectorAll<HTMLElement>('.mk-calendar__day'),
+    );
+    const target = buttons.find((b) => b.textContent!.trim() === '14')!;
+    target.dispatchEvent(new MouseEvent('mouseenter', { bubbles: true }));
+    fixture.detectChanges();
+    expect(selectedDayNums(el)).toEqual([10]);
   });
 });

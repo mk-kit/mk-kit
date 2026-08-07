@@ -4,6 +4,98 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.28.0] — 2026-08-07
+
+The accessibility compliance release: the 2026-08 audit's WCAG 2.1 AA
+failures, fixed across the whole library in one wave (10 file-partitioned
+agents + central integration; 128 new specs, 1320 total green).
+
+### Fixed — overlay & focus infrastructure
+
+- **Escape now closes only the topmost overlay.** Every overlay used to
+  register its own capture-phase document listener, so one Escape closed the
+  entire stack bottom-first and a menu or picker inside a dialog could never
+  consume the key. One bubble-phase listener now closes the topmost
+  `closeOnEscape` overlay and respects `defaultPrevented` — inner widgets
+  (menus, autocomplete, pickers, tooltips) win, as they already
+  `preventDefault()`.
+- **Modal overlays make the rest of the page inert.** `aria-modal` was a
+  promise the DOM didn't keep. Modals now set `inert` on the other body
+  children — except `[popover]` panels, toast/snackbar containers, and live
+  regions (an inert live region silently stops announcing) — with exact
+  per-overlay unwinding so nested modals restore correctly.
+- Backdropless overlays no longer block clicks on the page behind them; the
+  focus trap skips `visibility: hidden` elements and restores focus only to
+  still-connected targets.
+
+### Fixed — contrast tokens (visual change)
+
+- `--mk-text-subtle` (placeholders, breadcrumbs, weekday headers…) now
+  clears 4.5:1 in both themes (was 3.03:1 light / 3.97:1 dark);
+  `--mk-focus-ring` is opaque and ≥3:1 in both themes (was 2.29:1 light);
+  dark-theme `--mk-primary`/`--mk-danger` darkened minimally so white button
+  labels clear 4.5:1. New **`--mk-danger-text`** token (lighter red in dark)
+  keeps error/danger *text* at ≥4.5:1 on dark surfaces — all 23 danger
+  text-color usages now point at it.
+
+### Fixed — dismissal & keyboard paths
+
+- Date picker, date-range picker and tree-select panels (teleported to the
+  top layer) now close on Escape — returning focus to their trigger — and on
+  tabbing out. The range picker previously had no Escape handling at all.
+- Arrow keys now enter a mouse-opened menu (Down → first item, Up → last);
+  ArrowUp on a closed trigger opens focusing the last item.
+- Tooltips satisfy WCAG 1.4.13: a 150 ms grace lets the pointer travel onto
+  the tooltip, and Escape dismisses it from anywhere. Hovercards return
+  focus to the trigger on Escape.
+- The block editor's formatting toolbar is keyboard-operable (tools fire on
+  click, the toolbar survives Tab into it, Escape returns to the text); the
+  block options popup dropped its fake `role="menu"` for honest disclosure
+  semantics. The tree's chevron expands a branch without selecting it, which
+  makes tree-select branches mouse-reachable.
+- Sliders flip ArrowLeft/Right in RTL to match the mirrored track. Alt+Arrow
+  column reorder at the table edge no longer triggers browser Back.
+
+### Fixed — semantics & live regions
+
+- Carousel: visible pause/play toggle (first in tab order, two-way
+  `userPaused`), autoplay disabled under `prefers-reduced-motion`, touch
+  pauses on pointerdown, and the position live region is silenced only while
+  auto-rotating. Slide labels are i18n (`slideOf`).
+- Table stacked mode re-applies roles to the five spots it missed
+  (selection/expander cells, detail/group/empty rows); the inline cell
+  editor has an accessible name and deterministic focus; `MkSortHeader`
+  renders a real `<button>` (note: clicks on the `th` outside the button no
+  longer sort — set `--mk-sort-header-pad-y/x` to extend the fill).
+- Filtering announces result counts (autocomplete, multi-select, command
+  palette — new `resultsCount` key); chip collections announce add/remove
+  (`itemAdded`/`itemRemoved`); toast/snackbar no longer announce everything
+  twice (`MkSnackbarConfig.politeness` is deprecated, a no-op); the loading
+  bar is a real progressbar while active.
+- Chip remove buttons are named "Remove ⟨chip text⟩" by default; removable
+  chips are keyboard-focusable. Steppers announce completed/error states.
+  Diff rows carry sr "Added:"/"Removed:" prefixes and split view gained
+  visible +/− gutter glyphs. Banner scopes its live region away from its
+  buttons and hides the icon slot from AT.
+- Command palette: i18n dialog label, `role="group"` sections, active option
+  scrolled into view, visible-and-announced empty state.
+- Code, JSON viewer, heatmap and diff scroll regions are keyboard-focusable
+  named regions. FAB uses correct disclosure semantics (actions follow the
+  trigger in DOM, focus moves in on open, Escape restores). Back-to-top
+  respects `prefers-reduced-motion` and moves focus to the scroll target.
+- Rating and OTP wire into `mk-form-field` (label/description/error
+  associations); the file-upload retry button is no longer inside an
+  `aria-hidden` subtree; the form error summary uses the i18n title and
+  focuses itself on failed submit (`autoFocus`, default on).
+
+### Added
+
+- `MkPasswordInput[autocomplete]` (`'current-password' | 'new-password'`),
+  `MkCarousel[userPaused]`, `MkFormErrorSummary[autoFocus]`, and i18n keys
+  `resultsCount`, `pauseSlideshow`, `playSlideshow`, `slideOf`,
+  `commandPaletteLabel`, `stepCompleted`, `stepError`, `diffAddedLine`,
+  `diffRemovedLine`, `itemAdded`, `itemRemoved`.
+
 ## [0.27.2] — 2026-08-07
 
 Quick-wins wave from the 2026-08 five-track audit (a11y / mobile / performance

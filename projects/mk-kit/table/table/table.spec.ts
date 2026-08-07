@@ -265,6 +265,77 @@ describe('MkTable — data-grid pro', () => {
     expect(reordered).toHaveBeenCalledWith(['id', 'notes', 'name']);
   });
 
+  it('labels the inline-edit input with its column header and focuses it', async () => {
+    (table as any).startEdit(0, GRID_COLUMNS[1]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const input = fixture.nativeElement.querySelector(
+      '.mk-table__cell-input',
+    ) as HTMLInputElement;
+    expect(input).toBeTruthy();
+    // WCAG 4.1.2: the bare input had no accessible name at all.
+    expect(input.getAttribute('aria-label')).toBe('Name');
+    // Focus is explicit (afterNextRender), not a dynamically inserted
+    // `autofocus` attribute, which browsers only honour on page load.
+    expect(input.hasAttribute('autofocus')).toBe(false);
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('bounds the resize separator with aria-valuemin/max', () => {
+    const sep = fixture.nativeElement.querySelector(
+      '.mk-table__resize',
+    ) as HTMLElement;
+    expect(sep).toBeTruthy();
+    expect(sep.getAttribute('aria-valuemin')).toBe('60'); // default floor
+    expect(sep.getAttribute('aria-valuemax')).toBe('2000');
+    expect(sep.getAttribute('aria-valuenow')).toBe('80'); // id's 80px width
+  });
+
+  it('reflects a column minWidth as the separator floor', async () => {
+    fixture.componentRef.setInput('columns', [
+      { key: 'id', header: 'ID', resizable: true, minWidth: 120 },
+      { key: 'name', header: 'Name' },
+    ]);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const sep = fixture.nativeElement.querySelector(
+      '.mk-table__resize',
+    ) as HTMLElement;
+    expect(sep.getAttribute('aria-valuemin')).toBe('120');
+  });
+
+  it('swallows Alt+Arrow at the edges instead of letting the browser navigate', () => {
+    const reordered = vi.fn();
+    table.columnReorder.subscribe(reordered);
+    fixture.componentRef.setInput('columns', [
+      { key: 'id', header: 'ID' },
+      { key: 'name', header: 'Name' },
+    ]);
+    fixture.detectChanges();
+    const cols = (table as any).orderedColumns() as MkTableColumn<Row>[];
+
+    // Alt+ArrowLeft on the FIRST column: no move, but the combo must still be
+    // consumed or it falls through to the browser's history Back.
+    const left = new KeyboardEvent('keydown', {
+      key: 'ArrowLeft',
+      altKey: true,
+      cancelable: true,
+    });
+    (table as any).onReorderKeydown(left, cols[0]);
+    expect(left.defaultPrevented).toBe(true);
+
+    // Alt+ArrowRight on the LAST column: same, against history Forward.
+    const right = new KeyboardEvent('keydown', {
+      key: 'ArrowRight',
+      altKey: true,
+      cancelable: true,
+    });
+    (table as any).onReorderKeydown(right, cols[cols.length - 1]);
+    expect(right.defaultPrevented).toBe(true);
+
+    expect(reordered).not.toHaveBeenCalled();
+  });
+
   it('enters edit mode from the keyboard (Enter on an editable cell)', () => {
     const evt = {
       key: 'Enter',
@@ -431,6 +502,140 @@ describe('MkTable — grouped rows', () => {
     await fixture.whenStable();
     expect(groupHeaders()).toHaveLength(0);
     expect(dataRows()).toHaveLength(3);
+  });
+});
+
+// --- Stacked-mode roles ------------------------------------------------------
+// `display: block`/`flex`/`grid` strips a table element of its implicit role,
+// so while stacked the template re-applies them explicitly. The data rows and
+// cells were covered by the 0.27.0 work; these pin the five spots that were
+// missed: the selection cell, the expander cell, the detail row, the group
+// header row and the empty-state row. `stacked` is normally set by a
+// ResizeObserver, which jsdom does not run — the specs drive the protected
+// signal directly, same as table-stacked.spec.ts.
+interface StackRow {
+  id: number;
+  name: string;
+  notes: string;
+  team: string;
+}
+
+@Component({
+  selector: 'mk-stack-roles-host',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  imports: [MkTable, MkTableRowDetail],
+  template: `
+    <mk-table
+      [columns]="columns"
+      [data]="data()"
+      [groupBy]="groupBy()"
+      selectable
+      expandable
+      stackAt="600"
+    >
+      <ng-template mkTableRowDetail let-row>
+        <div class="detail-content">{{ row.notes }}</div>
+      </ng-template>
+    </mk-table>
+  `,
+})
+class StackRolesHost {
+  readonly columns: MkTableColumn<StackRow>[] = [
+    { key: 'name', header: 'Name' },
+    { key: 'team', header: 'Team' },
+  ];
+  readonly data = signal<StackRow[]>([
+    { id: 1, name: 'Ada', notes: 'first', team: 'Core' },
+  ]);
+  readonly groupBy = signal<string | null>(null);
+}
+
+describe('MkTable — stacked mode roles', () => {
+  let fixture: ComponentFixture<StackRolesHost>;
+
+  async function render(
+    opts: { data?: StackRow[]; groupBy?: string | null; stacked?: boolean } = {},
+  ): Promise<HTMLElement> {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(StackRolesHost);
+    if (opts.data) fixture.componentInstance.data.set(opts.data);
+    if (opts.groupBy !== undefined) {
+      fixture.componentInstance.groupBy.set(opts.groupBy);
+    }
+    fixture.detectChanges();
+    await fixture.whenStable();
+    const table = fixture.debugElement.children[0]
+      .componentInstance as MkTable<StackRow>;
+    (table as unknown as { stacked: { set(v: boolean): void } }).stacked.set(
+      opts.stacked ?? true,
+    );
+    fixture.detectChanges();
+    await fixture.whenStable();
+    return fixture.nativeElement as HTMLElement;
+  }
+
+  afterEach(() => fixture?.destroy());
+
+  it('re-applies cell roles to the selection and expander cells', async () => {
+    const el = await render();
+    expect(
+      el.querySelector('.mk-table__td--select')?.getAttribute('role'),
+    ).toBe('cell');
+    expect(
+      el.querySelector('.mk-table__td--expand')?.getAttribute('role'),
+    ).toBe('cell');
+  });
+
+  it('re-applies row/cell roles to an expanded detail row', async () => {
+    const el = await render();
+    (el.querySelector('.mk-table__expander') as HTMLButtonElement).click();
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(
+      el.querySelector('.mk-table__detail-row')?.getAttribute('role'),
+    ).toBe('row');
+    expect(el.querySelector('.mk-table__detail')?.getAttribute('role')).toBe(
+      'cell',
+    );
+  });
+
+  it('re-applies roles to the group header row', async () => {
+    const el = await render({ groupBy: 'team' });
+    expect(
+      el.querySelector('.mk-table__group-row')?.getAttribute('role'),
+    ).toBe('row');
+    expect(el.querySelector('.mk-table__group')?.getAttribute('role')).toBe(
+      'rowheader',
+    );
+  });
+
+  it('re-applies roles to the empty-state row', async () => {
+    const el = await render({ data: [] });
+    expect(
+      el.querySelector('.mk-table__row--empty')?.getAttribute('role'),
+    ).toBe('row');
+    expect(el.querySelector('.mk-table__empty')?.getAttribute('role')).toBe(
+      'cell',
+    );
+  });
+
+  it('adds none of these roles in the grid, where the elements already say it', async () => {
+    const el = await render({ groupBy: 'team', stacked: false });
+    expect(
+      el.querySelector('.mk-table__td--select')?.getAttribute('role'),
+    ).toBeNull();
+    expect(
+      el.querySelector('.mk-table__td--expand')?.getAttribute('role'),
+    ).toBeNull();
+    expect(
+      el.querySelector('.mk-table__group-row')?.getAttribute('role'),
+    ).toBeNull();
+    expect(
+      el.querySelector('.mk-table__group')?.getAttribute('role'),
+    ).toBeNull();
   });
 });
 

@@ -1,5 +1,11 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import {
+  Component,
+  provideZonelessChangeDetection,
+  signal,
+} from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { FormsModule } from '@angular/forms';
+import { MkFormField } from '../form-field/form-field';
 import { MkRating } from './rating';
 
 describe('MkRating', () => {
@@ -49,5 +55,55 @@ describe('MkRating', () => {
     fixture.componentRef.setInput('readonly', true);
     (rating as any).setValue(4);
     expect(rating.value()).toBe(0);
+  });
+
+  it('uses the default aria-label when standalone', () => {
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.getAttribute('aria-label')).toBeTruthy();
+    expect(el.getAttribute('aria-labelledby')).toBeNull();
+  });
+});
+
+@Component({
+  imports: [FormsModule, MkFormField, MkRating],
+  template: `
+    <mk-form-field label="Score" hint="Pick 1 to 5" [error]="error()">
+      <mk-rating [(ngModel)]="score" />
+    </mk-form-field>
+  `,
+})
+class FieldHost {
+  score = 0;
+  readonly error = signal<string | null>(null);
+}
+
+describe('MkRating inside mk-form-field', () => {
+  it('adopts the field label, description and validity wiring', async () => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(FieldHost);
+    fixture.detectChanges();
+    await fixture.whenStable();
+    fixture.detectChanges();
+
+    const el = fixture.nativeElement.querySelector('mk-rating') as HTMLElement;
+    const label = fixture.nativeElement.querySelector(
+      'label',
+    ) as HTMLLabelElement;
+
+    // The field label names the control; the built-in default must not win.
+    expect(el.getAttribute('aria-labelledby')).toBe(label.id);
+    expect(el.getAttribute('aria-label')).toBeNull();
+    // The hint describes it.
+    expect(el.getAttribute('aria-describedby')).toBeTruthy();
+    expect(el.getAttribute('aria-invalid')).toBeNull();
+
+    fixture.componentInstance.error.set('Nope');
+    fixture.detectChanges();
+    await fixture.whenStable();
+    expect(el.getAttribute('aria-invalid')).toBe('true');
+
+    fixture.destroy();
   });
 });

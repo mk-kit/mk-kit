@@ -4,7 +4,7 @@
     type="button"
     class="mk-tree-select__trigger"
     [id]="triggerId"
-    aria-haspopup="tree"
+    aria-haspopup="dialog"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"
     [attr.aria-labelledby]="labelledBy() ? labelledBy() + ' ' + valueId : null"
@@ -51,6 +51,7 @@
     [matchWidth]="true"
     (dismiss)="close()"
     (keydown)="onPanelKeydown($event)"
+    (focusout)="onPanelFocusout($event)"
   >
     <mk-tree
       class="mk-tree-select__tree"

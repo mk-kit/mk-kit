@@ -11,9 +11,10 @@ import { MkSort, MkSortable } from './sort';
 
 /**
  * Sort header — attach `mkSortHeader` to a header cell (`<th>`) inside an
- * element carrying `mkSort`. It projects the header text, adds a directional
- * arrow (faint on hover, solid when active), reflects `aria-sort`, and toggles
- * the sort on click or Enter/Space.
+ * element carrying `mkSort`. It wraps the projected header text in a real
+ * `<button>` (so assistive tech hears an operable control), adds a directional
+ * arrow (faint on hover, solid when active), reflects `aria-sort` on the cell,
+ * and toggles the sort on click or Enter/Space.
  *
  * ```html
  * <th mkSortHeader="email" mkSortHeaderLabel="Email address">Email</th>
@@ -29,9 +30,6 @@ import { MkSort, MkSortable } from './sort';
     '[class.mk-sort-header--active]': 'isActive()',
     '[class.mk-sort-header--disabled]': 'isDisabled()',
     '[attr.aria-sort]': 'ariaSort()',
-    '[attr.tabindex]': 'isDisabled() ? null : 0',
-    '(click)': 'toggle()',
-    '(keydown)': 'onKeydown($event)',
   },
 })
 export class MkSortHeader implements MkSortable {
@@ -67,12 +65,5 @@ export class MkSortHeader implements MkSortable {
 
   protected toggle(): void {
     if (!this.isDisabled()) this.sort.sort(this);
-  }
-
-  protected onKeydown(event: KeyboardEvent): void {
-    if (event.key === 'Enter' || event.key === ' ') {
-      event.preventDefault();
-      this.toggle();
-    }
   }
 }

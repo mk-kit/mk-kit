@@ -6,6 +6,7 @@ import {
   input,
   numberAttribute,
 } from '@angular/core';
+import { MK_I18N } from '@mkornas/ui/core';
 import { MkLoadingBarService } from './loading-bar.service';
 
 /**
@@ -29,13 +30,18 @@ import { MkLoadingBarService } from './loading-bar.service';
   host: {
     class: 'mk-loading-bar',
     role: 'progressbar',
-    'aria-hidden': 'true',
+    'aria-valuemin': '0',
+    'aria-valuemax': '100',
+    '[attr.aria-valuenow]': 'active() ? progress() : null',
+    '[attr.aria-hidden]': "active() ? null : 'true'",
+    '[attr.aria-label]': 'i18n.loading',
     '[class.mk-loading-bar--active]': 'active()',
     '[style.height.px]': 'height()',
   },
 })
 export class MkLoadingBar {
   private readonly service = inject(MkLoadingBarService);
+  protected readonly i18n = inject(MK_I18N);
 
   /** Bar colour. */
   readonly color = input('var(--mk-primary)');

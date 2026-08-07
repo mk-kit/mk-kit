@@ -1,3 +1,6 @@
+import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
+import { TestBed } from '@angular/core/testing';
+import { MkDiff, type MkDiffMode } from './diff';
 import { mkComputeDiff, mkDiffStats } from './diff-util';
 
 describe('mkComputeDiff', () => {
@@ -52,5 +55,82 @@ describe('mkComputeDiff', () => {
   it('summarises add/remove/unchanged counts', () => {
     const rows = mkComputeDiff('a\nb\nc', 'a\nB\nc\nd');
     expect(mkDiffStats(rows)).toEqual({ added: 2, removed: 1, unchanged: 2 });
+  });
+});
+
+@Component({
+  imports: [MkDiff],
+  template: `<mk-diff before="a\nb\nc" after="a\nB\nc" [mode]="mode()" />`,
+})
+class Host {
+  mode = signal<MkDiffMode>('unified');
+}
+
+describe('MkDiff', () => {
+  function mount(mode: MkDiffMode = 'unified') {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.mode.set(mode);
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    return { fixture, el };
+  }
+
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('prefixes changed unified rows with visually-hidden change text', () => {
+    const { el } = mount();
+
+    const deleted = el.querySelector('.mk-diff__row--delete')!;
+    expect(deleted.querySelector('.mk-visually-hidden')?.textContent).toBe(
+      'Removed:',
+    );
+    const inserted = el.querySelector('.mk-diff__row--insert')!;
+    expect(inserted.querySelector('.mk-visually-hidden')?.textContent).toBe(
+      'Added:',
+    );
+    // Unchanged rows carry no prefix; the visible +/- stays aria-hidden.
+    const equal = el.querySelector('.mk-diff__row:not(.mk-diff__row--insert):not(.mk-diff__row--delete)')!;
+    expect(equal.querySelector('.mk-visually-hidden')).toBeNull();
+    expect(
+      deleted.querySelector('.mk-diff__marker')?.getAttribute('aria-hidden'),
+    ).toBe('true');
+  });
+
+  it('marks split-view changes with sr text and a visible gutter glyph', () => {
+    const { el } = mount('split');
+
+    const deleted = el.querySelector('.mk-diff__cell--delete')!;
+    expect(deleted.querySelector('.mk-visually-hidden')?.textContent).toBe(
+      'Removed:',
+    );
+    expect(deleted.querySelector('.mk-diff__marker')?.textContent?.trim()).toBe(
+      '-',
+    );
+
+    const inserted = el.querySelector('.mk-diff__cell--insert')!;
+    expect(inserted.querySelector('.mk-visually-hidden')?.textContent).toBe(
+      'Added:',
+    );
+    expect(inserted.querySelector('.mk-diff__marker')?.textContent?.trim()).toBe(
+      '+',
+    );
+  });
+
+  it('exposes the scrollable body as a focusable labelled region', () => {
+    const { fixture, el } = mount();
+    const body = el.querySelector('.mk-diff__body')!;
+    expect(body.getAttribute('tabindex')).toBe('0');
+    expect(body.getAttribute('role')).toBe('region');
+    expect(body.getAttribute('aria-label')).toBe('Changes');
+
+    fixture.componentInstance.mode.set('split');
+    fixture.detectChanges();
+    const split = el.querySelector('.mk-diff__body--split')!;
+    expect(split.getAttribute('tabindex')).toBe('0');
+    expect(split.getAttribute('role')).toBe('region');
+    expect(split.getAttribute('aria-label')).toBe('Changes');
   });
 });

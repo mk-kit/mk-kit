@@ -13,6 +13,10 @@
   overflow-x: auto;
 }
 
+:host(:focus-visible) {
+  @include mk.focus-ring;
+}
+
 .mk-json-viewer__children {
   margin: 0;
   padding: 0 0 0 var(--mk-space-5);
