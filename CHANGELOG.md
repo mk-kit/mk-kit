@@ -4,6 +4,49 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.27.2] — 2026-08-07
+
+Quick-wins wave from the 2026-08 five-track audit (a11y / mobile / performance
+/ compatibility / gaps): the small, provable bugs first.
+
+### Fixed
+
+- **Anchored panels can no longer vanish when `showPopover()` throws.** The
+  top-layer promotion wrapped `showPopover()` in a try/catch but left the
+  `popover="manual"` attribute on the element in the catch path — and in any
+  Popover-supporting browser the UA stylesheet then applies
+  `[popover]:not(:popover-open) { display: none }`, hiding the panel with no
+  error. The catch now removes the attribute so the body-portal fallback
+  actually renders. Regression-tested with a throwing `showPopover`.
+
+- **`MkSignaturePad.clear()` no longer crashes on the server.** `redraw()`
+  read `window.devicePixelRatio` and called `getComputedStyle` unguarded;
+  its siblings (`resizeCanvas`, `paintExternal`) check `isBrowser`, this one
+  was missed — and it is reachable during SSR through the public `clear()`.
+  The SSR smoke root now calls `clear()` after view init to keep it covered.
+
+- **Fast taps can no longer abort pointer interactions mid-setup.**
+  `setPointerCapture` throws `NotFoundError` when the pointer has already
+  been released — easiest to hit with quick touch taps. Guarded in `mkDrag`,
+  the splitter, the scroll-area thumbs, and the signature pad (the other
+  call sites already used optional calls).
+
+- **Sliders recover from cancelled pointers.** `MkSlider` and
+  `MkRangeSlider` listened only for `pointerup`, so a browser-initiated
+  `pointercancel` (notification shade, long-press UI) left them wedged in
+  dragging state until the next stray pointer event. Both now treat
+  `pointercancel` as release.
+
+- **`rxjs` declared as a peer dependency.** `MkOverlayRef` has a runtime
+  import of `Observable`; resolution only worked through Angular's own
+  transitive peer. Now explicit (`^7.8.0`).
+
+### Changed
+
+- **SSR smoke coverage extended** to `mk-block-editor` (including a
+  server-side `mkHtmlToBlocks()` round through its no-DOM fallback) — the one
+  entry point the suite previously skipped.
+
 ## [0.27.1] — 2026-07-29
 
 ### Fixed

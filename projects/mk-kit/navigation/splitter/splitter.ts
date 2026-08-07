@@ -70,7 +70,11 @@ export class MkSplitter {
     if (this.disabled() || event.button !== 0) return;
     event.preventDefault();
     this.dragging = true;
-    (event.target as HTMLElement).setPointerCapture(event.pointerId);
+    try {
+      (event.target as HTMLElement).setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
   }
 
   protected onPointermove(event: PointerEvent): void {

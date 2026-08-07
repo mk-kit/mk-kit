@@ -52,6 +52,7 @@ export type MkRange = [number, number];
     '[attr.data-tone]': 'tone()',
     '(document:pointermove)': 'onPointerMove($event)',
     '(document:pointerup)': 'onPointerUp()',
+    '(document:pointercancel)': 'onPointerUp()',
     '(focusout)': 'onFocusOut($event)',
   },
   providers: [

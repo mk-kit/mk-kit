@@ -226,6 +226,9 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
         this.popover = true;
       } catch {
         // Already open or unsupported context — fall back to the body portal.
+        // The attribute must go too: with it left on, the UA sheet's
+        // `[popover]:not(:popover-open) { display: none }` hides the panel.
+        el.removeAttribute('popover');
         this.popover = false;
       }
     }

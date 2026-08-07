@@ -143,7 +143,11 @@ export class MkDrag<T = unknown> {
     this.startY = e.clientY;
 
     const el = this.element;
-    el.setPointerCapture(e.pointerId);
+    try {
+      el.setPointerCapture(e.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
     el.addEventListener('pointermove', this.moveHandler);
     el.addEventListener('pointerup', this.upHandler);
     el.addEventListener('pointercancel', this.cancelHandler);
