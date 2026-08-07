@@ -1,6 +1,6 @@
 {
   "name": "@mkornas/ui",
-  "version": "0.27.1",
+  "version": "0.27.2",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com"
   },
@@ -35,7 +35,8 @@
     "@angular/common": "^22.0.0",
     "@angular/core": "^22.0.0",
     "@angular/forms": "^22.0.0",
-    "@angular/platform-browser": "^22.0.0"
+    "@angular/platform-browser": "^22.0.0",
+    "rxjs": "^7.8.0"
   },
   "dependencies": {
     "tslib": "^2.3.0"

@@ -187,7 +187,11 @@ export class MkScrollArea {
       this.dragStartPointer = event.clientX;
       this.dragStartScroll = view.scrollLeft;
     }
-    (event.target as HTMLElement).setPointerCapture(event.pointerId);
+    try {
+      (event.target as HTMLElement).setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
     this.show();
   }
 

@@ -22,7 +22,12 @@
  * its own DOCUMENT (domino) through DI, so the render exercises the real
  * server code paths regardless of the surrounding globals.
  */
-import { Component, provideZonelessChangeDetection } from '@angular/core';
+import {
+  type AfterViewInit,
+  Component,
+  provideZonelessChangeDetection,
+  viewChild,
+} from '@angular/core';
 import {
   bootstrapApplication,
   type BootstrapContext,
@@ -47,6 +52,7 @@ import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
 import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
+import { MkBlockEditor, mkHtmlToBlocks } from '@mkornas/ui/block-editor';
 import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
 import { MkImage } from '@mkornas/ui/media/image';
 import { MkImageGallery } from '@mkornas/ui/media/image-gallery';
@@ -94,6 +100,7 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkTaxIdInput,
     MkSubmitInput,
     MkSignaturePad,
+    MkBlockEditor,
     MkJsonViewer,
     MkImage,
     MkImageGallery,
@@ -173,6 +180,7 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       <mk-form-field label="Signature">
         <mk-signature-pad />
       </mk-form-field>
+      <mk-block-editor [value]="parsedDoc" />
       <mk-json-viewer [data]="jsonData" [expandDepth]="2" />
 
       <mk-image src="/dish.jpg" alt="Dish" aspectRatio="4 / 3" caption="Special" />
@@ -227,7 +235,18 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     </main>
   `,
 })
-class SsrSmokeRoot {
+class SsrSmokeRoot implements AfterViewInit {
+  // Runs the HTML → blocks parser during server bootstrap: without a DOM it
+  // must fall back to a sanitised paragraph, never throw.
+  readonly parsedDoc = mkHtmlToBlocks('<h2>Title</h2><p>Body copy.</p>');
+  private readonly pad = viewChild.required(MkSignaturePad);
+
+  ngAfterViewInit(): void {
+    // clear() → redraw() touches canvas/window APIs; must be a no-op on the
+    // server rather than a ReferenceError.
+    this.pad().clear();
+  }
+
   readonly roleOptions: MkSelectOption[] = [
     { label: 'Admin', value: 'admin' },
     { label: 'Viewer', value: 'viewer' },
@@ -306,6 +325,7 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-tax-id-input',
       'mk-submit-input',
       'mk-signature-pad',
+      'mk-block-editor',
       'mk-json-viewer',
       'mk-image',
       'mk-image-gallery',

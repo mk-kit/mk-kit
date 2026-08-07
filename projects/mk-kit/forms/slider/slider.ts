@@ -50,6 +50,7 @@ import { MkFormField } from '../form-field/form-field';
     '[attr.data-tone]': 'tone()',
     '(document:pointermove)': 'onPointerMove($event)',
     '(document:pointerup)': 'onPointerUp()',
+    '(document:pointercancel)': 'onPointerUp()',
   },
   providers: [
     {

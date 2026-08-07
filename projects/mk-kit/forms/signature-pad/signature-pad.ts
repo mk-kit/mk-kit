@@ -136,7 +136,11 @@ export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
   protected onPointerDown(event: PointerEvent): void {
     if (this.isDisabled()) return;
     const canvas = this.canvasRef().nativeElement;
-    canvas.setPointerCapture(event.pointerId);
+    try {
+      canvas.setPointerCapture(event.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
     this.current = [this.toLocal(event)];
     event.preventDefault();
   }
@@ -203,6 +207,7 @@ export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
   }
 
   private redraw(): void {
+    if (!this.isBrowser) return;
     const canvas = this.canvasRef().nativeElement;
     const ctx = this.context();
     if (!ctx) return;

@@ -139,6 +139,31 @@ describe('MkAnchoredPanel (directive lifecycle)', () => {
     expect(panelCount()).toBe(0);
   });
 
+  it('drops the popover attribute when showPopover() throws, so the UA sheet cannot hide the panel', async () => {
+    // jsdom has no Popover API; install a throwing showPopover to drive the
+    // directive down its catch path in a "supporting" browser.
+    (HTMLElement.prototype as any).showPopover = () => {
+      throw new DOMException('InvalidStateError');
+    };
+    try {
+      const fixture = TestBed.createComponent(AnchoredHost);
+      fixture.detectChanges();
+      fixture.componentInstance.open.set(true);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const panel = document.querySelector('.panel') as HTMLElement;
+      expect(panel).toBeTruthy();
+      // With the attribute left behind, `[popover]:not(:popover-open)` would
+      // compute to display:none — the panel must fall back to a plain portal.
+      expect(panel.hasAttribute('popover')).toBe(false);
+
+      fixture.destroy();
+    } finally {
+      delete (HTMLElement.prototype as any).showPopover;
+    }
+  });
+
   it('leaves no orphaned panel behind across repeated open/close cycles', async () => {
     const fixture = TestBed.createComponent(AnchoredHost);
     fixture.detectChanges();
