@@ -40,6 +40,8 @@ const ROUTES: ReadonlyArray<{ path: string; slug: string }> = [
   { path: '/theming', slug: 'theming' },
   { path: '/components/rich-text', slug: 'rich-text' },
   { path: '/components/markdown', slug: 'markdown' },
+  { path: '/touch', slug: 'touch' },
+  { path: '/components/touch-keys', slug: 'touch-keys' },
   { path: '/components/signature', slug: 'signature' },
 ];
 

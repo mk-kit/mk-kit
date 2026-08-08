@@ -40,10 +40,10 @@
         tone="neutral"
         size="sm"
         iconOnly
-        (click)="theme.toggleDensity()"
-        [attr.aria-label]="'Density: ' + theme.density() + '. Click to toggle.'"
+        (click)="cycleDensity()"
+        [attr.aria-label]="'Density: ' + theme.density() + '. Click to change.'"
       >
-        {{ theme.density() === 'compact' ? '▤' : '☰' }}
+        {{ densityIcon() }}
       </button>
       <button
         mkButton
