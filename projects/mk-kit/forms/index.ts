@@ -24,6 +24,8 @@ export * from './number-input';
 export * from './numeric-keypad';
 export * from './on-screen-keyboard';
 export * from './otp';
+export * from './numeric-keypad';
+export * from './on-screen-keyboard';
 export * from './phone-input';
 export * from './postal-code-input';
 export * from './currency-input';
