@@ -54,6 +54,12 @@ export const routes: Routes = [
       import('./pages/signature/signature-page').then((m) => m.SignaturePage),
   },
   {
+    path: 'components/touch-keys',
+    title: 'Keypad & on-screen keyboard — mk-kit',
+    loadComponent: () =>
+      import('./pages/touch-keys/touch-keys-page').then((m) => m.TouchKeysPage),
+  },
+  {
     path: 'migration',
     title: 'Material migration — mk-kit',
     loadComponent: () =>
@@ -149,6 +155,12 @@ export const routes: Routes = [
       import('./pages/theme-builder/theme-builder-page').then(
         (m) => m.ThemeBuilderPage,
       ),
+  },
+  {
+    path: 'touch',
+    title: 'Touch & mobile — mk-kit',
+    loadComponent: () =>
+      import('./pages/touch/touch-page').then((m) => m.TouchPage),
   },
   {
     path: 'examples/dashboard',
@@ -265,6 +277,12 @@ export const routes: Routes = [
     title: 'Structure — mk-kit',
     loadComponent: () =>
       import('./pages/structure/structure-page').then((m) => m.StructurePage),
+  },
+  {
+    path: 'components/drawer',
+    title: 'Drawer — mk-kit',
+    loadComponent: () =>
+      import('./pages/drawer/drawer-page').then((m) => m.DrawerPage),
   },
   {
     path: 'components/command-nav',

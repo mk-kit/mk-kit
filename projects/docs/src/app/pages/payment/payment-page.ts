@@ -8,12 +8,14 @@ import {
   MkIbanInput,
   MkSelect,
   type MkSelectOption,
+  MkTaxIdInput,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the MONEY & PAYMENT inputs of
- * `@mkornas/ui`: Currency/amount input, Card number input and IBAN input.
+ * `@mkornas/ui`: Currency/amount input, Card number input, IBAN input and
+ * Tax-ID input.
  */
 @Component({
   selector: 'docs-payment-page',
@@ -25,6 +27,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkCurrencyInput,
     MkCardNumberInput,
     MkIbanInput,
+    MkTaxIdInput,
     MkSelect,
   ],
   template: `
@@ -38,7 +41,9 @@ import { DocsExample } from '../../shared/docs-example';
         <code class="docs-inline">&lt;mk-card-number-input&gt;</code> groups card
         digits per detected network and validates with Luhn;
         <code class="docs-inline">&lt;mk-iban-input&gt;</code> groups, caps and
-        checksums IBANs for 65 countries. All implement
+        checksums IBANs for 65 countries;
+        <code class="docs-inline">&lt;mk-tax-id-input&gt;</code> masks and
+        checksums business tax identifiers (PL NIP, …). All implement
         <code class="docs-inline">ControlValueAccessor</code> and wire themselves
         to a wrapping <code class="docs-inline">&lt;mk-form-field&gt;</code>.
       </p>
@@ -148,6 +153,51 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size / invalid / disabled / placeholder</td><td>—</td><td>—</td><td>Standard control inputs.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Tax ID input</h2>
+      <p>
+        A country-aware business tax identifier for invoice forms. Pick a
+        <code class="docs-inline">country</code> and the field adopts its mask
+        and rules — <code class="docs-inline">PL</code> NIP
+        (<code class="docs-inline">000-000-00-00</code>, checksum-verified),
+        <code class="docs-inline">DE</code> USt-IdNr.,
+        <code class="docs-inline">CZ</code> DIČ,
+        <code class="docs-inline">IT</code> Partita IVA,
+        <code class="docs-inline">SK</code> IČ DPH (shape-verified). The form
+        value is the compact identifier (digits only) while the field displays
+        it masked, and the placeholder defaults to a valid example. Try
+        <code class="docs-inline">1234563218</code>.
+      </p>
+
+      <docs-example [code]="taxIdCode" [column]="true">
+        <mk-form-field label="Country" style="max-width: 16rem; width: 100%;">
+          <mk-select [options]="taxCountryOptions" [(value)]="taxCountry" />
+        </mk-form-field>
+        <mk-form-field label="Tax ID" style="max-width: 20rem; width: 100%;">
+          <mk-tax-id-input
+            #taxId="mkTaxIdInput"
+            [country]="taxCountryCode()"
+            [(value)]="tin"
+          />
+        </mk-form-field>
+        <p class="echo">
+          Compact: {{ tin() || '—' }} ·
+          Valid: {{ taxId.valid() === null ? '—' : taxId.valid() }}
+        </p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way identifier in compact form (digits only, e.g. "1234563218").</td></tr>
+          <tr><td>country</td><td>string</td><td>'PL'</td><td>ISO 3166-1 country whose format applies. Unknown codes fall back to free digits.</td></tr>
+          <tr><td>valid()</td><td>Signal&lt;boolean | null&gt;</td><td>—</td><td>Format + checksum result for a complete identifier, null while empty/incomplete or the country is unknown (exportAs "mkTaxIdInput").</td></tr>
+          <tr><td>size / invalid / disabled / placeholder</td><td>—</td><td>—</td><td>Standard control inputs.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -181,6 +231,18 @@ export class PaymentPage {
   protected readonly brand = signal<MkCardBrand | null>(null);
   protected readonly account = signal('');
 
+  // --- Tax ID -----------------------------------------------------------------
+  protected readonly tin = signal('');
+  protected readonly taxCountry = signal<unknown>('PL');
+  protected readonly taxCountryCode = () => String(this.taxCountry());
+  protected readonly taxCountryOptions: MkSelectOption[] = [
+    { label: 'Poland — NIP', value: 'PL' },
+    { label: 'Germany — USt-IdNr.', value: 'DE' },
+    { label: 'Czechia — DIČ', value: 'CZ' },
+    { label: 'Italy — Partita IVA', value: 'IT' },
+    { label: 'Slovakia — IČ DPH', value: 'SK' },
+  ];
+
   // --- Code snippets ----------------------------------------------------------
   protected readonly currencyCode = `<mk-currency-input currency="PLN" [(ngModel)]="price" />
 <mk-currency-input currency="USD" [min]="0" [(value)]="budget" />
@@ -194,4 +256,10 @@ export class PaymentPage {
 
 // reactive forms
 account: ['', [Validators.required, mkIbanValidator()]]`;
+
+  protected readonly taxIdCode = `<mk-tax-id-input #taxId="mkTaxIdInput" country="PL" [(value)]="nip" />
+<!-- nip === '1234563218' (displayed as 123-456-32-18), taxId.valid() === true -->
+
+// reactive forms
+nip: ['', [Validators.required, mkTaxIdValidator('PL')]]`;
 }

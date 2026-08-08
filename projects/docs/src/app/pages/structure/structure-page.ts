@@ -1,45 +1,42 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   MkBadge,
   MkButton,
-  MkDrawer,
-  MkFormField,
-  MkInput,
   MkPageHeader,
   MkSplitter,
   MkScrollArea,
   MkToolbar,
 } from '@mkornas/ui';
-import { FormsModule } from '@angular/forms';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the admin/CMS structural components of
- * `@mkornas/ui`: PageHeader, Toolbar and Drawer.
+ * `@mkornas/ui`: PageHeader, Toolbar, Splitter and Scroll area. The Drawer has
+ * its own page (`/components/drawer`).
  */
 @Component({
   selector: 'docs-structure-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
   imports: [
-    FormsModule,
+    RouterLink,
     DocsExample,
     MkPageHeader,
     MkToolbar,
-    MkDrawer,
     MkSplitter,
     MkScrollArea,
     MkButton,
     MkBadge,
-    MkFormField,
-    MkInput,
   ],
   template: `
     <div class="docs-page docs-container">
       <h1>Structure</h1>
       <p class="docs-lead">
         Layout building blocks for admin apps and CMSes: a page header, an action
-        toolbar, and a slide-out drawer. They compose with the rest of the
-        library (breadcrumbs, tabs, buttons, badges, forms) via projection slots.
+        toolbar, resizable panes and themed scroll areas. They compose with the
+        rest of the library (breadcrumbs, tabs, buttons, badges, forms) via
+        projection slots. Need a slide-out panel? See the
+        <a routerLink="/components/drawer">Drawer</a>.
       </p>
 
       <!-- ============================================================ -->
@@ -116,53 +113,12 @@ import { DocsExample } from '../../shared/docs-example';
       <!-- ============================================================ -->
       <h2>Drawer</h2>
       <p>
-        A slide-out panel driven by a two-way
-        <code class="docs-inline">open</code>. It traps focus, closes on backdrop
-        or Escape, restores focus, and locks scroll while modal. Anchor it to any
-        edge with <code class="docs-inline">side</code>.
+        The slide-out <code class="docs-inline">&lt;mk-drawer&gt;</code> panel —
+        focus-trapping, edge-anchored and driven by a two-way
+        <code class="docs-inline">open</code> — has its own page with live demos
+        for every side and the full API.
+        <a routerLink="/components/drawer">See the Drawer docs →</a>
       </p>
-      <docs-example [code]="drawerCode">
-        <div style="display: flex; gap: var(--mk-space-3); flex-wrap: wrap;">
-          <button mkButton (click)="endOpen.set(true)">Open filters (end)</button>
-          <button mkButton variant="outline" (click)="startOpen.set(true)">Open nav (start)</button>
-        </div>
-      </docs-example>
-
-      <mk-drawer [(open)]="endOpen" side="end" heading="Filters" size="22rem">
-        <mk-form-field label="Search">
-          <input mkInput placeholder="Keyword…" [(ngModel)]="keyword" />
-        </mk-form-field>
-        <mk-form-field label="Status" style="margin-top: var(--mk-space-3);">
-          <input mkInput placeholder="Any" />
-        </mk-form-field>
-        <div mkDrawerFooter>
-          <button mkButton variant="ghost" (click)="endOpen.set(false)">Cancel</button>
-          <button mkButton (click)="endOpen.set(false)">Apply</button>
-        </div>
-      </mk-drawer>
-
-      <mk-drawer [(open)]="startOpen" side="start" heading="Navigation" size="18rem">
-        <p>Put an <code class="docs-inline">mk-nav-list</code> here for a mobile menu.</p>
-        <p style="color: var(--mk-text-muted);">Keyword bound from the other drawer: {{ keyword() || '—' }}</p>
-      </mk-drawer>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>open</code></td><td><code>model&lt;boolean&gt;</code></td><td><code>false</code></td><td>Two-way visibility of the panel.</td></tr>
-          <tr><td><code>side</code></td><td><code>'start' | 'end' | 'top' | 'bottom'</code></td><td><code>'end'</code></td><td>Edge the drawer slides in from.</td></tr>
-          <tr><td><code>size</code></td><td><code>string</code></td><td><code>'20rem'</code></td><td>Panel width (or height for top/bottom), any CSS length.</td></tr>
-          <tr><td><code>heading</code></td><td><code>string</code></td><td><code>''</code></td><td>Title shown in the panel header.</td></tr>
-          <tr><td><code>hasBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Dim the page behind the panel.</td></tr>
-          <tr><td><code>closeOnBackdrop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Clicking the backdrop closes the drawer.</td></tr>
-          <tr><td><code>closeOnEscape</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Escape closes the drawer.</td></tr>
-          <tr><td><code>trapFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Keep Tab focus inside while open; focus is restored on close.</td></tr>
-          <tr><td><code>hideClose</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Hide the built-in close button.</td></tr>
-          <tr><td><code>mkDrawerHeader</code> / <code>mkDrawerFooter</code></td><td>slot</td><td>—</td><td>Custom header content / pinned footer actions.</td></tr>
-        </tbody>
-      </table>
 
       <h2>Splitter</h2>
       <p>
@@ -276,9 +232,6 @@ export class StructurePage {
   protected readonly scrollItems = Array.from({ length: 20 }, (_, i) => i + 1);
   protected readonly scrollAreaCode = `<mk-scroll-area maxHeight="12rem">\n  <!-- long content -->\n</mk-scroll-area>`;
 
-  protected readonly endOpen = signal(false);
-  protected readonly startOpen = signal(false);
-  protected readonly keyword = signal('');
   protected readonly splitPos = signal(35);
 
   protected readonly splitterCode = `<mk-splitter [(position)]="splitPos" [min]="20" [max]="80">
@@ -305,13 +258,4 @@ export class StructurePage {
   </span>
 </mk-toolbar>`;
 
-  protected readonly drawerCode = `<button mkButton (click)="open.set(true)">Filters</button>
-
-<mk-drawer [(open)]="open" side="end" heading="Filters">
-  …filter form…
-  <div mkDrawerFooter>
-    <button mkButton variant="ghost" (click)="open.set(false)">Cancel</button>
-    <button mkButton (click)="open.set(false)">Apply</button>
-  </div>
-</mk-drawer>`;
 }

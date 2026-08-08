@@ -47,6 +47,7 @@ export class App {
         { label: 'Getting started', path: '/getting-started' },
         { label: 'Theming', path: '/theming' },
         { label: 'Theme builder', path: '/theme-builder' },
+        { label: 'Touch & mobile', path: '/touch' },
         { label: 'Core & services', path: '/core-services' },
         { label: 'Material migration', path: '/migration' },
       ],
@@ -67,6 +68,7 @@ export class App {
         { label: 'Phone & postal code', path: '/components/phone-postal' },
         { label: 'Money & payment', path: '/components/payment' },
         { label: 'Signature pad', path: '/components/signature' },
+        { label: 'Keypad & keyboard', path: '/components/touch-keys' },
         { label: 'Toggles', path: '/components/toggles' },
         { label: 'Sliders & rating', path: '/components/sliders' },
         { label: 'Selection', path: '/components/selection' },
@@ -110,6 +112,7 @@ export class App {
       links: [
         { label: 'Navigation', path: '/components/navigation' },
         { label: 'Structure', path: '/components/structure' },
+        { label: 'Drawer', path: '/components/drawer' },
         { label: 'Command & nav', path: '/components/command-nav' },
         { label: 'Stepper', path: '/components/stepper' },
         { label: 'Context menu', path: '/components/context-menu' },
@@ -150,6 +153,17 @@ export class App {
         run: () => this.router.navigateByUrl(link.path),
       })),
   );
+
+  protected cycleDensity(): void {
+    const order = ['comfortable', 'compact', 'touch'] as const;
+    const next = order[(order.indexOf(this.theme.density()) + 1) % 3];
+    this.theme.setDensity(next);
+  }
+
+  protected densityIcon(): string {
+    const d = this.theme.density();
+    return d === 'compact' ? '▤' : d === 'touch' ? '◉' : '☰';
+  }
 
   protected cycleTheme(): void {
     const order = ['light', 'dark', 'system'] as const;

@@ -48,6 +48,8 @@ import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
 import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
+import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
+import { MkOnScreenKeyboard } from '@mkornas/ui/forms/on-screen-keyboard';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
 import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
@@ -96,6 +98,8 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
     MkPostalCodeInput,
     MkCurrencyInput,
     MkCardNumberInput,
+    MkNumericKeypad,
+    MkOnScreenKeyboard,
     MkIbanInput,
     MkTaxIdInput,
     MkSubmitInput,
@@ -168,6 +172,8 @@ import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
       <mk-form-field label="Card number">
         <mk-card-number-input value="4111111111111111" />
       </mk-form-field>
+      <mk-numeric-keypad mode="pin" [length]="4" />
+      <mk-on-screen-keyboard />
       <mk-form-field label="IBAN">
         <mk-iban-input value="DE89370400440532013000" />
       </mk-form-field>
@@ -321,6 +327,8 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-postal-code-input',
       'mk-currency-input',
       'mk-card-number-input',
+      'mk-numeric-keypad',
+      'mk-on-screen-keyboard',
       'mk-iban-input',
       'mk-tax-id-input',
       'mk-submit-input',

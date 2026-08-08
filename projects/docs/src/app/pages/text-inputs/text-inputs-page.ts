@@ -1,20 +1,32 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  computed,
+  signal,
+} from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
+  MK_FIELD_PRESETS,
   MkAutosize,
+  MkField,
   MkFormField,
   MkIcon,
+  MkI18nInput,
   MkInput,
   MkInputGroup,
   MkNumberInput,
   MkOtp,
   MkPasswordInput,
+  type MkFieldKind,
+  type MkI18nLocale,
+  type MkI18nValue,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the TEXT INPUT components of `@mkornas/ui`:
- * Input/Textarea, Textarea autosize, Password input, Number input and OTP/PIN input.
+ * Input/Textarea, Textarea autosize, Password input, Number input, OTP/PIN input
+ * and the multi-locale I18n input.
  */
 @Component({
   selector: 'docs-text-inputs-page',
@@ -30,6 +42,8 @@ import { DocsExample } from '../../shared/docs-example';
     MkPasswordInput,
     MkNumberInput,
     MkOtp,
+    MkI18nInput,
+    MkField,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -37,8 +51,8 @@ import { DocsExample } from '../../shared/docs-example';
       <p class="docs-lead">
         Text-entry controls: the <code class="docs-inline">mkInput</code> styling
         directive for native inputs and textareas, autosizing textareas, a password
-        field with strength meter, a numeric spinbutton and a segmented OTP/PIN
-        field. Every control implements
+        field with strength meter, a numeric spinbutton, a segmented OTP/PIN
+        field and a multi-locale translatable field. Every control implements
         <code class="docs-inline">ControlValueAccessor</code>, so it works with
         <code class="docs-inline">[(ngModel)]</code>, reactive forms and native
         <code class="docs-inline">[(value)]</code> bindings — and each one wires
@@ -221,6 +235,137 @@ import { DocsExample } from '../../shared/docs-example';
         <mk-otp [(value)]="otp" [length]="6" />
         <p class="echo">Code: {{ otp() || '—' }}</p>
       </docs-example>
+
+      <!-- ============================================================ -->
+      <!-- I18N INPUT -->
+      <!-- ============================================================ -->
+      <h2>Translatable input (i18n)</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-i18n-input&gt;</code> edits the same text
+        in several languages from one field — a compact locale switcher over a
+        single input, instead of stacking one input per language. It binds a
+        <code class="docs-inline">Record&lt;localeCode, string&gt;</code>, so it
+        drops into a form as a single control (via
+        <code class="docs-inline">formControlName</code> /
+        <code class="docs-inline">[(ngModel)]</code>) rather than a nested group.
+        Codes listed in <code class="docs-inline">requiredLocales</code> show a
+        marker in the switcher while still empty, so a missing translation is
+        visible without switching to it. Add
+        <code class="docs-inline">multiline</code> for a textarea.
+      </p>
+      <docs-example [code]="i18nCode" [column]="true">
+        <mk-form-field label="Product name" style="max-width: 26rem; width: 100%;">
+          <mk-i18n-input
+            [(ngModel)]="translations"
+            [locales]="locales"
+            [requiredLocales]="requiredLocales"
+            placeholder="Name in the selected language…"
+          />
+        </mk-form-field>
+        <p class="echo">Value: {{ translationsJson() }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>Record&lt;string, string&gt;</td><td>{{ '{}' }}</td><td>Bound value — one string per locale code (via ngModel / formControlName).</td></tr>
+          <tr><td>locales</td><td>MkI18nLocale[]</td><td>[]</td><td>Locales offered, in switcher order. The first is the initial tab.</td></tr>
+          <tr><td>requiredLocales</td><td>string[]</td><td>[]</td><td>Codes that must be filled; each gets a marker in the switcher while empty.</td></tr>
+          <tr><td>multiline</td><td>boolean</td><td>false</td><td>Render a textarea instead of a single-line input.</td></tr>
+          <tr><td>rows</td><td>number</td><td>3</td><td>Textarea rows (ignored unless multiline).</td></tr>
+          <tr><td>placeholder</td><td>string</td><td>''</td><td>Placeholder for the active locale's input.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size, forwarded to the input and the switcher.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the whole control.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <!-- MKFIELD -->
+      <!-- ============================================================ -->
+      <h2>Semantic field kinds (mkField)</h2>
+      <p>
+        <code class="docs-inline">mkField</code> is an attribute directive that
+        applies the mobile-keyboard and autofill bundle a field needs —
+        <code class="docs-inline">type</code>,
+        <code class="docs-inline">inputmode</code>,
+        <code class="docs-inline">autocomplete</code>,
+        <code class="docs-inline">autocapitalize</code>,
+        <code class="docs-inline">autocorrect</code>,
+        <code class="docs-inline">spellcheck</code> and
+        <code class="docs-inline">enterkeyhint</code> — from a single name. It is
+        the fix for the two mistakes every codebase makes: email fields that iOS
+        capitalises (no <code class="docs-inline">autocapitalize="off"</code>) and
+        address fields the browser can't autofill (no
+        <code class="docs-inline">autocomplete</code> at all). It sets attributes
+        and nothing else, so it composes with
+        <code class="docs-inline">mkInput</code>,
+        <code class="docs-inline">&lt;mk-form-field&gt;</code>,
+        <code class="docs-inline">[(ngModel)]</code> and reactive forms untouched.
+      </p>
+      <p>
+        <strong>Precedence:</strong> a <em>static</em> attribute you write on the
+        element wins — the directive reads the seven attributes once at
+        construction and only fills in what you left out, so
+        <code class="docs-inline">&lt;input mkField="username" type="password" /&gt;</code>
+        stays a password field. A template binding
+        (<code class="docs-inline">[attr.autocomplete]="…"</code>) does
+        <em>not</em> win: Angular applies host bindings after template bindings,
+        so the preset overwrites it. Override with a static attribute.
+      </p>
+
+      <docs-example [code]="fieldCode" [column]="true">
+        <div class="field-demo">
+          <mk-form-field label="Email">
+            <input mkInput mkField="email" placeholder="you@example.com" [(ngModel)]="email" />
+          </mk-form-field>
+          <mk-form-field label="Full name">
+            <input mkInput mkField="name" placeholder="Jan Kowalski" [(ngModel)]="fullName" />
+          </mk-form-field>
+          <mk-form-field label="Street">
+            <input mkInput mkField="street" placeholder="Marszałkowska 1" [(ngModel)]="street" />
+          </mk-form-field>
+          <mk-form-field label="City">
+            <input mkInput mkField="city" placeholder="Warszawa" [(ngModel)]="city" />
+          </mk-form-field>
+          <mk-form-field label="Postal code">
+            <input mkInput mkField="postal-code" placeholder="00-001" [(ngModel)]="postalCode" />
+          </mk-form-field>
+        </div>
+      </docs-example>
+
+      <p>
+        Every kind and what it applies — the same table is exported as
+        <code class="docs-inline">MK_FIELD_PRESETS</code> so you can inspect it or
+        spread entries into your own presets. Blank = not set.
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>mkField</th><th>type</th><th>inputmode</th><th>autocomplete</th>
+            <th>autocapitalize</th><th>spellcheck</th><th>enterkeyhint</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of fieldKinds; track row.kind) {
+            <tr>
+              <td>{{ row.kind }}</td>
+              <td>{{ row.preset.type ?? '—' }}</td>
+              <td>{{ row.preset.inputmode ?? '—' }}</td>
+              <td>{{ row.preset.autocomplete ?? '—' }}</td>
+              <td>{{ row.preset.autocapitalize ?? '—' }}</td>
+              <td>{{ row.preset.spellcheck ?? '—' }}</td>
+              <td>{{ row.preset.enterkeyhint ?? '—' }}</td>
+            </tr>
+          }
+        </tbody>
+      </table>
+      <p>
+        <code class="docs-inline">autocorrect="off"</code> (non-standard, honoured
+        by iOS Safari) is applied wherever
+        <code class="docs-inline">spellcheck</code> is <code class="docs-inline">false</code>.
+      </p>
     </div>
   `,
   styles: [
@@ -232,6 +377,12 @@ import { DocsExample } from '../../shared/docs-example';
         margin: 0;
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
+      }
+      .field-demo {
+        display: grid;
+        gap: var(--mk-space-4);
+        grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
+        width: 100%;
       }
     `,
   ],
@@ -254,6 +405,29 @@ export class TextInputsPage {
   // --- Number / OTP -----------------------------------------------------------
   protected readonly qty = signal<number | null>(1);
   protected readonly otp = signal('');
+
+  // --- I18n input -------------------------------------------------------------
+  protected readonly locales: MkI18nLocale[] = [
+    { code: 'en', label: 'EN', name: 'English' },
+    { code: 'pl', label: 'PL', name: 'Polish' },
+    { code: 'de', label: 'DE', name: 'German' },
+  ];
+  protected readonly requiredLocales = ['en', 'pl'];
+  protected readonly translations = signal<MkI18nValue>({ en: 'Notebook' });
+  protected readonly translationsJson = computed(() =>
+    JSON.stringify(this.translations()),
+  );
+
+  // --- mkField ----------------------------------------------------------------
+  protected readonly email = signal('');
+  protected readonly fullName = signal('');
+  protected readonly street = signal('');
+  protected readonly city = signal('');
+  protected readonly postalCode = signal('');
+  /** The exported preset table, flattened for the docs table. */
+  protected readonly fieldKinds = (
+    Object.keys(MK_FIELD_PRESETS) as MkFieldKind[]
+  ).map((kind) => ({ kind, preset: MK_FIELD_PRESETS[kind] }));
 
   // --- Code snippets (plain strings shown in the code blocks) -----------------
   protected readonly inputCode = `<input mkInput placeholder="Small" size="sm" [(ngModel)]="name" />
@@ -291,4 +465,32 @@ export class TextInputsPage {
 
   protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
   protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
+
+  protected readonly i18nCode = `locales = [
+  { code: 'en', label: 'EN', name: 'English' },
+  { code: 'pl', label: 'PL', name: 'Polish' },
+  { code: 'de', label: 'DE', name: 'German' },
+];
+
+<mk-form-field label="Product name">
+  <mk-i18n-input
+    formControlName="name"
+    [locales]="locales"
+    [requiredLocales]="['en', 'pl']"
+    placeholder="Name in the selected language…" />
+</mk-form-field>`;
+
+  protected readonly fieldCode = `<mk-form-field label="Email">
+  <input mkInput mkField="email" formControlName="email" />
+</mk-form-field>
+
+<mk-form-field label="Street">
+  <input mkInput mkField="street" formControlName="street" />
+</mk-form-field>
+
+<!-- the kind can be bound -->
+<input mkInput [mkField]="isCompany() ? 'organization' : 'name'" />
+
+<!-- a static attribute wins over the preset -->
+<input mkInput mkField="username" type="password" />`;
 }

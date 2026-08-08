@@ -12,7 +12,13 @@
  * - jsdom has no layout engine, so layout-dependent axe rules are disabled
  *   below (each disable is documented at the definition of AXE_RUN_OPTIONS).
  */
-import { Component, provideZonelessChangeDetection, type Type } from '@angular/core';
+import {
+  type AfterViewInit,
+  Component,
+  provideZonelessChangeDetection,
+  type Type,
+  viewChild,
+} from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import axe from 'axe-core';
 
@@ -30,6 +36,11 @@ import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
 import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
+import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
+import {
+  MkOnScreenKeyboard,
+  MkOnScreenKeyboardTrigger,
+} from '@mkornas/ui/forms/on-screen-keyboard';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
 import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
@@ -178,6 +189,29 @@ class CurrencyInputHost {}
   `,
 })
 class CardNumberInputHost {}
+
+@Component({
+  imports: [MkNumericKeypad],
+  template: `<mk-numeric-keypad mode="pin" [length]="4" />`,
+})
+class NumericKeypadHost {}
+
+@Component({
+  imports: [MkOnScreenKeyboard, MkOnScreenKeyboardTrigger],
+  template: `
+    <label for="osk-input">Name</label>
+    <input id="osk-input" [mkOnScreenKeyboardFor]="kbd" />
+    <mk-on-screen-keyboard #kbd />
+  `,
+})
+class OnScreenKeyboardHost implements AfterViewInit {
+  readonly kbd = viewChild.required(MkOnScreenKeyboard);
+  ngAfterViewInit(): void {
+    // Open the panel so axe audits the key surface, not an empty host.
+    const el = document.getElementById('osk-input') as HTMLInputElement;
+    this.kbd().open(el, el);
+  }
+}
 
 @Component({
   imports: [MkFormField, MkIbanInput],
@@ -444,6 +478,8 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'postal code input', host: PostalCodeInputHost },
   { name: 'currency input', host: CurrencyInputHost },
   { name: 'card number input', host: CardNumberInputHost },
+  { name: 'numeric keypad', host: NumericKeypadHost },
+  { name: 'on-screen keyboard (open)', host: OnScreenKeyboardHost },
   { name: 'iban input', host: IbanInputHost },
   { name: 'tax id input', host: TaxIdInputHost },
   { name: 'submit input', host: SubmitInputHost },
@@ -473,6 +509,11 @@ describe('a11y smoke (axe-core)', () => {
       providers: [provideZonelessChangeDetection()],
     });
   });
+  // Destroy fixtures between cases. The runner shares one jsdom realm across
+  // spec files (isolate: false), so a host that opens an overlay (e.g. the
+  // on-screen keyboard's anchored panel) would otherwise leak its window
+  // scroll/resize listeners into later spec files.
+  afterEach(() => TestBed.resetTestingModule());
 
   for (const { name, host, disabledRules } of CASES) {
     it(`${name} renders with zero axe violations`, async () => {

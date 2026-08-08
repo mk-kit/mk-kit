@@ -400,6 +400,18 @@ export interface MkI18nStrings {
   /** OTP field labels. */
   oneTimeCode: string;
   otpDigit: (position: number) => string;
+  /** Numeric keypad labels + masked-PIN progress announcement. */
+  numericKeypadLabel: string;
+  keypadClear: string;
+  keypadBackspace: string;
+  keypadDigitsEntered: (count: number, length: number) => string;
+  /** On-screen keyboard label + action-key labels. */
+  onScreenKeyboardLabel: string;
+  keyboardShift: string;
+  keyboardSpace: string;
+  keyboardEnter: string;
+  keyboardAltLayer: string;
+  keyboardBaseLayer: string;
   /** Rating slider label + value text. */
   ratingLabel: string;
   ratingValueText: (value: number, max: number) => string;
@@ -701,6 +713,16 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   ruleNotMet: 'Not met:',
   oneTimeCode: 'One-time code',
   otpDigit: (position) => `Digit ${position}`,
+  numericKeypadLabel: 'Numeric keypad',
+  keypadClear: 'Clear',
+  keypadBackspace: 'Backspace',
+  keypadDigitsEntered: (count, length) => `${count} of ${length} digits entered`,
+  onScreenKeyboardLabel: 'On-screen keyboard',
+  keyboardShift: 'Shift',
+  keyboardSpace: 'Space',
+  keyboardEnter: 'Enter',
+  keyboardAltLayer: 'More characters',
+  keyboardBaseLayer: 'Letters',
   ratingLabel: 'Rating',
   ratingValueText: (value, max) => `${value} of ${max} stars`,
   minimum: 'Minimum',

@@ -1,0 +1,64 @@
+@if (opened()) {
+  <div
+    #panel
+    class="mk-on-screen-keyboard__panel"
+    role="group"
+    [id]="panelId"
+    [attr.aria-label]="i18n.onScreenKeyboardLabel"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="anchorEl()"
+    [placement]="placement()"
+    [gap]="8"
+    [clamp]="true"
+    (dismiss)="close()"
+    (pointerdown)="onPanelPointerdown($event)"
+  >
+    @for (row of rows(); track $index) {
+      <div class="mk-on-screen-keyboard__row">
+        @for (key of row; track $index) {
+          <button
+            type="button"
+            tabindex="-1"
+            class="mk-on-screen-keyboard__key"
+            [class.mk-on-screen-keyboard__key--action]="key.action !== undefined"
+            [class.mk-on-screen-keyboard__key--active]="
+              (key.action === 'shift' && shift()) ||
+              (key.action === 'layer' && layer() === 'alt')
+            "
+            [style.--_span]="key.span"
+            [attr.aria-label]="key.action !== undefined ? keyLabel(key) : null"
+            [attr.aria-pressed]="
+              key.action === 'shift'
+                ? shift()
+                : key.action === 'layer'
+                  ? layer() === 'alt'
+                  : null
+            "
+            (click)="onKeyClick(key)"
+          >
+            @switch (key.action) {
+              @case ('shift') {
+                <mk-icon name="arrow-up" />
+              }
+              @case ('backspace') {
+                <mk-icon name="backspace" />
+              }
+              @case ('enter') {
+                <mk-icon name="corner-down-left" />
+              }
+              @case ('space') {
+                <span class="mk-on-screen-keyboard__space-bar"></span>
+              }
+              @case ('layer') {
+                {{ layerFace() }}
+              }
+              @default {
+                {{ key.char }}
+              }
+            }
+          </button>
+        }
+      </div>
+    }
+  </div>
+}

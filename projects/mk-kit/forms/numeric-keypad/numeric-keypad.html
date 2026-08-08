@@ -1,0 +1,49 @@
+@if (showValue()) {
+  <div class="mk-numeric-keypad__echo">
+    @if (isPinMasked()) {
+      <span class="mk-numeric-keypad__dots" aria-hidden="true">
+        @for (filled of pinDots(); track $index) {
+          <span
+            class="mk-numeric-keypad__dot"
+            [class.mk-numeric-keypad__dot--filled]="filled"
+          ></span>
+        }
+      </span>
+    } @else {
+      <span class="mk-numeric-keypad__readout">{{ echoText() }}</span>
+    }
+  </div>
+}
+
+<div
+  class="mk-numeric-keypad__grid"
+  (keydown)="onGridKeydown($event)"
+  (focusout)="onBlur()"
+>
+  @for (key of keys(); track key.id; let i = $index) {
+    <button
+      #key
+      type="button"
+      class="mk-numeric-keypad__key"
+      [class.mk-numeric-keypad__key--action]="key.action !== 'digit'"
+      [id]="padId + '-' + key.id"
+      [tabindex]="focusIndex() === i ? 0 : -1"
+      [disabled]="isDisabled()"
+      [attr.aria-label]="keyAriaLabel(key)"
+      (focus)="onKeyFocus(i)"
+      (click)="onKeyClick(key)"
+    >
+      @switch (key.action) {
+        @case ('backspace') {
+          <mk-icon name="backspace" />
+        }
+        @case ('clear') {
+          <span class="mk-numeric-keypad__key-text">C</span>
+        }
+        @default {
+          {{ key.label }}
+        }
+      }
+    </button>
+  }
+</div>
