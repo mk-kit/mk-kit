@@ -2,6 +2,7 @@ import {
   ApplicationRef,
   ComponentRef,
   DOCUMENT,
+  DestroyRef,
   EnvironmentInjector,
   Injectable,
   Injector,
@@ -74,6 +75,13 @@ export class MkTourService {
   private endPromise = Promise.resolve();
   /** Element focused before start(); focus is restored to it on end(). */
   private previouslyFocused: HTMLElement | null = null;
+
+  constructor() {
+    // If a tour is still active when the app (root injector) is torn down,
+    // end it — otherwise the capture-phase document keydown listener, scrim
+    // and popup DOM would outlive the application.
+    inject(DestroyRef).onDestroy(() => this.end());
+  }
 
   /**
    * Begin a tour at step 0. Returns a promise that resolves when the tour ends
@@ -190,7 +198,9 @@ export class MkTourService {
   /** Destroy the current popup and restore the current target's styles. */
   private teardownStep(): void {
     if (this.popupRef) {
-      this.appRef.detachView(this.popupRef.hostView);
+      // At app teardown the ApplicationRef destroys (and detaches) its views
+      // before injector destroy hooks run — don't touch it then.
+      if (!this.appRef.destroyed) this.appRef.detachView(this.popupRef.hostView);
       this.popupRef.destroy();
       this.popupRef.location.nativeElement.remove();
       this.popupRef = undefined;

@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   ElementRef,
+  OnDestroy,
   booleanAttribute,
   computed,
   effect,
@@ -12,16 +13,16 @@ import {
   numberAttribute,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MkFormField } from '../form-field/form-field';
-import { mkHighlight } from './code-highlight';
+import { mkHighlight, type MkCodeLanguage } from '@mkornas/ui/core';
 
-/** Languages with built-in highlighting. Unknown values render plain text. */
-export type MkCodeLanguage = 'json' | 'plaintext';
+export type { MkCodeLanguage } from '@mkornas/ui/core';
 
 /** The validity of the editor's current content. */
 export interface MkCodeValidity {
@@ -29,6 +30,13 @@ export interface MkCodeValidity {
   /** Parser error message, or `null` when valid / not validated. */
   error: string | null;
 }
+
+/**
+ * How long (ms) after the last keystroke the expensive derivations (highlight
+ * re-render, JSON validation) wait before recomputing. The textarea text itself
+ * is always live — only the overlay/validation lag, invisibly, while typing.
+ */
+const MK_CODE_EDITOR_DEBOUNCE_MS = 180;
 
 /**
  * CodeEditor — a lightweight, dependency-free code field with syntax
@@ -73,7 +81,7 @@ export interface MkCodeValidity {
     },
   ],
 })
-export class MkCodeEditor implements ControlValueAccessor {
+export class MkCodeEditor implements ControlValueAccessor, OnDestroy {
   private readonly field = inject(MkFormField, { optional: true });
   private readonly textareaRef =
     viewChild<ElementRef<HTMLTextAreaElement>>('textarea');
@@ -110,6 +118,14 @@ export class MkCodeEditor implements ControlValueAccessor {
   readonly validate = output<MkCodeValidity>();
 
   private readonly cvaDisabled = signal(false);
+  /**
+   * Debounced mirror of `value` that the expensive derivations (highlight,
+   * JSON validation) read. Typing schedules a trailing update; programmatic
+   * writes (`writeValue`, `format()`, `[(value)]` at rest) flush synchronously
+   * so the overlay never lags when the user is not typing.
+   */
+  private readonly debouncedValue = signal('');
+  private debounceTimer: ReturnType<typeof setTimeout> | null = null;
   /** Set true by Escape so the next Tab moves focus instead of indenting. */
   private escapeArmed = false;
   private onChange: (value: string) => void = () => {};
@@ -133,7 +149,7 @@ export class MkCodeEditor implements ControlValueAccessor {
   /** Parse error for JSON content, or `null` when valid / empty / plaintext. */
   protected readonly jsonError = computed<string | null>(() => {
     if (this.language() !== 'json') return null;
-    const text = this.value().trim();
+    const text = this.debouncedValue().trim();
     if (!text) return null;
     try {
       JSON.parse(text);
@@ -157,18 +173,48 @@ export class MkCodeEditor implements ControlValueAccessor {
     return ids.length ? ids.join(' ') : null;
   });
 
-  /** Highlighted HTML for the layer behind the textarea. */
+  /**
+   * Highlighted HTML for the layer behind the textarea. Reads the debounced
+   * value: while typing the (transparent-text) textarea sits above the overlay,
+   * so a briefly stale highlight is invisible; at rest both are identical.
+   */
   protected readonly highlightedHtml = computed(() =>
-    mkHighlight(this.value(), this.language()),
+    mkHighlight(this.debouncedValue(), this.language()),
   );
 
-  /** Line numbers to render in the gutter. */
+  /** Cache so `lines()` returns the same array while the count is unchanged. */
+  private cachedLines: number[] = [1];
+
+  /**
+   * Line numbers to render in the gutter. Counts newlines in the LIVE value
+   * (cheap single scan, no `split()` allocation) so the gutter never lags the
+   * textarea, and returns a cached array while the count is unchanged so the
+   * `@for` never re-diffs on same-line edits.
+   */
   protected readonly lines = computed(() => {
-    const count = this.value() ? this.value().split('\n').length : 1;
-    return Array.from({ length: count }, (_, i) => i + 1);
+    const text = this.value();
+    let count = 1;
+    for (let i = text.indexOf('\n'); i !== -1; i = text.indexOf('\n', i + 1)) {
+      count++;
+    }
+    if (count !== this.cachedLines.length) {
+      this.cachedLines = Array.from({ length: count }, (_, i) => i + 1);
+    }
+    return this.cachedLines;
   });
 
   constructor() {
+    // Keep the debounced mirror in sync for value changes that do not come
+    // from typing (e.g. the `[(value)]` binding written by the parent). Typing
+    // schedules its own trailing timer in `onInput`, so while one is pending
+    // the timer callback is left to settle on the latest value.
+    effect(() => {
+      const text = this.value();
+      if (this.debounceTimer === null) {
+        untracked(() => this.debouncedValue.set(text));
+      }
+    });
+
     // Surface validity changes for JSON.
     effect(() => {
       const error = this.jsonError();
@@ -178,10 +224,36 @@ export class MkCodeEditor implements ControlValueAccessor {
     });
   }
 
+  ngOnDestroy(): void {
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+  }
+
+  /** Trailing-edge debounce for the expensive derivations while typing. */
+  private scheduleDerivations(): void {
+    if (this.debounceTimer !== null) clearTimeout(this.debounceTimer);
+    this.debounceTimer = setTimeout(() => {
+      this.debounceTimer = null;
+      this.debouncedValue.set(this.value());
+    }, MK_CODE_EDITOR_DEBOUNCE_MS);
+  }
+
+  /** Cancels any pending debounce and syncs the derivations immediately. */
+  private flushDerivations(): void {
+    if (this.debounceTimer !== null) {
+      clearTimeout(this.debounceTimer);
+      this.debounceTimer = null;
+    }
+    this.debouncedValue.set(this.value());
+  }
+
   protected onInput(event: Event): void {
     const text = (event.target as HTMLTextAreaElement).value;
     this.value.set(text);
     this.onChange(text);
+    this.scheduleDerivations();
   }
 
   protected onBlur(): void {
@@ -237,6 +309,7 @@ export class MkCodeEditor implements ControlValueAccessor {
       ta.selectionStart = ta.selectionEnd = start + text.length;
       this.value.set(next);
       this.onChange(next);
+      this.scheduleDerivations();
     }
   }
 
@@ -264,6 +337,7 @@ export class MkCodeEditor implements ControlValueAccessor {
       if (formatted !== this.value()) {
         this.value.set(formatted);
         this.onChange(formatted);
+        this.flushDerivations();
       }
     } catch {
       // Leave invalid JSON untouched.
@@ -273,6 +347,8 @@ export class MkCodeEditor implements ControlValueAccessor {
   // --- ControlValueAccessor -------------------------------------------------
   writeValue(value: string | null): void {
     this.value.set(value ?? '');
+    // Programmatic writes must never show a stale overlay / validation.
+    this.flushDerivations();
   }
   registerOnChange(fn: (value: string) => void): void {
     this.onChange = fn;

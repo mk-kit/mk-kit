@@ -4,6 +4,74 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.30.0] — 2026-08-08
+
+The performance wave: the 2026-08 audit's hot paths. The theme is the same
+everywhere — stop doing whole-structure work per event, and stop timers that
+have nothing left to do (in a zoneless app every stray tick is a change
+detection pass).
+
+### Changed — hot paths
+
+- **Signature pad** draws only the new segment per frame (rAF-batched, with
+  `getCoalescedEvents`), with the canvas rect / devicePixelRatio / stroke
+  color cached per gesture — it used to redraw *every stroke ever drawn* on
+  each pointermove and force a style recalc doing it. The final stroke is
+  pixel-identical (same midpoint-quadratic geometry, full redraw on release).
+- **Code editor**: syntax highlighting and JSON validation now trail typing
+  by ~180 ms (the textarea itself stays perfectly live; programmatic writes
+  and `format()` flush synchronously). The line-number gutter counts
+  newlines without allocating a split array, and keeps array identity while
+  the count is unchanged.
+- **Block editor** serializes the document to HTML only when something
+  consumes it (`valueFormat="html"` or an `htmlChange` listener) instead of
+  on every keystroke; block-definition lookup is Map-backed; the inserter
+  lost its O(n²) option indexing; N inserters now share ONE document
+  pointerdown listener; six input-mirror effects became pull-based signal
+  wiring.
+- **Drag & drop** measures each list and item once at lift (re-measuring
+  only lists the placeholder actually changed, or after a mid-drag scroll —
+  which the old code didn't handle at all), skips placeholder DOM work when
+  the index is unchanged, and coalesces moves to one computation per frame,
+  flushed synchronously on drop.
+- **Sliders** capture the pointer for the drag instead of holding
+  document-wide pointermove listeners for their whole life, and cache track
+  geometry/direction per drag — zero layout reads per move.
+- **Tree** rows `track` their node (expanding inserts rows instead of
+  rewriting every row below) and expansion state survives consumer array
+  rebuilds. **JSON viewer** toggles in O(1) with cached previews.
+  **Kanban** keeps its drop-list connection arrays referentially stable.
+  **Table** sorting uses a cached `Intl.Collator` (identical ordering,
+  several-fold faster on large data).
+- **Timers rest**: countdown stops ticking at zero (and while the tab is
+  hidden) and re-arms on a new target; the loading bar's trickle stops at
+  its 90% ceiling instead of spinning forever after a failed navigation;
+  carousel autoplay pauses while the tab is hidden or the carousel is
+  offscreen. Leaks fixed: tour's document listener at app teardown,
+  click-outside's listener while disabled, autofocus/phone-input timeouts.
+- **Paint**: progress bar and loading bar animate `transform: scaleX`
+  instead of `width` (RTL-aware origins); skeleton and image shimmers are
+  compositor-only translated gradients instead of per-frame
+  `background-position` repaints; the scroll-area coalesces its measurements
+  to one batch per frame. The event calendar's week view builds per-day
+  buckets in one pass (was 14 filter+sort passes per change detection) and
+  all date labels are precomputed (~98 `formatDate` calls per CD → 0 at
+  rest).
+
+### Changed — packaging
+
+- **New `@mkornas/ui/checkbox` entry point.** `mk-table` imported
+  `MkCheckbox` from the 714 KiB forms entry, dragging the whole forms module
+  graph into table-only consumers. Checkbox is now its own entry depending
+  only on core, via a new **`MkFieldContext`** DI token in core (the
+  abstract field-wrapper contract; `MkFormField` provides it) — also adopted
+  by `mk-inline-edit`, cutting the data→forms edge. `@mkornas/ui/forms`
+  re-exports `MkCheckbox`, so existing imports keep working.
+- **`mkHighlight` moved to `@mkornas/ui/core`** (with `MkCodeLanguage`);
+  `mk-code` no longer pulls the forms entry for a pure function. The forms
+  entry re-exports it for compat.
+- Docs site preloads lazy routes (`withPreloading(PreloadAllModules)`).
+
 ## [0.29.0] — 2026-08-08
 
 The mobile wave: the 2026-08 audit's phone-readiness gaps, fixed as a set.

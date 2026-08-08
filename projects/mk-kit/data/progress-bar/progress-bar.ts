@@ -59,4 +59,12 @@ export class MkProgressBar {
   protected readonly clamped = computed(() =>
     Math.round(Math.min(100, Math.max(0, this.value()))),
   );
+
+  /**
+   * Inline transform for the determinate fill. Scaling instead of animating
+   * `width` keeps the transition compositor-only (no layout per frame).
+   */
+  protected readonly fillTransform = computed(
+    () => `scaleX(${this.clamped() / 100})`,
+  );
 }

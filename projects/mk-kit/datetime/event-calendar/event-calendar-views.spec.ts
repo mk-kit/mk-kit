@@ -49,6 +49,76 @@ describe('MkEventCalendar week/day views', () => {
     ).toHaveLength(7);
   });
 
+  it('week view buckets each event into its own day column', () => {
+    const f = TestBed.createComponent(MkEventCalendar);
+    f.componentRef.setInput('view', 'week');
+    // Thu Jul 23 2026 → default (Sunday-first) week is Sun 19 … Sat 25.
+    f.componentRef.setInput('viewDate', new Date(2026, 6, 23));
+    f.componentRef.setInput('events', [
+      // Two timed events on Monday, deliberately out of start order.
+      {
+        date: new Date(2026, 6, 20),
+        title: 'Review',
+        start: new Date(2026, 6, 20, 14, 0),
+        end: new Date(2026, 6, 20, 15, 0),
+      },
+      {
+        date: new Date(2026, 6, 20),
+        title: 'Standup',
+        start: new Date(2026, 6, 20, 9, 0),
+        end: new Date(2026, 6, 20, 9, 30),
+      },
+      {
+        date: new Date(2026, 6, 23),
+        title: 'Rezerwacja',
+        start: new Date(2026, 6, 23, 18, 0),
+        end: new Date(2026, 6, 23, 19, 30),
+      },
+      // Untimed → Friday's all-day strip, never the timed grid.
+      { date: new Date(2026, 6, 24), title: 'Święto' },
+      // Following Tuesday — outside the viewed week entirely.
+      {
+        date: new Date(2026, 6, 28),
+        title: 'Outside',
+        start: new Date(2026, 6, 28, 10, 0),
+      },
+    ]);
+    f.detectChanges();
+
+    const cols = (f.componentInstance as any).timedColumns();
+    expect(cols).toHaveLength(7);
+    // Same per-day contents (and start-sorted order) as the old per-column
+    // filter+sort produced: Mon gets both meetings, Thu the reservation.
+    expect(
+      cols.map((c: any) => c.placements.map((p: any) => p.event.title)),
+    ).toEqual([[], ['Standup', 'Review'], [], [], ['Rezerwacja'], [], []]);
+    expect(cols.map((c: any) => c.allDay.map((e: any) => e.title))).toEqual([
+      [],
+      [],
+      [],
+      [],
+      [],
+      ['Święto'],
+      [],
+    ]);
+
+    // Precomputed column heads match what the head row renders.
+    const headTexts = Array.from(
+      f.nativeElement.querySelectorAll('.mk-event-calendar__col-head'),
+      (el: any) => el.textContent.trim(),
+    );
+    expect(headTexts).toEqual([
+      'Sun 19',
+      'Mon 20',
+      'Tue 21',
+      'Wed 22',
+      'Thu 23',
+      'Fri 24',
+      'Sat 25',
+    ]);
+    expect(cols.map((c: any) => c.head)).toEqual(headTexts);
+  });
+
   it('clicking an empty slot emits its start instant', () => {
     const f = make('day');
     const emitted: Date[] = [];

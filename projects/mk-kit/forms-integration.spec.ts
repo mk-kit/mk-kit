@@ -33,7 +33,8 @@ import { MkMultiSelect } from '@mkornas/ui/forms/multi-select';
 import { MkTagInput } from '@mkornas/ui/forms/tag-input';
 import { MkPasswordInput } from '@mkornas/ui/forms/password-input';
 import { MkOtp } from '@mkornas/ui/forms/otp';
-import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
+import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
+import { MkCheckbox } from '@mkornas/ui/checkbox';
 import { MkRadioGroup } from '@mkornas/ui/forms/radio';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
@@ -171,6 +172,14 @@ const VALIDATOR_CASES: readonly ValidatorCase[] = [
     bad: '123',
     key: 'minlength',
     good: '123456',
+  },
+  {
+    name: 'mk-numeric-keypad [min]',
+    type: MkNumericKeypad,
+    template: '<mk-numeric-keypad [min]="1" [formControl]="ctrl" />',
+    bad: 0,
+    key: 'min',
+    good: 2,
   },
   {
     name: 'mk-checkbox required',

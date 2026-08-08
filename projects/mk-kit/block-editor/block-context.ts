@@ -1,4 +1,4 @@
-import { ElementRef, Injectable, inject, signal } from '@angular/core';
+import { ElementRef, Injectable, type Signal, computed, inject, signal } from '@angular/core';
 import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
 import type { MkBlockDefinition, MkBlockUploadHandler, MkEmbedProvider } from './block-registry';
 
@@ -7,32 +7,49 @@ import type { MkBlockDefinition, MkBlockUploadHandler, MkEmbedProvider } from '.
  * block-editor component. Provided by {@link MkBlockEditor}, so deeply nested
  * blocks (e.g. inside columns) read config and coordinate focus without every
  * level re-declaring inputs.
+ *
+ * The config fields are plain `Signal` references that {@link MkBlockEditor}
+ * connects to its input-derived signals in its constructor — i.e. BEFORE any
+ * child component can inject this context — so consumers always track the live
+ * source with no mirroring effects. The initial values here only serve
+ * contexts created without an editor (e.g. component tests).
  */
 @Injectable()
 export class MkBlockEditorContext {
   private readonly i18n = inject(MK_I18N);
 
   /** Active block palette (defaults merged with app/editor definitions). */
-  readonly definitions = signal<MkBlockDefinition[]>([]);
+  definitions: Signal<MkBlockDefinition[]> = signal<MkBlockDefinition[]>([]);
   /** Read-only mode: content visible, editing chrome hidden. */
-  readonly readonly = signal(false);
+  readonly: Signal<boolean> = signal(false);
   /** Disabled mode (form-level). */
-  readonly disabled = signal(false);
+  disabled: Signal<boolean> = signal(false);
   /** Placeholder for empty text blocks. */
-  readonly placeholder = signal(this.i18n.blockEditor.emptyBlockPlaceholder);
+  placeholder: Signal<string> = signal(this.i18n.blockEditor.emptyBlockPlaceholder);
   /** Effective upload handler (input beats token beats data-URL fallback). */
-  readonly uploadHandler = signal<MkBlockUploadHandler | null>(null);
+  uploadHandler: Signal<MkBlockUploadHandler | null> = signal<MkBlockUploadHandler | null>(null);
   /** Effective embed providers (defaults + token + input). */
-  readonly embedProviders = signal<MkEmbedProvider[]>([]);
+  embedProviders: Signal<MkEmbedProvider[]> = signal<MkEmbedProvider[]>([]);
 
   /** Root editor host, used to locate editables for focus coordination. */
   hostRef: ElementRef<HTMLElement> | null = null;
+
+  /**
+   * `type → definition` lookup, rebuilt only when the registry array changes.
+   * `definitionFor` is called several times per block per change-detection
+   * pass, so an `array.find` scan here was O(blocks × definitions) per CD.
+   */
+  private readonly definitionMap = computed(() => {
+    const map = new Map<string, MkBlockDefinition>();
+    for (const def of this.definitions()) map.set(def.type, def);
+    return map;
+  });
 
   constructor(private readonly announcer: MkLiveAnnouncer) {}
 
   /** Returns the definition for a block type, if registered. */
   definitionFor(type: string): MkBlockDefinition | undefined {
-    return this.definitions().find((d) => d.type === type);
+    return this.definitionMap().get(type);
   }
 
   /** Human label for a block type (falls back to the raw type). */

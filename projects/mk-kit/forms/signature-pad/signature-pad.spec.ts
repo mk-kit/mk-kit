@@ -18,7 +18,10 @@ describe('MkSignaturePad', () => {
     fixture.detectChanges();
   });
 
-  afterEach(() => fixture.destroy());
+  afterEach(() => {
+    vi.restoreAllMocks();
+    fixture.destroy();
+  });
 
   it('starts empty with a null value', () => {
     expect(cmp.isEmpty()).toBe(true);
@@ -60,6 +63,55 @@ describe('MkSignaturePad', () => {
     cmp.writeValue(null);
     expect(cmp.isEmpty()).toBe(true);
     expect(changes).toEqual([]);
+  });
+
+  it('does not run the full redraw or re-read styles/layout per pointermove', async () => {
+    await fixture.whenStable();
+    const canvas = fixture.nativeElement.querySelector('canvas');
+    canvas.setPointerCapture ??= () => {};
+    const redraw = vi.spyOn(cmp as any, 'redraw');
+    const styleReads = vi.spyOn(window, 'getComputedStyle');
+    const rectReads = vi.spyOn(canvas, 'getBoundingClientRect');
+
+    (cmp as any).onPointerDown(fakePointer(10, 10));
+    (cmp as any).onPointerMove(fakePointer(20, 20));
+    (cmp as any).onPointerMove(fakePointer(30, 26));
+    (cmp as any).onPointerMove(fakePointer(40, 30));
+
+    // The per-gesture cache is filled once at pointerdown; moves draw
+    // incrementally without the full redraw or any layout/style reads.
+    expect(redraw).not.toHaveBeenCalled();
+    expect(styleReads).toHaveBeenCalledTimes(1);
+    expect(rectReads).toHaveBeenCalledTimes(1);
+
+    (cmp as any).onPointerUp();
+    expect(redraw).toHaveBeenCalledTimes(1); // final full redraw
+    expect((cmp as any).strokes.length).toBe(1);
+    expect((cmp as any).strokes[0].length).toBe(4);
+    expect(cmp.isEmpty()).toBe(false);
+
+    // The gesture is over — a stray move must not extend the stroke.
+    (cmp as any).onPointerMove(fakePointer(50, 50));
+    expect((cmp as any).strokes[0].length).toBe(4);
+    expect((cmp as any).strokes.length).toBe(1);
+  });
+
+  it('keeps full input fidelity via coalesced events', () => {
+    const canvas = fixture.nativeElement.querySelector('canvas');
+    canvas.setPointerCapture ??= () => {};
+    (cmp as any).onPointerDown(fakePointer(0, 0));
+    const move = {
+      clientX: 20,
+      clientY: 20,
+      getCoalescedEvents: () => [
+        { clientX: 10, clientY: 10 },
+        { clientX: 20, clientY: 20 },
+      ],
+    } as unknown as PointerEvent;
+    (cmp as any).onPointerMove(move);
+    expect((cmp as any).current.length).toBe(3);
+    (cmp as any).onPointerUp();
+    expect((cmp as any).strokes[0].length).toBe(3);
   });
 
   it('ignores drawing while disabled', () => {

@@ -3,7 +3,7 @@
   role="tree"
   [attr.aria-label]="ariaLabel() || null"
 >
-  @for (row of rows(); track $index; let i = $index) {
+  @for (row of rows(); track row.node; let i = $index) {
     <div
       #row
       class="mk-tree__item"

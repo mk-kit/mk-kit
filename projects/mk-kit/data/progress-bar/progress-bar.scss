@@ -44,11 +44,22 @@
   overflow: hidden;
 }
 
+/*
+ * The fill is a full-width layer scaled down to the current value with
+ * `scaleX` — compositor-only, unlike a `width` transition which relayouts per
+ * animation frame. The rounded track clips it (`overflow: hidden`), so the
+ * fill carries no radius of its own: a radius would stretch under `scaleX`.
+ */
 .mk-progress-bar__fill {
+  width: 100%;
   height: 100%;
   background-color: var(--_fill);
-  border-radius: inherit;
-  transition: width var(--mk-duration-normal) var(--mk-ease-out);
+  transform-origin: left center;
+  transition: transform var(--mk-duration-normal) var(--mk-ease-out);
+}
+/* RTL fills from the right, so the fill must scale from the right edge. */
+.mk-progress-bar__fill:dir(rtl) {
+  transform-origin: right center;
 }
 
 /* Indeterminate */

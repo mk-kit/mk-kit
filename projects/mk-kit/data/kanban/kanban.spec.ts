@@ -87,6 +87,28 @@ describe('MkKanban', () => {
     expect(original[0].cards.map((c) => c.id)).toEqual(['a1', 'a2']);
   });
 
+  it('keeps connectedTo identity stable across change detection and drops', () => {
+    kanban.columns.set(board());
+    fixture.detectChanges();
+
+    const ids = (kanban as any).listIds() as string[];
+    const first = (kanban as any).connectedTo(0) as string[];
+    expect(first).toEqual([ids[1]]);
+
+    // Same reference on a subsequent CD pass — a fresh array here would dirty
+    // MkDropList's `connectedTo` input identity every cycle.
+    fixture.detectChanges();
+    expect((kanban as any).connectedTo(0)).toBe(first);
+    expect((kanban as any).connectedTo(1)).toBe((kanban as any).connectedTo(1));
+
+    // A card move replaces the columns model but not the column count, so the
+    // connection arrays (and list ids) must keep their identity too.
+    (kanban as any).onDrop(dropEvent(ids[0], ids[1], 0, 0));
+    fixture.detectChanges();
+    expect((kanban as any).connectedTo(0)).toBe(first);
+    expect((kanban as any).listIds()).toBe(ids);
+  });
+
   it('ignores drops whose containers are not part of this board', () => {
     kanban.columns.set(board());
     const moved = vi.fn();

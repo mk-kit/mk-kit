@@ -1,7 +1,11 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
+  DestroyRef,
   ElementRef,
+  Injectable,
+  OnDestroy,
   booleanAttribute,
   computed,
   inject,
@@ -14,10 +18,49 @@ import { mkUniqueId } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlockDefinition } from './block-registry';
 
+/** A definition annotated with its index in the flat filtered list. */
+interface IndexedDef {
+  def: MkBlockDefinition;
+  /** Global index within `filtered()` — drives active-option highlighting. */
+  index: number;
+}
+
 /** A group of definitions for the inserter list. */
 interface DefGroup {
   name: string;
-  items: MkBlockDefinition[];
+  items: IndexedDef[];
+}
+
+/**
+ * Shares ONE capture-phase document `pointerdown` listener between every
+ * mounted {@link MkBlockInserter} (a block list renders an inserter per block,
+ * so per-instance listeners made document dispatch O(blocks)). The listener is
+ * attached lazily with the first registration and detached when the last
+ * callback unregisters. No-ops on the server (SSR).
+ */
+@Injectable({ providedIn: 'root' })
+export class MkDocumentPointerdownRegistry {
+  private readonly document = inject(DOCUMENT);
+  private readonly callbacks = new Set<(event: Event) => void>();
+  private readonly listener = (event: Event): void => {
+    // Copy so a callback closing (and unregistering) mid-dispatch is safe.
+    for (const callback of [...this.callbacks]) callback(event);
+  };
+
+  /** Registers a callback; returns an unregister function. */
+  register(callback: (event: Event) => void): () => void {
+    if (typeof window === 'undefined') return () => {};
+    if (this.callbacks.size === 0) {
+      this.document.addEventListener('pointerdown', this.listener, true);
+    }
+    this.callbacks.add(callback);
+    return () => {
+      if (!this.callbacks.delete(callback)) return;
+      if (this.callbacks.size === 0) {
+        this.document.removeEventListener('pointerdown', this.listener, true);
+      }
+    };
+  }
 }
 
 /**
@@ -36,13 +79,29 @@ interface DefGroup {
   host: {
     class: 'mk-block-inserter',
     '[class.mk-block-inserter--slim]': "variant() === 'slim'",
-    '(document:pointerdown)': 'onDocumentPointerdown($event)',
   },
 })
-export class MkBlockInserter {
+export class MkBlockInserter implements OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly searchRef = viewChild<ElementRef<HTMLInputElement>>('search');
   protected readonly i18n = inject(MK_I18N);
+  private focusTimer: ReturnType<typeof setTimeout> | null = null;
+
+  constructor() {
+    // One shared document listener for all inserters (instead of N host
+    // `(document:pointerdown)` bindings — one per rendered inserter).
+    const unregister = inject(MkDocumentPointerdownRegistry).register((event) =>
+      this.onDocumentPointerdown(event),
+    );
+    inject(DestroyRef).onDestroy(unregister);
+  }
+
+  ngOnDestroy(): void {
+    if (this.focusTimer !== null) {
+      clearTimeout(this.focusTimer);
+      this.focusTimer = null;
+    }
+  }
 
   /** The blocks to offer. */
   readonly definitions = input<MkBlockDefinition[]>([]);
@@ -78,23 +137,22 @@ export class MkBlockInserter {
     });
   });
 
-  /** Filtered list grouped by `group` for rendering. */
+  /**
+   * Filtered list grouped by `group` for rendering, with each option carrying
+   * its flat index (single pass — the template previously resolved each
+   * option's index with three `indexOf` scans, O(n²) per render).
+   */
   protected readonly groups = computed<DefGroup[]>(() => {
-    const map = new Map<string, MkBlockDefinition[]>();
-    for (const def of this.filtered()) {
+    const map = new Map<string, IndexedDef[]>();
+    this.filtered().forEach((def, index) => {
       const key = def.group ?? this.i18n.blockEditor.blocks;
-      (map.get(key) ?? map.set(key, []).get(key)!).push(def);
-    }
+      (map.get(key) ?? map.set(key, []).get(key)!).push({ def, index });
+    });
     return [...map.entries()].map(([name, items]) => ({ name, items }));
   });
 
   protected optionId(index: number): string {
     return `${this.listId}-opt-${index}`;
-  }
-
-  /** Global index of a definition within the flat filtered list. */
-  protected indexOf(def: MkBlockDefinition): number {
-    return this.filtered().indexOf(def);
   }
 
   protected toggle(): void {
@@ -106,7 +164,11 @@ export class MkBlockInserter {
     this.open.set(true);
     this.query.set('');
     this.activeIndex.set(0);
-    setTimeout(() => this.searchRef()?.nativeElement.focus());
+    if (this.focusTimer !== null) clearTimeout(this.focusTimer);
+    this.focusTimer = setTimeout(() => {
+      this.focusTimer = null;
+      this.searchRef()?.nativeElement.focus();
+    });
   }
 
   protected close(): void {

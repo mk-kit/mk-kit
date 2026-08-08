@@ -121,26 +121,72 @@ export class MkCountdown {
 
   private hasFinished = false;
   private intervalId?: number;
+  /** Set once the first render has happened (browser only). */
+  private viewReady = false;
 
   constructor() {
-    // Re-arm `finished` whenever the target moves into the future again
-    // (e.g. a "next round" pattern swapping `to` after completion).
+    // Re-arm whenever the target moves into the future again (e.g. a "next
+    // round" pattern swapping `to` after completion): reset `finished` and
+    // restart the stopped interval.
     effect(() => {
       const target = this.to();
-      if (target && target.getTime() > untracked(this.now)) this.hasFinished = false;
+      if (target && target.getTime() > untracked(this.now)) {
+        this.hasFinished = false;
+        if (this.viewReady && !this.document.hidden) {
+          untracked(() => {
+            this.tick();
+            this.startInterval();
+          });
+        }
+      }
     });
     afterNextRender(() => {
       if (!this.isBrowser) return;
+      this.viewReady = true;
+      this.document.addEventListener('visibilitychange', this.onVisibilityChange);
       this.tick();
-      this.intervalId = this.document.defaultView?.setInterval(() => this.tick(), 1000);
+      this.startInterval();
     });
+  }
+
+  /**
+   * No ticking while the tab is hidden — every tick is a change-detection
+   * pass in a zoneless app. On return, resync immediately from `Date.now()`
+   * so the display never shows stale time.
+   */
+  private readonly onVisibilityChange = (): void => {
+    if (this.document.hidden) {
+      this.stopInterval();
+    } else {
+      this.tick();
+      this.startInterval();
+    }
+  };
+
+  private startInterval(): void {
+    if (!this.isBrowser || this.intervalId != null) return;
+    // Nothing left to count (no target, or already at zero) — stay idle
+    // until the `to` input moves into the future again.
+    if (this.remaining() === 0) return;
+    this.intervalId = this.document.defaultView?.setInterval(() => this.tick(), 1000);
+  }
+
+  private stopInterval(): void {
+    if (this.intervalId != null) {
+      this.document.defaultView?.clearInterval(this.intervalId);
+      this.intervalId = undefined;
+    }
   }
 
   private tick(): void {
     this.now.set(Date.now());
-    if (!this.hasFinished && this.isDone()) {
-      this.hasFinished = true;
-      this.finished.emit();
+    if (this.remaining() === 0) {
+      // Reached zero — stop ticking entirely; the effect on `to` re-arms.
+      this.stopInterval();
+      if (!this.hasFinished && this.isDone()) {
+        this.hasFinished = true;
+        this.finished.emit();
+      }
     }
   }
 
@@ -149,8 +195,9 @@ export class MkCountdown {
   }
 
   ngOnDestroy(): void {
-    if (this.intervalId != null) {
-      this.document.defaultView?.clearInterval(this.intervalId);
+    this.stopInterval();
+    if (this.viewReady) {
+      this.document.removeEventListener('visibilitychange', this.onVisibilityChange);
     }
   }
 }

@@ -87,3 +87,117 @@ describe('MkTree chevron click', () => {
     expect(tree.selected()).toBe('leaf');
   });
 });
+
+/**
+ * Rendering + expansion-state performance semantics.
+ *
+ * Rows are tracked by their underlying node object (not `$index`), so
+ * expanding a node INSERTS child rows instead of rewriting every row below
+ * the insertion point. Expansion state lives in a `linkedSignal` keyed by
+ * node references, so it survives the consumer rebuilding the `nodes` array;
+ * a node's `expanded` flag only seeds nodes that were not in the previous
+ * array.
+ */
+describe('MkTree row identity & expansion persistence', () => {
+  let fixture: ComponentFixture<MkTree>;
+
+  const makeNodes = (): MkTreeNode[] => [
+    { label: 'Alpha', value: 'alpha' },
+    {
+      label: 'Branch',
+      value: 'branch',
+      children: [{ label: 'Child', value: 'child' }],
+    },
+    { label: 'Omega', value: 'omega' },
+  ];
+
+  function rows(): HTMLElement[] {
+    return Array.from(
+      (fixture.nativeElement as HTMLElement).querySelectorAll<HTMLElement>('.mk-tree__item'),
+    );
+  }
+
+  function toggleOf(row: HTMLElement): HTMLElement {
+    return row.querySelector<HTMLElement>('.mk-tree__toggle')!;
+  }
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(MkTree);
+  });
+
+  afterEach(() => fixture.destroy());
+
+  it('expanding a middle node does not recreate the row elements below it', () => {
+    fixture.componentRef.setInput('nodes', makeNodes());
+    fixture.detectChanges();
+
+    const before = rows();
+    expect(before.length).toBe(3); // Alpha, Branch, Omega
+
+    toggleOf(before[1]).click(); // expand Branch
+    fixture.detectChanges();
+
+    const after = rows();
+    expect(after.length).toBe(4); // Alpha, Branch, Child, Omega
+    // Rows before AND after the insertion point keep their DOM identity —
+    // the child row is a pure insert, not a rewrite of everything below.
+    expect(after[0]).toBe(before[0]);
+    expect(after[1]).toBe(before[1]);
+    expect(after[3]).toBe(before[2]);
+    expect(after[2].textContent).toContain('Child');
+  });
+
+  it('expansion survives the consumer rebuilding the array (same node objects)', () => {
+    const nodes = makeNodes();
+    fixture.componentRef.setInput('nodes', nodes);
+    fixture.detectChanges();
+
+    toggleOf(rows()[1]).click(); // expand Branch
+    fixture.detectChanges();
+    expect(rows().length).toBe(4);
+
+    // New array identity, same node objects — e.g. `[...items]` in an
+    // immutable-update flow. The user's expansion must not be lost.
+    fixture.componentRef.setInput('nodes', [...nodes]);
+    fixture.detectChanges();
+
+    expect(rows().length).toBe(4);
+    expect(rows()[1].getAttribute('aria-expanded')).toBe('true');
+  });
+
+  it('seeds `expanded` for new nodes only — a user collapse is not reverted', () => {
+    const branch: MkTreeNode = {
+      label: 'Branch',
+      value: 'branch',
+      expanded: true,
+      children: [{ label: 'Child', value: 'child' }],
+    };
+    fixture.componentRef.setInput('nodes', [branch]);
+    fixture.detectChanges();
+    expect(rows().length).toBe(2); // seeded open on first render
+
+    toggleOf(rows()[0]).click(); // user collapses despite `expanded: true`
+    fixture.detectChanges();
+    expect(rows().length).toBe(1);
+
+    // Rebuild with the SAME branch object plus a NEW pre-expanded node:
+    // the old node stays collapsed (user state wins), the new one opens.
+    const added: MkTreeNode = {
+      label: 'Added',
+      value: 'added',
+      expanded: true,
+      children: [{ label: 'Fresh', value: 'fresh' }],
+    };
+    fixture.componentRef.setInput('nodes', [branch, added]);
+    fixture.detectChanges();
+
+    const after = rows();
+    expect(after.length).toBe(3); // Branch (collapsed), Added, Fresh
+    expect(after[0].getAttribute('aria-expanded')).toBe('false');
+    expect(after[1].getAttribute('aria-expanded')).toBe('true');
+    expect(after[2].textContent).toContain('Fresh');
+  });
+});

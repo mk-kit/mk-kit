@@ -62,7 +62,7 @@
           class="mk-event-calendar__cell"
           [class.mk-event-calendar__cell--outside]="cell.outside"
           [class.mk-event-calendar__cell--today]="cell.today"
-          [attr.aria-label]="dayLabel(cell)"
+          [attr.aria-label]="cell.label"
           [attr.aria-current]="cell.today ? 'date' : null"
           (click)="onDayClick(cell.date)"
         >
@@ -112,7 +112,7 @@
             class="mk-event-calendar__col-head"
             [class.mk-event-calendar__col-head--today]="col.today"
           >
-            {{ colHead(col.day) }}
+            {{ col.head }}
           </span>
         }
       </div>
@@ -134,7 +134,7 @@
             <button
               type="button"
               class="mk-event-calendar__slot"
-              [attr.aria-label]="colHead(col.day) + ' ' + hourLabel(h)"
+              [attr.aria-label]="col.head + ' ' + hourLabel(h)"
               (click)="onSlotClick(col.day, h)"
             ></button>
           }

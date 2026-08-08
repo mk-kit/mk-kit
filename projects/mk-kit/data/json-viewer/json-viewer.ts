@@ -117,47 +117,74 @@ export class MkJsonViewer {
     alias: 'aria-label',
   });
 
-  /** Paths currently expanded. */
-  private readonly expanded = signal<ReadonlySet<string>>(new Set());
+  /**
+   * Paths currently expanded. Mutated in place — a toggle is O(1) instead of
+   * copying the whole set — with `expansionVersion` bumped so signal-driven
+   * bindings re-evaluate. Always read through {@link isExpanded}.
+   */
+  private readonly expanded = new Set<string>();
+  /** Bumped on every expansion change; the reactive face of `expanded`. */
+  private readonly expansionVersion = signal(0);
 
   /** The built node tree. */
   protected readonly root = computed(() => mkBuildJsonTree(this.data()));
+
+  /**
+   * Collapsed previews, cached per node so template bindings don't rebuild the
+   * string on every change-detection pass. Keyed weakly: entries die with the
+   * tree when `data` changes.
+   */
+  private readonly previews = new WeakMap<MkJsonNode, string>();
 
   constructor() {
     // Reset expansion to `expandDepth` whenever the data (or depth) changes.
     effect(() => {
       const root = this.root();
       const depth = this.expandDepth();
-      untracked(() => this.expanded.set(collectToDepth(root, depth)));
+      untracked(() => this.replaceExpanded(collectToDepth(root, depth)));
     });
   }
 
   protected isExpanded(path: string): boolean {
-    return this.expanded().has(path);
+    this.expansionVersion(); // Track: re-evaluate when expansion changes.
+    return this.expanded.has(path);
   }
 
   protected toggle(path: string): void {
-    const next = new Set(this.expanded());
-    next.has(path) ? next.delete(path) : next.add(path);
-    this.expanded.set(next);
+    if (!this.expanded.delete(path)) this.expanded.add(path);
+    this.expansionVersion.update((v) => v + 1);
   }
 
   /** Expand every object/array node. */
   expandAll(): void {
-    this.expanded.set(collectToDepth(this.root(), Number.POSITIVE_INFINITY));
+    this.replaceExpanded(collectToDepth(this.root(), Number.POSITIVE_INFINITY));
   }
 
   /** Collapse everything (the root stays visible). */
   collapseAll(): void {
-    this.expanded.set(new Set());
+    this.replaceExpanded(EMPTY_PATHS);
   }
 
-  /** Collapsed preview, e.g. `{…}` / `[…]` + item count. */
+  /** Swap the expansion set's contents and notify bindings. */
+  private replaceExpanded(paths: ReadonlySet<string>): void {
+    this.expanded.clear();
+    for (const path of paths) this.expanded.add(path);
+    this.expansionVersion.update((v) => v + 1);
+  }
+
+  /** Collapsed preview, e.g. `{…}` / `[…]` + item count (cached per node). */
   protected preview(node: MkJsonNode): string {
-    const braces = node.type === 'array' ? '[…]' : '{…}';
-    return `${braces} ${this.i18n.groupCount(node.children.length)}`;
+    let text = this.previews.get(node);
+    if (text === undefined) {
+      const braces = node.type === 'array' ? '[…]' : '{…}';
+      text = `${braces} ${this.i18n.groupCount(node.children.length)}`;
+      this.previews.set(node, text);
+    }
+    return text;
   }
 }
+
+const EMPTY_PATHS: ReadonlySet<string> = new Set();
 
 /** All container paths with depth < `maxDepth`. */
 function collectToDepth(root: MkJsonNode, maxDepth: number): Set<string> {

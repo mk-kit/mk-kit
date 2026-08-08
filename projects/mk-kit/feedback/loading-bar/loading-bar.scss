@@ -12,12 +12,22 @@
   opacity: 1;
 }
 
+// Full-width bar revealed by scaling from the inline start — transform runs
+// on the compositor, so trickle updates skip layout and repaint entirely.
 .mk-loading-bar__fill {
   height: 100%;
-  width: 0;
+  width: 100%;
+  transform: scaleX(0);
+  transform-origin: left center;
+  will-change: transform;
   background-color: var(--mk-primary);
   box-shadow: 0 0 8px color-mix(in srgb, var(--mk-primary) 60%, transparent);
-  transition: width var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+  transition: transform var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+}
+
+// In RTL the bar grows from the right edge instead.
+.mk-loading-bar__fill:dir(rtl) {
+  transform-origin: right center;
 }
 
 @media (prefers-reduced-motion: reduce) {

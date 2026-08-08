@@ -22,7 +22,7 @@ import { MkLoadingBarService } from './loading-bar.service';
   selector: 'mk-loading-bar',
   template: `<div
     class="mk-loading-bar__fill"
-    [style.width.%]="progress()"
+    [style.transform]="fillTransform()"
     [style.background]="color()"
   ></div>`,
   styleUrl: './loading-bar.scss',
@@ -50,4 +50,13 @@ export class MkLoadingBar {
 
   protected readonly progress = this.service.progress;
   protected readonly active = computed(() => this.service.active());
+
+  /**
+   * The fill is a full-width bar scaled from the inline start — `transform`
+   * animates on the compositor, so each trickle tick avoids the layout+paint
+   * cost that animating `width` incurred. Origin flips for RTL in the styles.
+   */
+  protected readonly fillTransform = computed(
+    () => `scaleX(${this.progress() / 100})`,
+  );
 }

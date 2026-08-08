@@ -62,6 +62,29 @@ describe('MkSlider', () => {
     }
   }
 
+  /** Gives the zero-sized jsdom track a usable 0–100px geometry. */
+  function mockRect(track: HTMLElement, width = 100) {
+    return vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: width,
+      bottom: 10,
+      width,
+      height: 10,
+      toJSON: () => ({}),
+    } as DOMRect);
+  }
+
+  const pev = (type: string, clientX: number) =>
+    new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      clientX,
+    });
+
   afterEach(() => {
     vi.restoreAllMocks();
     TestBed.resetTestingModule();
@@ -170,6 +193,68 @@ describe('MkSlider', () => {
     expect(host.value()).toBe(100);
     press(fixture, thumb, 'Home');
     expect(host.value()).toBe(0);
+  });
+
+  it('drags via pointer capture and stops listening after pointerup', async () => {
+    const { fixture, el, host } = mount();
+    const track = el.querySelector<HTMLElement>('.mk-slider__track')!;
+    mockRect(track);
+
+    track.dispatchEvent(pev('pointerdown', 30));
+    await fixture.whenStable();
+    expect(host.value()).toBe(30);
+
+    // Moves are handled by listeners on the capturing element, drag-only.
+    track.dispatchEvent(pev('pointermove', 70));
+    await fixture.whenStable();
+    expect(host.value()).toBe(70);
+
+    track.dispatchEvent(pev('pointerup', 70));
+    await fixture.whenStable();
+
+    // Listeners are gone: a move after release must not change the value.
+    track.dispatchEvent(pev('pointermove', 90));
+    await fixture.whenStable();
+    expect(host.value()).toBe(70);
+  });
+
+  it('stops the drag on pointercancel', async () => {
+    const { fixture, el, host } = mount();
+    const track = el.querySelector<HTMLElement>('.mk-slider__track')!;
+    mockRect(track);
+
+    track.dispatchEvent(pev('pointerdown', 30));
+    track.dispatchEvent(pev('pointercancel', 30));
+    track.dispatchEvent(pev('pointermove', 90));
+    await fixture.whenStable();
+    expect(host.value()).toBe(30);
+  });
+
+  it('reads the track geometry once per drag', async () => {
+    const { fixture, el } = mount();
+    const track = el.querySelector<HTMLElement>('.mk-slider__track')!;
+    const rectSpy = mockRect(track);
+
+    track.dispatchEvent(pev('pointerdown', 30));
+    track.dispatchEvent(pev('pointermove', 40));
+    track.dispatchEvent(pev('pointermove', 60));
+    track.dispatchEvent(pev('pointerup', 60));
+    await fixture.whenStable();
+    expect(rectSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('mirrors the drag geometry in RTL (cached at pointerdown)', async () => {
+    const { fixture, el, host } = mount();
+    const track = el.querySelector<HTMLElement>('.mk-slider__track')!;
+    forceRtl(track);
+    mockRect(track);
+
+    // In RTL the value grows from the right edge: offset = right(100) - 30.
+    track.dispatchEvent(pev('pointerdown', 30));
+    await fixture.whenStable();
+    expect(host.value()).toBe(70);
+    track.dispatchEvent(pev('pointerup', 30));
+    await fixture.whenStable();
   });
 
   it('ignores keys and drops out of the tab order while disabled', () => {

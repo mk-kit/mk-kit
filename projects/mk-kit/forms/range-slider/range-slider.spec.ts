@@ -94,4 +94,84 @@ describe('MkRangeSlider', () => {
     rs.writeValue([80, 20]);
     expect(rs.value()).toEqual([20, 80]);
   });
+
+  /** Gives the zero-sized jsdom track a usable 0–100px geometry. */
+  function mockTrackRect(width = 100) {
+    const el = fixture.nativeElement as HTMLElement;
+    const wrap = el.querySelector<HTMLElement>('.mk-range-slider__track-wrap')!;
+    const track = el.querySelector<HTMLElement>('.mk-range-slider__track')!;
+    const rectSpy = vi.spyOn(track, 'getBoundingClientRect').mockReturnValue({
+      x: 0,
+      y: 0,
+      top: 0,
+      left: 0,
+      right: width,
+      bottom: 10,
+      width,
+      height: 10,
+      toJSON: () => ({}),
+    } as DOMRect);
+    return { wrap, rectSpy };
+  }
+
+  const pev = (type: string, clientX: number) =>
+    new PointerEvent(type, {
+      bubbles: true,
+      cancelable: true,
+      pointerId: 1,
+      clientX,
+    });
+
+  it('drags the nearest thumb via pointer capture, one geometry read per drag', async () => {
+    const { wrap, rectSpy } = mockTrackRect();
+
+    // 30 is closer to low (20) than high (80) — the low thumb is grabbed.
+    wrap.dispatchEvent(pev('pointerdown', 30));
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([30, 80]);
+
+    // Moves are handled by listeners on the capturing element, drag-only.
+    wrap.dispatchEvent(pev('pointermove', 52));
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([50, 80]);
+
+    wrap.dispatchEvent(pev('pointerup', 52));
+    await fixture.whenStable();
+
+    // Listeners are gone: a move after release must not change the value.
+    wrap.dispatchEvent(pev('pointermove', 70));
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([50, 80]);
+
+    expect(rectSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it('grabs the high thumb when the pointer lands closer to it', async () => {
+    const { wrap } = mockTrackRect();
+
+    wrap.dispatchEvent(pev('pointerdown', 90));
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([20, 90]);
+    wrap.dispatchEvent(pev('pointerup', 90));
+  });
+
+  it('keeps the thumbs from crossing during a pointer drag', async () => {
+    const { wrap } = mockTrackRect();
+
+    wrap.dispatchEvent(pev('pointerdown', 30)); // low thumb
+    wrap.dispatchEvent(pev('pointermove', 95)); // past the high thumb
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([80, 80]);
+    wrap.dispatchEvent(pev('pointerup', 95));
+  });
+
+  it('stops the drag on pointercancel', async () => {
+    const { wrap } = mockTrackRect();
+
+    wrap.dispatchEvent(pev('pointerdown', 30));
+    wrap.dispatchEvent(pev('pointercancel', 30));
+    wrap.dispatchEvent(pev('pointermove', 70));
+    await fixture.whenStable();
+    expect(rs.value()).toEqual([30, 80]);
+  });
 });

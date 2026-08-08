@@ -45,22 +45,22 @@
       @for (group of groups(); track group.name) {
         <div class="mk-block-inserter__group" role="group" [attr.aria-label]="group.name">
           <div class="mk-block-inserter__group-label">{{ group.name }}</div>
-          @for (def of group.items; track def.type) {
+          @for (item of group.items; track item.def.type) {
             <button
               type="button"
               class="mk-block-inserter__option"
-              [class.mk-block-inserter__option--active]="indexOf(def) === activeIndex()"
-              [id]="optionId(indexOf(def))"
+              [class.mk-block-inserter__option--active]="item.index === activeIndex()"
+              [id]="optionId(item.index)"
               role="option"
-              [attr.aria-selected]="indexOf(def) === activeIndex()"
-              (mouseenter)="activeIndex.set(indexOf(def))"
-              (click)="choose(def)"
+              [attr.aria-selected]="item.index === activeIndex()"
+              (mouseenter)="activeIndex.set(item.index)"
+              (click)="choose(item.def)"
             >
-              <span class="mk-block-inserter__icon" aria-hidden="true">{{ def.icon ?? '▢' }}</span>
+              <span class="mk-block-inserter__icon" aria-hidden="true">{{ item.def.icon ?? '▢' }}</span>
               <span class="mk-block-inserter__text">
-                <span class="mk-block-inserter__name">{{ def.label }}</span>
-                @if (def.description) {
-                  <span class="mk-block-inserter__desc">{{ def.description }}</span>
+                <span class="mk-block-inserter__name">{{ item.def.label }}</span>
+                @if (item.def.description) {
+                  <span class="mk-block-inserter__desc">{{ item.def.description }}</span>
                 }
               </span>
             </button>

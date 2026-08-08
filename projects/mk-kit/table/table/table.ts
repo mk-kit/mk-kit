@@ -23,7 +23,7 @@ import { DOCUMENT, NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
 import { MkLiveAnnouncer } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
-import { MkCheckbox } from '@mkornas/ui/forms';
+import { MkCheckbox } from '@mkornas/ui/checkbox';
 import { MkTableRowDetail } from './table-row-detail';
 import { MkTableCell } from './table-cell';
 
@@ -720,6 +720,13 @@ export class MkTable<T = Record<string, unknown>> {
       (this.expandable() ? 1 : 0),
   );
 
+  /**
+   * Shared locale-sensitive collator for string sorting. `localeCompare`
+   * re-resolves locale data on every call; one cached `Intl.Collator` makes
+   * large-table sorts several-fold faster with the same default-locale order.
+   */
+  private static readonly sortCollator = new Intl.Collator();
+
   /** Data sorted by the active column, or the input order when unsorted. */
   protected readonly sortedData = computed<T[]>(() => {
     const key = this.sortKey();
@@ -733,7 +740,7 @@ export class MkTable<T = Record<string, unknown>> {
       if (av == null) return -1;
       if (bv == null) return 1;
       if (typeof av === 'number' && typeof bv === 'number') return av - bv;
-      return String(av).localeCompare(String(bv));
+      return MkTable.sortCollator.compare(String(av), String(bv));
     };
     // Negate the comparator for desc (instead of reversing) so the sort stays
     // stable and null ordering is consistent in both directions.

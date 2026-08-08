@@ -11,6 +11,6 @@
 <div class="mk-progress-bar__track">
   <div
     class="mk-progress-bar__fill"
-    [style.width.%]="indeterminate() ? null : clamped()"
+    [style.transform]="indeterminate() ? null : fillTransform()"
   ></div>
 </div>

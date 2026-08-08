@@ -27,13 +27,14 @@ import { TestBed } from '@angular/core/testing';
 import { MkAutocomplete } from '@mkornas/ui/forms/autocomplete';
 import { MkButtonToggleGroup } from '@mkornas/ui/forms/button-toggle';
 import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
-import { MkCheckbox } from '@mkornas/ui/forms/checkbox';
+import { MkCheckbox } from '@mkornas/ui/checkbox';
 import { MkCodeEditor } from '@mkornas/ui/forms/code-editor';
 import { MkColorPicker } from '@mkornas/ui/forms/color-picker';
 import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
 import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
 import { MkMultiSelect } from '@mkornas/ui/forms/multi-select';
 import { MkNumberInput } from '@mkornas/ui/forms/number-input';
+import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
 import { MkOtp } from '@mkornas/ui/forms/otp';
 import { MkPasswordInput } from '@mkornas/ui/forms/password-input';
 import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
@@ -160,6 +161,13 @@ const CASES: readonly CvaCase[] = [
     type: MkNumberInput,
     tag: 'mk-number-input',
     value: 42,
+    read: readValue,
+  },
+  {
+    name: 'mk-numeric-keypad',
+    type: MkNumericKeypad,
+    tag: 'mk-numeric-keypad',
+    value: 7,
     read: readValue,
   },
   { name: 'mk-otp', type: MkOtp, tag: 'mk-otp', value: '123456', read: readValue },

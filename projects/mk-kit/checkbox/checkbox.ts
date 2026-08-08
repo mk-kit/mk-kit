@@ -18,9 +18,9 @@ import {
   type Validator,
 } from '@angular/forms';
 import type { MkSize, MkTone } from '@mkornas/ui/core';
+import { MkFieldContext } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { mkValidatorChange } from '@mkornas/ui/core';
-import { MkFormField } from '../form-field/form-field';
 
 /**
  * Checkbox — a themed checkbox built on a visually-hidden native
@@ -67,7 +67,7 @@ import { MkFormField } from '../form-field/form-field';
   ],
 })
 export class MkCheckbox implements ControlValueAccessor, Validator {
-  private readonly field = inject(MkFormField, { optional: true });
+  private readonly field = inject(MkFieldContext, { optional: true });
 
   /** Two-way checked state. */
   readonly checked = model(false);

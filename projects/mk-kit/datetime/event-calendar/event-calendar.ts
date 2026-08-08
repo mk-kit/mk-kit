@@ -22,11 +22,7 @@ import {
   startOfMonth,
   startOfWeek,
 } from '../datetime/date-utils';
-import {
-  MkTimedPlacement,
-  allDayEvents,
-  layoutTimedEvents,
-} from './event-calendar-layout';
+import { MkTimedPlacement, layoutTimedEvents } from './event-calendar-layout';
 
 /** The calendar's presentation: month grid, or a timed week/day grid. */
 export type MkCalendarView = 'month' | 'week' | 'day';
@@ -65,6 +61,12 @@ interface MkDayCell {
   visible: readonly MkCalendarEvent[];
   /** Count beyond `maxPerDay` (0 when nothing is hidden). */
   overflow: number;
+  /**
+   * Precomputed screen-reader label (see {@link MkEventCalendar#dayLabel}) —
+   * formatting it once here keeps `formatDate` out of the per-CD template path
+   * for all 42 cells.
+   */
+  label: string;
 }
 
 /**
@@ -160,25 +162,62 @@ export class MkEventCalendar {
     return Array.from({ length: Math.max(to - from, 0) }, (_, i) => from + i);
   });
 
-  /** Per-day positioned events + all-day strip for the time grid. */
-  protected readonly timedColumns = computed(() =>
-    this.gridDays().map((day) => ({
-      day,
-      today: isSameDay(day, new Date()),
-      placements: layoutTimedEvents(
-        this.events(),
-        day,
-        this.dayStartHour(),
-        this.dayEndHour(),
-      ),
-      allDay: allDayEvents(this.events(), day),
-    })),
-  );
+  /**
+   * Timed events bucketed by their start's calendar day — a single pass over
+   * the events, shared by every column of the week/day grid instead of
+   * re-filtering (and re-sorting) the whole array once per day.
+   */
+  private readonly timedByDay = computed(() => {
+    const map = new Map<number, MkCalendarEvent[]>();
+    for (const event of this.events()) {
+      if (!event.start) continue;
+      const key = startOfDay(event.start).getTime();
+      const bucket = map.get(key);
+      if (bucket) bucket.push(event);
+      else map.set(key, [event]);
+    }
+    return map;
+  });
 
-  /** Week-view column head, e.g. `Mon 21`. */
-  protected colHead(day: Date): string {
-    return formatDate(day, 'ddd d', this.i18n.dateNames);
-  }
+  /** Untimed events (all-day strip) bucketed by `date`'s calendar day. */
+  private readonly allDayByDay = computed(() => {
+    const map = new Map<number, MkCalendarEvent[]>();
+    for (const event of this.events()) {
+      if (event.start) continue;
+      const key = startOfDay(event.date).getTime();
+      const bucket = map.get(key);
+      if (bucket) bucket.push(event);
+      else map.set(key, [event]);
+    }
+    return map;
+  });
+
+  /**
+   * Per-day positioned events + all-day strip for the time grid. The column
+   * head (`Mon 21`) is precomputed here so the template never calls
+   * `formatDate` during change detection.
+   */
+  protected readonly timedColumns = computed(() => {
+    const timedByDay = this.timedByDay();
+    const allDayByDay = this.allDayByDay();
+    const startHour = this.dayStartHour();
+    const endHour = this.dayEndHour();
+    const names = this.i18n.dateNames;
+    const today = new Date();
+    // gridDays() are `startOfDay` instants, so `getTime()` matches the keys.
+    return this.gridDays().map((day) => ({
+      day,
+      today: isSameDay(day, today),
+      head: formatDate(day, 'ddd d', names),
+      placements: layoutTimedEvents(
+        timedByDay.get(day.getTime()) ?? [],
+        day,
+        startHour,
+        endHour,
+      ),
+      allDay: allDayByDay.get(day.getTime()) ?? [],
+    }));
+  });
 
   protected hourLabel(hour: number): string {
     return `${String(hour).padStart(2, '0')}:00`;
@@ -231,13 +270,15 @@ export class MkEventCalendar {
     return this.weeks().map((week) =>
       week.map((date) => {
         const dayEvents = byDay.get(startOfDay(date).getTime()) ?? [];
-        return {
+        const cell = {
           date,
           outside: !isSameMonth(date, month),
           today: isSameDay(date, today),
           visible: dayEvents.slice(0, max),
           overflow: Math.max(0, dayEvents.length - max),
         };
+        // Label formatted once per rebuild, not on every CD pass (42 cells).
+        return { ...cell, label: this.dayLabel(cell) };
       }),
     );
   });
@@ -246,8 +287,9 @@ export class MkEventCalendar {
    * Screen-reader label for a day cell. The button's `aria-label` replaces its
    * visual content, so the label also announces the day's events — count plus
    * up to three titles — e.g. `July 9, 2026, 2 events: Standup, Demo`.
+   * Precomputed into {@link MkDayCell#label} by `weekCells`.
    */
-  protected dayLabel(cell: MkDayCell): string {
+  protected dayLabel(cell: Omit<MkDayCell, 'label'>): string {
     const formatted = formatDate(cell.date, 'MMMM d, yyyy', this.i18n.dateNames);
     const count = cell.visible.length + cell.overflow;
     if (count === 0) return formatted;

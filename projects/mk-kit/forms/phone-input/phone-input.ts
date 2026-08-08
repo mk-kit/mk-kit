@@ -268,6 +268,9 @@ export class MkPhoneInput implements ControlValueAccessor {
 
   // --- Country dropdown -----------------------------------------------------
 
+  /** Pending focus-the-search-box timeout; cleared on re-open and destroy. */
+  private searchFocusTimer?: ReturnType<typeof setTimeout>;
+
   protected toggle(): void {
     if (this.isDisabled()) return;
     this.open() ? this.close() : this.openList();
@@ -282,7 +285,10 @@ export class MkPhoneInput implements ControlValueAccessor {
     );
     this.activeIndex.set(selected >= 0 ? selected : 0);
     // The panel renders on the next change-detection pass.
-    setTimeout(() => this.searchRef()?.nativeElement.focus());
+    clearTimeout(this.searchFocusTimer);
+    this.searchFocusTimer = setTimeout(() =>
+      this.searchRef()?.nativeElement.focus(),
+    );
   }
 
   protected close(refocusTrigger = false): void {
@@ -445,5 +451,10 @@ export class MkPhoneInput implements ControlValueAccessor {
   }
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.searchFocusTimer);
+    this.searchFocusTimer = undefined;
   }
 }

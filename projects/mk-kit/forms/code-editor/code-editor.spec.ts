@@ -1,7 +1,9 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MkCodeEditor, MkCodeValidity } from './code-editor';
-import { mkHighlightJson, mkEscapeHtml } from './code-highlight';
+import { mkHighlightJson } from '@mkornas/ui/core';
+// Not exported from the core barrel (name collides with the block-editor's).
+import { mkEscapeHtml } from '../../core/highlight/code-highlight';
 
 describe('mkHighlightJson', () => {
   it('escapes HTML-significant characters', () => {
@@ -91,5 +93,106 @@ describe('MkCodeEditor', () => {
     fixture.componentRef.setInput('language', 'plaintext');
     ed.writeValue('{ not : json');
     expect((ed as any).jsonError()).toBeNull();
+  });
+});
+
+describe('MkCodeEditor debounced derivations', () => {
+  let fixture: ComponentFixture<MkCodeEditor>;
+  let ed: MkCodeEditor;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(MkCodeEditor);
+    ed = fixture.componentInstance;
+    fixture.componentRef.setInput('language', 'json');
+    fixture.detectChanges();
+  });
+
+  afterEach(() => {
+    fixture.destroy();
+    vi.useRealTimers();
+  });
+
+  const textarea = () =>
+    fixture.nativeElement.querySelector('textarea') as HTMLTextAreaElement;
+  /** Simulates a keystroke: the textarea fires `input` with its new value. */
+  const type = (text: string) => {
+    const ta = textarea();
+    ta.value = text;
+    ta.dispatchEvent(new Event('input'));
+  };
+
+  it('keeps the value live while typing but debounces the highlight', () => {
+    vi.useFakeTimers();
+    type('{"a": 1}');
+    // The textarea text itself is never delayed…
+    expect(ed.value()).toBe('{"a": 1}');
+    // …but the overlay still shows the previous (settled) content.
+    expect((ed as any).highlightedHtml()).toBe('');
+    vi.advanceTimersByTime(200);
+    // After the debounce settles, overlay and textarea are identical again.
+    expect((ed as any).highlightedHtml()).toBe(mkHighlightJson('{"a": 1}'));
+  });
+
+  it('reports a JSON error only after the debounce settles', () => {
+    vi.useFakeTimers();
+    type('{bad');
+    expect((ed as any).jsonError()).toBeNull();
+    vi.advanceTimersByTime(200);
+    expect((ed as any).jsonError()).toBeTruthy();
+  });
+
+  it('emits a single validate event for a burst of keystrokes', () => {
+    vi.useFakeTimers();
+    const events: MkCodeValidity[] = [];
+    ed.validate.subscribe((v) => events.push(v));
+    type('{');
+    vi.advanceTimersByTime(50);
+    type('{b');
+    vi.advanceTimersByTime(50);
+    type('{bad');
+    fixture.detectChanges();
+    expect(events).toEqual([]); // still within the debounce window
+    vi.advanceTimersByTime(200);
+    fixture.detectChanges();
+    expect(events).toEqual([{ valid: false, error: expect.any(String) }]);
+  });
+
+  it('writeValue flushes highlight and validation immediately', () => {
+    vi.useFakeTimers();
+    ed.writeValue('{"a": 1}');
+    expect((ed as any).highlightedHtml()).toBe(mkHighlightJson('{"a": 1}'));
+    ed.writeValue('{bad');
+    expect((ed as any).jsonError()).toBeTruthy(); // no timers advanced
+  });
+
+  it('writeValue cancels a pending typing debounce', () => {
+    vi.useFakeTimers();
+    type('{typing');
+    ed.writeValue('{"set": true}');
+    expect((ed as any).jsonError()).toBeNull();
+    vi.advanceTimersByTime(500); // the stale typing timer must not fire
+    expect((ed as any).highlightedHtml()).toBe(mkHighlightJson('{"set": true}'));
+  });
+
+  it('format() re-highlights synchronously', () => {
+    vi.useFakeTimers();
+    ed.writeValue('{"a":1}');
+    ed.format();
+    expect(ed.value()).toBe('{\n  "a": 1\n}');
+    expect((ed as any).highlightedHtml()).toBe(mkHighlightJson(ed.value()));
+  });
+
+  it('gutter lines track the live value and reuse the array while the count is unchanged', () => {
+    vi.useFakeTimers();
+    type('a\nb');
+    const first = (ed as any).lines();
+    expect(first).toEqual([1, 2]); // live — never behind the textarea
+    type('a\nbc');
+    expect((ed as any).lines()).toBe(first); // same instance → @for does not re-diff
+    type('a\nb\nc');
+    expect((ed as any).lines()).toEqual([1, 2, 3]);
   });
 });

@@ -10,6 +10,7 @@ import {
   model,
   numberAttribute,
   signal,
+  type OnDestroy,
   viewChild,
 } from '@angular/core';
 import {
@@ -48,9 +49,6 @@ import { MkFormField } from '../form-field/form-field';
     '[class.mk-slider--lg]': "size() === 'lg'",
     '[class.mk-slider--disabled]': 'isDisabled()',
     '[attr.data-tone]': 'tone()',
-    '(document:pointermove)': 'onPointerMove($event)',
-    '(document:pointerup)': 'onPointerUp()',
-    '(document:pointercancel)': 'onPointerUp()',
   },
   providers: [
     {
@@ -65,7 +63,7 @@ import { MkFormField } from '../form-field/form-field';
     },
   ],
 })
-export class MkSlider implements ControlValueAccessor, Validator {
+export class MkSlider implements ControlValueAccessor, Validator, OnDestroy {
   private readonly field = inject(MkFormField, { optional: true });
   private readonly trackRef = viewChild<ElementRef<HTMLElement>>('track');
   private readonly thumbRef = viewChild<ElementRef<HTMLElement>>('thumb');
@@ -90,6 +88,12 @@ export class MkSlider implements ControlValueAccessor, Validator {
   readonly value = model<number>(0);
 
   private dragging = false;
+  /** Element the drag listeners are attached to (only while dragging). */
+  private dragTarget: HTMLElement | null = null;
+  /** Track geometry cached at pointerdown — no layout reads per move. */
+  private dragRect: DOMRect | null = null;
+  /** Text direction cached at pointerdown (keyboard keeps live reads). */
+  private dragRtl = false;
   private readonly cvaDisabled = signal(false);
   private onChange: (value: number) => void = () => {};
   private onTouched: () => void = () => {};
@@ -164,21 +168,62 @@ export class MkSlider implements ControlValueAccessor, Validator {
   protected onPointerDown(event: Event): void {
     if (this.isDisabled()) return;
     const e = event as PointerEvent;
+    const track = this.trackRef()?.nativeElement;
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    // Cache the geometry + direction for the whole gesture: pointer capture
+    // means no scrolling can happen mid-drag, so one layout read suffices.
+    this.dragRect = rect;
+    this.dragRtl = this.isRtl();
     this.dragging = true;
+    const target = (e.currentTarget as HTMLElement | null) ?? track;
+    this.dragTarget = target;
+    try {
+      target.setPointerCapture(e.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
+    // Capture routes the pointer stream to this element for the drag only —
+    // no document-wide listeners outliving the gesture.
+    target.addEventListener('pointermove', this.onDragMove);
+    target.addEventListener('pointerup', this.onDragEnd);
+    target.addEventListener('pointercancel', this.onDragEnd);
     this.thumbRef()?.nativeElement.focus();
     this.updateFromClientX(e.clientX);
     event.preventDefault();
   }
 
-  protected onPointerMove(event: Event): void {
+  private readonly onDragMove = (event: PointerEvent): void => {
     if (!this.dragging) return;
-    this.updateFromClientX((event as PointerEvent).clientX);
+    this.updateFromClientX(event.clientX);
+  };
+
+  private readonly onDragEnd = (): void => {
+    this.endDrag(true);
+  };
+
+  /** Blur while dragging releases the drag (template binding). */
+  protected onPointerUp(): void {
+    this.endDrag(true);
   }
 
-  protected onPointerUp(): void {
+  private endDrag(markTouched: boolean): void {
+    const target = this.dragTarget;
+    if (target) {
+      target.removeEventListener('pointermove', this.onDragMove);
+      target.removeEventListener('pointerup', this.onDragEnd);
+      target.removeEventListener('pointercancel', this.onDragEnd);
+    }
+    this.dragTarget = null;
+    this.dragRect = null;
     if (!this.dragging) return;
     this.dragging = false;
-    this.onTouched();
+    if (markTouched) this.onTouched();
+  }
+
+  ngOnDestroy(): void {
+    this.endDrag(false);
   }
 
   /** Whether the rendered track is right-to-left. */
@@ -191,12 +236,11 @@ export class MkSlider implements ControlValueAccessor, Validator {
     );
   }
 
+  /** Pointer-drag path only — uses the geometry cached at pointerdown. */
   private updateFromClientX(clientX: number): void {
-    const track = this.trackRef()?.nativeElement;
-    if (!track) return;
-    const rect = track.getBoundingClientRect();
-    if (rect.width <= 0) return;
-    const offset = this.isRtl() ? rect.right - clientX : clientX - rect.left;
+    const rect = this.dragRect;
+    if (!rect || rect.width <= 0) return;
+    const offset = this.dragRtl ? rect.right - clientX : clientX - rect.left;
     const ratio = Math.min(1, Math.max(0, offset / rect.width));
     const raw = this.min() + ratio * (this.max() - this.min());
     this.setValue(raw);

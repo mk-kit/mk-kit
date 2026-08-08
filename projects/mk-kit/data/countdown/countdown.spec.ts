@@ -55,8 +55,15 @@ describe('MkCountdown', () => {
 
   afterEach(() => {
     fixture.destroy();
+    Reflect.deleteProperty(document, 'hidden');
     vi.useRealTimers();
   });
+
+  /** Fake `document.hidden` and fire the visibilitychange the component listens for. */
+  function setHidden(hidden: boolean): void {
+    Object.defineProperty(document, 'hidden', { value: hidden, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  }
 
   it('rolls days into hours when showDays is false', () => {
     fixture.componentRef.setInput('to', new Date(Date.now() + 90_061_000));
@@ -109,5 +116,60 @@ describe('MkCountdown', () => {
     vi.advanceTimersByTime(3000);
     expect(spy).toHaveBeenCalledTimes(1);
     expect((cmp as any).isDone()).toBe(true);
+  });
+
+  it('stops ticking entirely once the countdown reaches zero', () => {
+    fixture.componentRef.setInput('to', new Date(Date.now() + 2000));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(3000);
+    expect((cmp as any).isDone()).toBe(true);
+
+    // The interval is cleared at zero — no further `now` writes, ever.
+    const frozen = (cmp as any).now();
+    vi.advanceTimersByTime(30_000);
+    expect((cmp as any).now()).toBe(frozen);
+  });
+
+  it('re-arms the interval when `to` moves into the future again', () => {
+    const spy = vi.fn();
+    (cmp as any).finished.subscribe(spy);
+    fixture.componentRef.setInput('to', new Date(Date.now() + 1000));
+    fixture.detectChanges();
+    vi.advanceTimersByTime(2000);
+    expect((cmp as any).isDone()).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(1);
+
+    // A "next round" target restarts the stopped interval and re-arms finished.
+    fixture.componentRef.setInput('to', new Date(Date.now() + 5000));
+    fixture.detectChanges();
+    expect((cmp as any).isDone()).toBe(false);
+
+    const before = (cmp as any).now();
+    vi.advanceTimersByTime(1000);
+    expect((cmp as any).now()).toBeGreaterThan(before);
+
+    vi.advanceTimersByTime(5000);
+    expect((cmp as any).isDone()).toBe(true);
+    expect(spy).toHaveBeenCalledTimes(2);
+  });
+
+  it('pauses ticking while the tab is hidden and resyncs on return', () => {
+    fixture.componentRef.setInput('to', new Date(Date.now() + 60_000));
+    fixture.detectChanges();
+
+    vi.advanceTimersByTime(3000);
+    expect((cmp as any).remaining()).toBe(57_000);
+
+    // Hidden tab: the interval is cleared — time passes, `now` stays frozen.
+    setHidden(true);
+    vi.advanceTimersByTime(10_000);
+    expect((cmp as any).remaining()).toBe(57_000);
+
+    // Visible again: immediate resync from Date.now(), then normal ticking.
+    setHidden(false);
+    expect((cmp as any).remaining()).toBe(47_000);
+    vi.advanceTimersByTime(1000);
+    expect((cmp as any).remaining()).toBe(46_000);
   });
 });
