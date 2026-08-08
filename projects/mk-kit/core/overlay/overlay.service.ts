@@ -42,82 +42,20 @@ export interface MkOverlayConfig<TData = unknown> {
   injector?: Injector;
 }
 
-let openOverlays = 0;
-
 /**
  * State saved while body scroll is locked. iOS Safari ignores
  * `overflow: hidden` for touch scrolling, so the lock also fixes the body in
  * place at the current scroll offset (`position: fixed; top: -scrollY`) and
- * jumps back to that offset when the last overlay closes. `openOverlays` is
- * the reference count: only the FIRST open locks and only the LAST close
- * unlocks, so nested dialogs — including an Escape cascade closing them one
- * keypress at a time — never restore the page early.
+ * jumps back to that offset when the last overlay closes.
  */
-let bodyScrollLock: {
+interface BodyScrollLock {
   scrollY: number;
   /** The body's own inline styles before the lock, restored verbatim. */
   prev: Record<
     'position' | 'top' | 'left' | 'right' | 'width' | 'overflow',
     string
   >;
-} | null = null;
-
-function lockBodyScroll(doc: Document): void {
-  const body = doc.body;
-  const { style } = body;
-  bodyScrollLock = {
-    scrollY: doc.defaultView?.scrollY ?? 0,
-    prev: {
-      position: style.position,
-      top: style.top,
-      left: style.left,
-      right: style.right,
-      width: style.width,
-      overflow: style.overflow,
-    },
-  };
-  // overflow:hidden still does the whole job on desktop (and avoids a scroll
-  // jump there); the fixed-body treatment is what actually stops iOS touch
-  // scrolling. `top: -scrollY` keeps the page visually where it was.
-  style.overflow = 'hidden';
-  style.position = 'fixed';
-  style.top = `-${bodyScrollLock.scrollY}px`;
-  style.left = '0';
-  style.right = '0';
-  style.width = '100%';
 }
-
-function unlockBodyScroll(doc: Document): void {
-  if (!bodyScrollLock) return;
-  const { scrollY, prev } = bodyScrollLock;
-  bodyScrollLock = null;
-  const { style } = doc.body;
-  style.position = prev.position;
-  style.top = prev.top;
-  style.left = prev.left;
-  style.right = prev.right;
-  style.width = prev.width;
-  style.overflow = prev.overflow;
-  // Fixing the body collapsed the document's scroll position to 0; jump back
-  // instantly (never smooth — the restoration must be invisible). Guarded for
-  // jsdom, where scrollTo is unimplemented; skipped when there is nothing to
-  // restore.
-  const view = doc.defaultView;
-  if (scrollY !== 0 && typeof view?.scrollTo === 'function') {
-    view.scrollTo({ top: scrollY, behavior: 'instant' });
-  }
-}
-
-/**
- * Every overlay currently on screen, in open order (Map preserves insertion
- * order, so the last entry is the topmost). Kept so {@link
- * MkOverlayService.closeAll} can dismiss them — an app-level event (logging
- * out, a session expiring, a hard route change) has to clear whatever is
- * floating above the page, and the caller usually has no handle on it — and
- * so the shared Escape listener can find the topmost dismissible overlay.
- * Entries remove themselves on dispose, so a closed overlay never lingers.
- */
-const openRefs = new Map<MkOverlayRef<unknown>, { closeOnEscape: boolean }>();
 
 /**
  * Body-level elements a modal must NOT inert:
@@ -133,46 +71,6 @@ const INERT_EXEMPT_SELECTOR =
   '[popover], [aria-live], mk-toast-container, mk-snackbar-container';
 
 /**
- * The one document-level Escape listener, shared by every open overlay.
- *
- * Registered on the BUBBLE phase on purpose: widgets living inside an overlay
- * (a menu, an anchored panel, a picker) handle Escape on their own elements
- * during bubbling and call `preventDefault()` (e.g. `MkMenu.onPanelKeydown`),
- * so a consumed Escape arrives here already `defaultPrevented` and closes
- * nothing. A per-overlay capture listener with `stopPropagation()` cannot do
- * this: stopPropagation does not stop OTHER listeners on the same target, so
- * one Escape used to close every stacked overlay at once.
- */
-const onDocumentEscape = (event: KeyboardEvent): void => {
-  if (event.key !== 'Escape' || event.defaultPrevented) return;
-  // Close ONLY the topmost open overlay that opted into Escape dismissal.
-  const entries = [...openRefs.entries()];
-  for (let i = entries.length - 1; i >= 0; i--) {
-    const [ref, { closeOnEscape }] = entries[i];
-    if (closeOnEscape) {
-      ref.close();
-      event.preventDefault();
-      return;
-    }
-  }
-};
-
-/** The document currently carrying the shared Escape listener, if any. */
-let escapeListenerDoc: Document | null = null;
-
-/** (Un)register the shared Escape listener to match the open-overlay set. */
-function syncEscapeListener(doc: Document): void {
-  const needed = [...openRefs.values()].some((entry) => entry.closeOnEscape);
-  if (needed && escapeListenerDoc === null) {
-    doc.addEventListener('keydown', onDocumentEscape);
-    escapeListenerDoc = doc;
-  } else if (!needed && escapeListenerDoc !== null) {
-    escapeListenerDoc.removeEventListener('keydown', onDocumentEscape);
-    escapeListenerDoc = null;
-  }
-}
-
-/**
  * Lightweight, dependency-free overlay renderer. Instantiates a standalone
  * component into a body-level host, manages the backdrop, focus trapping,
  * Escape handling, and scroll locking. Powers Dialog, Menu, and others.
@@ -184,9 +82,116 @@ export class MkOverlayService {
   private readonly document = inject(DOCUMENT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
+  // All coordination state lives on the INSTANCE, not the module: the service
+  // is a root singleton, so one app still shares one stack — but each test
+  // injector gets a fresh world instead of leaking overlays/locks/listeners
+  // across spec files that share a worker.
+
+  /** Reference count for the body scroll lock (first open locks, last close unlocks). */
+  private openOverlays = 0;
+  private bodyScrollLock: BodyScrollLock | null = null;
+
+  /**
+   * Every overlay currently on screen, in open order (Map preserves insertion
+   * order, so the last entry is the topmost). Kept so {@link closeAll} can
+   * dismiss them and so the shared Escape listener can find the topmost
+   * dismissible overlay. Entries remove themselves on dispose.
+   */
+  private readonly openRefs = new Map<
+    MkOverlayRef<unknown>,
+    { closeOnEscape: boolean }
+  >();
+
+  /** The document currently carrying the shared Escape listener, if any. */
+  private escapeListenerDoc: Document | null = null;
+
+  /**
+   * The one document-level Escape listener, shared by every open overlay.
+   *
+   * Registered on the BUBBLE phase on purpose: widgets living inside an
+   * overlay (a menu, an anchored panel, a picker) handle Escape on their own
+   * elements during bubbling and call `preventDefault()`, so a consumed
+   * Escape arrives here already `defaultPrevented` and closes nothing. A
+   * per-overlay capture listener with `stopPropagation()` cannot do this:
+   * stopPropagation does not stop OTHER listeners on the same target, so one
+   * Escape used to close every stacked overlay at once.
+   */
+  private readonly onDocumentEscape = (event: KeyboardEvent): void => {
+    if (event.key !== 'Escape' || event.defaultPrevented) return;
+    // Close ONLY the topmost open overlay that opted into Escape dismissal.
+    const entries = [...this.openRefs.entries()];
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const [ref, { closeOnEscape }] = entries[i];
+      if (closeOnEscape) {
+        ref.close();
+        event.preventDefault();
+        return;
+      }
+    }
+  };
+
+  /** (Un)register the shared Escape listener to match the open-overlay set. */
+  private syncEscapeListener(doc: Document): void {
+    const needed = [...this.openRefs.values()].some((e) => e.closeOnEscape);
+    if (needed && this.escapeListenerDoc === null) {
+      doc.addEventListener('keydown', this.onDocumentEscape);
+      this.escapeListenerDoc = doc;
+    } else if (!needed && this.escapeListenerDoc !== null) {
+      this.escapeListenerDoc.removeEventListener(
+        'keydown',
+        this.onDocumentEscape,
+      );
+      this.escapeListenerDoc = null;
+    }
+  }
+
+  private lockBodyScroll(doc: Document): void {
+    const { style } = doc.body;
+    this.bodyScrollLock = {
+      scrollY: doc.defaultView?.scrollY ?? 0,
+      prev: {
+        position: style.position,
+        top: style.top,
+        left: style.left,
+        right: style.right,
+        width: style.width,
+        overflow: style.overflow,
+      },
+    };
+    // overflow:hidden still does the whole job on desktop (and avoids a
+    // scroll jump there); the fixed-body treatment is what actually stops iOS
+    // touch scrolling. `top: -scrollY` keeps the page visually where it was.
+    style.overflow = 'hidden';
+    style.position = 'fixed';
+    style.top = `-${this.bodyScrollLock.scrollY}px`;
+    style.left = '0';
+    style.right = '0';
+    style.width = '100%';
+  }
+
+  private unlockBodyScroll(doc: Document): void {
+    if (!this.bodyScrollLock) return;
+    const { scrollY, prev } = this.bodyScrollLock;
+    this.bodyScrollLock = null;
+    const { style } = doc.body;
+    style.position = prev.position;
+    style.top = prev.top;
+    style.left = prev.left;
+    style.right = prev.right;
+    style.width = prev.width;
+    style.overflow = prev.overflow;
+    // Fixing the body collapsed the document's scroll position to 0; jump
+    // back instantly (never smooth — the restoration must be invisible).
+    // Guarded for jsdom, where scrollTo is unimplemented.
+    const view = doc.defaultView;
+    if (scrollY !== 0 && typeof view?.scrollTo === 'function') {
+      view.scrollTo({ top: scrollY, behavior: 'instant' });
+    }
+  }
+
   /** How many overlays are currently open. */
   get openCount(): number {
-    return openRefs.size;
+    return this.openRefs.size;
   }
 
   /**
@@ -196,7 +201,7 @@ export class MkOverlayService {
    */
   closeAll(): void {
     // Iterate a COPY: close() disposes synchronously, which mutates the map.
-    for (const ref of [...openRefs.keys()].reverse()) ref.close();
+    for (const ref of [...this.openRefs.keys()].reverse()) ref.close();
   }
 
   open<TComponent, TResult = unknown, TData = unknown>(
@@ -275,8 +280,8 @@ export class MkOverlayService {
 
     // Lock body scroll while any overlay is open (see lockBodyScroll for the
     // iOS-proof fixed-body technique and the reference counting).
-    if (openOverlays++ === 0) {
-      lockBodyScroll(this.document);
+    if (this.openOverlays++ === 0) {
+      this.lockBodyScroll(this.document);
     }
 
     // Make the rest of the page inert while a MODAL overlay is open —
@@ -311,19 +316,19 @@ export class MkOverlayService {
     // Escape handling goes through ONE shared document listener (see
     // `onDocumentEscape`) so stacked overlays close one per keypress,
     // topmost first, and inner widgets can consume Escape before us.
-    openRefs.set(overlayRef as MkOverlayRef<unknown>, { closeOnEscape });
-    syncEscapeListener(this.document);
+    this.openRefs.set(overlayRef as MkOverlayRef<unknown>, { closeOnEscape });
+    this.syncEscapeListener(this.document);
 
     overlayRef._dispose = () => {
-      openRefs.delete(overlayRef as MkOverlayRef<unknown>);
-      syncEscapeListener(this.document);
+      this.openRefs.delete(overlayRef as MkOverlayRef<unknown>);
+      this.syncEscapeListener(this.document);
       for (const el of inerted) el.removeAttribute('inert');
       focusTrap?.release();
       this.appRef.detachView(componentRef.hostView);
       componentRef.destroy();
       container.remove();
-      if (--openOverlays === 0) {
-        unlockBodyScroll(this.document);
+      if (--this.openOverlays === 0) {
+        this.unlockBodyScroll(this.document);
       }
     };
 
