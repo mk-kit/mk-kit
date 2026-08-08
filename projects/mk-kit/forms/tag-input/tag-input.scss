@@ -81,3 +81,14 @@
 .mk-tag-input__input[readonly] {
   cursor: default;
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the entry
+   input on coarse pointers. Desktop sizes are unchanged. */
+@media (pointer: coarse) {
+  .mk-tag-input__input {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-tag-input--sm) .mk-tag-input__input {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

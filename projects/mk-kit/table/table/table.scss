@@ -228,6 +228,12 @@
   touch-action: none;
   user-select: none;
 }
+/* Touch: the 8px resize strip gets a ≥24px-wide hit box (height is already
+   100%). `::after` draws the visual line, so the mixin's default `::before`
+   is free; the handle is absolutely positioned, hence $position: null. */
+.mk-table__resize {
+  @include mk.touch-target(24px, $position: null);
+}
 .mk-table__resize::after {
   content: '';
   position: absolute;
@@ -503,5 +509,13 @@
     border: none;
     box-shadow: none;
     background: none;
+  }
+}
+
+/* iOS zooms into focused fields under 16px — the cell editor inherits the
+   (smaller) cell font, so pin it up on touch. */
+@media (pointer: coarse) {
+  .mk-table__cell-input {
+    font-size: max(var(--mk-font-size-md), 16px);
   }
 }

@@ -203,3 +203,14 @@
   color: var(--mk-text-muted);
   line-height: var(--mk-line-height-snug);
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the combobox
+   input on coarse pointers; lg (18px) already clears the threshold. */
+@media (pointer: coarse) {
+  .mk-autocomplete__input {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-autocomplete--sm) .mk-autocomplete__input {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

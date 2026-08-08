@@ -30,6 +30,14 @@
     color var(--mk-duration-fast) var(--mk-ease-standard),
     transform var(--mk-duration-fast) var(--mk-ease-standard);
 }
+/* Touch: each star button (separate pointer targets in the DOM; the host owns
+   keyboard) gets a ≥24px hit box — the default xl star is exactly 24px, but
+   the sm size (~18px) is not. The pseudo is absolutely positioned, so it does
+   not become a grid item and the glyph stays centred. */
+.mk-rating__star {
+  @include mk.touch-target(24px);
+}
+
 .mk-rating__star svg {
   fill: currentColor;
 }

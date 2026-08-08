@@ -448,7 +448,9 @@ body.mk-app {
   display: flex;
   flex-direction: column;
   width: min(92vw, 32rem);
+  /* vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   max-height: min(90vh, 44rem);
+  max-height: min(90dvh, 44rem);
   overflow: hidden;
   background-color: var(--mk-surface);
   color: var(--mk-text);
@@ -481,6 +483,8 @@ body.mk-app {
 .mk-dialog-panel > :not(.mk-dialog) {
   min-height: 0;
   overflow: auto;
+  /* Don't let dialog scroll chain into (rubber-band) the page behind. */
+  overscroll-behavior: contain;
 }
 
 .mk-dialog-panel:not(:has(.mk-dialog)) {
@@ -501,10 +505,16 @@ body.mk-app {
   align-self: flex-end;
   /* `width` (not max-width) so the panel's inline max-width:100% can't win. */
   width: min(100%, 42rem);
+  /* vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   max-height: 90vh;
+  max-height: 90dvh;
   display: flex;
   flex-direction: column;
   overflow: hidden;
+  /* Keep sheet content clear of the iOS home indicator. Applied on the panel
+     (not the sheet footer) so bare components and footer-less sheets are
+     covered too; env() falls back to 0px elsewhere. */
+  padding-bottom: env(safe-area-inset-bottom, 0px);
   background-color: var(--mk-surface);
   color: var(--mk-text);
   border: var(--mk-border-width) solid var(--mk-border-subtle);
@@ -519,10 +529,15 @@ body.mk-app {
 .mk-bottom-sheet-panel > :not(.mk-bottom-sheet) {
   min-height: 0;
   overflow: auto;
+  /* Don't let sheet scroll chain into (rubber-band) the page behind. */
+  overscroll-behavior: contain;
 }
 
 .mk-bottom-sheet-panel:not(:has(.mk-bottom-sheet)) {
   padding: var(--mk-space-5);
+  /* The shorthand above would clobber the panel's safe-area padding-bottom;
+     restate it on top of the bare-component padding. */
+  padding-bottom: calc(var(--mk-space-5) + env(safe-area-inset-bottom, 0px));
 }
 
 @keyframes mk-bottom-sheet-in {

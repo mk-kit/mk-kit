@@ -33,6 +33,12 @@
     background-color var(--mk-duration-fast) var(--mk-ease-standard);
 }
 
+/* Touch: ≥24px hit box on the ~18px visual control. The pseudo belongs to the
+   control span, so taps bubble to the interactive host exactly as before. */
+.mk-radio__control {
+  @include mk.touch-target(24px);
+}
+
 .mk-radio__dot {
   width: 50%;
   height: 50%;

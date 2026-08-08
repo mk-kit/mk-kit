@@ -5,9 +5,21 @@
   font-family: var(--mk-font-sans);
 }
 
+/* Steps never shrink — on narrow screens the horizontal header rail scrolls
+   sideways instead of clipping. No visible scrollbar. (Vertical orientation
+   renders rows, not this header, so it is unaffected.) */
 .mk-stepper__header {
   display: flex;
   align-items: center;
+  overflow-x: auto;
+  scrollbar-width: none;
+  /* A scroll container clips at its padding box — leave room so the steps'
+     outline focus ring stays visible. */
+  padding-block: calc(var(--mk-focus-ring-width) + var(--mk-focus-ring-offset));
+}
+
+.mk-stepper__header::-webkit-scrollbar {
+  display: none;
 }
 
 

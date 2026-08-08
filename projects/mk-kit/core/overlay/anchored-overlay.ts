@@ -44,6 +44,12 @@ export interface MkAnchoredPosition {
   placement: MkPlacement;
 }
 
+/**
+ * Never shrink a panel below this via the viewport size cap — a sub-120px
+ * dropdown is unusable; at that point overflowing beats collapsing.
+ */
+const MIN_SIZE_CAP = 120;
+
 function sideOf(placement: MkPlacement): 'top' | 'bottom' | 'left' | 'right' {
   if (placement.startsWith('top')) return 'top';
   if (placement.startsWith('bottom')) return 'bottom';
@@ -169,6 +175,8 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   readonly dismiss = output<void>();
 
   private popover = false;
+  /** Whether {@link position} applied an inline viewport size cap (`max-*`). */
+  private sizeCapped = false;
 
   private repositionRaf: number | null = null;
   /**
@@ -242,6 +250,13 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     });
     view?.addEventListener('resize', this.onResize);
     view?.addEventListener('blur', this.onWindowBlur);
+    // iOS's software keyboard (and pinch-zoom) resizes/pans only the VISUAL
+    // viewport — `window` never fires resize/scroll for it — so listen there
+    // too, into the same reposition paths. Feature-detected: jsdom and older
+    // browsers have no visualViewport.
+    const visual = view?.visualViewport;
+    visual?.addEventListener('resize', this.onResize);
+    visual?.addEventListener('scroll', this.onScroll);
     this.document.addEventListener('pointerdown', this.onDocPointerdown, true);
 
     // Re-measure once layout has settled (fonts, async content).
@@ -263,8 +278,16 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     const anchor = this.resolveAnchorRect();
     if (!anchor) return;
 
-    const vw = this.document.documentElement.clientWidth;
-    const vh = this.document.documentElement.clientHeight;
+    // Prefer the visual viewport when it exists and is measured: on iOS the
+    // software keyboard shrinks only `visualViewport`, never the layout
+    // viewport, so clamp/flip maths against `documentElement.client*` would
+    // keep placing panels underneath the keyboard. Fallback (no visualViewport,
+    // or one reporting 0×0 pre-measure) keeps the existing behaviour, including
+    // the jsdom "unmeasured viewport" guards below.
+    const visual = view.visualViewport;
+    const useVisual = visual != null && visual.width > 0 && visual.height > 0;
+    const vw = useVisual ? visual.width : this.document.documentElement.clientWidth;
+    const vh = useVisual ? visual.height : this.document.documentElement.clientHeight;
 
     // Anchor scrolled fully out of view — the panel would float detached.
     // Zero-size anchor rects and a zero-size viewport are skipped: they mean
@@ -285,14 +308,44 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
       el.style.minWidth = `${Math.round(anchor.width)}px`;
     }
 
-    const rect = el.getBoundingClientRect();
+    const gap = this.gap();
+
+    // Viewport size cap: a panel wider or taller than the screen (a fat menu
+    // on a 360px phone) gets an inline `max-width`/`max-height` so it scrolls
+    // internally instead of overflowing. An inline max-* OVERRIDES any
+    // stylesheet max (e.g. a select list's own 16rem max-height), so the cap
+    // is applied only when the panel's NATURAL size exceeds it — it never
+    // enlarges a panel that already limits itself. A previously applied cap is
+    // cleared first so the natural size is re-measured against the current
+    // viewport. Scroll-tracking frames skip all of this: the viewport has not
+    // resized mid-scroll, and clearing/re-measuring would force two extra
+    // reflows per frame.
+    if (!track && this.sizeCapped) {
+      el.style.removeProperty('max-width');
+      el.style.removeProperty('max-height');
+      this.sizeCapped = false;
+    }
+    let rect = el.getBoundingClientRect();
+    if (!track && vw > 0 && vh > 0) {
+      const capW = Math.max(MIN_SIZE_CAP, Math.floor(vw - 2 * gap));
+      const capH = Math.max(MIN_SIZE_CAP, Math.floor(vh - 2 * gap));
+      const capWidth = rect.width > capW;
+      const capHeight = rect.height > capH;
+      if (capWidth) el.style.maxWidth = `${capW}px`;
+      if (capHeight) el.style.maxHeight = `${capH}px`;
+      if (capWidth || capHeight) {
+        this.sizeCapped = true;
+        rect = el.getBoundingClientRect();
+      }
+    }
+
     const pos = mkComputeAnchoredPosition(
       anchor,
       { width: rect.width, height: rect.height },
       { width: vw, height: vh },
       {
         placement: this.placement(),
-        gap: this.gap(),
+        gap,
         flip: this.flip(),
         clamp: this.clamp() && !track,
         rtl: this.isAnchorRtl(),
@@ -343,6 +396,9 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     view?.removeEventListener('scroll', this.onScroll, true);
     view?.removeEventListener('resize', this.onResize);
     view?.removeEventListener('blur', this.onWindowBlur);
+    const visual = view?.visualViewport;
+    visual?.removeEventListener('resize', this.onResize);
+    visual?.removeEventListener('scroll', this.onScroll);
     this.document.removeEventListener('pointerdown', this.onDocPointerdown, true);
 
     const withPopover = el as HTMLElement & { hidePopover?: () => void };

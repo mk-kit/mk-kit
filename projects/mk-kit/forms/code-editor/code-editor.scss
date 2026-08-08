@@ -168,3 +168,17 @@
     transition: none;
   }
 }
+
+/* iOS zooms into focused fields under 16px. Bump the shared metric var so the
+   textarea and its highlight layer stay in lockstep. */
+@media (pointer: coarse) {
+  :host {
+    --_fs: max(var(--mk-font-size-sm), 16px);
+  }
+  :host(.mk-code-editor--sm) {
+    --_fs: max(var(--mk-font-size-xs), 16px);
+  }
+  :host(.mk-code-editor--lg) {
+    --_fs: max(var(--mk-font-size-md), 16px);
+  }
+}

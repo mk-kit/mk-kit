@@ -225,4 +225,95 @@ describe('MkAnchoredPanel (directive lifecycle)', () => {
 
     fixture.destroy();
   });
+
+  describe('viewport size cap', () => {
+    it('caps max-width/max-height when the panel is larger than the viewport', async () => {
+      const fixture = TestBed.createComponent(AnchoredHost);
+      fixture.detectChanges();
+      fixture.componentInstance.open.set(true);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const panel = document.querySelector('.panel') as HTMLElement;
+      // A panel measuring larger than the mocked 1000×800 viewport.
+      panel.getBoundingClientRect = () =>
+        rect(0, 0, 1400, 900) as DOMRect;
+
+      window.dispatchEvent(new Event('resize'));
+      await new Promise((r) => setTimeout(r, 50));
+
+      // cap = viewport - 2 * gap (default gap 4).
+      expect(panel.style.maxWidth).toBe('992px');
+      expect(panel.style.maxHeight).toBe('792px');
+
+      fixture.destroy();
+    });
+
+    it('leaves max-* alone when the panel fits — a panel with its own smaller CSS max keeps it', async () => {
+      const fixture = TestBed.createComponent(AnchoredHost);
+      fixture.detectChanges();
+      fixture.componentInstance.open.set(true);
+      fixture.detectChanges();
+      await fixture.whenStable();
+
+      const panel = document.querySelector('.panel') as HTMLElement;
+      // A panel already limited below the cap (e.g. a select list whose
+      // stylesheet max-height of 16rem keeps its measured height at 256px).
+      // An inline max-* would OVERRIDE that stylesheet max, so none may be set.
+      panel.getBoundingClientRect = () =>
+        rect(0, 0, 300, 256) as DOMRect;
+
+      window.dispatchEvent(new Event('resize'));
+      await new Promise((r) => setTimeout(r, 50));
+
+      expect(panel.style.maxWidth).toBe('');
+      expect(panel.style.maxHeight).toBe('');
+
+      fixture.destroy();
+    });
+  });
+
+  describe('visualViewport', () => {
+    it('attaches resize/scroll listeners to visualViewport, prefers its size for the cap, and detaches on destroy', async () => {
+      // jsdom has no visualViewport — install a feature-detectable mock.
+      const vv = Object.assign(new EventTarget(), { width: 360, height: 500 });
+      const addSpy = vi.spyOn(vv, 'addEventListener');
+      const removeSpy = vi.spyOn(vv, 'removeEventListener');
+      Object.defineProperty(window, 'visualViewport', {
+        value: vv,
+        configurable: true,
+      });
+
+      try {
+        const fixture = TestBed.createComponent(AnchoredHost);
+        fixture.detectChanges();
+        fixture.componentInstance.open.set(true);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        expect(addSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+        expect(addSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+
+        const panel = document.querySelector('.panel') as HTMLElement;
+        panel.getBoundingClientRect = () =>
+          rect(0, 0, 600, 600) as DOMRect;
+
+        // A visualViewport resize (iOS keyboard) must reach the reposition
+        // path even though `window` itself never fires.
+        vv.dispatchEvent(new Event('resize'));
+        await new Promise((r) => setTimeout(r, 50));
+
+        // Cap derives from the 360×500 visual viewport, not the 1000×800
+        // layout viewport mocked on documentElement.
+        expect(panel.style.maxWidth).toBe('352px');
+        expect(panel.style.maxHeight).toBe('492px');
+
+        fixture.destroy();
+        expect(removeSpy).toHaveBeenCalledWith('resize', expect.any(Function));
+        expect(removeSpy).toHaveBeenCalledWith('scroll', expect.any(Function));
+      } finally {
+        delete (window as any).visualViewport;
+      }
+    });
+  });
 });

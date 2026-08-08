@@ -137,6 +137,25 @@ describe('MkTabs', () => {
     expect(press(fixture, buttons[0], 'x').defaultPrevented).toBe(false);
   });
 
+  it('scrolls the newly active tab into view on click and on arrow keys', () => {
+    // jsdom has no scrollIntoView — install a prototype spy for the test.
+    const original = HTMLElement.prototype.scrollIntoView;
+    const spy = vi.fn();
+    HTMLElement.prototype.scrollIntoView = spy;
+    try {
+      const { fixture, buttons } = mount();
+      buttons[2].click();
+      fixture.detectChanges();
+      expect(spy).toHaveBeenCalledWith({ block: 'nearest', inline: 'nearest' });
+      expect(spy.mock.contexts.at(-1)).toBe(buttons[2]);
+
+      press(fixture, buttons[2], 'ArrowLeft');
+      expect(spy.mock.contexts.at(-1)).toBe(buttons[1]);
+    } finally {
+      HTMLElement.prototype.scrollIntoView = original;
+    }
+  });
+
   it('clamps an out-of-range selectedIndex onto a real tab', () => {
     const { fixture, panels, host } = mount();
     host.index.set(99);

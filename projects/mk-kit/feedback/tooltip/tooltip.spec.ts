@@ -308,3 +308,86 @@ describe('MkTooltip dismissal on pointer input', () => {
     expect(tips()).toBe(1);
   });
 });
+
+/**
+ * Touch has no hover, and pointerdown-dismiss alone would make tooltips
+ * unreachable with a finger (the tap that focuses the trigger would kill the
+ * tip in the same gesture). So a touch tap on the trigger TOGGLES: tap shows,
+ * tap again — or tap anywhere else — dismisses. Mouse and pen keep the plain
+ * dismiss-on-pointerdown behaviour.
+ */
+describe('MkTooltip on touch', () => {
+  function mount() {
+    TestBed.resetTestingModule();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const f = TestBed.createComponent(Host);
+    f.detectChanges();
+    return {
+      f,
+      trigger: (f.nativeElement as HTMLElement).querySelector('button')!,
+    };
+  }
+
+  const tips = () => document.querySelectorAll('.mk-tooltip').length;
+  const touchDown = () =>
+    new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' });
+
+  afterEach(() =>
+    document.querySelectorAll('.mk-tooltip').forEach((t) => t.remove()),
+  );
+
+  it('a touch tap on the trigger shows the tooltip immediately', () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(touchDown());
+    expect(tips()).toBe(1);
+  });
+
+  it('a second tap on the trigger hides it (toggle)', () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(touchDown());
+    expect(tips()).toBe(1);
+
+    trigger.dispatchEvent(touchDown());
+    expect(tips()).toBe(0);
+  });
+
+  it('a tap anywhere else dismisses via the document pointerdown path', () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(touchDown());
+    expect(tips()).toBe(1);
+
+    document.body.dispatchEvent(touchDown());
+    expect(tips()).toBe(0);
+  });
+
+  it('does not re-show via the focusin the same tap causes', () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(touchDown());
+    trigger.dispatchEvent(touchDown()); // toggle off …
+    trigger.dispatchEvent(new Event('focusin', { bubbles: true })); // … tap's focus
+    expect(tips()).toBe(0);
+  });
+
+  it('a press on the tooltip panel itself keeps it up (hoverable)', () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(touchDown());
+    const panel = document.querySelector<HTMLElement>('.mk-tooltip')!;
+
+    panel.dispatchEvent(touchDown());
+    expect(tips()).toBe(1);
+  });
+
+  it('mouse pointerdown on the trigger still dismisses a hover tooltip', async () => {
+    const { trigger } = mount();
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    await new Promise((r) => setTimeout(r, 400));
+    expect(tips()).toBe(1);
+
+    trigger.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }),
+    );
+    expect(tips()).toBe(0);
+  });
+});

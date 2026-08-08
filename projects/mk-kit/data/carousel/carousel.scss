@@ -9,6 +9,8 @@
   position: relative;
   overflow: hidden;
   border-radius: var(--mk-radius-md);
+  /* Horizontal swipes are ours; vertical page scroll stays native. */
+  touch-action: pan-y;
 }
 .mk-carousel__viewport:focus-visible {
   @include mk.focus-ring;
@@ -17,6 +19,10 @@
 .mk-carousel__track {
   display: flex;
   transition: transform var(--mk-duration-normal, 240ms) var(--mk-ease-standard);
+}
+/* While the finger drives the track, the transform must follow it 1:1. */
+.mk-carousel__track--dragging {
+  transition: none;
 }
 
 .mk-carousel__slide {

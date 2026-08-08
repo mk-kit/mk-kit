@@ -87,3 +87,11 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the field on
+   coarse pointers. Desktop sizes are unchanged. */
+@media (pointer: coarse) {
+  .mk-number-input__field {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+}

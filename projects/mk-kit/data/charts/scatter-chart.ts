@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { mkChartTapPin } from './chart-tap-pin';
 import {
   mkChartColor,
   mkFormatCompact,
@@ -97,6 +98,9 @@ export class MkScatterChart {
   readonly label = input<string>('');
 
   protected readonly hoverKey = signal<string | null>(null);
+  /** Tap-to-pin: a touch tap on a point pins the tooltip until a tap lands
+   *  outside the chart (mouse hover in/out is unaffected). */
+  private readonly tapPin = mkChartTapPin<string>((k) => this.hoverKey.set(k));
 
   protected readonly plot = computed(() => ({
     x: MARGIN.left,
@@ -232,6 +236,10 @@ export class MkScatterChart {
   });
 
   protected setHover(key: string | null): void {
-    this.hoverKey.set(key);
+    this.tapPin.hover(key);
+  }
+
+  protected pinHover(key: string, event: PointerEvent): void {
+    this.tapPin.pin(key, event);
   }
 }

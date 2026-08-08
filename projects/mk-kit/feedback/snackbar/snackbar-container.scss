@@ -1,6 +1,7 @@
 :host {
   position: fixed;
-  bottom: var(--mk-space-5);
+  /* Clear the iOS home indicator; env() falls back to 0px elsewhere. */
+  bottom: calc(var(--mk-space-5) + env(safe-area-inset-bottom, 0px));
   left: 50%;
   transform: translateX(-50%);
   z-index: var(--mk-z-toast);

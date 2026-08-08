@@ -61,3 +61,14 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the field on
+   coarse pointers; lg (18px) already clears the threshold. */
+@media (pointer: coarse) {
+  .mk-postal-code-input__field {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-postal-code-input--sm) .mk-postal-code-input__field {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

@@ -61,6 +61,15 @@
 :host(:dir(rtl)) .mk-range-slider__thumb {
   transform: translate(50%, -50%);
 }
+/* Touch: both ~18px thumbs are primary drag targets — 44px hit boxes each.
+   At close values the two boxes overlap but never fully cover one another
+   (each thumb's own 44px centre remains on top for the later-DOM thumb, and
+   the nearest-thumb pick in the component TS resolves ties). Thumbs are
+   already absolutely positioned, so $position: null. */
+.mk-range-slider__thumb {
+  @include mk.touch-target(44px, $position: null);
+}
+
 .mk-range-slider__thumb:hover {
   box-shadow: var(--mk-shadow-md);
 }

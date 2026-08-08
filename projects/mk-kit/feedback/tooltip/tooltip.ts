@@ -82,7 +82,9 @@ export class MkTooltipPanel {
     // this, tapping a tooltipped control leaves the tip on screen — and since
     // tooltips deliberately sit ABOVE dialogs (so a tip inside a modal is
     // visible), a stale one floats over whatever the tap just opened.
-    '(pointerdown)': 'onPointerDown()',
+    // Exception: a TOUCH tap on the trigger of a hidden tooltip SHOWS it —
+    // touch has no hover, so this is the only way a finger reaches the tip.
+    '(pointerdown)': 'onPointerDown($event)',
   },
 })
 export class MkTooltip {
@@ -155,10 +157,32 @@ export class MkTooltip {
     this.scheduleShow(0);
   }
 
-  protected onPointerDown(): void {
+  protected onPointerDown(event: PointerEvent): void {
     this.suppressFocusShow = true;
+    // Touch toggle: hover never happens on a touchscreen, so a tap on the
+    // trigger is the show gesture. Tap again (ref exists → fall through to
+    // hide) or tap elsewhere (document pointerdown) dismisses. Mouse and pen
+    // keep the plain dismiss-on-pointerdown behaviour.
+    if (event.pointerType === 'touch' && !this.ref) {
+      this.scheduleShow(0);
+      return;
+    }
     this.hide();
   }
+
+  /**
+   * Outside-tap dismissal (attached to the document only while visible): a
+   * pointerdown that lands on neither the trigger nor the panel hides the
+   * tooltip. The trigger's own pointerdown handles show/hide/toggle itself,
+   * and a press on the panel keeps it up (WCAG 1.4.13 "hoverable").
+   */
+  private readonly onDocumentPointerdown = (event: Event): void => {
+    const target = event.target as Node | null;
+    if (!target || this.host.nativeElement.contains(target)) return;
+    const panel = this.ref?.location.nativeElement as HTMLElement | undefined;
+    if (panel?.contains(target)) return;
+    this.hide();
+  };
 
   private scheduleShow(delay: number): void {
     if (!this.isBrowser || !this.mkTooltip().trim() || this.ref) return;
@@ -176,6 +200,11 @@ export class MkTooltip {
     if (!this.ref) return;
 
     this.document.removeEventListener('keydown', this.onDocumentKeydown, true);
+    this.document.removeEventListener(
+      'pointerdown',
+      this.onDocumentPointerdown,
+      true,
+    );
 
     // Restore the trigger's original aria-describedby.
     const el = this.host.nativeElement;
@@ -225,6 +254,13 @@ export class MkTooltip {
     // defaultPrevented before any bubbling handler (e.g. a dialog deciding
     // whether to close) sees it — layered dismissal, tooltip first.
     this.document.addEventListener('keydown', this.onDocumentKeydown, true);
+    // … and from an outside tap — the touch analogue of mouseleave. Capture
+    // phase so the tooltip is gone before the tap's own target reacts.
+    this.document.addEventListener(
+      'pointerdown',
+      this.onDocumentPointerdown,
+      true,
+    );
 
     // Promote into the top layer so the tooltip is never clipped by an
     // ancestor's overflow/transform or hidden behind a stacking context.

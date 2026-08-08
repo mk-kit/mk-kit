@@ -9,6 +9,7 @@ import {
   signal,
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
+import { mkChartTapPin } from './chart-tap-pin';
 import {
   MkChartSlice,
   mkArcPath,
@@ -67,6 +68,9 @@ export class MkDonutChart {
   readonly label = input<string>('');
 
   protected readonly hovered = signal<number | null>(null);
+  /** Tap-to-pin: a touch tap on a slice pins the tooltip until a tap lands
+   *  outside the chart (mouse hover in/out is unaffected). */
+  private readonly tapPin = mkChartTapPin<number>((i) => this.hovered.set(i));
 
   protected readonly total = computed(() =>
     this.slices().reduce((sum, s) => sum + Math.max(s.value, 0), 0),
@@ -141,6 +145,10 @@ export class MkDonutChart {
   });
 
   protected setHover(index: number | null): void {
-    this.hovered.set(index);
+    this.tapPin.hover(index);
+  }
+
+  protected pinHover(index: number, event: PointerEvent): void {
+    this.tapPin.pin(index, event);
   }
 }

@@ -9,6 +9,14 @@
   display: flex;
   align-items: stretch;
   gap: var(--mk-space-1);
+  /* Tabs never wrap — on narrow screens the list scrolls sideways instead of
+     clipping. No visible scrollbar; the active tab is scrolled into view. */
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.mk-tabs__list::-webkit-scrollbar {
+  display: none;
 }
 
 :host(.mk-tabs--line) .mk-tabs__list {
@@ -64,7 +72,11 @@
 
 .mk-tabs__indicator {
   position: absolute;
-  bottom: calc(-1 * var(--mk-border-width));
+  /* The list is a scroll container now, which clips at its padding box — a
+     negative `bottom` would lose a slice of the indicator. Sitting at 0 it
+     rests directly on the border instead of overlapping it. Being absolutely
+     positioned inside the scrolling list, it scrolls along with the tabs. */
+  bottom: 0;
   left: 0;
   height: 2px;
   background: var(--mk-primary);

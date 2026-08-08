@@ -203,3 +203,11 @@
     animation: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the filter
+   input on coarse pointers. Desktop sizes are unchanged. */
+@media (pointer: coarse) {
+  .mk-multi-select__input {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+}
