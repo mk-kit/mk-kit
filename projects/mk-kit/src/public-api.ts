@@ -10,6 +10,7 @@
 export * from '@mkornas/ui/core';
 export * from '@mkornas/ui/icon';
 export * from '@mkornas/ui/chip';
+export * from '@mkornas/ui/checkbox';
 export * from '@mkornas/ui/button';
 export * from '@mkornas/ui/directives';
 export * from '@mkornas/ui/dnd';

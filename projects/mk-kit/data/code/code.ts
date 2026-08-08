@@ -6,8 +6,7 @@ import {
   input,
 } from '@angular/core';
 import { MkCopyToClipboard } from '@mkornas/ui/directives';
-import { mkHighlight } from '@mkornas/ui/forms';
-import type { MkCodeLanguage } from '@mkornas/ui/forms';
+import { mkHighlight, type MkCodeLanguage } from '@mkornas/ui/core';
 
 /**
  * Code — a read-only, themed code block with syntax highlighting, an optional

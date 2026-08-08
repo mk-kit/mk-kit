@@ -9,19 +9,34 @@
   gap: var(--mk-space-2);
 }
 
-/* Elements that receive the shimmer: block shapes and text lines. */
+/*
+ * Elements that receive the shimmer: block shapes and text lines. The shine
+ * is an oversized gradient overlay translated across the element — a
+ * compositor-only animation, unlike an animated `background-position`, which
+ * repaints every shimmering element on every frame. The elements are leaves
+ * (no content), so clipping the overlay with `overflow: hidden` is safe.
+ */
 :host(.mk-skeleton--rect),
 :host(.mk-skeleton--circle),
 .mk-skeleton__line {
+  position: relative;
+  overflow: hidden;
   background-color: var(--mk-skeleton-base);
+}
+
+:host(.mk-skeleton--rect)::after,
+:host(.mk-skeleton--circle)::after,
+.mk-skeleton__line::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 200%;
   background-image: linear-gradient(
     90deg,
     var(--mk-skeleton-base) 0%,
     var(--mk-skeleton-shine) 50%,
     var(--mk-skeleton-base) 100%
   );
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: mk-skeleton-shimmer 1.4s ease-in-out infinite;
 }
 
@@ -39,17 +54,18 @@
   border-radius: var(--mk-radius-xs);
 }
 
+/* Same tempo and left-to-right sweep as the old background-position slide. */
 @keyframes mk-skeleton-shimmer {
-  0% { background-position: 200% 0; }
-  100% { background-position: -200% 0; }
+  0% { transform: translateX(-50%); }
+  100% { transform: translateX(50%); }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  :host(.mk-skeleton--rect),
-  :host(.mk-skeleton--circle),
-  .mk-skeleton__line {
+  /* The gradient overlay carries the animation now — drop it entirely. */
+  :host(.mk-skeleton--rect)::after,
+  :host(.mk-skeleton--circle)::after,
+  .mk-skeleton__line::after {
+    content: none;
     animation: none;
-    background-image: none;
-    background-color: var(--mk-skeleton-base);
   }
 }

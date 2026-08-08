@@ -34,7 +34,7 @@ export class MkLoadingBarService {
     this.clearTimers();
     this._active.set(true);
     this._progress.set(8);
-    this.timer = setInterval(() => this.trickle(), 350);
+    this.armTrickle();
   }
 
   /** Set an explicit determinate value (0–100). */
@@ -48,6 +48,9 @@ export class MkLoadingBarService {
   inc(amount = 5): void {
     if (!this._active()) this.start();
     this._progress.set(Math.min(90, this._progress() + amount));
+    // Re-arm the trickle if it stopped at the ceiling (or after a `set()`)
+    // and there is still room to move.
+    if (this._progress() < 90) this.armTrickle();
   }
 
   /** Finish (jump to 100%) then fade out. */
@@ -71,12 +74,35 @@ export class MkLoadingBarService {
     this._progress.set(0);
   }
 
-  /** Auto-slowing trickle so the bar keeps moving without ever completing. */
+  /**
+   * Auto-slowing trickle so the bar keeps moving without ever completing.
+   * Stops its own interval at the 90% ceiling — otherwise a navigation that
+   * never `complete()`s would leave a timer firing (and, in a zoneless app,
+   * scheduling change detection) forever. `start()`/`inc()` re-arm it.
+   */
   private trickle(): void {
     const p = this._progress();
-    if (p >= 90) return;
+    if (p >= 90) {
+      this.stopTrickle();
+      return;
+    }
     const step = p < 20 ? 10 : p < 50 ? 4 : p < 80 ? 2 : 0.5;
-    this._progress.set(Math.min(90, p + step));
+    const next = Math.min(90, p + step);
+    this._progress.set(next);
+    if (next >= 90) this.stopTrickle();
+  }
+
+  /** Start the 350ms trickle interval unless it is already running. */
+  private armTrickle(): void {
+    if (!this.isBrowser || this.timer) return;
+    this.timer = setInterval(() => this.trickle(), 350);
+  }
+
+  private stopTrickle(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+      this.timer = undefined;
+    }
   }
 
   private clearTimers(): void {

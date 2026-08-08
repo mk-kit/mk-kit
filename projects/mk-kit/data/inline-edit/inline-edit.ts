@@ -18,7 +18,7 @@ import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mkornas/ui/core';
 import { mkUniqueId } from '@mkornas/ui/core';
 import { MK_I18N } from '@mkornas/ui/core';
-import { MkFormField } from '@mkornas/ui/forms';
+import { MkFieldContext } from '@mkornas/ui/core';
 
 /**
  * InlineEdit — click a piece of text to edit it in place. The display is a
@@ -54,7 +54,7 @@ import { MkFormField } from '@mkornas/ui/forms';
 })
 export class MkInlineEdit implements ControlValueAccessor {
   private readonly injector = inject(Injector);
-  private readonly field = inject(MkFormField, { optional: true });
+  private readonly field = inject(MkFieldContext, { optional: true });
   protected readonly i18n = inject(MK_I18N);
   private readonly displayRef =
     viewChild<ElementRef<HTMLButtonElement>>('display');

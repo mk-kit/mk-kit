@@ -198,6 +198,105 @@ describe('MkCarousel autoplay', () => {
   });
 });
 
+describe('MkCarousel autoplay visibility', () => {
+  type IoCb = (entries: Array<{ isIntersecting: boolean }>) => void;
+
+  let fixture: ComponentFixture<AutoplayHost>;
+  let carousel: MkCarousel;
+  let ioCb: IoCb | undefined;
+  let originalIO: typeof IntersectionObserver;
+
+  const playing = () => (carousel as any).playing() as boolean;
+
+  /** Fake `document.hidden` and fire the visibilitychange the carousel listens for. */
+  const setHidden = (hidden: boolean) => {
+    Object.defineProperty(document, 'hidden', { value: hidden, configurable: true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  };
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    ioCb = undefined;
+    originalIO = globalThis.IntersectionObserver;
+    class MockIO {
+      constructor(cb: IoCb) {
+        ioCb = cb;
+      }
+      observe() {}
+      disconnect() {}
+      unobserve() {}
+    }
+    globalThis.IntersectionObserver = MockIO as unknown as typeof IntersectionObserver;
+
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(AutoplayHost);
+    fixture.detectChanges();
+    carousel = fixture.debugElement.children[0].componentInstance;
+  });
+
+  afterEach(() => {
+    fixture.destroy();
+    globalThis.IntersectionObserver = originalIO;
+    Reflect.deleteProperty(document, 'hidden');
+    vi.useRealTimers();
+  });
+
+  it('pauses autoplay while the tab is hidden — no advances in the dark', () => {
+    expect(playing()).toBe(true);
+
+    setHidden(true);
+    fixture.detectChanges();
+    expect(playing()).toBe(false);
+
+    vi.advanceTimersByTime(60_000 * 3); // three intervals' worth of hidden time
+    expect(carousel.index()).toBe(0);
+  });
+
+  it('resumes autoplay when the tab becomes visible again', () => {
+    setHidden(true);
+    fixture.detectChanges();
+    expect(playing()).toBe(false);
+
+    setHidden(false);
+    fixture.detectChanges();
+    expect(playing()).toBe(true);
+
+    vi.advanceTimersByTime(60_000);
+    expect(carousel.index()).toBe(1);
+  });
+
+  it('respects the userPaused latch across hidden/visible flips', () => {
+    carousel.userPaused.set(true);
+    fixture.detectChanges();
+    setHidden(true);
+    fixture.detectChanges();
+    setHidden(false);
+    fixture.detectChanges();
+    expect(playing()).toBe(false);
+    vi.advanceTimersByTime(60_000 * 2);
+    expect(carousel.index()).toBe(0);
+  });
+
+  it('pauses while fully offscreen and resumes when intersecting again', () => {
+    expect(ioCb).toBeDefined();
+    expect(playing()).toBe(true);
+
+    ioCb!([{ isIntersecting: false }]);
+    fixture.detectChanges();
+    expect(playing()).toBe(false);
+    vi.advanceTimersByTime(60_000 * 2);
+    expect(carousel.index()).toBe(0);
+
+    ioCb!([{ isIntersecting: true }]);
+    fixture.detectChanges();
+    expect(playing()).toBe(true);
+    vi.advanceTimersByTime(60_000);
+    expect(carousel.index()).toBe(1);
+  });
+});
+
 describe('MkCarousel swipe', () => {
   let fixture: ComponentFixture<Host>;
   let carousel: MkCarousel;

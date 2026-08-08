@@ -4,6 +4,7 @@ import {
   ElementRef,
   PLATFORM_ID,
   booleanAttribute,
+  effect,
   inject,
   input,
   output,
@@ -38,6 +39,8 @@ export class MkClickOutside {
   readonly mkClickOutside = output<PointerEvent>();
 
   private readonly onPointerdown = (event: Event): void => {
+    // Defensive: the listener detaches on the effect flush after `enabled`
+    // flips false, so also ignore any event racing in before that.
     if (!this.enabled()) return;
     const target = event.target as Node | null;
     if (target && !this.host.nativeElement.contains(target)) {
@@ -46,14 +49,15 @@ export class MkClickOutside {
   };
 
   constructor() {
-    if (this.isBrowser) {
+    // The document listener exists only while `enabled()` — an idle directive
+    // must not run its handler (and wake change detection) on every pointer
+    // press on the page. Effect cleanup also detaches it on destroy.
+    effect((onCleanup) => {
+      if (!this.isBrowser || !this.enabled()) return;
       this.document.addEventListener('pointerdown', this.onPointerdown, true);
-    }
-  }
-
-  ngOnDestroy(): void {
-    if (this.isBrowser) {
-      this.document.removeEventListener('pointerdown', this.onPointerdown, true);
-    }
+      onCleanup(() =>
+        this.document.removeEventListener('pointerdown', this.onPointerdown, true),
+      );
+    });
   }
 }

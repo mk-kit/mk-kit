@@ -4,6 +4,9 @@
  * tokens. Input is HTML-escaped first, so the result is safe to render.
  */
 
+/** Languages with built-in highlighting. Unknown values render plain text. */
+export type MkCodeLanguage = 'json' | 'plaintext';
+
 /** Escape the three characters that could break out of HTML text content. */
 export function mkEscapeHtml(src: string): string {
   return src.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;');

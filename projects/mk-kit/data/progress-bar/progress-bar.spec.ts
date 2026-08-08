@@ -45,13 +45,13 @@ describe('MkProgressBar', () => {
     expect(bar.getAttribute('aria-valuenow')).toBe('40');
   });
 
-  it('drives the fill width from the value', () => {
+  it('drives the fill transform from the value', () => {
     const { fixture, fill, host } = mount();
-    expect(fill.style.width).toBe('40%');
+    expect(fill.style.transform).toBe('scaleX(0.4)');
 
     host.value.set(75);
     fixture.detectChanges();
-    expect(fill.style.width).toBe('75%');
+    expect(fill.style.transform).toBe('scaleX(0.75)');
   });
 
   it('clamps out-of-range values into 0–100', () => {
@@ -59,12 +59,12 @@ describe('MkProgressBar', () => {
     host.value.set(150);
     fixture.detectChanges();
     expect(bar.getAttribute('aria-valuenow')).toBe('100');
-    expect(fill.style.width).toBe('100%');
+    expect(fill.style.transform).toBe('scaleX(1)');
 
     host.value.set(-20);
     fixture.detectChanges();
     expect(bar.getAttribute('aria-valuenow')).toBe('0');
-    expect(fill.style.width).toBe('0%');
+    expect(fill.style.transform).toBe('scaleX(0)');
   });
 
   it('rounds fractional values', () => {
@@ -82,7 +82,8 @@ describe('MkProgressBar', () => {
     // No known completion: the value must be absent, not zero.
     expect(bar.getAttribute('aria-valuenow')).toBeNull();
     expect(bar.classList.contains('mk-progress-bar--indeterminate')).toBe(true);
-    expect(fill.style.width).toBe('');
+    // No inline transform either — the CSS keyframes own the fill's motion.
+    expect(fill.style.transform).toBe('');
   });
 
   it('falls back to a generic aria-label when unlabelled', () => {

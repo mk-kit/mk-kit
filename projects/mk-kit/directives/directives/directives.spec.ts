@@ -1,5 +1,6 @@
 import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { MkAutofocus } from './autofocus';
 import { MkClickOutside } from './click-outside';
 import { MkCopyToClipboard } from './copy-to-clipboard';
 import { MkScrollspy } from './scrollspy';
@@ -58,6 +59,107 @@ describe('MkClickOutside', () => {
     const inside = fixture.nativeElement.querySelector('#inside') as HTMLElement;
     inside.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
     expect(fixture.componentInstance.hits()).toBe(0);
+  });
+});
+
+@Component({
+  imports: [MkClickOutside],
+  template: `<div
+    mkClickOutside
+    [mkClickOutsideEnabled]="enabled()"
+    (mkClickOutside)="hits.set(hits() + 1)"
+  ></div>`,
+})
+class ToggleClickOutsideHost {
+  readonly enabled = signal(false);
+  readonly hits = signal(0);
+}
+
+describe('MkClickOutside enabled toggling', () => {
+  it('keeps the document listener attached only while enabled', () => {
+    const addSpy = vi.spyOn(document, 'addEventListener');
+    const removeSpy = vi.spyOn(document, 'removeEventListener');
+    const added = () =>
+      addSpy.mock.calls.filter((c) => c[0] === 'pointerdown').length;
+    const removed = () =>
+      removeSpy.mock.calls.filter((c) => c[0] === 'pointerdown').length;
+
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    const fixture = TestBed.createComponent(ToggleClickOutsideHost);
+    fixture.detectChanges();
+
+    // Disabled from the start — no listener at all.
+    expect(added()).toBe(0);
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(fixture.componentInstance.hits()).toBe(0);
+
+    // Enabled → attaches and emits.
+    fixture.componentInstance.enabled.set(true);
+    fixture.detectChanges();
+    expect(added()).toBe(1);
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(fixture.componentInstance.hits()).toBe(1);
+
+    // Disabled again → detaches; outside presses no longer run the handler.
+    fixture.componentInstance.enabled.set(false);
+    fixture.detectChanges();
+    expect(removed()).toBe(1);
+    document.body.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true }));
+    expect(fixture.componentInstance.hits()).toBe(1);
+
+    // Re-enabled → re-attaches; destroy detaches via the effect cleanup.
+    fixture.componentInstance.enabled.set(true);
+    fixture.detectChanges();
+    expect(added()).toBe(2);
+    fixture.destroy();
+    expect(removed()).toBe(2);
+
+    addSpy.mockRestore();
+    removeSpy.mockRestore();
+  });
+});
+
+// --- MkAutofocus ------------------------------------------------------------
+@Component({
+  imports: [MkAutofocus],
+  template: `<input mkAutofocus [mkAutofocusDelay]="100" />`,
+})
+class AutofocusHost {}
+
+describe('MkAutofocus', () => {
+  let fixture: ComponentFixture<AutofocusHost>;
+  let input: HTMLInputElement;
+
+  beforeEach(() => {
+    vi.useFakeTimers();
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(AutofocusHost);
+    document.body.appendChild(fixture.nativeElement);
+    fixture.detectChanges();
+    input = fixture.nativeElement.querySelector('input') as HTMLInputElement;
+  });
+
+  afterEach(() => {
+    fixture.nativeElement.remove();
+    fixture.destroy();
+    vi.useRealTimers();
+  });
+
+  it('focuses the host after the configured delay', () => {
+    expect(document.activeElement).not.toBe(input);
+    vi.advanceTimersByTime(100);
+    expect(document.activeElement).toBe(input);
+  });
+
+  it('clears the pending delayed focus on destroy', () => {
+    const focusSpy = vi.spyOn(input, 'focus');
+    fixture.destroy(); // before the 100ms delay elapses
+    vi.advanceTimersByTime(1000);
+    expect(focusSpy).not.toHaveBeenCalled();
   });
 });
 

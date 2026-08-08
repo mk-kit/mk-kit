@@ -360,6 +360,29 @@ describe('MkTable — data-grid pro', () => {
     // desc: b, a, then null last
     expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([2, 3, 1]);
   });
+
+  it('sorts strings locale-sensitively (mixed case + diacritics via the cached collator)', () => {
+    fixture.componentRef.setInput('data', [
+      { id: 1, name: 'Zebra', notes: '' },
+      { id: 2, name: 'äpple', notes: '' },
+      { id: 3, name: 'banana', notes: '' },
+      { id: 4, name: 'Apple', notes: '' },
+      { id: 5, name: 'apple', notes: '' },
+      { id: 6, name: 'zebra', notes: '' },
+    ]);
+    (table as any).onSort({ key: 'name', header: 'Name', sortable: true });
+    // The shared Intl.Collator keeps localeCompare's default-locale order:
+    // case is a tertiary difference (lowercase first), diacritics secondary
+    // (a < ä), and neither ever outranks the base letters.
+    expect((table as any).sortedData().map((r: Row) => r.name)).toEqual([
+      'apple',
+      'Apple',
+      'äpple',
+      'banana',
+      'zebra',
+      'Zebra',
+    ]);
+  });
 });
 
 // --- Grouping ---------------------------------------------------------------

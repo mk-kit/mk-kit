@@ -97,7 +97,12 @@ export class MkCarousel {
   protected readonly paused = signal(false);
   /** True while the autoplay interval is actually running. */
   protected readonly playing = signal(false);
+  /** True while the browser tab is hidden — no advancing (or CD) in the dark. */
+  private readonly pageHidden = signal(false);
+  /** True while the carousel is fully scrolled out of the viewport. */
+  private readonly offscreen = signal(false);
   private timer?: ReturnType<typeof setInterval>;
+  private io?: IntersectionObserver;
 
   protected readonly count = computed(() => this.slides().length);
   protected readonly dots = computed(() =>
@@ -147,6 +152,18 @@ export class MkCarousel {
     afterNextRender(() => {
       const { direction } = getComputedStyle(this.host.nativeElement);
       this.dir.set(direction === 'rtl' ? 'rtl' : 'ltr');
+      // Autoplay only runs while the tab is visible…
+      this.pageHidden.set(this.document.hidden ?? false);
+      this.document.addEventListener('visibilitychange', this.onVisibilityChange);
+      // …and while the carousel itself is at least partially on screen
+      // (guarded — jsdom has no IntersectionObserver).
+      if (typeof IntersectionObserver !== 'undefined') {
+        this.io = new IntersectionObserver((entries) => {
+          const entry = entries[entries.length - 1];
+          this.offscreen.set(!entry.isIntersecting);
+        });
+        this.io.observe(this.host.nativeElement);
+      }
     });
     // Reflect the active slide onto each slide element (visibility + a11y).
     effect(() => {
@@ -161,10 +178,17 @@ export class MkCarousel {
       });
     });
     // Autoplay lifecycle. Never starts under prefers-reduced-motion — the
-    // motion itself must stop, not just the CSS transition.
+    // motion itself must stop, not just the CSS transition. Also idles while
+    // the tab is hidden or the carousel is fully offscreen: in a zoneless app
+    // every unseen advance is a wasted change-detection pass.
     effect(() => {
       const on =
-        this.autoplay() && !this.paused() && !this.userPaused() && this.count() > 1;
+        this.autoplay() &&
+        !this.paused() &&
+        !this.userPaused() &&
+        !this.pageHidden() &&
+        !this.offscreen() &&
+        this.count() > 1;
       this.stopTimer();
       const start = on && this.isBrowser && !this.prefersReducedMotion();
       this.playing.set(start);
@@ -315,6 +339,10 @@ export class MkCarousel {
     );
   }
 
+  private readonly onVisibilityChange = (): void => {
+    this.pageHidden.set(this.document.hidden ?? false);
+  };
+
   private stopTimer(): void {
     if (this.timer) {
       clearInterval(this.timer);
@@ -324,5 +352,10 @@ export class MkCarousel {
 
   ngOnDestroy(): void {
     this.stopTimer();
+    if (this.isBrowser) {
+      this.document.removeEventListener('visibilitychange', this.onVisibilityChange);
+    }
+    this.io?.disconnect();
+    this.io = undefined;
   }
 }

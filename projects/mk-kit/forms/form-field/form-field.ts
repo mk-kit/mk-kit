@@ -6,6 +6,7 @@ import {
   computed,
   contentChild,
   effect,
+  forwardRef,
   inject,
   input,
   signal,
@@ -18,7 +19,12 @@ import {
 } from '@angular/forms';
 import type { Subscription } from 'rxjs';
 import type { MkErrorMessages, MkSize } from '@mkornas/ui/core';
-import { MK_I18N, mkFirstErrorMessage, mkUniqueId } from '@mkornas/ui/core';
+import {
+  MK_I18N,
+  MkFieldContext,
+  mkFirstErrorMessage,
+  mkUniqueId,
+} from '@mkornas/ui/core';
 
 /**
  * FormField — an accessible wrapper that provides a real `<label>`, optional
@@ -72,8 +78,14 @@ import { MK_I18N, mkFirstErrorMessage, mkUniqueId } from '@mkornas/ui/core';
     '[class.mk-form-field--required]': 'isRequired()',
     '[class.mk-form-field--disabled]': 'isDisabled()',
   },
+  providers: [
+    {
+      provide: MkFieldContext,
+      useExisting: forwardRef(() => MkFormField),
+    },
+  ],
 })
-export class MkFormField {
+export class MkFormField implements MkFieldContext {
   private readonly i18n = inject(MK_I18N);
   private readonly parentForm = inject(NgForm, { optional: true });
   private readonly parentFormGroup = inject(FormGroupDirective, {

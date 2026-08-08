@@ -131,6 +131,7 @@ export class MkScrollArea {
   private dragStartScroll = 0;
   private hideTimer?: ReturnType<typeof setTimeout>;
   private resizeObserver?: ResizeObserver;
+  private scrollRaf: number | null = null;
 
   constructor() {
     // Runs after the first render (inputs bound, view children resolved).
@@ -158,10 +159,20 @@ export class MkScrollArea {
     this.clientWidth.set(view.clientWidth);
   }
 
+  /**
+   * rAF-coalesced (same pattern as `MkScrollspy`): a burst of scroll events
+   * per frame triggers a single batch of layout reads + signal writes, and the
+   * auto-hide idle timer restarts once per flushed frame rather than per raw
+   * event.
+   */
   protected onScroll(): void {
-    this.measure();
-    this.show();
-    this.scheduleHide();
+    if (!this.isBrowser || this.scrollRaf != null) return;
+    this.scrollRaf = requestAnimationFrame(() => {
+      this.scrollRaf = null;
+      this.measure();
+      this.show();
+      this.scheduleHide();
+    });
   }
 
   protected onEnter(): void {
@@ -267,6 +278,10 @@ export class MkScrollArea {
   }
 
   ngOnDestroy(): void {
+    if (this.scrollRaf != null) {
+      cancelAnimationFrame(this.scrollRaf);
+      this.scrollRaf = null;
+    }
     this.resizeObserver?.disconnect();
     this.clearHideTimer();
   }

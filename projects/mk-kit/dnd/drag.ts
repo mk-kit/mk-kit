@@ -44,6 +44,11 @@ const SETTLE_MS = 180;
  * gets the `mk-drag--armed` class so consumers can style the lift moment.
  * Mouse and pen drags start immediately, as before.
  *
+ * Performance: pointer moves are rAF-coalesced (one hit-test + one set of
+ * style/DOM writes per frame) against list/item rects snapshotted when the
+ * drag lifts, so a move never forces layout. The pending frame is flushed
+ * synchronously on release so drops land exactly where the pointer ended.
+ *
  * ```html
  * <li mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
  *   <span mkDragHandle aria-hidden="true">⠿</span> {{ row.title }}
@@ -173,6 +178,37 @@ export class MkDrag<T = unknown> {
   /** Android fires `contextmenu` on long-press — keep it off the gesture. */
   private readonly contextMenuHandler = (e: Event) => e.preventDefault();
 
+  // --- frame-coalesced move state (perf) ------------------------------
+  //
+  // Every `pointermove` used to force layout O(lists + items) times via
+  // getBoundingClientRect. Instead, moves now only record the latest
+  // coordinates and schedule ONE rAF (same pattern as the table's column
+  // resize); the frame resolves list/index from rects snapshotted at lift
+  // and does all style/DOM writes in one pass. The pending frame is flushed
+  // synchronously on pointerup so drops land exactly where the pointer ended.
+
+  /** Pending rAF id for the coalesced move pass, if any. */
+  private moveRaf: number | null = null;
+  private pendingX = 0;
+  private pendingY = 0;
+  private hasPendingMove = false;
+  /** Connected lists resolved once at lift (stable for the drag's duration). */
+  private cachedGroup: MkDropList<any>[] = [];
+  /** List bounds snapshotted at lift / after invalidation. */
+  private readonly listRects = new Map<MkDropList<any>, DOMRect>();
+  /** Item bounds per list, aligned with `itemElementsExcept(this)`. */
+  private readonly itemRects = new Map<MkDropList<any>, DOMRect[]>();
+  /** Lists whose snapshots a placeholder move invalidated (re-measured next frame). */
+  private readonly dirtyLists = new Set<MkDropList<any>>();
+  /** Any scroll moves everything — re-snapshot every list on the next frame. */
+  private scrollDirty = false;
+  private readonly scrollHandler = () => {
+    this.scrollDirty = true;
+  };
+  /** Last placeholder sync target — makes `syncPlaceholder` idempotent. */
+  private lastSyncList: MkDropList<any> | null = null;
+  private lastSyncIndex = -1;
+
   // ===================================================================
   // Pointer dragging
   // ===================================================================
@@ -235,7 +271,12 @@ export class MkDrag<T = unknown> {
       this.beginPointer();
     }
     e.preventDefault();
-    this.updatePointer(e.clientX, e.clientY);
+    // Only record the coordinates here — the heavy work (hit-testing,
+    // placeholder sync, preview transform) is coalesced to one rAF.
+    this.pendingX = e.clientX;
+    this.pendingY = e.clientY;
+    this.hasPendingMove = true;
+    this.scheduleMoveFrame();
   }
 
   /** The long-press delay elapsed with the finger still down — lift. */
@@ -297,24 +338,77 @@ export class MkDrag<T = unknown> {
     this.element.style.display = 'none';
     this.createPreview(rect);
     this.home.setReceiving(true);
+    // The manual insert above already placed the placeholder at homeIndex.
+    this.lastSyncList = this.home;
+    this.lastSyncIndex = this.homeIndex;
+    // One-time layout snapshot at lift; every move hits the cache instead of
+    // forcing layout. Scrolling anywhere invalidates the whole snapshot.
+    this.snapshotRects();
+    this.doc.addEventListener('scroll', this.scrollHandler, {
+      capture: true,
+      passive: true,
+    });
   }
 
-  private updatePointer(clientX: number, clientY: number): void {
-    // Follow the cursor.
+  /** Coalesce move handling to at most one layout pass per animation frame. */
+  private scheduleMoveFrame(): void {
+    if (this.moveRaf !== null) return;
+    const raf = this.doc.defaultView?.requestAnimationFrame(() => {
+      this.moveRaf = null;
+      this.applyPendingMove();
+    });
+    if (raf === undefined) this.applyPendingMove(); // no window — degrade to sync
+    else this.moveRaf = raf;
+  }
+
+  /**
+   * Cancel the scheduled frame; when `apply` is set, process the pending
+   * coordinates synchronously (flush-on-end, like the table column resize) so
+   * a drop lands exactly where the pointer stopped.
+   */
+  private flushMoveFrame(apply: boolean): void {
+    if (this.moveRaf !== null) {
+      this.doc.defaultView?.cancelAnimationFrame(this.moveRaf);
+      this.moveRaf = null;
+    }
+    if (apply) this.applyPendingMove();
+    this.hasPendingMove = false;
+  }
+
+  /**
+   * The per-frame move pass. Ordered reads → writes: refresh invalidated
+   * snapshots first, resolve the hovered list/index from the cache, then do
+   * all style/DOM writes — no read ever follows a write within the frame.
+   */
+  private applyPendingMove(): void {
+    if (!this.started || !this.hasPendingMove) return;
+    this.hasPendingMove = false;
+    // Reads: re-measure only what was invalidated since the last frame.
+    if (this.scrollDirty) {
+      this.scrollDirty = false;
+      this.dirtyLists.clear();
+      this.snapshotRects();
+    } else if (this.dirtyLists.size) {
+      for (const list of this.dirtyLists) this.measureList(list);
+      this.dirtyLists.clear();
+    }
+    const x = this.pendingX;
+    const y = this.pendingY;
+    const list = this.listUnderPoint(x, y) ?? this.targetList;
+    const index = list ? this.indexInList(list, x, y) : this.targetIndex;
+    // Writes: follow the cursor, then settle the placeholder.
     if (this.preview) {
-      const dx = clientX - this.offsetX - this.originLeft;
-      const dy = clientY - this.offsetY - this.originTop;
+      const dx = x - this.offsetX - this.originLeft;
+      const dy = y - this.offsetY - this.originTop;
       this.preview.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
     }
-    // Resolve which connected list the pointer is over.
-    const list = this.listUnderPoint(clientX, clientY) ?? this.targetList;
     if (!list) return;
     if (list !== this.targetList) {
       this.targetList?.setReceiving(false);
       this.targetList = list;
       list.setReceiving(true);
     }
-    this.targetIndex = this.indexInList(list, clientX, clientY);
+    this.targetIndex = index;
     this.syncPlaceholder();
   }
 
@@ -334,6 +428,10 @@ export class MkDrag<T = unknown> {
     this.clearTouchState();
 
     if (!this.started) return; // was a click, never a drag
+
+    // Flush the last coalesced move (unless cancelling) so the drop target
+    // reflects exactly where the pointer ended, not the last painted frame.
+    this.flushMoveFrame(!cancel);
 
     const settle = () => this.commitPointer(cancel);
     if (cancel || this.prefersReducedMotion() || !this.preview) {
@@ -444,6 +542,9 @@ export class MkDrag<T = unknown> {
     const rect = this.element.getBoundingClientRect();
     this.createPlaceholder(rect);
     this.home.setReceiving(true);
+    // Fresh placeholder — force the first sync through the idempotence guard.
+    this.lastSyncList = null;
+    this.lastSyncIndex = -1;
     this.syncPlaceholder();
 
     this.announcePickedUp(this.homeIndex, this.home.size());
@@ -556,35 +657,65 @@ export class MkDrag<T = unknown> {
     return target ?? null;
   }
 
-  /** Which connected list (if any) the pointer is currently over. */
+  /** Snapshot every connected list's bounds + item bounds (at lift / scroll). */
+  private snapshotRects(): void {
+    this.cachedGroup = this.home ? this.registry.connectedGroup(this.home) : [];
+    this.listRects.clear();
+    this.itemRects.clear();
+    for (const list of this.cachedGroup) this.measureList(list);
+  }
+
+  /** (Re)measure one list's bounds and item bounds into the cache. */
+  private measureList(list: MkDropList<any>): void {
+    this.listRects.set(list, list.element.getBoundingClientRect());
+    this.itemRects.set(
+      list,
+      list.itemElementsExcept(this).map((el) => el.getBoundingClientRect()),
+    );
+  }
+
+  /**
+   * Which connected list (if any) the pointer is currently over. Pointer path
+   * only — reads the rects snapshotted at lift, not live layout.
+   */
   private listUnderPoint(x: number, y: number): MkDropList<any> | null {
-    if (!this.home) return null;
-    const group = this.registry.connectedGroup(this.home);
-    // Prefer a deeper/closer match by checking the current target first.
-    for (const list of group) {
-      const r = list.element.getBoundingClientRect();
+    for (const list of this.cachedGroup) {
+      const r = this.listRects.get(list) ?? list.element.getBoundingClientRect();
       if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return list;
     }
     return null;
   }
 
-  /** Insertion index for the pointer position within `list`. */
+  /**
+   * Insertion index for the pointer position within `list`. Pointer path only
+   * — reads the cached item rects (live measurement is the fallback for a
+   * list that somehow joined the group mid-drag).
+   */
   private indexInList(list: MkDropList<any>, x: number, y: number): number {
-    const items = list.itemElementsExcept(this);
+    const rects =
+      this.itemRects.get(list) ??
+      list.itemElementsExcept(this).map((el) => el.getBoundingClientRect());
     const horizontal = list.mkDropListOrientation() === 'horizontal';
     const pos = horizontal ? x : y;
-    for (let i = 0; i < items.length; i++) {
-      const r = items[i].getBoundingClientRect();
+    for (let i = 0; i < rects.length; i++) {
+      const r = rects[i];
       const mid = horizontal ? r.left + r.width / 2 : r.top + r.height / 2;
       if (pos < mid) return i;
     }
-    return items.length;
+    return rects.length;
   }
 
   private syncPlaceholder(): void {
     const list = this.targetList;
     const ph = this.placeholder;
     if (!list || !ph) return;
+    // Idempotent: same list and index → the placeholder is already in place.
+    if (list === this.lastSyncList && this.targetIndex === this.lastSyncIndex) {
+      return;
+    }
+    const prevList = this.lastSyncList;
+    this.lastSyncList = list;
+    this.lastSyncIndex = this.targetIndex;
     const items = list.itemElementsExcept(this);
     ph.remove();
     if (this.targetIndex >= items.length) {
@@ -593,6 +724,10 @@ export class MkDrag<T = unknown> {
     } else {
       items[this.targetIndex].before(ph);
     }
+    // Moving the placeholder shifted the affected lists' layout — re-measure
+    // just those lists on the next frame (no-op for the cache-less keyboard path).
+    this.dirtyLists.add(list);
+    if (prevList && prevList !== list) this.dirtyLists.add(prevList);
   }
 
   private createPlaceholder(rect: DOMRect): void {
@@ -649,6 +784,8 @@ export class MkDrag<T = unknown> {
   private destroyed = false;
 
   private cleanupDom(): void {
+    this.flushMoveFrame(false); // drop any scheduled frame, never apply it
+    this.doc.removeEventListener('scroll', this.scrollHandler, { capture: true });
     this.placeholder?.remove();
     this.placeholder = null;
     this.preview?.remove();
@@ -656,6 +793,13 @@ export class MkDrag<T = unknown> {
     this.element.style.display = '';
     this.home?.setReceiving(false);
     this.targetList?.setReceiving(false);
+    this.cachedGroup = [];
+    this.listRects.clear();
+    this.itemRects.clear();
+    this.dirtyLists.clear();
+    this.scrollDirty = false;
+    this.lastSyncList = null;
+    this.lastSyncIndex = -1;
   }
 
   private emit(

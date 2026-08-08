@@ -39,11 +39,16 @@ export class MkAutofocus {
     transform: numberAttribute,
   });
 
+  private timeoutId?: number;
+
   constructor() {
     afterNextRender(() => {
       if (!this.isBrowser || !this.enabled()) return;
       if (this.delay() > 0) {
-        this.document.defaultView?.setTimeout(() => this.focus(), this.delay());
+        this.timeoutId = this.document.defaultView?.setTimeout(
+          () => this.focus(),
+          this.delay(),
+        );
       } else {
         this.focus();
       }
@@ -52,5 +57,12 @@ export class MkAutofocus {
 
   private focus(): void {
     this.el.nativeElement.focus();
+  }
+
+  ngOnDestroy(): void {
+    if (this.timeoutId != null) {
+      this.document.defaultView?.clearTimeout(this.timeoutId);
+      this.timeoutId = undefined;
+    }
   }
 }

@@ -78,6 +78,19 @@ describe('MkJsonViewer', () => {
     expect(text()).toContain('"Ada"');
   });
 
+  it('toggling the same node again collapses it (and only it)', () => {
+    (cmp as any).toggle('$.user');
+    fixture.detectChanges();
+    expect(text()).toContain('"Ada"');
+
+    (cmp as any).toggle('$.user');
+    fixture.detectChanges();
+    expect(text()).not.toContain('"Ada"');
+    // Siblings at the root level stay rendered — the root is still expanded.
+    expect(text()).toContain('active');
+    expect(text()).toContain('{…}');
+  });
+
   it('expandAll / collapseAll', () => {
     cmp.expandAll();
     fixture.detectChanges();

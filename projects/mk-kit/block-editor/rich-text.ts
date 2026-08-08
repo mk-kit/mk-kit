@@ -3,6 +3,7 @@ import {
   Component,
   DOCUMENT,
   ElementRef,
+  OnDestroy,
   afterRenderEffect,
   booleanAttribute,
   computed,
@@ -46,11 +47,13 @@ interface MkInlineTool {
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mk-rich-text' },
 })
-export class MkRichText {
+export class MkRichText implements OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly editableRef = viewChild.required<ElementRef<HTMLElement>>('editable');
   protected readonly i18n = inject(MK_I18N);
+  /** Pending toolbar-hide delay from `onBlur`; cleared on destroy. */
+  private blurTimer: ReturnType<typeof setTimeout> | null = null;
 
   /** Current HTML content. */
   readonly html = input<string>('');
@@ -123,11 +126,20 @@ export class MkRichText {
     this.focusChange.emit(true);
   }
 
+  ngOnDestroy(): void {
+    if (this.blurTimer !== null) {
+      clearTimeout(this.blurTimer);
+      this.blurTimer = null;
+    }
+  }
+
   protected onBlur(): void {
     this.focusChange.emit(false);
     // Hide the toolbar on a delay, but only if focus really left the
     // component — Tabbing into the toolbar itself must not dismiss it.
-    setTimeout(() => {
+    if (this.blurTimer !== null) clearTimeout(this.blurTimer);
+    this.blurTimer = setTimeout(() => {
+      this.blurTimer = null;
       const active = this.document.activeElement;
       if (active && this.host.nativeElement.contains(active)) return;
       this.toolbar.update((t) => (t.visible ? { ...t, visible: false } : t));

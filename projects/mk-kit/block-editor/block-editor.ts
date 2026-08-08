@@ -4,7 +4,6 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
-  effect,
   forwardRef,
   inject,
   input,
@@ -142,21 +141,22 @@ export class MkBlockEditor implements ControlValueAccessor {
   constructor() {
     this.ctx.hostRef = this.hostRef;
 
-    // Keep the shared context in sync with inputs/tokens.
-    effect(() => this.ctx.definitions.set(this.definitions()));
-    effect(() => this.ctx.readonly.set(this.readonly()));
-    effect(() => this.ctx.disabled.set(this.disabled() || this.cvaDisabled()));
-    effect(() => this.ctx.placeholder.set(this.placeholder()));
-    effect(() =>
-      this.ctx.uploadHandler.set(this.uploadHandler() ?? this.tokenUpload ?? null),
+    // Connect the shared context straight to the input-derived signals (pull
+    // based; no per-input mirror effects). Must happen before any child
+    // renders, which the constructor guarantees: the context is provided by
+    // this component, so children inject it only after we are constructed.
+    this.ctx.definitions = this.definitions;
+    this.ctx.readonly = this.readonly;
+    this.ctx.disabled = computed(() => this.disabled() || this.cvaDisabled());
+    this.ctx.placeholder = this.placeholder;
+    this.ctx.uploadHandler = computed(
+      () => this.uploadHandler() ?? this.tokenUpload ?? null,
     );
-    effect(() =>
-      this.ctx.embedProviders.set([
-        ...MK_DEFAULT_EMBED_PROVIDERS,
-        ...(this.tokenEmbeds?.flat() ?? []),
-        ...(this.embedProviders() ?? []),
-      ]),
-    );
+    this.ctx.embedProviders = computed(() => [
+      ...MK_DEFAULT_EMBED_PROVIDERS,
+      ...(this.tokenEmbeds?.flat() ?? []),
+      ...(this.embedProviders() ?? []),
+    ]);
   }
 
   protected onBlocksChange(blocks: MkBlock[]): void {
@@ -165,11 +165,15 @@ export class MkBlockEditor implements ControlValueAccessor {
       blocks,
     };
     this.value.set(next);
-    const html = mkBlocksToHtml(next);
-    this.onChange(this.valueFormat() === 'html' ? html : next);
+    // Serialising the whole document on every keystroke is expensive — do it
+    // only when something actually consumes the HTML: `html` value format, or
+    // a subscriber on `htmlChange`.
+    const wantsHtml = this.valueFormat() === 'html' || hasObservers(this.htmlChange);
+    const html = wantsHtml ? mkBlocksToHtml(next) : null;
+    this.onChange(this.valueFormat() === 'html' ? html! : next);
     this.onTouched();
     this.change.emit(next);
-    this.htmlChange.emit(html);
+    if (html !== null) this.htmlChange.emit(html);
   }
 
   /**
@@ -203,6 +207,19 @@ export class MkBlockEditor implements ControlValueAccessor {
   setDisabledState(isDisabled: boolean): void {
     this.cvaDisabled.set(isDisabled);
   }
+}
+
+/**
+ * Whether an `output()` emitter currently has any subscribers (template
+ * `(htmlChange)` bindings and programmatic `.subscribe()` both register one).
+ * Reads `OutputEmitterRef`'s internal `listeners` array — not public API, so
+ * if the field ever disappears in a future Angular this reports `true` and we
+ * fall back to always serialising (the documented pre-optimisation behaviour).
+ */
+function hasObservers(ref: unknown): boolean {
+  const listeners = (ref as { listeners?: unknown[] | null }).listeners;
+  if (listeners === undefined) return true;
+  return (listeners?.length ?? 0) > 0;
 }
 
 /**

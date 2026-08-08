@@ -49,28 +49,40 @@
   opacity: 0;
 }
 
-/* Skeleton shimmer while the picture loads (same recipe as mk-skeleton). */
+/*
+ * Skeleton shimmer while the picture loads (same recipe as mk-skeleton): an
+ * oversized gradient overlay translated across the placeholder — a
+ * compositor-only animation instead of a per-frame `background-position`
+ * repaint. The placeholder is a leaf, so clipping the overlay is safe.
+ */
 .mk-image__skeleton {
   position: absolute;
   inset: 0;
+  overflow: hidden;
   background-color: var(--mk-skeleton-base);
+}
+
+.mk-image__skeleton::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  width: 200%;
   background-image: linear-gradient(
     90deg,
     var(--mk-skeleton-base) 0%,
     var(--mk-skeleton-shine) 50%,
     var(--mk-skeleton-base) 100%
   );
-  background-size: 200% 100%;
-  background-repeat: no-repeat;
   animation: mk-image-shimmer 1.4s ease-in-out infinite;
 }
 
+/* Same tempo and left-to-right sweep as the old background-position slide. */
 @keyframes mk-image-shimmer {
   0% {
-    background-position: 200% 0;
+    transform: translateX(-50%);
   }
   100% {
-    background-position: -200% 0;
+    transform: translateX(50%);
   }
 }
 
@@ -111,8 +123,9 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .mk-image__skeleton {
+  /* The gradient overlay carries the animation now — drop it entirely. */
+  .mk-image__skeleton::after {
+    content: none;
     animation: none;
-    background-image: none;
   }
 }

@@ -91,6 +91,22 @@ describe('MkEventCalendar', () => {
     );
   });
 
+  it('renders the precomputed cell label as the day button aria-label', () => {
+    fixture.componentRef.setInput('events', [
+      { date: new Date(2026, 6, 9), title: 'Standup' },
+      { date: new Date(2026, 6, 9), title: 'Demo' },
+    ]);
+    fixture.detectChanges();
+
+    const cell = findCell(9);
+    expect(cell.label).toBe('July 9, 2026, 2 events: Standup, Demo');
+    const ariaLabels = Array.from(
+      fixture.nativeElement.querySelectorAll('.mk-event-calendar__cell'),
+      (el: any) => el.getAttribute('aria-label'),
+    );
+    expect(ariaLabels).toContain('July 9, 2026, 2 events: Standup, Demo');
+  });
+
   it('nextMonth shifts viewDate forward one month and emits monthChange', () => {
     const seen: Date[] = [];
     cmp.monthChange.subscribe((d) => seen.push(d));

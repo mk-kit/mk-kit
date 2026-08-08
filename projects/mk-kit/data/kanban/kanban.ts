@@ -14,6 +14,9 @@ import { mkUniqueId } from '@mkornas/ui/core';
 import { MkDrag, MkDropList, mkMoveItemInArray } from '@mkornas/ui/dnd';
 import type { MkDropEvent } from '@mkornas/ui/dnd';
 
+/** Stable empty fallback so out-of-range lookups don't allocate per call. */
+const NO_CONNECTIONS: string[] = [];
+
 /** A single draggable card on a {@link MkKanban} board. */
 export interface MkKanbanCard {
   /** Stable identity used for tracking and move events. */
@@ -93,14 +96,28 @@ export class MkKanban {
   /** Board-scoped prefix so this board's drop-list ids never collide. */
   private readonly boardId = mkUniqueId('mk-kanban');
 
+  /** Column count as its own computed so id arrays survive card-only updates. */
+  private readonly columnCount = computed(() => this.columns().length);
+
   /** Stable drop-list id per column, positionally matched to `columns()`. */
   protected readonly listIds = computed(() =>
-    this.columns().map((_, i) => `${this.boardId}-col-${i}`),
+    Array.from({ length: this.columnCount() }, (_, i) => `${this.boardId}-col-${i}`),
   );
+
+  /**
+   * Per-column connected-target ids (every other column's list). One stable
+   * array per column, recomputed only when the column count changes — a fresh
+   * array per change-detection pass would dirty each `MkDropList`'s
+   * `connectedTo` input identity on every cycle.
+   */
+  private readonly connections = computed(() => {
+    const ids = this.listIds();
+    return ids.map((_, i) => ids.filter((_, j) => j !== i));
+  });
 
   /** Ids of every other column's list — the connected transfer targets for `i`. */
   protected connectedTo(index: number): string[] {
-    return this.listIds().filter((_, i) => i !== index);
+    return this.connections()[index] ?? NO_CONNECTIONS;
   }
 
   /**

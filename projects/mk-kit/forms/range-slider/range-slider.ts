@@ -10,6 +10,7 @@ import {
   model,
   numberAttribute,
   signal,
+  type OnDestroy,
   viewChildren,
 } from '@angular/core';
 import {
@@ -50,9 +51,6 @@ export type MkRange = [number, number];
     '[class.mk-range-slider--disabled]': 'isDisabled()',
     '[class.mk-range-slider--invalid]': 'isInvalid()',
     '[attr.data-tone]': 'tone()',
-    '(document:pointermove)': 'onPointerMove($event)',
-    '(document:pointerup)': 'onPointerUp()',
-    '(document:pointercancel)': 'onPointerUp()',
     '(focusout)': 'onFocusOut($event)',
   },
   providers: [
@@ -68,7 +66,7 @@ export type MkRange = [number, number];
     },
   ],
 })
-export class MkRangeSlider implements ControlValueAccessor, Validator {
+export class MkRangeSlider implements ControlValueAccessor, Validator, OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
   protected readonly i18n = inject(MK_I18N);
@@ -97,6 +95,12 @@ export class MkRangeSlider implements ControlValueAccessor, Validator {
   readonly value = model<MkRange>([0, 100]);
 
   private activeThumb: 0 | 1 | null = null;
+  /** Element the drag listeners are attached to (only while dragging). */
+  private dragTarget: HTMLElement | null = null;
+  /** Track geometry cached at pointerdown — no layout reads per move. */
+  private dragRect: DOMRect | null = null;
+  /** Text direction cached at pointerdown (keyboard keeps live reads). */
+  private dragRtl = false;
   private readonly cvaDisabled = signal(false);
   private onChange: (value: MkRange) => void = () => {};
   private onTouched: () => void = () => {};
@@ -169,27 +173,66 @@ export class MkRangeSlider implements ControlValueAccessor, Validator {
   protected onPointerDown(event: Event): void {
     if (this.isDisabled()) return;
     const e = event as PointerEvent;
+    const track = this.trackRef()[0]?.nativeElement;
+    if (!track) return;
+    const rect = track.getBoundingClientRect();
+    if (rect.width <= 0) return;
+    // Cache the geometry + direction for the whole gesture: pointer capture
+    // means no scrolling can happen mid-drag, so one layout read suffices.
+    this.dragRect = rect;
+    this.dragRtl = this.isRtl();
     const raw = this.rawFromClientX(e.clientX);
-    if (raw == null) return;
+    if (raw == null) {
+      this.dragRect = null;
+      return;
+    }
     // Grab whichever thumb is closer to the pointer.
     const thumb: 0 | 1 =
       Math.abs(raw - this.low()) <= Math.abs(raw - this.high()) ? 0 : 1;
     this.activeThumb = thumb;
+    const target = (e.currentTarget as HTMLElement | null) ?? track;
+    this.dragTarget = target;
+    try {
+      target.setPointerCapture(e.pointerId);
+    } catch {
+      // Pointer already lifted (fast tap) — nothing left to capture.
+    }
+    // Capture routes the pointer stream to this element for the drag only —
+    // no document-wide listeners outliving the gesture.
+    target.addEventListener('pointermove', this.onDragMove);
+    target.addEventListener('pointerup', this.onDragEnd);
+    target.addEventListener('pointercancel', this.onDragEnd);
     this.thumbRefs()[thumb]?.nativeElement.focus();
     this.setThumb(thumb, raw);
     event.preventDefault();
   }
 
-  protected onPointerMove(event: Event): void {
+  private readonly onDragMove = (event: PointerEvent): void => {
     if (this.activeThumb == null) return;
-    const raw = this.rawFromClientX((event as PointerEvent).clientX);
+    const raw = this.rawFromClientX(event.clientX);
     if (raw != null) this.setThumb(this.activeThumb, raw);
-  }
+  };
 
-  protected onPointerUp(): void {
+  private readonly onDragEnd = (): void => {
+    this.endDrag(true);
+  };
+
+  private endDrag(markTouched: boolean): void {
+    const target = this.dragTarget;
+    if (target) {
+      target.removeEventListener('pointermove', this.onDragMove);
+      target.removeEventListener('pointerup', this.onDragEnd);
+      target.removeEventListener('pointercancel', this.onDragEnd);
+    }
+    this.dragTarget = null;
+    this.dragRect = null;
     if (this.activeThumb == null) return;
     this.activeThumb = null;
-    this.onTouched();
+    if (markTouched) this.onTouched();
+  }
+
+  ngOnDestroy(): void {
+    this.endDrag(false);
   }
 
   /** Whether the rendered track is right-to-left. */
@@ -202,12 +245,11 @@ export class MkRangeSlider implements ControlValueAccessor, Validator {
     );
   }
 
+  /** Pointer-drag path only — uses the geometry cached at pointerdown. */
   private rawFromClientX(clientX: number): number | null {
-    const track = this.trackRef()[0]?.nativeElement;
-    if (!track) return null;
-    const rect = track.getBoundingClientRect();
-    if (rect.width <= 0) return null;
-    const offset = this.isRtl() ? rect.right - clientX : clientX - rect.left;
+    const rect = this.dragRect;
+    if (!rect || rect.width <= 0) return null;
+    const offset = this.dragRtl ? rect.right - clientX : clientX - rect.left;
     const ratio = Math.min(1, Math.max(0, offset / rect.width));
     return this.min() + ratio * (this.max() - this.min());
   }

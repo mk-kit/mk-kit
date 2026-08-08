@@ -4,8 +4,8 @@ import {
   ElementRef,
   booleanAttribute,
   computed,
-  effect,
   input,
+  linkedSignal,
   model,
   output,
   signal,
@@ -80,23 +80,53 @@ export class MkTree {
   protected readonly rowRefs =
     viewChildren<ElementRef<HTMLElement>>('row');
 
-  private readonly expandedSet = signal<ReadonlySet<MkTreeNode>>(new Set());
-  protected readonly activeIndex = signal(0);
-
-  constructor() {
-    // Seed expansion from each node's `expanded` flag whenever the data changes.
-    effect(() => {
-      const seed = new Set<MkTreeNode>();
+  /**
+   * Expanded nodes. Survives `nodes` identity changes (a consumer rebuilding
+   * the array keeps the user's expansion state for the node objects it
+   * reuses); a node's `expanded` flag only seeds nodes NOT present in the
+   * previous array — so it applies on first render and to newly added nodes,
+   * without reverting branches the user has since collapsed.
+   */
+  private readonly expandedSet = linkedSignal<
+    readonly MkTreeNode[],
+    ReadonlySet<MkTreeNode>
+  >({
+    source: this.nodes,
+    computation: (nodes, previous) => {
+      const prevExpanded = previous?.value;
+      // Lazily built set of nodes from the previous input — only needed when
+      // a node carries `expanded: true` and we must decide whether it is new.
+      let prevNodes: Set<MkTreeNode> | null = null;
+      const isNewNode = (node: MkTreeNode): boolean => {
+        if (!previous) return true;
+        if (prevNodes === null) {
+          prevNodes = new Set<MkTreeNode>();
+          const collect = (list: readonly MkTreeNode[]): void => {
+            for (const n of list) {
+              prevNodes!.add(n);
+              if (n.children?.length) collect(n.children);
+            }
+          };
+          collect(previous.source);
+        }
+        return !prevNodes.has(node);
+      };
+      const next = new Set<MkTreeNode>();
       const walk = (list: readonly MkTreeNode[]): void => {
         for (const node of list) {
-          if (node.expanded && node.children?.length) seed.add(node);
-          if (node.children?.length) walk(node.children);
+          if (node.children?.length) {
+            if (prevExpanded?.has(node) || (node.expanded && isNewNode(node))) {
+              next.add(node);
+            }
+            walk(node.children);
+          }
         }
       };
-      walk(this.nodes());
-      this.expandedSet.set(seed);
-    });
-  }
+      walk(nodes);
+      return next;
+    },
+  });
+  protected readonly activeIndex = signal(0);
 
   /** Flattened list of currently visible rows (respects expansion). */
   protected readonly rows = computed<MkTreeRow[]>(() => {

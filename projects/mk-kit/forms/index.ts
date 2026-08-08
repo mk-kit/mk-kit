@@ -28,11 +28,14 @@ export * from './iban-input';
 export * from './tax-id-input';
 export * from './signature-pad';
 export * from './button-toggle';
-export * from './checkbox';
+// Checkbox moved to its own entry (`@mkornas/ui/checkbox`) so non-forms
+// consumers (mk-table row selection) don't drag the whole forms group;
+// re-exported here for backward compatibility.
+export * from '@mkornas/ui/checkbox';
 export * from './radio';
 export * from './switch';
 export * from './slider';
 export * from './color-picker';
 export * from './range-slider';
-// Shared JSON/code highlighter (used by mk-code in the data group).
-export { mkHighlight } from './code-editor/code-highlight';
+// Shared JSON/code highlighter — moved to core; re-exported for compat.
+export { mkHighlight } from '@mkornas/ui/core';
