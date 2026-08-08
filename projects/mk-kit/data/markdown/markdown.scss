@@ -1,0 +1,198 @@
+/* ViewEncapsulation.None — content arrives via [innerHTML], so emulated
+   encapsulation attributes never reach it. Every rule is namespaced under
+   `.mk-markdown` so nothing can leak into the host app. */
+
+.mk-markdown {
+  display: block;
+  color: var(--mk-text);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-md);
+  line-height: 1.65;
+  overflow-wrap: break-word;
+}
+
+/* ---- Typographic rhythm ------------------------------------------ */
+
+.mk-markdown h1,
+.mk-markdown h2,
+.mk-markdown h3,
+.mk-markdown h4,
+.mk-markdown h5,
+.mk-markdown h6 {
+  margin: var(--mk-space-5) 0 var(--mk-space-2);
+  color: var(--mk-text);
+  font-weight: var(--mk-font-weight-semibold);
+  line-height: 1.3;
+}
+.mk-markdown h1 {
+  font-size: var(--mk-font-size-2xl);
+  letter-spacing: var(--mk-letter-spacing-tight);
+}
+.mk-markdown h2 {
+  font-size: var(--mk-font-size-xl);
+  letter-spacing: var(--mk-letter-spacing-tight);
+}
+.mk-markdown h3 {
+  font-size: var(--mk-font-size-lg);
+}
+.mk-markdown h4 {
+  font-size: var(--mk-font-size-md);
+}
+.mk-markdown h5 {
+  font-size: var(--mk-font-size-sm);
+}
+.mk-markdown h6 {
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+  text-transform: uppercase;
+  letter-spacing: var(--mk-letter-spacing-wide);
+}
+
+.mk-markdown p {
+  margin: 0 0 var(--mk-space-3);
+}
+
+.mk-markdown > .mk-markdown__body > :first-child,
+.mk-markdown blockquote > :first-child,
+.mk-markdown li > :first-child {
+  margin-top: 0;
+}
+.mk-markdown > .mk-markdown__body > :last-child,
+.mk-markdown blockquote > :last-child {
+  margin-bottom: 0;
+}
+
+/* ---- Inline ------------------------------------------------------ */
+
+.mk-markdown a {
+  color: var(--mk-primary);
+  text-decoration: underline;
+  text-underline-offset: 0.15em;
+}
+.mk-markdown a:hover {
+  color: var(--mk-primary-hover, var(--mk-primary));
+}
+
+.mk-markdown code {
+  padding: 0.1em 0.35em;
+  font-family: var(--mk-font-mono);
+  font-size: 0.875em;
+  background-color: var(--mk-surface-2);
+  border: var(--mk-border-width) solid var(--mk-border-subtle);
+  border-radius: var(--mk-radius-sm);
+}
+
+.mk-markdown img {
+  max-width: 100%;
+  height: auto;
+  border-radius: var(--mk-radius-sm);
+}
+
+/* ---- Code blocks (reuses the mk-code look) ----------------------- */
+
+.mk-markdown .mk-markdown__code {
+  margin: 0 0 var(--mk-space-3);
+  padding: var(--mk-space-3);
+  overflow-x: auto;
+  background-color: var(--mk-code-bg, var(--mk-surface-2));
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-font-size-sm);
+  line-height: 1.6;
+}
+.mk-markdown .mk-markdown__code code {
+  padding: 0;
+  font: inherit;
+  color: var(--mk-text);
+  background: none;
+  border: none;
+  border-radius: 0;
+}
+
+/* Syntax tokens (shared palette with mk-code / mk-code-editor). */
+.mk-markdown .mk-tok-key {
+  color: var(--mk-info);
+}
+.mk-markdown .mk-tok-str {
+  color: var(--mk-success);
+}
+.mk-markdown .mk-tok-num {
+  color: var(--mk-warning);
+}
+.mk-markdown .mk-tok-kw {
+  color: var(--mk-primary);
+  font-weight: var(--mk-font-weight-medium);
+}
+.mk-markdown .mk-tok-punc {
+  color: var(--mk-text-muted);
+}
+
+/* ---- Lists ------------------------------------------------------- */
+
+.mk-markdown ul,
+.mk-markdown ol {
+  margin: 0 0 var(--mk-space-3);
+  padding-inline-start: var(--mk-space-5);
+}
+.mk-markdown li {
+  margin-block: var(--mk-space-1);
+}
+.mk-markdown li > ul,
+.mk-markdown li > ol {
+  margin-bottom: 0;
+}
+
+/* ---- Blockquote -------------------------------------------------- */
+
+.mk-markdown blockquote {
+  margin: 0 0 var(--mk-space-3);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  color: var(--mk-text-muted);
+  border-inline-start: 3px solid var(--mk-border);
+}
+.mk-markdown blockquote blockquote {
+  margin-bottom: 0;
+}
+
+/* ---- Horizontal rule --------------------------------------------- */
+
+.mk-markdown hr {
+  margin: var(--mk-space-4) 0;
+  border: none;
+  border-top: var(--mk-border-width) solid var(--mk-border);
+}
+
+/* ---- Tables (docs-props look) ------------------------------------ */
+
+.mk-markdown table {
+  width: 100%;
+  margin: 0 0 var(--mk-space-3);
+  border-collapse: collapse;
+  font-size: var(--mk-font-size-sm);
+}
+.mk-markdown th,
+.mk-markdown td {
+  padding: var(--mk-space-2) var(--mk-space-3);
+  text-align: start;
+  vertical-align: top;
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+}
+.mk-markdown th {
+  color: var(--mk-text-subtle);
+  font-weight: var(--mk-font-weight-semibold);
+  font-size: var(--mk-font-size-xs);
+  letter-spacing: var(--mk-letter-spacing-wide);
+  text-transform: uppercase;
+}
+.mk-markdown tbody tr:hover td {
+  background-color: var(--mk-hover-overlay);
+}
+
+/* Table column alignment (from `:---:` delimiter colons). */
+.mk-markdown .mk-markdown--center {
+  text-align: center;
+}
+.mk-markdown .mk-markdown--right {
+  text-align: end;
+}

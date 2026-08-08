@@ -29,3 +29,5 @@ export * from './diff';
 export * from './kanban';
 export * from './qr-code';
 export * from './json-viewer';
+export * from './log-viewer';
+export * from './markdown';

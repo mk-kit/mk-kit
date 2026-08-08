@@ -445,6 +445,40 @@ export interface MkI18nStrings {
   /** JSON viewer: default accessible label of the tree. */
   jsonLabel: string;
 
+  // --- Log viewer -------------------------------------------------------------
+  /** Log viewer: default accessible label of the log region. */
+  logViewerLabel: string;
+  /** Log viewer: re-attach-to-tail button. */
+  logFollow: string;
+  /** Log viewer: copy-the-whole-buffer toolbar button. */
+  logCopyAll: string;
+  /** Log viewer: soft-wrap toolbar toggle. */
+  logWrapLines: string;
+
+  // --- Event calendar editing --------------------------------------------------
+  /** Announced when an event is picked up in keyboard move mode. */
+  eventCalendarGrabbed: (title: string, from: string, to: string) => string;
+  /** Announced after each keyboard step: current day + time range. */
+  eventCalendarPosition: (
+    title: string,
+    day: string,
+    from: string,
+    to: string,
+  ) => string;
+  /** Announced when a move commits. */
+  eventCalendarMoved: (
+    title: string,
+    day: string,
+    from: string,
+    to: string,
+  ) => string;
+  /** Announced when a resize commits. */
+  eventCalendarResized: (title: string, to: string) => string;
+  /** Announced when an edit is aborted. */
+  eventCalendarEditCancelled: string;
+  /** `aria-roledescription` of an editable event pill. */
+  eventCalendarMovableEvent: string;
+
   // --- Media -----------------------------------------------------------------
   /** Lightbox / gallery: previous-image control. */
   previousImage: string;
@@ -751,6 +785,23 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   taxId: 'Tax ID',
   signature: 'Signature',
   jsonLabel: 'JSON',
+
+  logViewerLabel: 'Log output',
+  logFollow: 'Follow',
+  logCopyAll: 'Copy log',
+  logWrapLines: 'Wrap lines',
+
+  eventCalendarGrabbed: (title, from, to) =>
+    `${title} grabbed, ${from} – ${to}. Use the arrow keys to move, ` +
+    'Shift with Up or Down to change the end time, Enter to save, ' +
+    'Escape to cancel.',
+  eventCalendarPosition: (title, day, from, to) =>
+    `${title}, ${day}, ${from} – ${to}.`,
+  eventCalendarMoved: (title, day, from, to) =>
+    `${title} moved to ${day}, ${from} – ${to}.`,
+  eventCalendarResized: (title, to) => `${title} now ends at ${to}.`,
+  eventCalendarEditCancelled: 'Move cancelled. The event keeps its original time.',
+  eventCalendarMovableEvent: 'Movable event',
 
   previousImage: 'Previous image',
   nextImage: 'Next image',

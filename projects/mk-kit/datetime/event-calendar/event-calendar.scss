@@ -250,6 +250,48 @@
   outline-offset: 1px;
 }
 
+/* ── editable time grid (drag-to-move / drag-to-resize) ─────────────────── */
+.mk-event-calendar__block--editable {
+  /* Native vertical scroll stays alive until the touch long-press arms the
+     drag (the drag then locks `touch-action` inline for the gesture). */
+  touch-action: pan-y;
+  user-select: none;
+}
+
+.mk-event-calendar__block--dragging {
+  z-index: 3;
+  opacity: 0.85;
+  box-shadow: var(--mk-shadow-lg);
+  /* The lift moves via translate only — compositor work, no layout churn. */
+  will-change: transform;
+}
+
+.mk-event-calendar__drag-time {
+  display: block;
+  font-weight: var(--mk-font-weight-semibold);
+  white-space: nowrap;
+}
+
+.mk-event-calendar__resize-handle {
+  position: absolute;
+  inset-inline: 0;
+  bottom: 0;
+  height: 6px;
+  cursor: ns-resize;
+  /* Coarse pointers get a ≥24px hit box across the thin axis. */
+  @include mk.touch-target(24px, null);
+}
+
+.mk-event-calendar__drop-outline {
+  position: absolute;
+  inset-inline: 1px;
+  z-index: 2;
+  pointer-events: none;
+  border: var(--mk-border-width-strong) dashed var(--mk-primary);
+  border-radius: var(--mk-radius-sm);
+  background: color-mix(in srgb, var(--mk-primary) 8%, transparent);
+}
+
 .mk-event-calendar__all-day {
   position: absolute;
   inset-inline: 2px;

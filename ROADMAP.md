@@ -295,8 +295,25 @@ consumers still had to hand-roll):
 - ✅ **`mk-numeric-keypad`** + **`mk-on-screen-keyboard`** — touch-first PIN
   keypad and on-screen keyboard with trigger directive (shipped).
 
-Still open from the analysis: event-calendar week/day drag-to-move (P2),
-`mk-markdown` renderer (P2), `mk-log-viewer` (P2), `MkHistoryService`
-undo/redo (P3), org-chart (P3). Infra: Playwright visual regression (P2),
-`ng add` schematic (P2), generated API reference (P2), test harnesses (P3),
-public-npm/provenance decision (P3).
+## Round 4 — scheduler, output & tooling wave (2026-08, shipped in 0.32.0)
+
+- ✅ **Event-calendar editable time grid** — drag-to-move / drag-to-resize on
+  the week/day views (snap grid, touch long-press, full keyboard equivalents,
+  consumer-owns-data `(eventMove)`/`(eventResize)`) (shipped).
+- ✅ **`mk-markdown`** — dependency-free CommonMark-subset renderer; raw HTML
+  always escaped, unsafe URLs dropped at parse time; fenced-code highlighting
+  via the core highlighter; GitHub pipe tables (shipped).
+- ✅ **`mk-log-viewer`** — virtualized tail-follow log pane: theme-mapped ANSI
+  colors, stick-to-bottom follow with scroll detach, search highlighting,
+  ring-buffer cap, `role="log"` (shipped).
+- ✅ **`MkHistoryService` / `MkHistoryStack`** — generic undo/redo command
+  stack: batching, re-entrancy guard, scoped stacks, opt-in `mod+z` hotkey
+  wiring (shipped).
+- ✅ **Playwright visual regression** — 12 docs routes × light/dark, frozen
+  clock, Linux baselines, weekly + manual workflow (shipped).
+- ✅ **`ng add @mkornas/ui`** — wires the theme stylesheet, optional
+  `provideMkI18n` scaffold (shipped).
+
+Still open: org-chart (P3), generated API reference (P2), test harnesses
+(P3), public-npm/provenance decision (P3), nested tree-table rows (P3),
+high-contrast theme preset (P3).

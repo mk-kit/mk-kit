@@ -5,8 +5,27 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { MkButton, MkHotkeysService, MkLiveAnnouncer } from '@mkornas/ui';
+import {
+  MkAlert,
+  MkButton,
+  MkChip,
+  MkHistoryService,
+  MkHotkeysService,
+  MkLiveAnnouncer,
+  type MkTone,
+} from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
+
+/** One chip of the history demo's tiny list editor. */
+interface DemoChip {
+  id: number;
+  name: string;
+  tone: MkTone;
+}
+
+/** Deterministic add-chip palette (cycled by a counter — no randomness). */
+const CHIP_NAMES = ['plum', 'mint', 'amber', 'coral', 'iris', 'slate'] as const;
+const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger', 'info', 'neutral'];
 
 /**
  * Documentation page for the core primitives of `@mkornas/ui`: the overlay
@@ -16,7 +35,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-core-services-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkButton],
+  imports: [DocsExample, MkAlert, MkButton, MkChip],
   template: `
     <div class="docs-page docs-container">
       <h1>Core &amp; services</h1>
@@ -26,9 +45,9 @@ import { DocsExample } from '../../shared/docs-example';
         <strong>anchored-panel</strong> directive backed by the native Popover
         API, a <strong>focus trap</strong> and <strong>live announcer</strong>
         for accessibility, a reactive <strong>theme</strong> controller,
-        <strong>i18n</strong> string overrides, and app-wide
-        <strong>hotkeys</strong>. All are tree-shakable, SSR-safe and provided
-        in root.
+        <strong>i18n</strong> string overrides, app-wide
+        <strong>hotkeys</strong>, and an undo/redo <strong>history</strong>
+        stack. All are tree-shakable, SSR-safe and provided in root.
       </p>
 
       <!-- ============================================================ -->
@@ -278,6 +297,114 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>mkParseHotkey(combo)</code> / <code>mkMatchesHotkey(event, combo)</code></td><td><code>function</code></td><td>Pure, SSR-safe helpers behind the service — usable standalone.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>History (undo / redo)</h2>
+      <p>
+        <code class="docs-inline">MkHistoryService</code> is the app-wide,
+        signal-based, linear undo/redo command stack (a root-provided
+        <code class="docs-inline">MkHistoryStack</code> — the plain class is
+        exported too and can be instantiated directly).
+        <code class="docs-inline">push()</code> records an action that has
+        <em>already happened</em>: you do the work first, then push an entry
+        with a human <code class="docs-inline">label</code> and
+        <code class="docs-inline">undo</code> /
+        <code class="docs-inline">redo</code> callbacks. Pushing clears the
+        redo branch (the standard editor model), and the oldest entries are
+        evicted beyond <code class="docs-inline">limit</code> (default 100).
+      </p>
+      <p>
+        The demo below is a tiny list editor: every add / remove is pushed with
+        a label, and the Undo/Redo buttons are driven entirely by the stack's
+        signals. (It runs on a <code class="docs-inline">createScope()</code>
+        stack — an independent stack with the same API — so playing with it
+        does not pollute the app-wide history.)
+      </p>
+      <docs-example [code]="historyCode" [column]="true">
+        <div class="core-demo">
+          <button mkButton size="sm" (click)="addChip()">Add chip</button>
+          <button
+            mkButton
+            size="sm"
+            variant="outline"
+            tone="neutral"
+            [disabled]="!history.canUndo()"
+            (click)="history.undo()"
+          >
+            Undo{{ history.undoLabel() ? ' — ' + history.undoLabel() : '' }}
+          </button>
+          <button
+            mkButton
+            size="sm"
+            variant="outline"
+            tone="neutral"
+            [disabled]="!history.canRedo()"
+            (click)="history.redo()"
+          >
+            Redo{{ history.redoLabel() ? ' — ' + history.redoLabel() : '' }}
+          </button>
+        </div>
+        <div class="core-demo core-demo--chips">
+          @for (chip of chips(); track chip.id) {
+            <mk-chip removable [tone]="chip.tone" (removed)="removeChip(chip)">
+              {{ chip.name }}
+            </mk-chip>
+          } @empty {
+            <span class="core-demo__note">
+              No chips — add a few, remove one, then walk the history with
+              Undo/Redo.
+            </span>
+          }
+        </div>
+      </docs-example>
+
+      <h3>Hotkeys &amp; batching</h3>
+      <p>
+        Nothing is registered automatically — wire the standard editor
+        shortcuts (<code class="docs-inline">mod+z</code> to undo,
+        <code class="docs-inline">mod+shift+z</code> and
+        <code class="docs-inline">mod+y</code> to redo) with
+        <code class="docs-inline">registerHistoryHotkeys()</code> in an
+        injection context. The hotkeys service already ignores keydowns inside
+        editable fields, so native text-field undo keeps working. To group many
+        pushes into <em>one</em> undoable step, run them inside
+        <code class="docs-inline">batch(label, work)</code>: undo replays the
+        children in reverse order, nested batches flatten into the outermost
+        one, and an empty batch records nothing.
+      </p>
+      <pre class="core-code"><code>{{ historyHotkeysCode }}</code></pre>
+
+      <mk-alert tone="warning" variant="soft" title="Re-entrancy: push during undo is ignored">
+        Pushes made <strong>while</strong> <code class="docs-inline">undo()</code>
+        or <code class="docs-inline">redo()</code> is executing are
+        <strong>silently ignored</strong>. In the service's own words: "Naive
+        consumers often record history from a generic change handler
+        (<code class="docs-inline">(cellEdit)</code>,
+        <code class="docs-inline">valueChanges</code>, …); when an undo replays
+        the old value, that same handler fires again and would push a mirror
+        entry, corrupting the stack into an undo/redo ping-pong. The guard
+        makes that pattern safe by construction. If you need to record
+        something new in response to an undo, do it after
+        <code class="docs-inline">undo()</code> returns."
+      </mk-alert>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>push(entry)</code></td><td><code>method</code></td><td>Record an already-performed action (<code>{{ '{' }} label, undo(), redo() {{ '}' }}</code>). Clears the redo branch; ignored during undo/redo; collected into the composite inside a <code>batch()</code>.</td></tr>
+          <tr><td><code>undo()</code> / <code>redo()</code></td><td><code>boolean</code></td><td>Revert / re-apply the top entry; <code>false</code> when there is nothing to do.</td></tr>
+          <tr><td><code>canUndo</code> / <code>canRedo</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>Whether an entry can be undone / redone — bind buttons to these.</td></tr>
+          <tr><td><code>undoLabel</code> / <code>redoLabel</code></td><td><code>Signal&lt;string | null&gt;</code></td><td>Label of the entry the next undo / redo would touch ("Undo <em>Delete row</em>").</td></tr>
+          <tr><td><code>size</code></td><td><code>Signal&lt;number&gt;</code></td><td>Number of undoable entries on the stack.</td></tr>
+          <tr><td><code>limit</code></td><td><code>number</code></td><td>Max undoable entries kept (default <code>100</code>); the oldest are dropped. Lowering it trims immediately.</td></tr>
+          <tr><td><code>batch(label, work)</code></td><td><code>method</code></td><td>Group every push made during <code>work()</code> into one undoable step; returns <code>work()</code>'s result.</td></tr>
+          <tr><td><code>clear()</code></td><td><code>method</code></td><td>Drop all entries (both branches) and any in-flight batch collection.</td></tr>
+          <tr><td><code>createScope()</code></td><td><code>MkHistoryStack</code></td><td>Independent stack with the same API — for a dialog's local session that shouldn't pollute the app-wide history.</td></tr>
+          <tr><td><code>registerHistoryHotkeys(history?)</code></td><td><code>() =&gt; void</code></td><td>Wire <code>mod+z</code> / <code>mod+shift+z</code> / <code>mod+y</code> to a stack (the service by default). Returns a disposer; auto-disposed with the injection context.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -305,6 +432,11 @@ import { DocsExample } from '../../shared/docs-example';
         color: var(--mk-text-muted);
         max-width: 46ch;
       }
+      .core-demo--chips {
+        min-height: 2.5rem;
+        margin-top: var(--mk-space-3);
+        gap: var(--mk-space-2);
+      }
       .core-demo__note kbd {
         font-family: var(--mk-font-mono);
         font-size: var(--mk-font-size-xs);
@@ -320,6 +452,42 @@ export class CoreServicesPage {
   private readonly announcer = inject(MkLiveAnnouncer);
   private readonly hotkeys = inject(MkHotkeysService);
   private readonly destroyRef = inject(DestroyRef);
+
+  /**
+   * The history demo runs on an isolated scope of the app-wide service, so
+   * undoing here never touches history other parts of the app may have pushed.
+   */
+  protected readonly history = inject(MkHistoryService).createScope();
+
+  protected readonly chips = signal<readonly DemoChip[]>([]);
+  /** Deterministic sequence for chip names/tones (counter + modulo). */
+  private chipSeq = 0;
+
+  protected addChip(): void {
+    const n = this.chipSeq++;
+    const chip: DemoChip = {
+      id: n,
+      name: CHIP_NAMES[n % CHIP_NAMES.length],
+      tone: CHIP_TONES[n % CHIP_TONES.length],
+    };
+    const insert = () =>
+      this.chips.update((chips) => [...chips, chip]);
+    const remove = () =>
+      this.chips.update((chips) => chips.filter((c) => c.id !== chip.id));
+    insert(); // 1. do the work yourself…
+    this.history.push({ label: `Add ${chip.name}`, undo: remove, redo: insert }); // 2. …then record it
+  }
+
+  protected removeChip(chip: DemoChip): void {
+    const at = this.chips().indexOf(chip);
+    if (at === -1) return;
+    const remove = () =>
+      this.chips.update((chips) => chips.filter((c) => c.id !== chip.id));
+    const insert = () =>
+      this.chips.update((chips) => [...chips.slice(0, at), chip, ...chips.slice(at)]);
+    remove();
+    this.history.push({ label: `Remove ${chip.name}`, undo: insert, redo: remove });
+  }
 
   protected readonly announceCount = signal(0);
   protected readonly hotkeyActive = signal(false);
@@ -430,4 +598,33 @@ this.hotkeys.register('g i', () => this.goToInbox()); // two-step chord
 
 // … later
 off();`;
+
+  protected readonly historyCode = `private readonly history = inject(MkHistoryService);
+readonly chips = signal<Chip[]>([]);
+
+addChip(chip: Chip): void {
+  const insert = () => this.chips.update((c) => [...c, chip]);
+  const remove = () => this.chips.update((c) => c.filter((x) => x.id !== chip.id));
+  insert(); // 1. do the work yourself — push() records an action that already happened
+  this.history.push({ label: \`Add \${chip.name}\`, undo: remove, redo: insert });
+}
+
+<button [disabled]="!history.canUndo()" (click)="history.undo()">
+  Undo {{ history.undoLabel() }}
+</button>
+<button [disabled]="!history.canRedo()" (click)="history.redo()">
+  Redo {{ history.redoLabel() }}
+</button>`;
+
+  protected readonly historyHotkeysCode = `// Standard editor shortcuts — call in an injection context:
+export class AppShell {
+  private readonly disposeHistoryKeys = registerHistoryHotkeys();
+  // mod+z -> undo(), mod+shift+z / mod+y -> redo()
+  // Pass a createScope() stack to bind a dialog's local history instead.
+}
+
+// Group many pushes into ONE undoable step:
+history.batch('Paste 3 rows', () => {
+  for (const row of pasted) this.insertRow(row); // each insert push()es
+});`;
 }

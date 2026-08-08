@@ -9,6 +9,7 @@ import {
   MkTimePicker,
   MkWeekPicker,
   type MkCalendarEvent,
+  type MkCalendarEventEdit,
   type MkDateRange,
   type MkWeek,
   formatDate,
@@ -326,8 +327,8 @@ import { DocsExample } from '../../shared/docs-example';
       <!-- ============================================================ -->
       <h2>Event calendar</h2>
       <p>
-        <code class="docs-inline">&lt;mk-event-calendar&gt;</code> is a display-only
-        month-grid scheduler: it plots
+        <code class="docs-inline">&lt;mk-event-calendar&gt;</code> is a
+        month-grid scheduler (with timed week/day views — see below): it plots
         <code class="docs-inline">MkCalendarEvent</code>s —
         <code class="docs-inline">&#123; date, title, color?, id? &#125;</code> — as
         coloured pills on the day they fall on, capped at
@@ -361,6 +362,83 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>dayClick</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted when a day cell is activated.</td></tr>
           <tr><td>eventClick</td><td>output&lt;MkCalendarEvent&gt;</td><td>—</td><td>Emitted when an event pill is activated (does not also fire dayClick).</td></tr>
           <tr><td>monthChange</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted when the viewed month changes via prev/next.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Editable time grid</h3>
+      <p>
+        <code class="docs-inline">[view]</code> switches the calendar to a
+        timed <code class="docs-inline">week</code> or
+        <code class="docs-inline">day</code> grid spanning
+        <code class="docs-inline">dayStartHour</code>–<code class="docs-inline">dayEndHour</code>.
+        Events with a <code class="docs-inline">start</code> instant (and an
+        optional <code class="docs-inline">end</code>, defaulting to 30
+        minutes) are positioned on the grid; events without one land in the
+        all-day strip. With <code class="docs-inline">editable</code>, pills
+        can be rescheduled by pointer <em>and</em> keyboard: drag a pill to
+        move it, drag its bottom edge to resize it. The calendar
+        <strong>never mutates <code class="docs-inline">events</code></strong>
+        — it emits the would-be range via
+        <code class="docs-inline">(eventMove)</code> /
+        <code class="docs-inline">(eventResize)</code> and the consumer applies
+        (or rejects) the change, typically with a map-and-replace on its own
+        events signal, as below.
+      </p>
+      <docs-example [code]="editableCalendarCode" [column]="true">
+        <mk-event-calendar
+          view="week"
+          editable
+          [events]="weekEvents()"
+          [(viewDate)]="weekDate"
+          [firstDayOfWeek]="1"
+          [dayStartHour]="8"
+          [dayEndHour]="18"
+          [snapMinutes]="15"
+          (eventMove)="onEventMove($event)"
+          (eventResize)="onEventResize($event)"
+        />
+        <p class="echo">Last change: {{ lastEdit() }}</p>
+      </docs-example>
+
+      <p>
+        <strong>Snapping:</strong> pointer drags and keyboard steps both snap
+        to the <code class="docs-inline">snapMinutes</code> grid (default 15),
+        which is also the minimum event duration a resize can reach — the end
+        never gets closer than one snap step to the start.
+      </p>
+
+      <p><strong>Keyboard:</strong> (on a focused event pill, WCAG 2.5.7 — no drag required)</p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Arm "move mode" on the focused pill (also swallows the click, so <code>eventClick</code> does not fire).</td></tr>
+          <tr><td><kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd></td><td>Move the event earlier / later by <code>snapMinutes</code>.</td></tr>
+          <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd></td><td>Move the event to the previous / next day column (week view).</td></tr>
+          <tr><td><kbd>Shift</kbd>+<kbd>ArrowUp</kbd> / <kbd>Shift</kbd>+<kbd>ArrowDown</kbd></td><td>Resize: shrink / grow the end time by <code>snapMinutes</code> (never below one snap step of duration).</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (again)</td><td>Commit — emits <code>eventMove</code>, or <code>eventResize</code> when only the end changed.</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Cancel — the pill snaps back, nothing is emitted. (Escape also aborts an in-flight pointer drag; losing focus mid-move cancels too.)</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Every grab, step, commit and cancel is announced to screen readers via
+        the live announcer.
+      </p>
+
+      <p><strong>Week/day view additions:</strong></p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>view</td><td>model&lt;'month' | 'week' | 'day'&gt;</td><td>'month'</td><td>Two-way presentation: the classic month grid, or a timed week/day grid. Prev/next then steps by 7 days / 1 day.</td></tr>
+          <tr><td>dayStartHour / dayEndHour</td><td>number</td><td>8 / 22</td><td>Visible hour range of the time grid (end exclusive).</td></tr>
+          <tr><td>editable</td><td>boolean</td><td>false</td><td>Enable drag/keyboard rescheduling on the week/day grids. Off = no handles, no ARIA additions, no drag behaviour.</td></tr>
+          <tr><td>snapMinutes</td><td>number</td><td>15</td><td>Snap grid (minutes) for drag/keyboard edits; also the minimum duration.</td></tr>
+          <tr><td>slotClick</td><td>output&lt;Date&gt;</td><td>—</td><td>An empty hour slot was clicked — emits the slot's start instant.</td></tr>
+          <tr><td>eventMove / eventResize</td><td>output&lt;MkCalendarEventEdit&gt;</td><td>—</td><td>The would-be edit: <code>&#123; event, start, end &#125;</code> — the untouched source event plus the new (snapped) range. Applying it is your job.</td></tr>
+          <tr><td>MkCalendarEvent.start / end</td><td>Date (optional)</td><td>—</td><td>Start/end instants positioning the event on the time grid; a missing <code>end</code> reads as 30 minutes, no <code>start</code> puts the event in the all-day strip.</td></tr>
         </tbody>
       </table>
 
@@ -483,6 +561,32 @@ export class DateTimePage {
     this.lastActivity.set(`Event clicked: ${event.title} (${formatDate(event.date, 'MMM d')})`);
   }
 
+  // --- Editable time grid ---------------------------------------------------
+  protected readonly weekDate = signal<Date>(new Date());
+  protected readonly weekEvents = signal<readonly MkCalendarEvent[]>(seedWeekEvents());
+  protected readonly lastEdit = signal<string>('—');
+
+  protected onEventMove(edit: MkCalendarEventEdit): void {
+    this.applyEdit(edit);
+    this.lastEdit.set(
+      `Moved "${edit.event.title}" to ${formatDate(edit.start, 'ddd')} ${hm(edit.start)} – ${hm(edit.end)}`,
+    );
+  }
+
+  protected onEventResize(edit: MkCalendarEventEdit): void {
+    this.applyEdit(edit);
+    this.lastEdit.set(
+      `Resized "${edit.event.title}" to ${hm(edit.start)} – ${hm(edit.end)}`,
+    );
+  }
+
+  /** The documented map-and-replace: swap the edited event for a new object. */
+  private applyEdit({ event, start, end }: MkCalendarEventEdit): void {
+    this.weekEvents.update((events) =>
+      events.map((e) => (e === event ? { ...e, date: start, start, end } : e)),
+    );
+  }
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
   protected readonly calendarCode = `calDate = signal<Date | null>(new Date());
 
@@ -552,6 +656,29 @@ calMonth = signal<Date>(new Date());
   (dayClick)="onDayClick($event)"
   (eventClick)="onEventClick($event)"
 />`;
+
+  protected readonly editableCalendarCode = `events = signal<MkCalendarEvent[]>([
+  { date: mon9, start: mon9, end: mon930, title: 'Standup' },
+  // …
+]);
+
+onEventMove({ event, start, end }: MkCalendarEventEdit): void {
+  // The calendar never mutates events — apply the change yourself:
+  this.events.update((all) =>
+    all.map((e) => (e === event ? { ...e, date: start, start, end } : e)),
+  );
+}
+
+<mk-event-calendar
+  view="week"
+  editable
+  [events]="events()"
+  [snapMinutes]="15"
+  [dayStartHour]="8"
+  [dayEndHour]="18"
+  (eventMove)="onEventMove($event)"
+  (eventResize)="onEventMove($event)"
+/>`;
 }
 
 /** ~5 events scattered across the current month for the event-calendar demo. */
@@ -565,6 +692,40 @@ function eventsThisMonth(): MkCalendarEvent[] {
     { date: new Date(y, m, 18), title: 'Sprint demo' },
     { date: new Date(y, m, 18), title: 'Retro' },
     { date: new Date(y, m, 24), title: 'Release', color: 'var(--mk-warning)' },
+  ];
+}
+
+/** `HH:mm` of a Date's local time. */
+function hm(d: Date): string {
+  const p = (n: number) => String(n).padStart(2, '0');
+  return `${p(d.getHours())}:${p(d.getMinutes())}`;
+}
+
+/**
+ * Seed events for the editable week demo: fixed offsets from this week's
+ * Monday (deterministic — nothing random, just the current week).
+ */
+function seedWeekEvents(): MkCalendarEvent[] {
+  const today = startOfToday();
+  const monday = new Date(today);
+  monday.setDate(today.getDate() - ((today.getDay() + 6) % 7));
+  const at = (dayOffset: number, hour: number, minute: number, durationMin: number, title: string, color?: string): MkCalendarEvent => {
+    const start = new Date(monday);
+    start.setDate(monday.getDate() + dayOffset);
+    start.setHours(hour, minute, 0, 0);
+    const end = new Date(start.getTime() + durationMin * 60_000);
+    return { date: start, start, end, title, color };
+  };
+  const wednesday = new Date(monday);
+  wednesday.setDate(monday.getDate() + 2);
+  return [
+    at(0, 9, 0, 30, 'Standup', 'var(--mk-success)'),
+    at(1, 10, 0, 90, 'Design review'),
+    at(2, 13, 0, 60, 'Lunch & learn', 'var(--mk-warning)'),
+    at(3, 9, 30, 45, 'Sprint planning'),
+    at(4, 15, 0, 60, 'Demo', 'var(--mk-info)'),
+    // No `start` — renders in the all-day strip.
+    { date: wednesday, title: 'Release freeze' },
   ];
 }
 

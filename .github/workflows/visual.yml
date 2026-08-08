@@ -1,0 +1,46 @@
+name: Visual regression
+
+# Screenshot sweep of the docs site against committed Linux baselines.
+# Deliberately NOT part of ci.yml: font rasterization differs across OSes, so
+# these snapshots are only meaningful on the same platform they were generated
+# on (ubuntu). Run on demand or on the weekly schedule.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 6 * * 1' # Mondays 06:00 UTC
+
+concurrency:
+  group: visual-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  visual:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+
+      - name: Set up Node
+        uses: actions/setup-node@v5
+        with:
+          # Angular 22's CLI requires Node >= 24.15 (matches verify.yml).
+          node-version: 24.18.0
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright Chromium
+        run: npx playwright install --with-deps chromium
+
+      - name: Run visual tests
+        run: npm run test:visual
+
+      - name: Upload report and diffs
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: visual-report
+          path: |
+            playwright-report
+            test-results
+          retention-days: 14

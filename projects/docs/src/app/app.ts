@@ -132,6 +132,7 @@ export class App {
       links: [
         { label: 'Content editor', path: '/components/content-editor' },
         { label: 'Rich text', path: '/components/rich-text' },
+        { label: 'Markdown & logs', path: '/components/markdown' },
         { label: 'Drag & drop', path: '/components/drag-drop' },
         { label: 'Utilities', path: '/components/utilities' },
       ],

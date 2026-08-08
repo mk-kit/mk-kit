@@ -1,0 +1,3 @@
+<!-- Safe by construction: the renderer escapes all source text, and Angular's
+     sanitizer re-checks the markup here (same pattern as mk-code). -->
+<div class="mk-markdown__body" [innerHTML]="html()"></div>

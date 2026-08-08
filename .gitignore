@@ -39,6 +39,10 @@ testem.log
 /typings
 __screenshots__/
 
+# Playwright (visual regression) — reports and failure diffs, not baselines
+/playwright-report
+/test-results
+
 # System files
 .DS_Store
 Thumbs.db
