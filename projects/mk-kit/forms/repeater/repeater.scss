@@ -1,0 +1,86 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: var(--mk-space-2);
+  width: 100%;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-repeater__rows {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.mk-repeater__row {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+}
+
+/* The mkDrag host is focusable for keyboard reorder — show the ring. */
+.mk-repeater__row:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-repeater__content {
+  flex: 1;
+  min-width: 0;
+}
+
+/* Drag handle — grab cursor + touch-action come from the global
+   `.mk-drag-handle` class the directive applies. */
+.mk-repeater__handle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  width: var(--mk-control-height-sm);
+  height: var(--mk-control-height-sm);
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-md);
+  border-radius: var(--mk-radius-sm);
+  @include mk.touch-target;
+}
+
+.mk-repeater__handle:hover:not(:disabled) {
+  color: var(--mk-text);
+  background-color: var(--mk-surface-2);
+}
+
+.mk-repeater__handle:focus-visible {
+  @include mk.focus-ring;
+}
+
+.mk-repeater__handle:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
+.mk-repeater__remove {
+  flex: none;
+}
+
+.mk-repeater__empty {
+  width: 100%;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+}
+
+:host(.mk-repeater--disabled) .mk-repeater__row {
+  opacity: 0.7;
+}

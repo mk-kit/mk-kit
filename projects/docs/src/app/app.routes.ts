@@ -209,6 +209,12 @@ export const routes: Routes = [
       import('./pages/selection/selection-page').then((m) => m.SelectionPage),
   },
   {
+    path: 'components/rich-text',
+    title: 'Rich text — mk-kit',
+    loadComponent: () =>
+      import('./pages/rich-text/rich-text-page').then((m) => m.RichTextPage),
+  },
+  {
     path: 'components/stepper',
     title: 'Stepper — mk-kit',
     loadComponent: () =>

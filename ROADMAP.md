@@ -269,3 +269,34 @@ existing primitive it would reuse. Priorities as before.
   (shipped).
 - ✅ **`mk-countdown`** — count-to-date display, `(finished)`, `mkSplitDuration`
   helper (shipped).
+
+## Round 3 — growth wave (2026-08, shipped in 0.31.0)
+
+From the 2026-08 audit's gap analysis (ranked by what admin-dashboard
+consumers still had to hand-roll):
+
+- ✅ **`MkTableDataSource`** — server-side sort/page/filter adapter for
+  `mk-table` + `mkSort` + `mk-pagination`: signal state (`rows/total/loading/
+  error/empty`), debounced filter, latest-wins race handling, Promise or
+  Observable fetchers (shipped).
+- ✅ **`@mkornas/ui/rich-text`** — the block editor's rich-text engine as its
+  own entry + standalone **`mk-rich-text`** field: sanitized-HTML-string CVA
+  with toolbar, for single description/notes fields (shipped).
+- ✅ **`mk-repeater`** — add/remove/reorder rows of a projected template, CVA
+  over `T[]`, min/max caps, touch-safe handle reordering (shipped).
+- ✅ **`[mkMention]`** — @mention/#tag autocomplete inside native
+  textarea/input: caret-anchored top-layer panel, sync or async options
+  (shipped).
+- ✅ **`*mkCan` / `*mkCannot` / `[mkCanDisable]`** — permission-gated
+  rendering/disabling via a provided `MkPermissionPolicy` (signal-reactive)
+  (shipped).
+- ✅ **`mk-calendar-heatmap`** — GitHub-style year-of-activity squares with
+  month/weekday labels, buckets, legend (shipped).
+- ✅ **`mk-numeric-keypad`** + **`mk-on-screen-keyboard`** — touch-first PIN
+  keypad and on-screen keyboard with trigger directive (shipped).
+
+Still open from the analysis: event-calendar week/day drag-to-move (P2),
+`mk-markdown` renderer (P2), `mk-log-viewer` (P2), `MkHistoryService`
+undo/redo (P3), org-chart (P3). Infra: Playwright visual regression (P2),
+`ng add` schematic (P2), generated API reference (P2), test harnesses (P3),
+public-npm/provenance decision (P3).

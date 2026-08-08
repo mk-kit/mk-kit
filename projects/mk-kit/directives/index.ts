@@ -3,3 +3,4 @@
  */
 export * from './directives';
 export * from './hotkeys';
+export * from './permissions';

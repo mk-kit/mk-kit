@@ -20,6 +20,7 @@ export * from '@mkornas/ui/datetime';
 export * from '@mkornas/ui/table';
 export * from '@mkornas/ui/data';
 export * from '@mkornas/ui/feedback';
+export * from '@mkornas/ui/rich-text';
 export * from '@mkornas/ui/block-editor';
 export * from '@mkornas/ui/context-menu';
 export * from '@mkornas/ui/media';

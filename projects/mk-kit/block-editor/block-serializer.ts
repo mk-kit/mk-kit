@@ -1,3 +1,4 @@
+import { sanitizeInlineHtml } from '@mkornas/ui/rich-text';
 import type { MkBlock, MkBlockDocument } from './block-model';
 
 /**
@@ -6,16 +7,17 @@ import type { MkBlock, MkBlockDocument } from './block-model';
  * SECURITY MODEL: text blocks (`paragraph`, `heading`, `quote`, `list`) store
  * HTML authored through the editor's restricted formatting commands. Before it
  * ever reaches a string of markup here it is passed through
- * {@link sanitizeInlineHtml}, an allow-list cleaner that strips scripts, event
- * handlers and dangerous URLs. `mk-block-renderer` additionally re-sanitises
- * through Angular's `DomSanitizer` at display time. These serialisers are
- * dependency-free so they can run on a server (SSG/SSR) — never feed their
- * output back into `innerHTML` without sanitising again.
+ * {@link sanitizeInlineHtml} (from `@mkornas/ui/rich-text`), an allow-list
+ * cleaner that strips scripts, event handlers and dangerous URLs.
+ * `mk-block-renderer` additionally re-sanitises through Angular's
+ * `DomSanitizer` at display time. These serialisers are dependency-free so
+ * they can run on a server (SSG/SSR) — never feed their output back into
+ * `innerHTML` without sanitising again.
  */
 
-const ALLOWED_INLINE_TAGS = new Set([
-  'b', 'strong', 'i', 'em', 'u', 's', 'strike', 'code', 'a', 'br', 'span', 'mark', 'sub', 'sup',
-]);
+// Re-exported for backward compatibility — the implementation moved to the
+// rich-text entry alongside the editing surface it protects.
+export { sanitizeInlineHtml };
 
 /** Escapes text for safe placement in element content. */
 export function mkEscapeHtml(value: string): string {
@@ -39,36 +41,6 @@ export function mkIsSafeUrl(url: string): boolean {
   if (/^data:image\//i.test(trimmed)) return true;
   if (/^[a-z][a-z0-9+.-]*:/i.test(trimmed)) return false; // any other scheme
   return true; // relative / anchor / protocol-relative-ish
-}
-
-/**
- * Allow-list cleaner for inline rich text. Keeps a small set of formatting
- * tags, strips everything else's tags (preserving their text), removes event
- * handler attributes and unsafe `href`s. Not a substitute for `DomSanitizer`,
- * but makes the serialised string safe by construction.
- */
-export function sanitizeInlineHtml(html: string): string {
-  if (!html) return '';
-  let out = String(html);
-  // Drop script/style blocks entirely.
-  out = out.replace(/<\s*(script|style)[\s\S]*?<\s*\/\s*\1\s*>/gi, '');
-  // Rewrite each tag: keep allow-listed ones with a scrubbed attribute set.
-  out = out.replace(/<\/?[a-z][a-z0-9]*\b[^>]*>/gi, (tag) => {
-    const closing = /^<\s*\//.test(tag);
-    const name = (tag.match(/^<\s*\/?\s*([a-z0-9]+)/i)?.[1] ?? '').toLowerCase();
-    if (!ALLOWED_INLINE_TAGS.has(name)) return '';
-    if (closing) return `</${name}>`;
-    if (name === 'a') {
-      const href = tag.match(/\shref\s*=\s*(?:"([^"]*)"|'([^']*)')/i);
-      const url = href?.[1] ?? href?.[2] ?? '';
-      if (url && mkIsSafeUrl(url)) {
-        return `<a href="${mkEscapeAttr(url)}" rel="noopener noreferrer nofollow" target="_blank">`;
-      }
-      return '<a>';
-    }
-    return `<${name}>`;
-  });
-  return out;
 }
 
 /** Maps a ratio preset like `66-33` to a CSS `grid-template-columns` value. */

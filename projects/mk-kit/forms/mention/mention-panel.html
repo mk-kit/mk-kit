@@ -1,0 +1,35 @@
+<ul
+  #list
+  class="mk-mention__list"
+  mkAnchoredPanel
+  [mkAnchoredPanelFor]="anchorEl"
+  [anchorRect]="anchorPoint()"
+  [gap]="6"
+  (dismiss)="onDismiss()"
+  [id]="listId"
+  role="listbox"
+>
+  @if (loading() && !options().length) {
+    <li class="mk-mention__status" role="presentation">
+      <span class="mk-mention__spinner" aria-hidden="true"></span>
+      {{ i18n.loading }}
+    </li>
+  } @else {
+    @for (opt of options(); track $index; let i = $index) {
+      <li
+        class="mk-mention__option"
+        [id]="optionId(i)"
+        role="option"
+        [attr.aria-selected]="i === activeIndex()"
+        [class.mk-mention__option--active]="i === activeIndex()"
+        (pointerdown)="pick($event, i)"
+        (pointermove)="onHover(i)"
+      >
+        <span class="mk-mention__option-label">{{ opt.label }}</span>
+        @if (opt.hint) {
+          <span class="mk-mention__option-hint">{{ opt.hint }}</span>
+        }
+      </li>
+    }
+  }
+</ul>

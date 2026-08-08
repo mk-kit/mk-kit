@@ -1,0 +1,72 @@
+<!-- Focusable so keyboard users can scroll the overflowing grid (WCAG 2.1.1). -->
+<div
+  class="mk-chart__frame mk-calendar-heatmap__scroll"
+  role="region"
+  tabindex="0"
+  [attr.aria-label]="resolvedLabel()"
+>
+  <table class="mk-calendar-heatmap__grid">
+    <caption class="mk-visually-hidden">{{ resolvedLabel() }}</caption>
+    <thead>
+      <tr>
+        <td class="mk-calendar-heatmap__corner"></td>
+        @for (month of monthSegments(); track month.key) {
+          <th
+            scope="colgroup"
+            class="mk-calendar-heatmap__month"
+            [attr.colspan]="month.span"
+          >
+            <!-- A 1–2 week segment is narrower than its label: keep the name
+                 for SR but do not let it stretch the week columns. -->
+            <span [class.mk-visually-hidden]="month.span < 3">
+              {{ month.label }}
+            </span>
+          </th>
+        }
+      </tr>
+    </thead>
+    <tbody>
+      @for (row of rows(); track row.label) {
+        <tr>
+          <th scope="row" class="mk-calendar-heatmap__row-head">
+            <!-- Every row keeps its name for SR; only Mon/Wed/Fri-style rows show it. -->
+            <span [class.mk-visually-hidden]="!row.showLabel">{{ row.label }}</span>
+          </th>
+          @for (cell of row.cells; track cell.key) {
+            @if (cell.date) {
+              <td
+                class="mk-calendar-heatmap__cell"
+                [class.mk-calendar-heatmap__cell--empty]="cell.value <= 0"
+                [style.background]="cell.bg"
+                [attr.title]="cell.title"
+                (click)="onCellClick(cell)"
+              >
+                <!-- Colour must not be the only signal: expose the value to AT. -->
+                <span class="mk-visually-hidden">{{ cell.title }}</span>
+              </td>
+            } @else {
+              <td
+                class="mk-calendar-heatmap__cell mk-calendar-heatmap__cell--blank"
+              ></td>
+            }
+          }
+        </tr>
+      }
+    </tbody>
+  </table>
+</div>
+
+@if (showScale()) {
+  <div class="mk-calendar-heatmap__legend" aria-hidden="true">
+    <span class="mk-calendar-heatmap__legend-label">{{ scaleStops().min }}</span>
+    <span class="mk-calendar-heatmap__legend-ramp">
+      @for (swatch of scaleStops().swatches; track $index) {
+        <span
+          class="mk-calendar-heatmap__legend-swatch"
+          [style.background]="swatch"
+        ></span>
+      }
+    </span>
+    <span class="mk-calendar-heatmap__legend-label">{{ scaleStops().max }}</span>
+  </div>
+}

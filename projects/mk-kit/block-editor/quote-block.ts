@@ -8,16 +8,16 @@ import {
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
-import { MkRichText, type MkRichTextSplit } from './rich-text';
+import { MkRichTextEngine, type MkRichTextSplit } from '@mkornas/ui/rich-text';
 
 /** Quote block — a blockquote with rich text and an optional citation line. */
 @Component({
   selector: 'mk-quote-block',
-  imports: [MkRichText],
+  imports: [MkRichTextEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <blockquote class="mk-quote-block__quote">
-      <mk-rich-text
+      <mk-rich-text-engine
         [html]="block().data['html'] ?? ''"
         [placeholder]="i18n.blockEditor.blockQuote"
         [disabled]="readonly()"

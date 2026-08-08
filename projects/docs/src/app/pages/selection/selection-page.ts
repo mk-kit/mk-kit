@@ -6,6 +6,11 @@ import {
   MkButtonToggle,
   MkButtonToggleGroup,
   MkFormField,
+  MkInput,
+  MkMention,
+  type MkMentionOption,
+  type MkMentionSearchEvent,
+  type MkMentionSelectEvent,
   MkMultiSelect,
   MkTagInput,
   MkTransferList,
@@ -34,6 +39,8 @@ interface Framework {
     MkButtonToggle,
     MkButtonToggleGroup,
     MkFormField,
+    MkInput,
+    MkMention,
     MkMultiSelect,
     MkTagInput,
     MkTransferList,
@@ -437,6 +444,101 @@ interface Framework {
           <tr><td><code>disabled</code> <span style="color: var(--mk-text-muted);">(item)</span></td><td><code>boolean</code></td><td><code>false</code></td><td>On <code>mk-button-toggle</code>: disable just this item.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- MENTION -->
+      <!-- ============================================================ -->
+      <h2 id="mention">Mention</h2>
+      <p>
+        <code class="docs-inline">[mkMention]</code> adds mention / hashtag
+        autocomplete to a <strong>native</strong>
+        <code class="docs-inline">&lt;textarea&gt;</code> or text input. Typing
+        a trigger character (<code class="docs-inline">&#64;</code>,
+        <code class="docs-inline">#</code>, …) at the start of a word opens a
+        top-layer suggestion panel anchored at the caret; picking an option
+        replaces the trigger-plus-query with the completed mention and
+        dispatches an <code class="docs-inline">input</code> event, so
+        <code class="docs-inline">ngModel</code> / reactive-forms bindings stay
+        in sync. The element keeps its native textbox semantics and follows the
+        ARIA activedescendant pattern while the panel is open.
+      </p>
+      <p>
+        An option's <code class="docs-inline">trigger</code> field scopes it to
+        one trigger character — here the people only appear after
+        <code class="docs-inline">&#64;</code> and the tags only after
+        <code class="docs-inline">#</code>. Last pick:
+        <code class="docs-inline">{{ mentionPick() }}</code>
+      </p>
+      <docs-example [code]="mentionCode" column>
+        <div style="max-width: 26rem; width: 100%;">
+          <textarea
+            mkInput
+            mkMention
+            rows="3"
+            [mentionTriggers]="['@', '#']"
+            [mentionOptions]="mentionDirectory"
+            (mentionSelect)="onMentionSelect($event)"
+            placeholder="Type @ for people or # for tags…"
+            aria-label="Comment with mentions"
+            style="width: 100%"
+          ></textarea>
+        </div>
+      </docs-example>
+
+      <h3>Async / server-driven suggestions</h3>
+      <p>
+        Set <code class="docs-inline">mentionFilter="none"</code> and drive
+        <code class="docs-inline">mentionOptions</code> yourself from the
+        <code class="docs-inline">(mentionSearch)</code> output —
+        <code class="docs-inline">mentionLoading</code> keeps the panel open
+        with a spinner row while results are in flight. Here a
+        <code class="docs-inline">setTimeout</code> stands in for the server
+        round-trip.
+      </p>
+      <docs-example [code]="mentionAsyncCode" column>
+        <div style="max-width: 26rem; width: 100%;">
+          <textarea
+            mkInput
+            mkMention
+            rows="3"
+            mentionFilter="none"
+            [mentionOptions]="mentionResults()"
+            [mentionLoading]="mentionSearching()"
+            (mentionSearch)="onMentionSearch($event)"
+            (mentionSelect)="onMentionSelect($event)"
+            placeholder="Type @ to search the directory…"
+            aria-label="Comment with async mentions"
+            style="width: 100%"
+          ></textarea>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mentionTriggers</code></td><td><code>readonly string[]</code></td><td><code>['&#64;']</code></td><td>Single characters that start a mention session.</td></tr>
+          <tr><td><code>mentionOptions</code></td><td><code>readonly MkMentionOption[]</code></td><td><code>[]</code></td><td>The suggestion pool: <code>{{ '{' }} value, label, hint?, trigger? {{ '}' }}</code>. An option's <code>trigger</code> scopes it to one trigger character; without it the option is offered for every trigger.</td></tr>
+          <tr><td><code>mentionFilter</code></td><td><code>'contains' | 'startsWith' | 'none'</code></td><td><code>'contains'</code></td><td>How suggestions are narrowed against the typed query (over label + value); <code>'none'</code> for server-driven lists.</td></tr>
+          <tr><td><code>mentionLoading</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Keep the panel open with a loading row while async results are pending.</td></tr>
+          <tr><td><code>mentionInsert</code></td><td><code>(option, trigger) =&gt; string</code></td><td><code>null</code></td><td>Builds the inserted text. Default: trigger + label + a trailing space.</td></tr>
+          <tr><td><code>(mentionSearch)</code></td><td><code>{{ '{' }} trigger, query {{ '}' }}</code></td><td>—</td><td>Emits whenever the active query changes — drive async loading.</td></tr>
+          <tr><td><code>(mentionSelect)</code></td><td><code>{{ '{' }} option, trigger {{ '}' }}</code></td><td>—</td><td>Emits after an option has been inserted into the control.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><kbd>↑</kbd> / <kbd>↓</kbd></td><td>Move the active suggestion (wraps around).</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Tab</kbd></td><td>Insert the active suggestion.</td></tr>
+          <tr><td><kbd>Escape</kbd></td><td>Dismiss the panel for this trigger position — an enclosing dialog stays open.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
 })
@@ -519,6 +621,53 @@ export class SelectionPage {
     },
   ];
   protected readonly category = signal<unknown | null>(null);
+
+  // --- mention demos ---
+  protected readonly mentionDirectory: MkMentionOption[] = [
+    { value: 'ada', label: 'ada', hint: 'Ada Lovelace', trigger: '@' },
+    { value: 'grace', label: 'grace', hint: 'Grace Hopper', trigger: '@' },
+    { value: 'alan', label: 'alan', hint: 'Alan Turing', trigger: '@' },
+    { value: 'katherine', label: 'katherine', hint: 'Katherine Johnson', trigger: '@' },
+    { value: 'release', label: 'release', hint: '12 posts', trigger: '#' },
+    { value: 'design', label: 'design', hint: '31 posts', trigger: '#' },
+    { value: 'a11y', label: 'a11y', hint: '9 posts', trigger: '#' },
+    { value: 'perf', label: 'perf', hint: '17 posts', trigger: '#' },
+  ];
+  protected readonly mentionPick = signal('—');
+
+  protected onMentionSelect(e: MkMentionSelectEvent): void {
+    this.mentionPick.set(`${e.trigger}${e.option.label}`);
+  }
+
+  private readonly mentionUsers: MkMentionOption[] = [
+    { value: 'ada.lovelace', label: 'ada.lovelace', hint: 'ada@example.com' },
+    { value: 'alan.turing', label: 'alan.turing', hint: 'alan@example.com' },
+    { value: 'grace.hopper', label: 'grace.hopper', hint: 'grace@example.com' },
+    { value: 'katherine.johnson', label: 'katherine.johnson', hint: 'kat@example.com' },
+    { value: 'margaret.hamilton', label: 'margaret.hamilton', hint: 'margaret@example.com' },
+    { value: 'radia.perlman', label: 'radia.perlman', hint: 'radia@example.com' },
+  ];
+  protected readonly mentionResults = signal<MkMentionOption[]>([]);
+  protected readonly mentionSearching = signal(false);
+  private mentionTimer: ReturnType<typeof setTimeout> | null = null;
+
+  /** Fake directory lookup: resolves ~400 ms after the last keystroke. */
+  protected onMentionSearch(e: MkMentionSearchEvent): void {
+    if (this.mentionTimer) clearTimeout(this.mentionTimer);
+    this.mentionSearching.set(true);
+    const q = e.query.toLowerCase();
+    this.mentionTimer = setTimeout(() => {
+      this.mentionTimer = null;
+      this.mentionResults.set(
+        this.mentionUsers.filter(
+          (u) =>
+            u.label.toLowerCase().includes(q) ||
+            (u.hint ?? '').toLowerCase().includes(q),
+        ),
+      );
+      this.mentionSearching.set(false);
+    }, 400);
+  }
 
   // --- toggle demos ---
   protected readonly view = signal<unknown>('grid');
@@ -611,4 +760,29 @@ assigned = signal<unknown[]>(['editor', 'reviewer']);
   <mk-button-toggle value="m">Month</mk-button-toggle>
   <mk-button-toggle value="y" [disabled]="true">Year</mk-button-toggle>
 </mk-button-toggle-group>`;
+
+  protected readonly mentionCode = `// An option's \`trigger\` scopes it to one trigger character:
+directory: MkMentionOption[] = [
+  { value: 'ada',     label: 'ada',     hint: 'Ada Lovelace', trigger: '@' },
+  { value: 'grace',   label: 'grace',   hint: 'Grace Hopper', trigger: '@' },
+  { value: 'release', label: 'release', hint: '12 posts',     trigger: '#' },
+  { value: 'design',  label: 'design',  hint: '31 posts',     trigger: '#' },
+];
+
+<textarea mkInput mkMention rows="3"
+  [mentionTriggers]="['@', '#']"
+  [mentionOptions]="directory"
+  (mentionSelect)="onPick($event)"   <!-- { option, trigger } -->
+></textarea>`;
+
+  protected readonly mentionAsyncCode = `<textarea mkInput mkMention rows="3"
+  mentionFilter="none"
+  [mentionOptions]="results()"
+  [mentionLoading]="searching()"
+  (mentionSearch)="onSearch($event)"
+></textarea>
+
+// onSearch({ trigger, query }): debounce, fetch, then
+//   results.set(…); searching.set(false);
+// The panel shows a spinner row while mentionLoading is true.`;
 }

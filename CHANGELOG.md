@@ -4,6 +4,74 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.31.0] — 2026-08-08
+
+The growth wave: the 2026-08 audit's top "what admin consumers still
+hand-roll" list, plus the touch-keys input components. Built in an isolated
+worktree; also repairs a 0.30.0 packaging slip (see Fixed).
+
+### Added
+
+- **`MkTableDataSource<T>`** (`@mkornas/ui/table`) — the server-side data
+  adapter for `mk-table`: signal state (`rows`/`total`/`loading`/`error`/
+  `empty`), `setPage`/`setPageSize`/`setSort`/`setFilter` (debounced) /
+  `refresh`, Promise or Observable fetchers, epoch-based latest-wins race
+  handling (a stale response can never overwrite newer state), rows kept
+  on screen during loads, `connectSort(mkSort)`, and auto-cleanup when
+  created in an injection context. `setSort` accepts both the `mkSort`
+  directive's state and `mk-table`'s `(sortChange)` payload.
+- **`@mkornas/ui/rich-text`** — new entry point. The block editor's
+  internal rich-text engine moved here (block-editor shrank 222→205 KiB and
+  re-exports everything it used to), plus the new standalone
+  **`mk-rich-text`**: a sanitized-HTML-string CVA field with toolbar for
+  single description/notes fields where the block editor is overkill.
+  Sanitizes on write and on every edit; wires into `mk-form-field`;
+  normalizes visually-empty content to `''`.
+- **`mk-repeater`** — add/remove/reorder rows of a projected
+  `mkRepeaterRow` template. CVA over `T[]` with immutable updates,
+  `factory`/`min`/`max`, touch-safe handle-only drag reorder (+ dnd's
+  keyboard mode), object-identity row tracking so removing a middle row
+  preserves the state of the rows below, `mkRepeaterEmpty` slot, and
+  reorder announcements. New i18n keys `repeaterAddRow`,
+  `repeaterRemoveRow`, `repeaterReorderRow`, `repeaterRowMoved`.
+- **`[mkMention]`** — @mention/#tag autocomplete for native
+  textarea/input: mirror-div caret measurement anchors a top-layer listbox
+  at the caret, triggers configurable per option, contains/startsWith or
+  async (`mentionFilter="none"` + `(mentionSearch)` + `mentionLoading`),
+  full keyboard support with the library's Escape contract, insertion via
+  `mentionInsert` with a proper `input` event so forms stay in sync.
+- **`*mkCan` / `*mkCannot` / `[mkCanDisable]`** — permission-gated UI via a
+  provided `MkPermissionPolicy` (`can(permission)` returning `boolean` or a
+  `Signal<boolean>` — signal policies re-evaluate live). `else` templates
+  supported; no provider means everything is granted; `[mkCanDisable]`
+  uses native `disabled` where the element has it, `aria-disabled`
+  otherwise.
+- **`mk-calendar-heatmap`** — GitHub-style year-of-activity squares:
+  semantic-table rendering like `mk-heatmap`, month/weekday labels from the
+  i18n date names, linear intensity buckets with a `color-mix` ramp,
+  legend, `(cellClick)`, rolling last-12-months default or a fixed `year`.
+- **`mk-numeric-keypad`** and **`mk-on-screen-keyboard`** (+
+  `[mkOnScreenKeyboardFor]` trigger) — the touch-first input components
+  from the touch-keys side task, now landed with their spec coverage
+  (CVA/a11y/SSR suites included), i18n keys, and the `backspace` /
+  `corner-down-left` icons.
+- Docs: new `/components/rich-text` page; `MkTableDataSource` section on
+  the table page; repeater and mention sections on the forms/selection
+  pages; calendar heatmap on charts; permissions on utilities.
+
+### Fixed
+
+- **0.30.0 shipped root-spec references to components it didn't contain**
+  (the numeric-keypad/on-screen-keyboard coverage landed a release before
+  the components) — a clean checkout of 0.30.0 could not compile the spec
+  suites. 0.31.0 lands the components those specs cover, restoring a
+  buildable tree.
+
+### Changed
+
+- Forms bundle budget raised 725→800 KiB (four new controls this wave:
+  repeater, mention, numeric keypad, on-screen keyboard).
+
 ## [0.30.0] — 2026-08-08
 
 The performance wave: the 2026-08 audit's hot paths. The theme is the same

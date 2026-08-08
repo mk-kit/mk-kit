@@ -1,0 +1,13 @@
+<mk-rich-text-engine
+  [html]="safeHtml()"
+  [placeholder]="placeholder()"
+  [disabled]="isDisabled()"
+  [splitOnEnter]="false"
+  [minHeight]="minHeight()"
+  [ariaLabel]="effectiveAriaLabel()"
+  [labelledBy]="labelledBy"
+  [describedBy]="describedBy()"
+  [invalid]="isInvalid()"
+  (contentChange)="onContentChange($event)"
+  (focusChange)="onFocusChange($event)"
+/>

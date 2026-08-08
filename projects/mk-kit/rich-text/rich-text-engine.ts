@@ -30,24 +30,27 @@ interface MkInlineTool {
 }
 
 /**
- * Rich-text — an accessible contenteditable surface with a floating inline
- * formatting toolbar (Bold, Italic, Underline, Strikethrough, Inline code,
- * Link, Clear). Built on the native Selection API + `document.execCommand`
- * (deprecated but universally supported and dependency-free — the only
- * practical way to do inline formatting without a heavyweight editor engine).
+ * Rich-text engine — an accessible contenteditable surface with a floating
+ * inline formatting toolbar (Bold, Italic, Underline, Strikethrough, Inline
+ * code, Link, Clear). Built on the native Selection API +
+ * `document.execCommand` (deprecated but universally supported and
+ * dependency-free — the only practical way to do inline formatting without a
+ * heavyweight editor engine).
  *
- * Emits sanitising HTML via `contentChange`, and structural intents
- * (`splitAt`, `removeEmpty`, `arrowOut`) so the host list can create, merge or
- * navigate blocks. Used by the paragraph, heading, quote and list blocks.
+ * This is the low-level building block: it emits HTML via `contentChange`, and
+ * structural intents (`splitAt`, `removeEmpty`, `arrowOut`) so a block-editor
+ * host can create, merge or navigate blocks. For a standalone form control use
+ * {@link MkRichText} (`<mk-rich-text>`), which wraps this engine in a CVA over
+ * a sanitised HTML string.
  */
 @Component({
-  selector: 'mk-rich-text',
-  templateUrl: './rich-text.html',
-  styleUrl: './rich-text.scss',
+  selector: 'mk-rich-text-engine',
+  templateUrl: './rich-text-engine.html',
+  styleUrl: './rich-text-engine.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: { class: 'mk-rich-text' },
 })
-export class MkRichText implements OnDestroy {
+export class MkRichTextEngine implements OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly editableRef = viewChild.required<ElementRef<HTMLElement>>('editable');
@@ -63,8 +66,21 @@ export class MkRichText implements OnDestroy {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Allow soft line breaks (Shift+Enter). Plain Enter always splits. */
   readonly multiline = input(true, { transform: booleanAttribute });
+  /**
+   * Emit `splitAt` on Enter (block-editor hosts). When `false` — standalone
+   * field usage — Enter inserts a line break inside this surface instead.
+   */
+  readonly splitOnEnter = input(true, { transform: booleanAttribute });
+  /** Minimum height of the editable surface (any CSS length). */
+  readonly minHeight = input<string | null>(null);
   /** Accessible label for the editable region. */
   readonly ariaLabel = input<string>(this.i18n.blockEditor.editableText);
+  /** Id of an external label element, for `aria-labelledby`. */
+  readonly labelledBy = input<string | null>(null);
+  /** Space-separated id list for `aria-describedby`. */
+  readonly describedBy = input<string | null>(null);
+  /** Reflect an invalid state via `aria-invalid`. */
+  readonly invalid = input(false, { transform: booleanAttribute });
 
   /** Fired on every edit with the sanitised-by-construction HTML. */
   readonly contentChange = output<string>();
@@ -156,13 +172,15 @@ export class MkRichText implements OnDestroy {
 
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
-      this.emitSplit(el);
+      if (this.splitOnEnter()) this.emitSplit(el);
+      else this.insertLineBreak();
       return;
     }
     // Shift+Enter in single-line mode is a hard split too.
     if (event.key === 'Enter' && event.shiftKey && !this.multiline()) {
       event.preventDefault();
-      this.emitSplit(el);
+      if (this.splitOnEnter()) this.emitSplit(el);
+      else this.insertLineBreak();
       return;
     }
     if (event.key === 'Backspace' && this.isCaretAtStart(el) && this.isSelectionCollapsed()) {
@@ -239,6 +257,14 @@ export class MkRichText implements OnDestroy {
   private emitSplit(el: HTMLElement): void {
     const { before, after } = this.splitHtmlAtCaret(el);
     this.splitAt.emit({ before, after });
+  }
+
+  /** Inserts a `<br>` at the caret (Enter in `splitOnEnter=false` mode). */
+  private insertLineBreak(): void {
+    // insertHTML keeps the markup to the sanitiser's allow-list (`<br>`),
+    // unlike the browser's default Enter handling which wraps lines in divs.
+    this.document.execCommand('insertHTML', false, '<br>');
+    this.onInput();
   }
 
   /** Extracts markup after the caret so the host can start a new block with it. */

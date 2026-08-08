@@ -1,0 +1,85 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  font-family: var(--mk-font-sans);
+}
+
+.mk-calendar-heatmap__scroll {
+  width: 100%;
+  overflow-x: auto;
+}
+.mk-calendar-heatmap__scroll:focus-visible {
+  @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+}
+
+.mk-calendar-heatmap__grid {
+  border-collapse: separate;
+  border-spacing: 3px;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text);
+}
+
+.mk-calendar-heatmap__corner {
+  border: 0;
+}
+
+.mk-calendar-heatmap__month {
+  padding: 0 0 var(--mk-space-1);
+  font-weight: var(--mk-font-weight-medium);
+  color: var(--mk-text-muted);
+  text-align: start;
+  white-space: nowrap;
+}
+
+.mk-calendar-heatmap__row-head {
+  padding: 0 var(--mk-space-1);
+  font-weight: var(--mk-font-weight-medium);
+  color: var(--mk-text-muted);
+  text-align: end;
+  white-space: nowrap;
+  line-height: 1;
+}
+
+.mk-calendar-heatmap__cell {
+  width: 0.8rem;
+  height: 0.8rem;
+  padding: 0;
+  border-radius: 3px;
+  cursor: pointer;
+  transition: outline-color var(--mk-duration-fast) var(--mk-ease-standard);
+  outline: 1px solid transparent;
+  outline-offset: -1px;
+}
+.mk-calendar-heatmap__cell:hover {
+  outline-color: var(--mk-border-strong);
+}
+/* Zero-value days stay transparent but keep a faint trace of the grid. */
+.mk-calendar-heatmap__cell--empty {
+  box-shadow: inset 0 0 0 1px var(--mk-border);
+}
+.mk-calendar-heatmap__cell--blank {
+  cursor: default;
+  outline: none;
+}
+.mk-calendar-heatmap__cell--blank:hover {
+  outline-color: transparent;
+}
+
+.mk-calendar-heatmap__legend {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  margin-top: var(--mk-space-3);
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+}
+.mk-calendar-heatmap__legend-ramp {
+  display: inline-flex;
+  gap: 2px;
+}
+.mk-calendar-heatmap__legend-swatch {
+  width: 0.8rem;
+  height: 0.8rem;
+  border-radius: 3px;
+}
