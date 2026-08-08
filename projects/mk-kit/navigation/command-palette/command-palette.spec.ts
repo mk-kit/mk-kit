@@ -19,16 +19,21 @@ class Host {
 
 describe('MkCommandPalette', () => {
   // jsdom has no scrollIntoView — install a spy so the palette's optional
-  // chain has something to call.
+  // chain has something to call. HTMLElement.prototype (not Element): a
+  // closer prototype wins the lookup, so a leaked own-property there from
+  // another spec file would silently shadow a spy on Element.prototype —
+  // the order-dependent CI failure the diagnostic below exists to name.
   let scrollSpy: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
     scrollSpy = vi.fn();
-    (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView = scrollSpy;
+    (HTMLElement.prototype as { scrollIntoView?: unknown }).scrollIntoView =
+      scrollSpy;
   });
 
   afterEach(() => {
-    delete (Element.prototype as { scrollIntoView?: unknown }).scrollIntoView;
+    delete (HTMLElement.prototype as { scrollIntoView?: unknown })
+      .scrollIntoView;
     document.body.style.removeProperty('overflow');
     TestBed.resetTestingModule();
   });
@@ -122,6 +127,26 @@ describe('MkCommandPalette', () => {
     );
     fixture.detectChanges();
     await fixture.whenStable();
+
+    // Diagnostic breadcrumb: if the scroll assertion below ever fails in an
+    // environment we can't attach to (CI), this names the broken link —
+    // palette closed, index not moved, option not findable by id, or the spy
+    // not visible on the element's prototype chain (realm mismatch).
+    const cmp = fixture.debugElement.children[0].componentInstance as {
+      open: () => boolean;
+      activeIndex: () => number;
+      optionId: (i: number) => string;
+    };
+    const idx = cmp.activeIndex();
+    const opt = document.getElementById(cmp.optionId(idx));
+    expect({
+      open: cmp.open(),
+      idx,
+      optFound: !!opt,
+      optSeesSpy:
+        !!opt &&
+        (opt as { scrollIntoView?: unknown }).scrollIntoView === scrollSpy,
+    }).toEqual({ open: true, idx: 1, optFound: true, optSeesSpy: true });
 
     expect(scrollSpy).toHaveBeenCalledWith({ block: 'nearest' });
   });

@@ -152,7 +152,14 @@ describe('MkTabs', () => {
       press(fixture, buttons[2], 'ArrowLeft');
       expect(spy.mock.contexts.at(-1)).toBe(buttons[1]);
     } finally {
-      HTMLElement.prototype.scrollIntoView = original;
+      // jsdom has no native scrollIntoView, so `original` is undefined —
+      // assigning it back would CREATE an own `scrollIntoView: undefined`
+      // on the prototype, shadowing any spy later spec files (sharing this
+      // worker) install on Element.prototype. Delete instead.
+      if (original) HTMLElement.prototype.scrollIntoView = original;
+      else
+        delete (HTMLElement.prototype as { scrollIntoView?: unknown })
+          .scrollIntoView;
     }
   });
 
