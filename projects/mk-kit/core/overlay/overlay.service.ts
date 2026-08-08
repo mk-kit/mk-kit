@@ -4,6 +4,7 @@ import {
   EnvironmentInjector,
   Injectable,
   Injector,
+  type OnDestroy,
   PLATFORM_ID,
   Type,
   createComponent,
@@ -76,7 +77,7 @@ const INERT_EXEMPT_SELECTOR =
  * Escape handling, and scroll locking. Powers Dialog, Menu, and others.
  */
 @Injectable({ providedIn: 'root' })
-export class MkOverlayService {
+export class MkOverlayService implements OnDestroy {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
@@ -204,6 +205,17 @@ export class MkOverlayService {
     for (const ref of [...this.openRefs.keys()].reverse()) ref.close();
   }
 
+  /**
+   * Injector teardown closes everything still open. In an app this runs only
+   * at shutdown; in tests it runs on every `TestBed.resetTestingModule()`,
+   * so an overlay a spec forgot to close cannot leak its scroll lock, focus
+   * trap, inert marks, or document listeners into later spec files sharing
+   * the worker.
+   */
+  ngOnDestroy(): void {
+    this.closeAll();
+  }
+
   open<TComponent, TResult = unknown, TData = unknown>(
     component: Type<TComponent>,
     config: MkOverlayConfig<TData> = {},
@@ -324,7 +336,9 @@ export class MkOverlayService {
       this.syncEscapeListener(this.document);
       for (const el of inerted) el.removeAttribute('inert');
       focusTrap?.release();
-      this.appRef.detachView(componentRef.hostView);
+      // ApplicationRef destroys its views before root-injector destroy hooks
+      // run — detaching then would throw (same guard as MkTourService).
+      if (!this.appRef.destroyed) this.appRef.detachView(componentRef.hostView);
       componentRef.destroy();
       container.remove();
       if (--this.openOverlays === 0) {
