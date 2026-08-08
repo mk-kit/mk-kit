@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import { mkChartAutoWidth } from './chart-autowidth';
+import { mkChartTapPin } from './chart-tap-pin';
 import {
   MkChartSeries,
   mkChartColor,
@@ -107,6 +108,9 @@ export class MkBarChart {
   readonly label = input<string>('');
 
   protected readonly hovered = signal<BarRect | null>(null);
+  /** Tap-to-pin: a touch tap on a bar pins the tooltip until a tap lands
+   *  outside the chart (mouse hover in/out is unaffected). */
+  private readonly tapPin = mkChartTapPin<BarRect>((b) => this.hovered.set(b));
 
   protected readonly horizontal = computed(
     () => this.orientation() === 'horizontal',
@@ -291,6 +295,10 @@ export class MkBarChart {
   });
 
   protected setHover(bar: BarRect | null): void {
-    this.hovered.set(bar);
+    this.tapPin.hover(bar);
+  }
+
+  protected pinHover(bar: BarRect, event: PointerEvent): void {
+    this.tapPin.pin(bar, event);
   }
 }

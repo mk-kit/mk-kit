@@ -9,7 +9,8 @@
   (mouseleave)="resume()"
   (focusin)="pause()"
   (focusout)="resume()"
-  (pointerdown)="onPointerDown()"
+  (pointerdown)="onPointerDown($event)"
+  (pointermove)="onPointerMove($event)"
   (pointerup)="onPointerUp($event)"
   (pointercancel)="onPointerUp($event)"
 >
@@ -26,6 +27,7 @@
   }
   <div
     class="mk-carousel__track"
+    [class.mk-carousel__track--dragging]="dragging()"
     [style.transform]="trackTransform()"
   >
     <ng-content />

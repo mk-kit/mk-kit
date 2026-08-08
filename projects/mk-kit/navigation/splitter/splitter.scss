@@ -32,6 +32,15 @@
   touch-action: none;
   transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
 }
+/* Touch: the 7px handle keeps its visual width but gets a ≥24px hit box
+   across the drag axis; along the long axis 100% ≥ 24px, so min(0px, …)
+   leaves it untouched. The separator is already position: relative, so
+   $position: null. Note the expanded box overhangs the panes — pane content
+   that paints later in the DOM (the end pane) still wins hit-testing there. */
+.mk-splitter__separator {
+  @include mk.touch-target(24px, $position: null);
+}
+
 .mk-splitter__separator:hover,
 .mk-splitter__separator:focus-visible {
   background-color: var(--mk-primary);

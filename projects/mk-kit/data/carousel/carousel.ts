@@ -19,6 +19,9 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { MK_I18N } from '@mkornas/ui/core';
 
+/** Horizontal movement (px) before a pointer gesture commits to a swipe. */
+const SWIPE_START_PX = 30;
+
 /**
  * A single slide inside {@link MkCarousel}. Mark each slide element with
  * `mkCarouselSlide`; the carousel wires ARIA + visibility.
@@ -37,9 +40,10 @@ export class MkCarouselSlide {
 
 /**
  * Carousel — an accessible slides/gallery. Project slides marked with
- * `mkCarouselSlide`; get prev/next arrows, dot indicators, Arrow-key navigation
- * and optional autoplay that pauses on hover/focus. The current slide is a
- * two-way `index` model.
+ * `mkCarouselSlide`; get prev/next arrows, dot indicators, Arrow-key
+ * navigation, pointer swipe (touch or mouse drag; vertical page scroll stays
+ * native) and optional autoplay that pauses on hover/focus. The current slide
+ * is a two-way `index` model.
  *
  * ```html
  * <mk-carousel ariaLabel="Featured" autoplay>
@@ -111,13 +115,32 @@ export class MkCarousel {
 
   /** Resolved text direction ('ltr' until measured in the browser). */
   private readonly dir = signal<'ltr' | 'rtl'>('ltr');
+
+  /** Live swipe gesture, or null when no pointer is being tracked. */
+  private swipe: {
+    startX: number;
+    startY: number;
+    startT: number;
+    /** True once the gesture committed to a horizontal drag. */
+    active: boolean;
+  } | null = null;
+  /** Visual drag offset (px) applied on top of the slide position. */
+  private readonly dragOffset = signal(0);
+  /** True while a horizontal drag is in flight (kills the track transition). */
+  protected readonly dragging = signal(false);
+
   /**
    * Track offset — in RTL the flex track lays out right-to-left, so moving to
-   * the next slide means translating in the positive X direction.
+   * the next slide means translating in the positive X direction. While a
+   * swipe is in flight the pixel drag offset rides on top.
    */
   protected readonly trackTransform = computed(() => {
     const sign = this.dir() === 'rtl' ? 1 : -1;
-    return `translateX(${sign * this.index() * 100}%)`;
+    const base = sign * this.index() * 100;
+    const offset = this.dragOffset();
+    return offset
+      ? `translateX(calc(${base}% + ${offset}px))`
+      : `translateX(${base}%)`;
   });
 
   constructor() {
@@ -192,13 +215,97 @@ export class MkCarousel {
     this.userPaused.update((v) => !v);
   }
 
-  /** Touch users can't hover — holding a pointer down pauses transiently. */
-  protected onPointerDown(): void {
+  /**
+   * Touch users can't hover — holding a pointer down pauses autoplay
+   * transiently. It also arms swipe tracking, except on the carousel's own
+   * controls (play/pause, arrows), which must stay plain tappable buttons.
+   */
+  protected onPointerDown(event: PointerEvent): void {
     this.pause();
+    const target = event.target as HTMLElement | null;
+    if (this.count() < 2 || target?.closest?.('button')) return;
+    this.swipe = {
+      startX: event.clientX ?? 0,
+      startY: event.clientY ?? 0,
+      startT: performance.now(),
+      active: false,
+    };
   }
+
+  protected onPointerMove(event: PointerEvent): void {
+    const swipe = this.swipe;
+    if (!swipe) return;
+    const dx = (event.clientX ?? 0) - swipe.startX;
+    const dy = (event.clientY ?? 0) - swipe.startY;
+    if (!swipe.active) {
+      // Mostly vertical — hand the gesture back to native page scroll
+      // (touch-action: pan-y keeps that scroll running throughout).
+      if (Math.abs(dy) > Math.abs(dx) && Math.abs(dy) > SWIPE_START_PX) {
+        this.swipe = null;
+        return;
+      }
+      // Commit to a horizontal drag only past the threshold.
+      if (Math.abs(dx) < SWIPE_START_PX || Math.abs(dx) <= Math.abs(dy)) return;
+      swipe.active = true;
+      this.dragging.set(true);
+      try {
+        // Keep receiving moves when a mouse drag leaves the viewport.
+        (event.currentTarget as HTMLElement | null)?.setPointerCapture?.(
+          event.pointerId,
+        );
+      } catch {
+        /* jsdom / detached target */
+      }
+    }
+    this.dragOffset.set(dx);
+  }
+
   protected onPointerUp(event: PointerEvent): void {
     // A mouse release while still hovering must not undo the hover pause.
     if (event.pointerType !== 'mouse') this.resume();
+
+    const swipe = this.swipe;
+    this.swipe = null;
+    if (!swipe?.active) return;
+    this.dragging.set(false);
+    this.dragOffset.set(0); // springs back / snaps via the track transition
+
+    const viewport = event.currentTarget as HTMLElement | null;
+    if (event.type === 'pointercancel') return;
+
+    const dx = (event.clientX ?? 0) - swipe.startX;
+    const elapsed = performance.now() - swipe.startT;
+    // Velocity only counts for gestures long enough to measure — guards
+    // against nonsense values from near-zero durations.
+    const velocity = elapsed >= 50 ? dx / elapsed : 0;
+    const width = viewport?.offsetWidth || 360;
+    if (Math.abs(dx) > width * 0.25 || Math.abs(velocity) > 0.5) {
+      // In RTL the track lays out right-to-left, so dragging towards positive
+      // X reveals the NEXT slide; in LTR it's the opposite.
+      const toNext = this.dir() === 'rtl' ? dx > 0 : dx < 0;
+      if (toNext) this.next();
+      else this.prev();
+    }
+    // A real drag happened — swallow the click that follows so links/buttons
+    // inside the slide don't activate from a swipe.
+    if (viewport) this.suppressNextClick(viewport);
+  }
+
+  /**
+   * Capture-phase, one-shot click swallow: the browser fires a synthetic click
+   * right after pointerup, which would activate whatever link/button the drag
+   * ended on. The safety timeout covers gestures that produce no click at all.
+   */
+  private suppressNextClick(viewport: HTMLElement): void {
+    const swallow = (e: Event) => {
+      e.preventDefault();
+      e.stopPropagation();
+    };
+    viewport.addEventListener('click', swallow, { capture: true, once: true });
+    setTimeout(
+      () => viewport.removeEventListener('click', swallow, { capture: true }),
+      400,
+    );
   }
 
   private prefersReducedMotion(): boolean {

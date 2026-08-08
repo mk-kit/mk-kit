@@ -10,23 +10,27 @@
   align-items: flex-end;
   gap: var(--mk-space-2);
 }
+/* Fixed positions clear the safe-area insets (iOS home indicator, landscape
+   notch); env() falls back to 0px everywhere else. Physical env() paired with
+   a logical inset is a deliberate LTR-leaning compromise — the inset is 0 in
+   portrait either way. */
 :host([data-position='bottom-end']) {
-  bottom: var(--mk-space-5);
-  inset-inline-end: var(--mk-space-5);
+  bottom: calc(var(--mk-space-5) + env(safe-area-inset-bottom, 0px));
+  inset-inline-end: calc(var(--mk-space-5) + env(safe-area-inset-right, 0px));
 }
 :host([data-position='bottom-start']) {
-  bottom: var(--mk-space-5);
-  inset-inline-start: var(--mk-space-5);
+  bottom: calc(var(--mk-space-5) + env(safe-area-inset-bottom, 0px));
+  inset-inline-start: calc(var(--mk-space-5) + env(safe-area-inset-left, 0px));
   align-items: flex-start;
 }
 :host([data-position='top-end']) {
-  top: var(--mk-space-5);
-  inset-inline-end: var(--mk-space-5);
+  top: calc(var(--mk-space-5) + env(safe-area-inset-top, 0px));
+  inset-inline-end: calc(var(--mk-space-5) + env(safe-area-inset-right, 0px));
   flex-direction: column;
 }
 :host([data-position='top-start']) {
-  top: var(--mk-space-5);
-  inset-inline-start: var(--mk-space-5);
+  top: calc(var(--mk-space-5) + env(safe-area-inset-top, 0px));
+  inset-inline-start: calc(var(--mk-space-5) + env(safe-area-inset-left, 0px));
   align-items: flex-start;
   flex-direction: column;
 }

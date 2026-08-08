@@ -61,6 +61,13 @@
 .mk-inline-edit__display:focus-visible .mk-inline-edit__pencil {
   opacity: 1;
 }
+/* No hover, no reveal — on touch the pencil must always be visible, or the
+   field is indistinguishable from plain text. */
+@media (hover: none) {
+  .mk-inline-edit__pencil {
+    opacity: 1;
+  }
+}
 
 .mk-inline-edit__input {
   width: 100%;
@@ -103,4 +110,12 @@
 }
 .mk-inline-edit__action:focus-visible {
   @include mk.focus-ring;
+}
+
+/* iOS zooms into focused fields under 16px — the editor inherits the host
+   font, so pin it up on touch. */
+@media (pointer: coarse) {
+  .mk-inline-edit__input {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
 }

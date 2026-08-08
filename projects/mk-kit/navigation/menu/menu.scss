@@ -6,8 +6,12 @@
   // Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive.
   min-width: 12rem;
   max-width: min(20rem, calc(100vw - var(--mk-space-4)));
+  /* 100vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   max-height: calc(100vh - var(--mk-space-8));
+  max-height: calc(100dvh - var(--mk-space-8));
   overflow-y: auto;
+  /* Don't let menu scroll chain into (rubber-band) the page behind. */
+  overscroll-behavior: contain;
   padding: var(--mk-space-1);
   background: var(--mk-surface);
   border: var(--mk-border-width) solid var(--mk-border);

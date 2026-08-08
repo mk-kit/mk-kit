@@ -57,6 +57,12 @@
   height: 1.25rem;
 }
 
+/* Touch: the 20px toggle column gets a ≥24px hit box, so the expand tap
+   (which stops propagation and does not select) is comfortably hittable. */
+.mk-tree__toggle {
+  @include mk.touch-target(24px);
+}
+
 .mk-tree__caret {
   width: 0.4rem;
   height: 0.4rem;

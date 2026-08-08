@@ -104,3 +104,10 @@
     transition: none;
   }
 }
+
+/* iOS zooms into focused fields under 16px — keep the hex field >=16px on touch. */
+@media (pointer: coarse) {
+  .mk-color-picker__hex {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

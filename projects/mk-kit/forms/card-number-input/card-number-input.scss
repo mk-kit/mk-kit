@@ -85,3 +85,14 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the field on
+   coarse pointers; lg (18px) already clears the threshold. */
+@media (pointer: coarse) {
+  .mk-card-number-input__field {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-card-number-input--sm) .mk-card-number-input__field {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

@@ -200,3 +200,18 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the number
+   field and the country-search input on coarse pointers. The country BUTTON
+   is not a text field (no zoom) and keeps its size. */
+@media (pointer: coarse) {
+  .mk-phone-input__field {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-phone-input--sm) .mk-phone-input__field {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+  .mk-phone-input__search {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

@@ -147,3 +147,14 @@
     transition: none;
   }
 }
+
+/* iOS input-zoom guard: keep the trigger text at ≥16px on coarse pointers so
+   the select reads consistently with adjacent (16px-floored) text inputs. */
+@media (pointer: coarse) {
+  .mk-select__trigger {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-select--sm) .mk-select__trigger {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

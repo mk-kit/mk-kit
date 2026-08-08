@@ -51,6 +51,13 @@
   cursor: grabbing;
 }
 
+/* Touch: the ~18px thumb is the primary drag target — give it a 44px hit box.
+   The thumb is already absolutely positioned, so the mixin must not set
+   `position: relative` ($position: null). */
+.mk-slider__thumb {
+  @include mk.touch-target(44px, $position: null);
+}
+
 .mk-slider__thumb:focus-visible {
   @include mk.focus-ring;
 }

@@ -7,11 +7,21 @@
 :host {
   position: relative;
   cursor: grab;
-  /* Prevent the browser turning a press-drag into a scroll/gesture. When a
-     handle is used, the handle owns this instead. */
-  touch-action: none;
+  /* Keep native vertical scrolling alive on touch — a swipe over the item
+     scrolls the page/column; the drag only arms after the long-press delay
+     (drag.ts), which then locks touch-action to none for the gesture. When a
+     handle is used, the handle owns the gesture instead (global
+     .mk-drag-handle keeps touch-action: none). */
+  touch-action: pan-y;
   user-select: none;
   -webkit-user-select: none;
+}
+
+/* Items in a horizontal list: a horizontal swipe is more likely a deliberate
+   drag axis, but panning must still work in every direction until the
+   long-press arms — only tap-assist gestures are reserved. */
+:host(.mk-drag--horizontal) {
+  touch-action: manipulation;
 }
 
 /* When a handle restricts the grip, the item body is not itself grabbable. */
@@ -22,6 +32,14 @@
 
 :host(.mk-drag--dragging) {
   cursor: grabbing;
+}
+
+/* Touch long-press armed — signal the lift moment so the user knows the item
+   is grabbed before it starts moving. Consumers may restyle freely. */
+:host(.mk-drag--armed) {
+  cursor: grabbing;
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-md);
 }
 
 /* Keyboard "picked up" state — must be visible without relying on colour alone

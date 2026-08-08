@@ -45,6 +45,19 @@
   cursor: inherit;
 }
 
+/* Touch: grow the invisible native input's hit box to ≥24px, centred on the
+   ~18px visual box. `<input>` is a replaced element, so the `touch-target`
+   mixin's pseudo-element cannot be used — instead the absolutely-positioned
+   input itself is sized via negative inset (min(0px, …) so a `lg` box is
+   never shrunk). Visuals are untouched: the input is opacity: 0. */
+@media (pointer: coarse) {
+  .mk-checkbox__native {
+    width: auto;
+    height: auto;
+    inset: min(0px, calc((100% - 24px) / 2));
+  }
+}
+
 .mk-checkbox__box {
   display: inline-flex;
   align-items: center;

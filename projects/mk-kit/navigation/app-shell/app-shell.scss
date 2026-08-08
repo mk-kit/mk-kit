@@ -2,7 +2,9 @@
 
 :host {
   display: block;
+  /* 100vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   min-height: 100vh;
+  min-height: 100dvh;
   background: var(--mk-bg);
   color: var(--mk-text);
 }
@@ -14,7 +16,9 @@
   display: flex;
   align-items: center;
   height: var(--mk-header-height);
-  padding: 0 var(--mk-space-4);
+  /* Landscape notch: keep header content out of the safe-area insets. */
+  padding: 0 calc(var(--mk-space-4) + env(safe-area-inset-right, 0px)) 0
+    calc(var(--mk-space-4) + env(safe-area-inset-left, 0px));
   background: var(--mk-surface);
   border-bottom: var(--mk-border-width) solid var(--mk-border);
 }
@@ -22,7 +26,9 @@
 .mk-app-shell__body {
   display: flex;
   align-items: stretch;
+  /* 100vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   min-height: calc(100vh - var(--mk-header-height));
+  min-height: calc(100dvh - var(--mk-header-height));
 }
 
 .mk-app-shell__sidebar {
@@ -34,7 +40,9 @@
   align-self: flex-start;
   position: sticky;
   top: var(--mk-header-height);
+  /* 100vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   height: calc(100vh - var(--mk-header-height));
+  height: calc(100dvh - var(--mk-header-height));
   overflow-y: auto;
   transition: width var(--mk-duration-normal) var(--mk-ease-emphasized);
 }
@@ -45,6 +53,10 @@
 
 .mk-app-shell__nav {
   padding: var(--mk-space-3);
+  /* Landscape notch: the sidebar hugs the screen edge, so its nav padding
+     absorbs the safe-area inset. Physical env() with a logical property is a
+     deliberate LTR-leaning compromise; the inset is 0 in portrait either way. */
+  padding-inline-start: calc(var(--mk-space-3) + env(safe-area-inset-left, 0px));
 }
 
 .mk-app-shell__main {

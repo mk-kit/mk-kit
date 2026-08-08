@@ -4,6 +4,77 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.29.0] — 2026-08-08
+
+The mobile wave: the 2026-08 audit's phone-readiness gaps, fixed as a set.
+The library now behaves on an uncustomized iPhone, not just on a tablet with
+the touch density flag set.
+
+### Fixed
+
+- **Kanban boards and sortable lists scroll on phones again.** `mkDrag` set
+  `touch-action: none` on the whole item and lifted after 5px — a swipe over
+  a card *was* a drag, so a board couldn't be scrolled by touch at all. Items
+  now use `touch-action: pan-y` (horizontal lists: `manipulation`), and touch
+  lifts via **press-and-hold** (~300 ms, new `mkDragTouchDelay` input, `0`
+  restores instant lifting): moving beyond a 10 px slop before the hold
+  elapses is a scroll and is left to the browser; once armed, the item gets a
+  `.mk-drag--armed` lift style, scrolling locks for the gesture, and
+  Android's long-press context menu is suppressed. Mouse, pen, and keyboard
+  drag are unchanged.
+- **iOS no longer zooms into every form.** Text-entry fields rendered at
+  14 px, under the 16 px threshold iOS uses to decide to zoom. Every editable
+  field — inputs, selects' typed fields, tag/multi-select queries, number,
+  phone/postal/currency/card/IBAN/tax-id, OTP small cells, date/time picker
+  inputs, color-picker hex, code editor (via its shared metric variable, so
+  the highlight overlay stays in lockstep), table cell editor, inline edit —
+  now renders at `max(var(--mk-font-size-md), 16px)` under
+  `@media (pointer: coarse)`. Desktop is untouched.
+- **Touch targets meet 24 px (44 px where it counts) on coarse pointers.**
+  New `touch-target()` mixin in `_mixins.scss` draws an invisible centred
+  hit box under `(pointer: coarse)` without changing visuals — applied to
+  chip remove (~17 px), checkbox/radio (~18 px), switch, slider and
+  range-slider thumbs (44 px), rating stars, splitter handle (7 px), table
+  column-resize handle (8 px), tree expander.
+- **Safe areas and dynamic viewports.** `env(safe-area-inset-*)` on the FAB,
+  toast and snackbar containers, bottom-sheet panel, and app-shell header/nav
+  (landscape notch); `100vh` → `100dvh` (with vh fallback lines) in the
+  app-shell, dialog and bottom-sheet panels, menu, and toast container — so
+  bottom-anchored UI clears the home indicator and nothing hides behind
+  iOS Safari's collapsing toolbar.
+- **Overlays behave around the software keyboard.** `MkAnchoredPanel` caps
+  panels to the viewport (respecting a panel's own smaller CSS max), listens
+  to `visualViewport` resize/scroll — the only signal iOS gives when the
+  keyboard appears — and positions against the visual viewport. The modal
+  scroll lock upgraded from `overflow: hidden` (ignored by iOS touch
+  scrolling) to the fixed-body technique with reference counting and
+  invisible scroll restoration; overlay scroll regions gained
+  `overscroll-behavior: contain`.
+
+### Added
+
+- **Carousel swipe.** Pointer-based: horizontal-intent detection releases
+  vertical movement to native scroll, the track follows the finger, release
+  advances past 25% width or on a flick (RTL-aware), a post-drag click
+  swallower protects links in slides, and reduced motion snaps instantly.
+- **Tap paths for hover-only UI.** Chart tooltips pin on tap (tap another
+  point to move the pin, tap outside to clear — mouse hover semantics
+  unchanged); `[mkTooltip]` toggles on touch tap instead of being
+  instantly self-dismissed, and taps outside dismiss it; hovercards toggle
+  on tap; inline-edit's pencil affordance is always visible under
+  `(hover: none)`.
+- **Long-press context menu.** `[mkContextMenuFor]` opens after a 500 ms
+  press on iOS Safari, which never fires `contextmenu`; the Android
+  synthetic follow-up is de-duplicated.
+- **Tabs and stepper headers scroll at phone widths** (hidden scrollbars;
+  the active tab is scrolled into view on selection — note the tab
+  indicator now sits ON the bottom border rather than 1 px below it).
+- **Docs: `/touch` showcase page** — side-by-side touch-density comparison,
+  a stacked `stackAt` table in a phone-width frame, bottom-sheet vs dialog,
+  gestures (signature pad, handle-based sortable list), a 375 px phone-frame
+  demo — and the header density toggle now cycles comfortable → compact →
+  **touch**.
+
 ## [0.28.0] — 2026-08-07
 
 The accessibility compliance release: the 2026-08 audit's WCAG 2.1 AA

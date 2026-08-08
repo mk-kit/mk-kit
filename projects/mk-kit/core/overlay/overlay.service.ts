@@ -43,6 +43,71 @@ export interface MkOverlayConfig<TData = unknown> {
 }
 
 let openOverlays = 0;
+
+/**
+ * State saved while body scroll is locked. iOS Safari ignores
+ * `overflow: hidden` for touch scrolling, so the lock also fixes the body in
+ * place at the current scroll offset (`position: fixed; top: -scrollY`) and
+ * jumps back to that offset when the last overlay closes. `openOverlays` is
+ * the reference count: only the FIRST open locks and only the LAST close
+ * unlocks, so nested dialogs — including an Escape cascade closing them one
+ * keypress at a time — never restore the page early.
+ */
+let bodyScrollLock: {
+  scrollY: number;
+  /** The body's own inline styles before the lock, restored verbatim. */
+  prev: Record<
+    'position' | 'top' | 'left' | 'right' | 'width' | 'overflow',
+    string
+  >;
+} | null = null;
+
+function lockBodyScroll(doc: Document): void {
+  const body = doc.body;
+  const { style } = body;
+  bodyScrollLock = {
+    scrollY: doc.defaultView?.scrollY ?? 0,
+    prev: {
+      position: style.position,
+      top: style.top,
+      left: style.left,
+      right: style.right,
+      width: style.width,
+      overflow: style.overflow,
+    },
+  };
+  // overflow:hidden still does the whole job on desktop (and avoids a scroll
+  // jump there); the fixed-body treatment is what actually stops iOS touch
+  // scrolling. `top: -scrollY` keeps the page visually where it was.
+  style.overflow = 'hidden';
+  style.position = 'fixed';
+  style.top = `-${bodyScrollLock.scrollY}px`;
+  style.left = '0';
+  style.right = '0';
+  style.width = '100%';
+}
+
+function unlockBodyScroll(doc: Document): void {
+  if (!bodyScrollLock) return;
+  const { scrollY, prev } = bodyScrollLock;
+  bodyScrollLock = null;
+  const { style } = doc.body;
+  style.position = prev.position;
+  style.top = prev.top;
+  style.left = prev.left;
+  style.right = prev.right;
+  style.width = prev.width;
+  style.overflow = prev.overflow;
+  // Fixing the body collapsed the document's scroll position to 0; jump back
+  // instantly (never smooth — the restoration must be invisible). Guarded for
+  // jsdom, where scrollTo is unimplemented; skipped when there is nothing to
+  // restore.
+  const view = doc.defaultView;
+  if (scrollY !== 0 && typeof view?.scrollTo === 'function') {
+    view.scrollTo({ top: scrollY, behavior: 'instant' });
+  }
+}
+
 /**
  * Every overlay currently on screen, in open order (Map preserves insertion
  * order, so the last entry is the topmost). Kept so {@link
@@ -208,9 +273,10 @@ export class MkOverlayService {
 
     this.document.body.appendChild(container);
 
-    // Lock body scroll while any overlay is open.
+    // Lock body scroll while any overlay is open (see lockBodyScroll for the
+    // iOS-proof fixed-body technique and the reference counting).
     if (openOverlays++ === 0) {
-      this.document.body.style.setProperty('overflow', 'hidden');
+      lockBodyScroll(this.document);
     }
 
     // Make the rest of the page inert while a MODAL overlay is open —
@@ -257,7 +323,7 @@ export class MkOverlayService {
       componentRef.destroy();
       container.remove();
       if (--openOverlays === 0) {
-        this.document.body.style.removeProperty('overflow');
+        unlockBodyScroll(this.document);
       }
     };
 

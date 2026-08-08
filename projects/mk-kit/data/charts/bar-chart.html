@@ -41,6 +41,7 @@
         rx="3"
         (pointerenter)="setHover(b)"
         (pointerleave)="setHover(null)"
+        (pointerdown)="pinHover(b, $event)"
       />
     }
 

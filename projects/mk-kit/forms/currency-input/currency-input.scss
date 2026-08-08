@@ -90,3 +90,14 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px — floor the field on
+   coarse pointers; lg (18px) already clears the threshold. */
+@media (pointer: coarse) {
+  .mk-currency-input__field {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-currency-input--sm) .mk-currency-input__field {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}

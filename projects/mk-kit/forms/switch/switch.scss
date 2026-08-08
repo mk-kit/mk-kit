@@ -30,6 +30,12 @@
   cursor: not-allowed;
 }
 
+/* Touch: the 38×22px track button gets a ≥24px-tall hit box (width already
+   exceeds 24px, so min(0px, …) leaves it alone). Visuals unchanged. */
+.mk-switch__control {
+  @include mk.touch-target(24px);
+}
+
 .mk-switch__track {
   display: block;
   position: relative;

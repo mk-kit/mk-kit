@@ -1,13 +1,16 @@
 :host {
   position: fixed;
-  bottom: var(--mk-space-4);
+  /* Clear the iOS home indicator; env() falls back to 0px elsewhere. */
+  bottom: calc(var(--mk-space-4) + env(safe-area-inset-bottom, 0px));
   inset-inline-end: var(--mk-space-4);
   z-index: var(--mk-z-toast);
   display: flex;
   flex-direction: column;
   gap: var(--mk-space-2);
   align-items: flex-end;
+  /* 100vh fallback first; dvh tracks iOS Safari's dynamic toolbar. */
   max-height: calc(100vh - var(--mk-space-8));
+  max-height: calc(100dvh - var(--mk-space-8));
   overflow: visible;
   pointer-events: none;
 }

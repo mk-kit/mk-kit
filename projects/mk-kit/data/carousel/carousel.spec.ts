@@ -172,4 +172,118 @@ describe('MkCarousel autoplay', () => {
     await fixture.whenStable();
     expect(playing()).toBe(true);
   });
+
+  it('does not initiate a swipe from the play/pause button, which stays tappable', async () => {
+    await create();
+    const button = viewport().querySelector<HTMLButtonElement>('.mk-carousel__playpause')!;
+    const touch = (type: string, x: number) =>
+      new PointerEvent(type, {
+        pointerType: 'touch',
+        clientX: x,
+        clientY: 100,
+        bubbles: true,
+      });
+
+    // A press starting on the control must not become a slide swipe…
+    button.dispatchEvent(touch('pointerdown', 200));
+    viewport().dispatchEvent(touch('pointermove', 80));
+    viewport().dispatchEvent(touch('pointerup', 80));
+    await fixture.whenStable();
+    expect(carousel.index()).toBe(0);
+
+    // …and the button itself still works.
+    button.click();
+    await fixture.whenStable();
+    expect(carousel.userPaused()).toBe(true);
+  });
+});
+
+describe('MkCarousel swipe', () => {
+  let fixture: ComponentFixture<Host>;
+  let carousel: MkCarousel;
+
+  beforeEach(() => {
+    TestBed.configureTestingModule({
+      providers: [provideZonelessChangeDetection()],
+    });
+    fixture = TestBed.createComponent(Host);
+    fixture.detectChanges();
+    carousel = fixture.debugElement.children[0].componentInstance;
+  });
+
+  afterEach(() => fixture.destroy());
+
+  const viewport = () =>
+    fixture.nativeElement.querySelector('.mk-carousel__viewport') as HTMLElement;
+  const track = () =>
+    fixture.nativeElement.querySelector('.mk-carousel__track') as HTMLElement;
+  const touch = (type: string, x: number, y: number) =>
+    new PointerEvent(type, {
+      pointerType: 'touch',
+      clientX: x,
+      clientY: y,
+      bubbles: true,
+      cancelable: true,
+    });
+
+  // jsdom has no layout, so the viewport measures 0 and the swipe logic falls
+  // back to a 360px reference width — the advance threshold is 90px.
+
+  it('advances to the next slide when a touch drag passes the threshold', () => {
+    const vp = viewport();
+    vp.dispatchEvent(touch('pointerdown', 200, 100));
+    vp.dispatchEvent(touch('pointermove', 150, 102));
+    vp.dispatchEvent(touch('pointermove', 80, 104)); // dx = -120
+    vp.dispatchEvent(touch('pointerup', 80, 104));
+    expect(carousel.index()).toBe(1);
+  });
+
+  it('drags the track visually while the swipe is in flight', () => {
+    const vp = viewport();
+    vp.dispatchEvent(touch('pointerdown', 200, 100));
+    vp.dispatchEvent(touch('pointermove', 140, 100)); // dx = -60
+    fixture.detectChanges();
+    expect(track().classList.contains('mk-carousel__track--dragging')).toBe(true);
+    expect(track().style.transform).toBe('translateX(calc(0% + -60px))');
+
+    vp.dispatchEvent(touch('pointerup', 140, 100));
+    fixture.detectChanges();
+    expect(track().classList.contains('mk-carousel__track--dragging')).toBe(false);
+  });
+
+  it('springs back without advancing when the drag stays small', () => {
+    const vp = viewport();
+    vp.dispatchEvent(touch('pointerdown', 200, 100));
+    vp.dispatchEvent(touch('pointermove', 160, 100)); // dx = -40 < 90px threshold
+    vp.dispatchEvent(touch('pointerup', 160, 100));
+    fixture.detectChanges();
+
+    expect(carousel.index()).toBe(0);
+    expect(track().style.transform).toBe('translateX(0%)');
+  });
+
+  it('leaves a mostly-vertical drag to native scrolling', () => {
+    const vp = viewport();
+    vp.dispatchEvent(touch('pointerdown', 200, 100));
+    vp.dispatchEvent(touch('pointermove', 205, 160)); // dy dominates → released
+    fixture.detectChanges();
+    expect(track().classList.contains('mk-carousel__track--dragging')).toBe(false);
+
+    vp.dispatchEvent(touch('pointermove', 80, 220)); // ignored, gesture was released
+    vp.dispatchEvent(touch('pointerup', 80, 220));
+    expect(carousel.index()).toBe(0);
+  });
+
+  it('does not start a swipe from the arrow buttons, which stay clickable', () => {
+    const next = fixture.nativeElement.querySelector(
+      '.mk-carousel__arrow--next',
+    ) as HTMLButtonElement;
+    next.dispatchEvent(touch('pointerdown', 200, 100)); // bubbles up from the control
+    viewport().dispatchEvent(touch('pointermove', 80, 100));
+    viewport().dispatchEvent(touch('pointerup', 80, 100));
+    expect(carousel.index()).toBe(0);
+
+    next.click();
+    expect(carousel.index()).toBe(1);
+  });
 });

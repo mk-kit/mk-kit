@@ -103,6 +103,10 @@
   opacity: 0.75;
   transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
 }
+/* Touch: the ~17px remove button gets a ≥24px hit box (visuals unchanged). */
+.mk-chip__remove {
+  @include mk.touch-target(24px);
+}
 .mk-chip__remove:hover {
   opacity: 1;
   background-image: linear-gradient(var(--mk-hover-overlay), var(--mk-hover-overlay));

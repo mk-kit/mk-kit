@@ -175,4 +175,59 @@ describe('MkHovercard', () => {
     expect(card.opened()).toBe(false);
     expect(document.activeElement).toBe(trigger);
   });
+
+  // --- Touch tap-toggle -----------------------------------------------------
+  // Touch has no hover: mouseenter/focus only fire as compatibility events
+  // after the tap, so the trigger toggles directly on a touch pointerdown.
+
+  const touchDown = () =>
+    new PointerEvent('pointerdown', { bubbles: true, pointerType: 'touch' });
+
+  it('a touch tap opens the card immediately (no openDelay)', () => {
+    trigger.dispatchEvent(touchDown());
+    expect(card.opened()).toBe(true);
+  });
+
+  it('a second touch tap on the trigger closes the card', () => {
+    trigger.dispatchEvent(touchDown());
+    expect(card.opened()).toBe(true);
+
+    trigger.dispatchEvent(touchDown());
+    expect(card.opened()).toBe(false);
+  });
+
+  it('the closing tap is not undone by its own emulated mouseenter/focus', () => {
+    trigger.dispatchEvent(touchDown());
+    trigger.dispatchEvent(touchDown());
+    expect(card.opened()).toBe(false);
+
+    // A tap fires compatibility mouseenter + focus right after pointerdown;
+    // within the suppression window they must not schedule a re-open.
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    trigger.dispatchEvent(new FocusEvent('focus'));
+    vi.advanceTimersByTime(400);
+    expect(card.opened()).toBe(false);
+  });
+
+  it('real hover works again once the touch suppression window has passed', () => {
+    trigger.dispatchEvent(touchDown());
+    trigger.dispatchEvent(touchDown());
+    vi.advanceTimersByTime(600); // > suppression window
+
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(300);
+    expect(card.opened()).toBe(true);
+  });
+
+  it('mouse pointerdown does not toggle — hover behaviour is unchanged', () => {
+    trigger.dispatchEvent(
+      new PointerEvent('pointerdown', { bubbles: true, pointerType: 'mouse' }),
+    );
+    expect(card.opened()).toBe(false);
+
+    // And hover still opens after the normal delay.
+    trigger.dispatchEvent(new MouseEvent('mouseenter'));
+    vi.advanceTimersByTime(300);
+    expect(card.opened()).toBe(true);
+  });
 });

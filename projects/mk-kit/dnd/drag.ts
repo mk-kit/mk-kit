@@ -10,6 +10,7 @@ import {
   contentChildren,
   inject,
   input,
+  numberAttribute,
   signal,
 } from '@angular/core';
 import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
@@ -20,6 +21,11 @@ import type { MkDropEvent } from './drag-drop.types';
 
 /** Pixels the pointer must travel before a press turns into a drag. */
 const DRAG_THRESHOLD = 5;
+/**
+ * Pixels a *touch* pointer may wander during the long-press delay before the
+ * press is treated as a scroll and the pending drag is abandoned.
+ */
+const TOUCH_SLOP = 10;
 /** Settle animation duration for the pointer preview (ms). */
 const SETTLE_MS = 180;
 
@@ -32,6 +38,11 @@ const SETTLE_MS = 180;
  * Keyboard: focus an item and press **Space/Enter** to pick it up, **Arrow**
  * keys to move it (crossing into connected lists at the ends / across the
  * perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
+ *
+ * Touch: a swipe scrolls the page as usual — the drag only arms after a
+ * long-press ({@link mkDragTouchDelay}, default 300 ms). While armed the item
+ * gets the `mk-drag--armed` class so consumers can style the lift moment.
+ * Mouse and pen drags start immediately, as before.
  *
  * ```html
  * <li mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
@@ -59,7 +70,9 @@ const SETTLE_MS = 180;
     '[class.mk-drag--disabled]': 'disabled()',
     '[class.mk-drag--dragging]': 'dragging()',
     '[class.mk-drag--lifted]': 'lifted()',
+    '[class.mk-drag--armed]': 'armed()',
     '[class.mk-drag--has-handle]': 'ownHandles().length > 0',
+    '[class.mk-drag--horizontal]': 'inHorizontalList()',
     '(pointerdown)': 'onPointerDown($event)',
     '(keydown)': 'onKeyDown($event)',
     '(blur)': 'onBlur()',
@@ -83,6 +96,14 @@ export class MkDrag<T = unknown> {
   /** Disable dragging this specific item. */
   readonly mkDragDisabled = input(false, { transform: booleanAttribute });
 
+  /**
+   * Long-press delay (ms) before a *touch* pointer arms the drag. Until it
+   * elapses a swipe scrolls natively; moving more than {@link TOUCH_SLOP}
+   * pixels abandons the pending drag. `0` arms immediately (legacy behavior).
+   * Mouse and pen are never delayed.
+   */
+  readonly mkDragTouchDelay = input(300, { transform: numberAttribute });
+
   /** Every handle in the projected subtree, including those of nested drags. */
   private readonly handles = contentChildren(MkDragHandle, { descendants: true });
 
@@ -101,6 +122,13 @@ export class MkDrag<T = unknown> {
   protected readonly dragging = signal(false);
   /** True while the item is "picked up" for keyboard movement. */
   protected readonly lifted = signal(false);
+  /** True from the moment a touch long-press arms the drag until release. */
+  protected readonly armed = signal(false);
+
+  /** Whether the home list lays items out horizontally (scopes touch-action). */
+  protected readonly inHorizontalList = computed(
+    () => this.home?.mkDropListOrientation() === 'horizontal',
+  );
 
   /** Effective disabled state (item- or list-level). */
   readonly disabled = computed(
@@ -127,6 +155,24 @@ export class MkDrag<T = unknown> {
   private readonly upHandler = (e: PointerEvent) => this.onPointerUp(e);
   private readonly cancelHandler = () => this.finishPointer(true);
 
+  // --- touch long-press state ---
+  /** Gate for the move handler: mouse/pen arm on pointerdown, touch on timer. */
+  private pointerArmed = false;
+  private touchTimer: number | null = null;
+  /** Inline `touch-action` to restore after a drag locked it (null = not locked). */
+  private savedTouchAction: string | null = null;
+  /**
+   * `touch-action: pan-y` (see drag.scss) keeps native scrolling alive while
+   * the long-press is pending, but that also means the browser may still start
+   * a scroll once we *are* dragging — so the armed drag must eat `touchmove`.
+   * Registered with `passive: false` for `preventDefault` to register.
+   */
+  private readonly touchMoveHandler = (e: TouchEvent) => {
+    if (this.pointerArmed && e.cancelable) e.preventDefault();
+  };
+  /** Android fires `contextmenu` on long-press — keep it off the gesture. */
+  private readonly contextMenuHandler = (e: Event) => e.preventDefault();
+
   // ===================================================================
   // Pointer dragging
   // ===================================================================
@@ -151,10 +197,37 @@ export class MkDrag<T = unknown> {
     el.addEventListener('pointermove', this.moveHandler);
     el.addEventListener('pointerup', this.upHandler);
     el.addEventListener('pointercancel', this.cancelHandler);
+
+    if (e.pointerType === 'touch') {
+      el.addEventListener('touchmove', this.touchMoveHandler, { passive: false });
+      el.addEventListener('contextmenu', this.contextMenuHandler);
+      const delay = this.mkDragTouchDelay();
+      if (delay > 0) {
+        // Long-press lift: do NOT preventDefault and do NOT arm yet — until
+        // the timer fires this press may just be the start of a scroll.
+        this.touchTimer =
+          this.doc.defaultView?.setTimeout(() => this.armTouch(), delay) ?? null;
+      } else {
+        // Legacy immediate mode.
+        this.pointerArmed = true;
+        this.lockTouchAction();
+      }
+    } else {
+      // Mouse / pen: armed immediately, the 5px threshold does the rest.
+      this.pointerArmed = true;
+    }
   }
 
   private onPointerMove(e: PointerEvent): void {
     if (this.pointerId === null || e.pointerId !== this.pointerId) return;
+    if (!this.pointerArmed) {
+      // Long-press still pending: real movement means the user is scrolling —
+      // abandon the pending drag and leave the gesture to the browser.
+      if (Math.hypot(e.clientX - this.startX, e.clientY - this.startY) > TOUCH_SLOP) {
+        this.finishPointer(true);
+      }
+      return;
+    }
     if (!this.started) {
       if (Math.hypot(e.clientX - this.startX, e.clientY - this.startY) < DRAG_THRESHOLD) {
         return;
@@ -163,6 +236,41 @@ export class MkDrag<T = unknown> {
     }
     e.preventDefault();
     this.updatePointer(e.clientX, e.clientY);
+  }
+
+  /** The long-press delay elapsed with the finger still down — lift. */
+  private armTouch(): void {
+    this.touchTimer = null;
+    this.pointerArmed = true;
+    this.armed.set(true);
+    // `pan-y` would still let the browser start a vertical scroll mid-drag;
+    // lock the element down for the rest of the gesture.
+    this.lockTouchAction();
+  }
+
+  private lockTouchAction(): void {
+    this.savedTouchAction = this.element.style.touchAction;
+    this.element.style.touchAction = 'none';
+  }
+
+  private unlockTouchAction(): void {
+    if (this.savedTouchAction === null) return;
+    this.element.style.touchAction = this.savedTouchAction;
+    this.savedTouchAction = null;
+  }
+
+  /** Undo everything the touch path set up (timer, listeners, lock, class). */
+  private clearTouchState(): void {
+    const el = this.element;
+    el.removeEventListener('touchmove', this.touchMoveHandler);
+    el.removeEventListener('contextmenu', this.contextMenuHandler);
+    if (this.touchTimer !== null) {
+      this.doc.defaultView?.clearTimeout(this.touchTimer);
+      this.touchTimer = null;
+    }
+    this.pointerArmed = false;
+    this.armed.set(false);
+    this.unlockTouchAction();
   }
 
   private onPointerUp(e: PointerEvent): void {
@@ -223,6 +331,7 @@ export class MkDrag<T = unknown> {
     el.removeEventListener('pointerup', this.upHandler);
     el.removeEventListener('pointercancel', this.cancelHandler);
     this.pointerId = null;
+    this.clearTouchState();
 
     if (!this.started) return; // was a click, never a drag
 
@@ -533,6 +642,7 @@ export class MkDrag<T = unknown> {
       }
       this.pointerId = null;
     }
+    this.clearTouchState();
     this.cleanupDom();
   }
 

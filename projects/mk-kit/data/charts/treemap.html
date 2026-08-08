@@ -25,6 +25,7 @@
         [class.mk-treemap__tile--active]="hoverKey() === keyOf(i)"
         (pointerenter)="setHover(keyOf(i))"
         (pointerleave)="setHover(null)"
+        (pointerdown)="pinHover(keyOf(i), $event)"
       >
         <rect
           class="mk-treemap__rect"

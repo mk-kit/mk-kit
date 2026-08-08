@@ -187,6 +187,93 @@ describe('MkOverlayService — Escape stacking, inert background, pointer events
     });
   });
 
+  describe('body scroll lock', () => {
+    /** Mock window.scrollY / window.scrollTo the way client sizes are mocked. */
+    function mockPageScroll(scrollY: number) {
+      const scrollTo = vi.fn();
+      Object.defineProperty(window, 'scrollY', {
+        value: scrollY,
+        configurable: true,
+      });
+      Object.defineProperty(window, 'scrollTo', {
+        value: scrollTo,
+        configurable: true,
+        writable: true,
+      });
+      return scrollTo;
+    }
+
+    function restorePageScroll() {
+      delete (window as any).scrollY;
+      delete (window as any).scrollTo;
+    }
+
+    it('fixes the body at the saved offset and restores it only when the last overlay closes', () => {
+      const scrollTo = mockPageScroll(320);
+      try {
+        const first = service.open(PanelStub, {});
+        const second = service.open(PanelStub, {});
+        appRef.tick();
+
+        const body = document.body;
+        // iOS-proof lock: overflow:hidden alone is ignored for touch scrolls.
+        expect(body.style.position).toBe('fixed');
+        expect(body.style.top).toBe('-320px');
+        expect(body.style.overflow).toBe('hidden');
+        expect(body.style.width).toBe('100%');
+
+        second.close();
+        // Reference-counted: the remaining overlay still holds the lock, so
+        // the inner close must not restore the page early.
+        expect(body.style.position).toBe('fixed');
+        expect(scrollTo).not.toHaveBeenCalled();
+
+        first.close();
+        expect(body.style.position).toBe('');
+        expect(body.style.top).toBe('');
+        expect(body.style.overflow).toBe('');
+        expect(body.style.width).toBe('');
+        // Restoration jumps back instantly so it is invisible to the user.
+        expect(scrollTo).toHaveBeenCalledTimes(1);
+        expect(scrollTo).toHaveBeenCalledWith({ top: 320, behavior: 'instant' });
+      } finally {
+        restorePageScroll();
+      }
+    });
+
+    it('restores the scroll position after an Escape cascade closes the stack', () => {
+      const scrollTo = mockPageScroll(48);
+      try {
+        service.open(PanelStub, {});
+        service.open(PanelStub, {});
+        appRef.tick();
+
+        pressEscape();
+        expect(scrollTo).not.toHaveBeenCalled();
+
+        pressEscape();
+        expect(service.openCount).toBe(0);
+        expect(document.body.style.position).toBe('');
+        expect(scrollTo).toHaveBeenCalledWith({ top: 48, behavior: 'instant' });
+      } finally {
+        restorePageScroll();
+      }
+    });
+
+    it('preserves pre-existing inline body styles across a lock/unlock cycle', () => {
+      document.body.style.overflow = 'auto';
+      try {
+        const ref = service.open(PanelStub, {});
+        appRef.tick();
+        expect(document.body.style.overflow).toBe('hidden');
+        ref.close();
+        expect(document.body.style.overflow).toBe('auto');
+      } finally {
+        document.body.style.removeProperty('overflow');
+      }
+    });
+  });
+
   describe('focus restore', () => {
     it('closing after the trigger was removed does not throw and does not leave focus detached', async () => {
       const trigger = document.createElement('button');

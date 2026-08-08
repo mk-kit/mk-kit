@@ -69,6 +69,7 @@
         [style.fill]="p.color"
         (pointerenter)="setHover(keyOf(i))"
         (pointerleave)="setHover(null)"
+        (pointerdown)="pinHover(keyOf(i), $event)"
       />
     }
   </svg>

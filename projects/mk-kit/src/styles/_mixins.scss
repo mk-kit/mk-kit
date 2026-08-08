@@ -78,6 +78,45 @@ $tones: (primary, success, warning, danger, info, neutral);
   outline-offset: $offset;
 }
 
+/// Minimum touch-target sizing (mobile audit / WCAG 2.5.8).
+///
+/// Under `(pointer: coarse)` only — desktop rendering is untouched — draws an
+/// invisible pseudo-element centred on the element that is at least
+/// `$min` × `$min`. The trick is `inset: min(0px, calc((100% - $min) / 2))`:
+/// on an axis where the element is already `$min` or larger the calc() term is
+/// positive and `min()` clamps the inset to 0 (a big element is never shrunk);
+/// where the element is smaller the term is negative and the pseudo overhangs
+/// symmetrically until the hit box reaches `$min`. Percentages resolve per
+/// axis (width for inline, height for block), so a long-and-thin element —
+/// splitter handle, resize grip — only grows across its thin axis.
+///
+/// The pseudo is a child box of the element itself, so hit-testing attributes
+/// taps to the element exactly as if its own box were tapped: pointer-events,
+/// cursor, and event bubbling are unchanged.
+///
+/// The pseudo needs the element as its containing block, so the element must
+/// be positioned. By default the mixin sets `position: relative` (inside the
+/// media query); pass `$position: null` when the element is already positioned
+/// (e.g. an absolutely-placed slider thumb) so its positioning is not
+/// clobbered.
+///
+/// Pass `$pseudo: after` when the element already uses `::before` for
+/// visuals. Not usable on replaced elements (`<input>`, `<img>`, …) — they do
+/// not render pseudo-elements; grow the element's own box instead (see
+/// checkbox.scss for the pattern).
+@mixin touch-target($min: 24px, $position: relative, $pseudo: before) {
+  @media (pointer: coarse) {
+    @if $position != null {
+      position: $position;
+    }
+    &::#{$pseudo} {
+      content: '';
+      position: absolute;
+      inset: min(0px, calc((100% - #{$min}) / 2));
+    }
+  }
+}
+
 /// The repeated control-size triple — `height` + `padding` + `font-size` — for
 /// a sized control (`sm`/`md`/`lg`). `$padding` is the full padding value (it
 /// varies per component, so it's passed in); any size-scoped `border-radius`

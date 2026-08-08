@@ -59,3 +59,12 @@
     transition: none;
   }
 }
+
+/* iOS Safari zooms into focused text fields below 16px. The default (lg,
+   18px) and lg (xl) cells already clear the threshold; only the sm cells
+   render at md (14px) — floor those on coarse pointers. */
+@media (pointer: coarse) {
+  :host(.mk-otp--sm) .mk-otp__cell {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+}

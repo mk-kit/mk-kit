@@ -71,6 +71,13 @@ export class MkTabs {
     const tab = this.tabs()[index];
     if (!tab || tab.disabled()) return;
     this.selectedIndex.set(index);
+    // The tablist scrolls horizontally on narrow screens — keep the newly
+    // active tab visible. 'nearest' so activating a tab never jumps the page
+    // vertically. Optional-chained: jsdom has no scrollIntoView.
+    this.tabButtons()[index]?.nativeElement.scrollIntoView?.({
+      block: 'nearest',
+      inline: 'nearest',
+    });
   }
 
   protected focusTab(index: number): void {

@@ -52,6 +52,7 @@
   flex: 1 1 auto;
   min-height: 0;
   overflow-y: auto;
+  overscroll-behavior: contain;
   padding: var(--mk-space-5);
   font-size: var(--mk-font-size-md);
   line-height: var(--mk-line-height-normal);

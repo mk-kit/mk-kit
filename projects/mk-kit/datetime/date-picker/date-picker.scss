@@ -141,3 +141,13 @@
     transition: none;
   }
 }
+
+/* iOS zooms into focused fields under 16px — keep typed text >=16px on touch. */
+@media (pointer: coarse) {
+  .mk-date-picker__input {
+    font-size: max(var(--mk-font-size-md), 16px);
+  }
+  :host(.mk-date-picker--sm) .mk-date-picker__input {
+    font-size: max(var(--mk-font-size-sm), 16px);
+  }
+}
