@@ -138,14 +138,16 @@ export class MkCommandPalette {
       queueMicrotask(() => this.sync(isOpen));
     });
     // Keep the active option visible while the list scrolls under 70vh.
+    // Synchronous on purpose: on an index change the option elements already
+    // exist, and the getElementById chain no-ops for the open-with-index-0
+    // case where the list has not rendered yet. (A queueMicrotask here raced
+    // test schedulers and bought nothing.)
     effect(() => {
       const index = this.activeIndex();
       if (!this.isBrowser || !this.open() || index < 0) return;
-      queueMicrotask(() => {
-        this.document
-          .getElementById(this.optionId(index))
-          ?.scrollIntoView?.({ block: 'nearest' });
-      });
+      this.document
+        .getElementById(this.optionId(index))
+        ?.scrollIntoView?.({ block: 'nearest' });
     });
   }
 
