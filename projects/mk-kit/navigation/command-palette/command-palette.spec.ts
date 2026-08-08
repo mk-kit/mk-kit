@@ -122,6 +122,10 @@ describe('MkCommandPalette', () => {
     );
     fixture.detectChanges();
     await fixture.whenStable();
+    // The component schedules the scroll in a queueMicrotask from its effect;
+    // whenStable() does not deterministically order after it (flaked on CI).
+    // A macrotask hop guarantees every pending microtask has run.
+    await new Promise((resolve) => setTimeout(resolve, 0));
 
     expect(scrollSpy).toHaveBeenCalledWith({ block: 'nearest' });
   });
