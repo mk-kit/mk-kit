@@ -215,6 +215,12 @@ export const routes: Routes = [
       import('./pages/rich-text/rich-text-page').then((m) => m.RichTextPage),
   },
   {
+    path: 'components/markdown',
+    title: 'Markdown & logs — mk-kit',
+    loadComponent: () =>
+      import('./pages/markdown/markdown-page').then((m) => m.MarkdownPage),
+  },
+  {
     path: 'components/stepper',
     title: 'Stepper — mk-kit',
     loadComponent: () =>

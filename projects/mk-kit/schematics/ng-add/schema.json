@@ -1,0 +1,22 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "MkKitNgAdd",
+  "title": "@mkornas/ui ng-add schematic",
+  "type": "object",
+  "properties": {
+    "project": {
+      "type": "string",
+      "description": "The name of the project to add @mkornas/ui to.",
+      "$default": {
+        "$source": "projectName"
+      }
+    },
+    "i18n": {
+      "type": "boolean",
+      "default": false,
+      "description": "Insert a provideMkI18n({}) override block into the application config so built-in strings can be localised.",
+      "x-prompt": "Set up a provideMkI18n override block?"
+    }
+  },
+  "required": []
+}

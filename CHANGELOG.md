@@ -4,6 +4,60 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.32.0] — 2026-08-08
+
+The scheduler, output & tooling wave — ROADMAP Round 4.
+
+### Added
+
+- **Event calendar: editable time grid.** With `editable`, week/day-view
+  event pills drag to move (vertical snaps to `snapMinutes`, horizontal
+  changes the day, touch arms via long-press) and drag their bottom edge to
+  resize; a live time-range label and target-slot outline show the would-be
+  result. Full keyboard equivalents (Enter/Space arms, arrows move,
+  Shift+Up/Down resizes, Enter commits, Escape cancels) with live-announced
+  steps satisfy WCAG 2.5.7. The calendar never mutates your data:
+  `(eventMove)`/`(eventResize)` emit `{event, start, end}` and the consumer
+  maps-and-replaces. Also fixed in passing: time-grid tooltips rendered a
+  literal "HH:mm" (the date formatter has no time tokens).
+- **`mk-markdown`** — dependency-free CommonMark-subset renderer for
+  changelogs, AI output, and user notes. Raw HTML is always escaped and
+  unsafe URL schemes are dropped at parse time, so there is no XSS surface
+  and no sanitizer bypass; fenced code highlights via the core highlighter;
+  GitHub pipe tables with alignment; typed AST exported
+  (`mkParseMarkdown`/`mkRenderMarkdown`).
+- **`mk-log-viewer`** — virtualized tail-follow log pane: ANSI SGR colors
+  mapped to theme tokens (not raw terminal colors), stick-to-bottom follow
+  that detaches when you scroll up (floating "Follow" chip to re-attach),
+  case-insensitive search with `<mark>` highlighting that preserves ANSI
+  coloring across match boundaries, `maxLines` ring buffer, copy-all and
+  wrap toggles, `role="log"` semantics.
+- **`MkHistoryService` / `MkHistoryStack`** — a generic undo/redo command
+  stack: `push` records done actions, `batch()` groups (nested batches
+  flatten), pushes during undo/redo are ignored (the classic corruption
+  footgun, guarded and documented), `limit` eviction, independent scopes
+  via `createScope()`, and opt-in `registerHistoryHotkeys()` wiring
+  `mod+z` / `mod+shift+z` / `mod+y` that never fights native text-field
+  undo.
+- **Playwright visual regression** — `npm run test:visual`: 13 docs routes
+  × light/dark, full-page, with a frozen clock, disabled animations, and
+  two subtle stabilizations (forced scrollbar gutter; a font-warm-up pass)
+  discovered the hard way. Linux baselines committed; weekly + manual
+  GitHub workflow (not in the PR-blocking CI).
+- **`ng add @mkornas/ui`** — wires the theme stylesheet into angular.json
+  (prepended, so app styles win) and optionally scaffolds
+  `provideMkI18n({})` (`--i18n`); ships as compiled schematics in the
+  package.
+- Docs: new "Markdown & logs" page; history section on Core services;
+  editable-grid section on Date & time; `ng add` in Getting started (which
+  also had a stale pre-rename package name corrected).
+- i18n: six `eventCalendar*` editing keys, four `log*` viewer keys.
+
+### Changed
+
+- Size budgets: data 560→640 KiB (markdown + log viewer), directives
+  80→100 KiB (history).
+
 ## [0.31.0] — 2026-08-08
 
 The growth wave: the 2026-08 audit's top "what admin consumers still

@@ -43,7 +43,24 @@ export class I18nDemo {}
       </p>
 
       <h2>1. Install</h2>
-      <pre class="gs-code"><code>npm install &#64;mk-kit/ui</code></pre>
+      <p>The fastest path is the <code class="docs-inline">ng add</code> schematic:</p>
+      <pre class="gs-code"><code>ng add &#64;mkornas/ui</code></pre>
+      <p>
+        It installs the package and wires the theme stylesheet into your
+        project automatically: the compiled theme
+        (<code class="docs-inline">node_modules/&#64;mkornas/ui/styles/mk-kit.css</code>)
+        is <em>prepended</em> to the app's <code class="docs-inline">styles</code>
+        array in <code class="docs-inline">angular.json</code>, so your own
+        styles keep the last word for overrides. It targets the first
+        application project in the workspace (pass
+        <code class="docs-inline">--project &lt;name&gt;</code> to pick
+        another), and with <code class="docs-inline">--i18n</code> it also
+        inserts an empty <code class="docs-inline">provideMkI18n({{ '{' }}{{ '}' }})</code>
+        override block into your application config, ready for translations.
+        If you use it, step 2 below is already done — continue at step 3.
+      </p>
+      <p>Or install manually:</p>
+      <pre class="gs-code"><code>npm install &#64;mkornas/ui</code></pre>
       <p>
         Peer dependencies: <code class="docs-inline">&#64;angular/core</code>,
         <code class="docs-inline">&#64;angular/common</code> and
@@ -56,7 +73,7 @@ export class I18nDemo {}
         design token plus the base reset. Add it to your global
         <code class="docs-inline">styles.css</code>:
       </p>
-      <pre class="gs-code"><code>&#64;import '&#64;mk-kit/ui/styles.css';</code></pre>
+      <pre class="gs-code"><code>&#64;import '&#64;mkornas/ui/styles.css';</code></pre>
       <p>or reference it from the <code class="docs-inline">styles</code> array in <code class="docs-inline">angular.json</code>.</p>
 
       <h2>3. Enable the theme surface</h2>
@@ -106,6 +123,13 @@ export class I18nDemo {}
       <h2>7. Publish your own build</h2>
       <p>The library builds into a standards-compliant Angular package:</p>
       <pre class="gs-code"><code>{{ publishSnippet }}</code></pre>
+      <p>
+        Contributing? Besides unit tests, this docs site is covered by a
+        Playwright <strong>visual regression</strong> sweep
+        (<code class="docs-inline">npm run test:visual</code>) — screenshots of
+        every page compared against committed Linux baselines, run on demand
+        and on a weekly CI schedule.
+      </p>
     </div>
   `,
   styles: [

@@ -1,0 +1,79 @@
+@if (!hideToolbar()) {
+  <div class="mk-log-viewer__toolbar">
+    <ng-content />
+    <span class="mk-log-viewer__toolbar-spacer"></span>
+    <button
+      type="button"
+      class="mk-log-viewer__tool"
+      [class.mk-log-viewer__tool--active]="wrap()"
+      [attr.aria-pressed]="wrap()"
+      (click)="wrap.set(!wrap())"
+    >
+      {{ i18n.logWrapLines }}
+    </button>
+    <button
+      type="button"
+      class="mk-log-viewer__tool"
+      [mkCopyToClipboard]="allText()"
+      #copier="mkCopyToClipboard"
+    >
+      {{ copier.justCopied() ? '✓ ' + i18n.logCopyAll : i18n.logCopyAll }}
+    </button>
+  </div>
+}
+
+<div class="mk-log-viewer__body">
+  <!--
+    role="log" makes additions politely announced without re-reading the whole
+    buffer; tabindex="0" keeps the overflowing region keyboard-scrollable.
+    Tokens are emitted on one line: the rows render `white-space: pre`, so any
+    inter-element template whitespace would corrupt log alignment.
+  -->
+  <div
+    #viewport
+    class="mk-log-viewer__viewport"
+    role="log"
+    tabindex="0"
+    [attr.aria-label]="ariaLabel()"
+    (scroll)="onScroll($event)"
+  >
+    @if (wrap()) {
+      <div class="mk-log-viewer__lines mk-log-viewer__lines--wrap">
+        @for (line of wrappedLines(); track line.index) {
+          <div class="mk-log-viewer__line">@for (t of line.tokens; track $index) {@if (t.mark) {<mark class="mk-log-viewer__match {{ t.cls }}">{{ t.text }}</mark>} @else {<span class="{{ t.cls }}">{{ t.text }}</span>}}</div>
+        }
+      </div>
+    } @else {
+      <div class="mk-log-viewer__spacer" [style.height.px]="totalHeight()">
+        <div
+          class="mk-log-viewer__window"
+          [style.transform]="'translateY(' + offset() + 'px)'"
+        >
+          @for (line of visibleLines(); track line.index) {
+            <div
+              class="mk-log-viewer__line"
+              [style.height.px]="itemHeight()"
+              [style.line-height.px]="itemHeight()"
+            >@for (t of line.tokens; track $index) {@if (t.mark) {<mark class="mk-log-viewer__match {{ t.cls }}">{{ t.text }}</mark>} @else {<span class="{{ t.cls }}">{{ t.text }}</span>}}</div>
+          }
+        </div>
+      </div>
+    }
+  </div>
+
+  @if (!follow()) {
+    <button
+      type="button"
+      class="mk-log-viewer__follow"
+      (click)="resumeFollow()"
+    >
+      {{ i18n.logFollow }} <span aria-hidden="true">↓</span>
+    </button>
+  }
+</div>
+
+@if (query()) {
+  <span class="mk-visually-hidden" aria-live="polite">
+    {{ i18n.resultsCount(matchCount()) }}
+  </span>
+}

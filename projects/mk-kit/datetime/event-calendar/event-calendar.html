@@ -125,7 +125,7 @@
         }
       </div>
 
-      @for (col of timedColumns(); track col.day.getTime()) {
+      @for (col of timedColumns(); track col.day.getTime(); let ci = $index) {
         <div
           class="mk-event-calendar__col"
           [class.mk-event-calendar__col--today]="col.today"
@@ -143,16 +143,44 @@
             <button
               type="button"
               class="mk-event-calendar__block"
+              [class.mk-event-calendar__block--editable]="editable()"
+              [class.mk-event-calendar__block--dragging]="isEditing(p)"
               [style.top.%]="p.top"
-              [style.height.%]="p.height"
+              [style.height.%]="blockHeight(p)"
               [style.left.%]="(100 / p.lanes) * p.lane"
               [style.width.%]="100 / p.lanes"
+              [style.transform]="blockTransform(p)"
               [style.background-color]="p.event.color || 'var(--mk-primary)'"
               [title]="placementTitle(p)"
+              [attr.aria-label]="editable() ? blockAriaLabel(p) : null"
+              [attr.aria-roledescription]="editable() ? movableRoledescription : null"
               (click)="onEventClick($event, p.event)"
+              (pointerdown)="onBlockPointerDown($event, p, ci)"
+              (keydown)="onBlockKeydown($event, p, ci)"
+              (blur)="onBlockBlur()"
             >
+              @if (dragLabelFor(p); as lbl) {
+                <span class="mk-event-calendar__drag-time" aria-hidden="true">{{
+                  lbl
+                }}</span>
+              }
               {{ p.event.title }}
+              @if (editable()) {
+                <span
+                  class="mk-event-calendar__resize-handle"
+                  aria-hidden="true"
+                ></span>
+              }
             </button>
+          }
+
+          @if (dropOutlineFor(ci); as outline) {
+            <div
+              class="mk-event-calendar__drop-outline"
+              aria-hidden="true"
+              [style.top.%]="outline.top"
+              [style.height.%]="outline.outlineHeight"
+            ></div>
           }
 
           @if (col.allDay.length) {
