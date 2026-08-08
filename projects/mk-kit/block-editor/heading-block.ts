@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
-import { MkRichText, type MkRichTextSplit } from './rich-text';
+import { MkRichTextEngine, type MkRichTextSplit } from '@mkornas/ui/rich-text';
 
 const LEVELS = [1, 2, 3, 4] as const;
 
@@ -19,7 +19,7 @@ const LEVELS = [1, 2, 3, 4] as const;
  */
 @Component({
   selector: 'mk-heading-block',
-  imports: [MkRichText],
+  imports: [MkRichTextEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!readonly()) {
@@ -37,7 +37,7 @@ const LEVELS = [1, 2, 3, 4] as const;
         }
       </div>
     }
-    <mk-rich-text
+    <mk-rich-text-engine
       class="mk-heading-block__text"
       [class]="'mk-heading-block__text--h' + level()"
       [html]="block().data['html'] ?? ''"

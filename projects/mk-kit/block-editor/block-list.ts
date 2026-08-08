@@ -11,7 +11,7 @@ import { MK_I18N } from '@mkornas/ui/core';
 import { type MkBlock, mkBlockId, mkCloneBlock } from './block-model';
 import type { MkBlockDefinition } from './block-registry';
 import { MkBlockEditorContext } from './block-context';
-import type { MkRichTextSplit } from './rich-text';
+import type { MkRichTextSplit } from '@mkornas/ui/rich-text';
 import { MkParagraphBlock } from './paragraph-block';
 import { MkHeadingBlock } from './heading-block';
 import { MkQuoteBlock } from './quote-block';

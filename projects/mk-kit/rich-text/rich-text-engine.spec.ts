@@ -1,10 +1,10 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MkRichText } from './rich-text';
+import { MkRichTextEngine } from './rich-text-engine';
 
-describe('MkRichText toolbar accessibility', () => {
-  let fixture: ComponentFixture<MkRichText>;
-  let cmp: MkRichText;
+describe('MkRichTextEngine toolbar accessibility', () => {
+  let fixture: ComponentFixture<MkRichTextEngine>;
+  let cmp: MkRichTextEngine;
   let execCommand: ReturnType<typeof vi.fn>;
 
   beforeEach(() => {
@@ -14,7 +14,7 @@ describe('MkRichText toolbar accessibility', () => {
     TestBed.configureTestingModule({
       providers: [provideZonelessChangeDetection()],
     });
-    fixture = TestBed.createComponent(MkRichText);
+    fixture = TestBed.createComponent(MkRichTextEngine);
     fixture.detectChanges();
     cmp = fixture.componentInstance;
   });

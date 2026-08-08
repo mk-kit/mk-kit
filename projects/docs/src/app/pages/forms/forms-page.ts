@@ -18,11 +18,19 @@ import {
   type MkFormError,
   MkInput,
   MkNumberInput,
+  MkRepeater,
+  MkRepeaterEmpty,
+  MkRepeaterRow,
   MkSelect,
   type MkSelectOption,
   MkSubmitInput,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
+
+interface OrderLine {
+  name: string;
+  qty: number;
+}
 
 /**
  * Documentation + live demo page for the FORM structure components of `@mkornas/ui`:
@@ -43,6 +51,9 @@ import { DocsExample } from '../../shared/docs-example';
     MkFileUpload,
     MkCodeEditor,
     MkButton,
+    MkRepeater,
+    MkRepeaterEmpty,
+    MkRepeaterRow,
     MkSubmitInput,
   ],
   template: `
@@ -388,6 +399,91 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>(validate)</td><td>MkCodeValidity</td><td>—</td><td>Emits {{ '{ valid, error }' }} on change.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <!-- REPEATER -->
+      <!-- ============================================================ -->
+      <h2 id="repeater">Repeater</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-repeater&gt;</code> is the
+        schema-friendly editable list: it renders one instance of your
+        projected <code class="docs-inline">mkRepeaterRow</code> template per
+        item, with add / remove / drag-and-drop reorder built in.
+        <code class="docs-inline">items</code> is a two-way model (and the
+        component is a <code class="docs-inline">ControlValueAccessor</code>
+        over <code class="docs-inline">T[]</code>), every mutation produces a
+        <strong>new array</strong>, and rows are tracked by item identity so
+        removing a middle row keeps the other rows' input state intact.
+      </p>
+      <p>
+        Here <code class="docs-inline">[factory]</code> creates a fresh
+        <code class="docs-inline">{{ '{' }} name, qty {{ '}' }}</code> row,
+        <code class="docs-inline">[min]="1"</code> keeps at least one row (its
+        remove button disables) and <code class="docs-inline">[max]="5"</code>
+        disables the add button at five. With
+        <code class="docs-inline">reorderable</code>, each row gets a drag
+        handle — pointer or keyboard (Space/Enter picks up, arrows move,
+        Escape cancels), and each move is announced to screen readers.
+      </p>
+      <docs-example [code]="repeaterCode" [column]="true">
+        <div style="max-width: 30rem; width: 100%;">
+          <mk-repeater
+            [(items)]="lines"
+            [factory]="newLine"
+            [min]="1"
+            [max]="5"
+            reorderable
+            addLabel="Add line"
+            (added)="onLineAdded($event)"
+            (removed)="onLineRemoved($event)"
+            (moved)="onLineMoved($event)"
+          >
+            <ng-template mkRepeaterRow let-item let-i="index">
+              <div style="display: flex; gap: var(--mk-space-2); width: 100%;">
+                <input
+                  mkInput
+                  placeholder="Item name"
+                  [attr.aria-label]="'Name, row ' + (i + 1)"
+                  [(ngModel)]="$any(item).name"
+                  style="flex: 1"
+                />
+                <input
+                  mkInput
+                  type="number"
+                  min="1"
+                  [attr.aria-label]="'Quantity, row ' + (i + 1)"
+                  [(ngModel)]="$any(item).qty"
+                  style="width: 5.5rem"
+                />
+              </div>
+            </ng-template>
+            <ng-template mkRepeaterEmpty>No lines yet — add one.</ng-template>
+          </mk-repeater>
+          <p class="echo">
+            {{ lines().length }} line(s) — last change: {{ repeaterStatus() }}
+          </p>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>items</td><td>model&lt;T[]&gt;</td><td>[]</td><td>Two-way rows ([(items)] / [(ngModel)] / formControl). Every mutation sets a new array.</td></tr>
+          <tr><td>factory</td><td>() =&gt; T</td><td>() =&gt; {{ '{}' }}</td><td>Creates the item appended by the add button.</td></tr>
+          <tr><td>min</td><td>number</td><td>0</td><td>Minimum rows — remove buttons disable at (or below) it.</td></tr>
+          <tr><td>max</td><td>number</td><td>0</td><td>Maximum rows (0 = unlimited) — the add button disables at it.</td></tr>
+          <tr><td>reorderable</td><td>boolean</td><td>false</td><td>Per-row drag handles; pointer + keyboard reorder, announced via the live announcer.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the whole control (add, remove and reorder).</td></tr>
+          <tr><td>addLabel</td><td>string</td><td>i18n 'Add row'</td><td>Add-button caption.</td></tr>
+          <tr><td>(added)</td><td>{{ '{ item, index }' }}</td><td>—</td><td>Emitted after the add button appended a factory-made item.</td></tr>
+          <tr><td>(removed)</td><td>{{ '{ item, index }' }}</td><td>—</td><td>Emitted after a row was removed.</td></tr>
+          <tr><td>(moved)</td><td>{{ '{ from, to }' }}</td><td>—</td><td>Emitted after a row was reordered (drag or keyboard).</td></tr>
+          <tr><td>mkRepeaterRow</td><td>ng-template</td><td>required</td><td>Row template; context: item (implicit, <code class="docs-inline">let-item</code>) + <code class="docs-inline">let-i="index"</code>.</td></tr>
+          <tr><td>mkRepeaterEmpty</td><td>ng-template</td><td>—</td><td>Optional empty state shown instead of the row list while there are no items.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -513,6 +609,26 @@ export class FormsPage {
     age: new FormControl<number | null>(null, Validators.required),
   });
 
+  // --- Repeater ---------------------------------------------------------------
+  protected readonly lines = signal<OrderLine[]>([
+    { name: 'Espresso beans 1 kg', qty: 2 },
+    { name: 'Oat milk 1 l', qty: 6 },
+  ]);
+  protected readonly repeaterStatus = signal('—');
+
+  /** Fresh row appended by the add button. */
+  protected readonly newLine = (): OrderLine => ({ name: '', qty: 1 });
+
+  protected onLineAdded(e: { item: OrderLine; index: number }): void {
+    this.repeaterStatus.set(`added row ${e.index + 1}`);
+  }
+  protected onLineRemoved(e: { item: OrderLine; index: number }): void {
+    this.repeaterStatus.set(`removed "${e.item.name || 'empty row'}" (row ${e.index + 1})`);
+  }
+  protected onLineMoved(e: { from: number; to: number }): void {
+    this.repeaterStatus.set(`moved row ${e.from + 1} → ${e.to + 1}`);
+  }
+
   // --- Code snippets (plain strings shown in the code blocks) ---------------
   protected readonly formFieldCode = `<mk-form-field
   label="Email"
@@ -595,4 +711,21 @@ onSubmit() {
   protected readonly codeEditorCode = `<mk-code-editor #editor language="json" [rows]="9" [(value)]="config"
   (validate)="jsonValid.set($event)" />
 <button mkButton variant="outline" size="sm" (click)="editor.format()">Format</button>`;
+
+  protected readonly repeaterCode = `interface OrderLine { name: string; qty: number; }
+
+lines = signal<OrderLine[]>([{ name: 'Espresso beans 1 kg', qty: 2 }]);
+newLine = (): OrderLine => ({ name: '', qty: 1 });   // fresh row per click
+
+<mk-repeater [(items)]="lines" [factory]="newLine"
+             [min]="1" [max]="5" reorderable addLabel="Add line"
+             (added)="onAdded($event)"      <!-- { item, index } -->
+             (removed)="onRemoved($event)"  <!-- { item, index } -->
+             (moved)="onMoved($event)">     <!-- { from, to } -->
+  <ng-template mkRepeaterRow let-item let-i="index">
+    <input mkInput [(ngModel)]="$any(item).name" />
+    <input mkInput type="number" min="1" [(ngModel)]="$any(item).qty" />
+  </ng-template>
+  <ng-template mkRepeaterEmpty>No lines yet — add one.</ng-template>
+</mk-repeater>`;
 }

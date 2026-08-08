@@ -9,12 +9,12 @@ import {
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
-import { MkRichText, type MkRichTextSplit } from './rich-text';
+import { MkRichTextEngine, type MkRichTextSplit } from '@mkornas/ui/rich-text';
 
 /** List block — a bulleted or numbered list of rich-text items. */
 @Component({
   selector: 'mk-list-block',
-  imports: [MkRichText],
+  imports: [MkRichTextEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     @if (!readonly()) {
@@ -43,7 +43,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
       <ol class="mk-list-block__list">
         @for (item of items(); track $index) {
           <li class="mk-list-block__item">
-            <mk-rich-text
+            <mk-rich-text-engine
               [html]="item"
               [placeholder]="i18n.blockEditor.listItem"
               [disabled]="readonly()"
@@ -60,7 +60,7 @@ import { MkRichText, type MkRichTextSplit } from './rich-text';
       <ul class="mk-list-block__list">
         @for (item of items(); track $index) {
           <li class="mk-list-block__item">
-            <mk-rich-text
+            <mk-rich-text-engine
               [html]="item"
               [placeholder]="i18n.blockEditor.listItem"
               [disabled]="readonly()"

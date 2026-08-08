@@ -400,6 +400,18 @@ export interface MkI18nStrings {
   /** OTP field labels. */
   oneTimeCode: string;
   otpDigit: (position: number) => string;
+  /** Numeric keypad labels + masked-PIN progress announcement. */
+  numericKeypadLabel: string;
+  keypadClear: string;
+  keypadBackspace: string;
+  keypadDigitsEntered: (count: number, length: number) => string;
+  /** On-screen keyboard label + action-key labels. */
+  onScreenKeyboardLabel: string;
+  keyboardShift: string;
+  keyboardSpace: string;
+  keyboardEnter: string;
+  keyboardAltLayer: string;
+  keyboardBaseLayer: string;
   /** Rating slider label + value text. */
   ratingLabel: string;
   ratingValueText: (value: number, max: number) => string;
@@ -521,6 +533,16 @@ export interface MkI18nStrings {
   dndDropped: (position: number) => string;
   /** Announced when the drag is cancelled. */
   dndCancelled: string;
+
+  // --- Repeater ---------------------------------------------------------------------
+  /** Repeater add-row button caption (default when no `addLabel` is given). */
+  repeaterAddRow: string;
+  /** Repeater per-row remove button label (1-based row number). */
+  repeaterRemoveRow: (index: number) => string;
+  /** Repeater per-row drag-handle label (1-based row number). */
+  repeaterReorderRow: (index: number) => string;
+  /** Announced after a repeater row is reordered (1-based positions). */
+  repeaterRowMoved: (from: number, to: number) => string;
 
   // --- File upload rejection reasons ------------------------------------------------
   fileRejectedType: (name: string) => string;
@@ -701,6 +723,16 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   ruleNotMet: 'Not met:',
   oneTimeCode: 'One-time code',
   otpDigit: (position) => `Digit ${position}`,
+  numericKeypadLabel: 'Numeric keypad',
+  keypadClear: 'Clear',
+  keypadBackspace: 'Backspace',
+  keypadDigitsEntered: (count, length) => `${count} of ${length} digits entered`,
+  onScreenKeyboardLabel: 'On-screen keyboard',
+  keyboardShift: 'Shift',
+  keyboardSpace: 'Space',
+  keyboardEnter: 'Enter',
+  keyboardAltLayer: 'More characters',
+  keyboardBaseLayer: 'Letters',
   ratingLabel: 'Rating',
   ratingValueText: (value, max) => `${value} of ${max} stars`,
   minimum: 'Minimum',
@@ -778,6 +810,11 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
     `Moved to ${list}, position ${position} of ${total}.`,
   dndDropped: (position) => `Dropped at position ${position}.`,
   dndCancelled: 'Movement cancelled. Item returned to its starting position.',
+
+  repeaterAddRow: 'Add row',
+  repeaterRemoveRow: (index) => `Remove row ${index}`,
+  repeaterReorderRow: (index) => `Reorder row ${index}`,
+  repeaterRowMoved: (from, to) => `Row moved from position ${from} to position ${to}.`,
 
   fileRejectedType: (name) => `${name}: unsupported type`,
   fileRejectedSize: (name, limit) => `${name}: exceeds ${limit}`,

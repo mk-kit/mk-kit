@@ -131,6 +131,7 @@ export class App {
       title: 'Editors & interactions',
       links: [
         { label: 'Content editor', path: '/components/content-editor' },
+        { label: 'Rich text', path: '/components/rich-text' },
         { label: 'Drag & drop', path: '/components/drag-drop' },
         { label: 'Utilities', path: '/components/utilities' },
       ],

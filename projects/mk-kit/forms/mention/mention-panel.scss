@@ -1,0 +1,86 @@
+/* The listbox is teleported to the top layer by mkAnchoredPanel; this host
+   element stays behind, empty. */
+:host {
+  display: contents;
+}
+
+.mk-mention__list {
+  /* Positioning (fixed, top layer) is owned by the mkAnchoredPanel directive. */
+  margin: 0;
+  padding: var(--mk-space-1);
+  list-style: none;
+  min-width: 11rem;
+  max-width: 18rem;
+  max-height: 14rem;
+  overflow-y: auto;
+  font-family: var(--mk-font-sans);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  box-shadow: var(--mk-shadow-lg);
+}
+
+.mk-mention__option {
+  display: flex;
+  align-items: baseline;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text);
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  user-select: none;
+}
+
+.mk-mention__option-label {
+  flex: 1 1 auto;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-mention__option-hint {
+  flex: none;
+  max-width: 55%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+}
+
+.mk-mention__option--active {
+  background-color: var(--mk-selected-bg);
+}
+
+.mk-mention__status {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  color: var(--mk-text-subtle);
+  font-size: var(--mk-font-size-sm);
+}
+
+.mk-mention__spinner {
+  flex: none;
+  width: 0.9rem;
+  height: 0.9rem;
+  border: 2px solid var(--mk-border-strong);
+  border-top-color: var(--mk-primary);
+  border-radius: var(--mk-radius-circle);
+  animation: mk-mention-spin var(--mk-duration-slow) linear infinite;
+}
+
+@keyframes mk-mention-spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-mention__spinner {
+    animation: none;
+  }
+}

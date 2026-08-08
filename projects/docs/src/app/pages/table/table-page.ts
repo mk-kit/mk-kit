@@ -3,10 +3,16 @@ import {
   MkDescItem,
   MkDescriptionList,
   MkInlineEdit,
+  MkInput,
+  MkPagination,
+  MkSpinner,
   MkTable,
   MkTableCell,
+  MkTableDataSource,
   MkTableRowDetail,
   MkTag,
+  type MkDataPage,
+  type MkDataRequest,
   type MkSortChange,
   type MkTableColumn,
   type MkTone,
@@ -21,6 +27,29 @@ interface DemoUser {
   status: string;
 }
 
+interface DemoCustomer {
+  name: string;
+  email: string;
+  city: string;
+  orders: number;
+}
+
+// ----- Deterministic 57-row "server" dataset for the data-source demo -------
+const DS_FIRST = ['Ada', 'Grace', 'Alan', 'Katherine', 'Edsger', 'Barbara', 'Donald', 'Margaret', 'Linus', 'Radia'];
+const DS_LAST = ['Lovelace', 'Hopper', 'Turing', 'Johnson', 'Dijkstra', 'Liskov', 'Knuth', 'Hamilton', 'Torvalds', 'Perlman', 'Ritchie', 'Allen'];
+const DS_CITIES = ['Warsaw', 'Kraków', 'Gdańsk', 'Wrocław', 'Poznań', 'Katowice'];
+
+const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
+  const first = DS_FIRST[i % DS_FIRST.length];
+  const last = DS_LAST[i % DS_LAST.length];
+  return {
+    name: `${first} ${last}`,
+    email: `${first.toLowerCase()}.${last.toLowerCase()}${i + 1}@example.com`,
+    city: DS_CITIES[i % DS_CITIES.length],
+    orders: ((i * 37) % 96) + 3,
+  };
+});
+
 /**
  * Table & data grid demo page — Table, expandable rows, inline edit and the
  * data-grid pro features.
@@ -33,6 +62,9 @@ interface DemoUser {
     MkDescItem,
     MkDescriptionList,
     MkInlineEdit,
+    MkInput,
+    MkPagination,
+    MkSpinner,
     MkTable,
     MkTableCell,
     MkTableRowDetail,
@@ -352,6 +384,193 @@ interface DemoUser {
           <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd> (on a group header)</td><td>Collapse / expand the group (the header is a real button).</td></tr>
         </tbody>
       </table>
+
+      <!-- =============== MK TABLE DATA SOURCE ======================== -->
+      <h2 id="data-source">MkTableDataSource — server-side data</h2>
+      <p>
+        <code class="docs-inline">MkTableDataSource</code> is the server-side
+        adapter for <code class="docs-inline">mk-table</code> — the page /
+        sort / filter plumbing every admin screen otherwise hand-rolls. It is
+        a plain class (no component, no injection required): give it a
+        <em>fetcher</em> that loads one page for an
+        <code class="docs-inline">MkDataRequest</code> (returning a
+        <code class="docs-inline">Promise</code> from
+        <code class="docs-inline">fetch</code> or an
+        <code class="docs-inline">Observable</code> from
+        <code class="docs-inline">HttpClient</code>) and bind its signals.
+        Every setter re-queries the server and <strong>stale responses never
+        overwrite newer state</strong> (latest-wins).
+      </p>
+      <p>
+        <code class="docs-inline">setFilter</code> is debounced (300 ms by
+        default); page, sort and page-size changes load immediately and reset
+        to page 1. <code class="docs-inline">rows</code> keeps its previous
+        value while loading and on error, so the table never blanks
+        mid-transition. Constructed in an injection context (a component field
+        initialiser) it hooks <code class="docs-inline">DestroyRef</code> and
+        cleans up automatically.
+      </p>
+      <p>
+        The demo below "fetches" from an in-memory list of
+        <strong>57 customers</strong> with a ~300 ms simulated latency — page,
+        sort a column or filter and watch the loading row. Clear pages by
+        filtering for something that matches nothing (e.g.
+        <em>zzz</em>) to see the empty state.
+      </p>
+      <docs-example [code]="dataSourceCode" column>
+        <div class="ds-demo">
+          <input
+            mkInput
+            type="search"
+            placeholder="Filter 57 customers…"
+            aria-label="Filter customers"
+            (input)="ds.setFilter($any($event.target).value)"
+            style="max-width: 18rem"
+          />
+          <mk-table
+            [columns]="dsColumns"
+            [data]="ds.rows()"
+            zebra
+            (sortChange)="ds.setSort($event)"
+            style="width: 100%"
+          />
+          @if (ds.loading()) {
+            <p class="echo ds-status"><mk-spinner size="sm" /> Loading…</p>
+          } @else if (ds.empty()) {
+            <p class="echo ds-status">No customers match "{{ ds.filter() }}".</p>
+          } @else {
+            <p class="echo ds-status">
+              {{ ds.total() }} row(s) — page {{ ds.page() }}
+            </p>
+          }
+          <mk-pagination
+            [total]="ds.total()"
+            [pageSize]="ds.pageSize()"
+            [page]="ds.page()"
+            (pageChange)="ds.setPage($event)"
+          />
+        </div>
+      </docs-example>
+
+      <p>
+        The fetcher's contract — <code class="docs-inline">MkDataRequest</code>
+        in, <code class="docs-inline">MkDataPage</code> out:
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">MkDataRequest.page</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>1-based page index, matching <code class="docs-inline">mk-pagination</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataRequest.pageSize</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Rows per page.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataRequest.sort</code></td>
+            <td><code class="docs-inline">MkSortState | null</code></td>
+            <td><code class="docs-inline">{{ '{' }} active, direction {{ '}' }}</code>; cleared sorts normalise to <code class="docs-inline">null</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataRequest.filter</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>Free-text query (<code class="docs-inline">''</code> = none).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataPage.rows</code></td>
+            <td><code class="docs-inline">T[]</code></td>
+            <td>The rows for the requested page.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataPage.total</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Total row count across ALL pages (drives the pager).</td>
+          </tr>
+        </tbody>
+      </table>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>MkTableDataSource member</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">new MkTableDataSource(fetcher, opts?)</code></td>
+            <td><code class="docs-inline">MkDataFetcher&lt;T&gt;, MkTableDataSourceOptions</code></td>
+            <td>Options: <code class="docs-inline">pageSize</code> (default 10), <code class="docs-inline">filterDebounce</code> ms (default 300). Loads immediately.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">rows()</code></td>
+            <td><code class="docs-inline">Signal&lt;T[]&gt;</code></td>
+            <td>Current page's rows; kept during loads and errors.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">total()</code></td>
+            <td><code class="docs-inline">Signal&lt;number&gt;</code></td>
+            <td>Total across all pages — feed <code class="docs-inline">mk-pagination</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">loading()</code></td>
+            <td><code class="docs-inline">Signal&lt;boolean&gt;</code></td>
+            <td>True while the LATEST request is in flight.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">error()</code></td>
+            <td><code class="docs-inline">Signal&lt;unknown | null&gt;</code></td>
+            <td>Last load's error; cleared by the next successful load.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">empty()</code></td>
+            <td><code class="docs-inline">Signal&lt;boolean&gt;</code></td>
+            <td>True when a settled load reported no rows at all.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">page() / pageSize() / sort() / filter()</code></td>
+            <td><code class="docs-inline">Signal&lt;…&gt;</code></td>
+            <td>The current request state, as read-only signals.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">setPage(page)</code></td>
+            <td><code class="docs-inline">(number) =&gt; void</code></td>
+            <td>Jump to a 1-based page; loads immediately.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">setPageSize(size)</code></td>
+            <td><code class="docs-inline">(number) =&gt; void</code></td>
+            <td>Change the page size; resets to page 1.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">setSort(sort)</code></td>
+            <td><code class="docs-inline">(MkSortState | MkSortChange | null) =&gt; void</code></td>
+            <td>Accepts <code class="docs-inline">mk-table</code>'s <code class="docs-inline">(sortChange)</code> payload directly; resets to page 1.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">setFilter(query)</code></td>
+            <td><code class="docs-inline">(string) =&gt; void</code></td>
+            <td>Debounced; resets to page 1. <code class="docs-inline">filter()</code> updates immediately.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">refresh()</code></td>
+            <td><code class="docs-inline">() =&gt; void</code></td>
+            <td>Re-run the current request now (e.g. after a mutation); flushes a pending debounce.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">connectSort(sort)</code></td>
+            <td><code class="docs-inline">(MkSort) =&gt; void</code></td>
+            <td>Pipe a custom <code class="docs-inline">mkSort</code> directive's changes into <code class="docs-inline">setSort</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">destroy()</code></td>
+            <td><code class="docs-inline">() =&gt; void</code></td>
+            <td>Cancel pending work. Automatic when created in an injection context.</td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -361,6 +580,19 @@ interface DemoUser {
       }
       h2 {
         margin-top: var(--mk-space-9, 3rem);
+      }
+      .ds-demo {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-3);
+        width: 100%;
+      }
+      .ds-status {
+        display: flex;
+        align-items: center;
+        gap: var(--mk-space-2);
+        margin: 0;
+        min-height: 1.5rem;
       }
     `,
   ],
@@ -544,6 +776,88 @@ export class TablePage {
   groupBy="role"
   [groupLabel]="labelFn"
   (groupToggle)="onGroupToggle($event)" />`;
+
+  // ----- MkTableDataSource — server-side data --------------------------
+  protected readonly dsColumns: MkTableColumn<DemoCustomer>[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'email', header: 'Email' },
+    { key: 'city', header: 'City', sortable: true },
+    { key: 'orders', header: 'Orders', sortable: true, align: 'end' },
+  ];
+
+  /** Fake server: filters, sorts and slices the dataset after ~300 ms. */
+  private readonly fetchCustomers = (
+    req: MkDataRequest,
+  ): Promise<MkDataPage<DemoCustomer>> =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        const q = req.filter.trim().toLowerCase();
+        const filtered = q
+          ? DS_CUSTOMERS.filter((c) =>
+              `${c.name} ${c.email} ${c.city}`.toLowerCase().includes(q),
+            )
+          : DS_CUSTOMERS;
+        const rows = [...filtered];
+        const sort = req.sort;
+        if (sort) {
+          const dir = sort.direction === 'desc' ? -1 : 1;
+          const key = sort.active as keyof DemoCustomer;
+          rows.sort((a, b) => {
+            const av = a[key];
+            const bv = b[key];
+            const cmp =
+              typeof av === 'number' && typeof bv === 'number'
+                ? av - bv
+                : String(av).localeCompare(String(bv));
+            return cmp * dir;
+          });
+        }
+        const start = (req.page - 1) * req.pageSize;
+        resolve({
+          rows: rows.slice(start, start + req.pageSize),
+          total: rows.length,
+        });
+      }, 300);
+    });
+
+  /** Field initialiser = injection context, so cleanup is automatic. */
+  protected readonly ds = new MkTableDataSource<DemoCustomer>(
+    this.fetchCustomers,
+    { pageSize: 8 },
+  );
+
+  protected readonly dataSourceCode = `// The fetcher loads ONE page for each MkDataRequest — a Promise (fetch)
+// or an Observable (HttpClient) resolving to { rows, total }:
+private readonly fetchCustomers = (req: MkDataRequest) =>
+  this.http.get<MkDataPage<Customer>>('/api/customers', {
+    params: {
+      page: req.page,          // 1-based
+      size: req.pageSize,
+      q: req.filter,           // debounced free-text query
+      ...(req.sort && { sort: req.sort.active + ',' + req.sort.direction }),
+    },
+  });
+
+// Field initialiser = injection context → destroys itself with the page.
+readonly ds = new MkTableDataSource<Customer>(this.fetchCustomers, {
+  pageSize: 8,
+});
+
+<input mkInput type="search"
+  (input)="ds.setFilter($any($event.target).value)" />
+
+<mk-table [columns]="columns" [data]="ds.rows()"
+  (sortChange)="ds.setSort($event)" />
+
+@if (ds.loading()) { <p>Loading…</p> }
+@if (ds.empty())   { <p>No rows match.</p> }
+@if (ds.error())   { <p role="alert">Failed to load.</p> }
+
+<mk-pagination
+  [total]="ds.total()"
+  [pageSize]="ds.pageSize()"
+  [page]="ds.page()"
+  (pageChange)="ds.setPage($event)" />`;
 
   protected readonly expandableCode = `<mk-table
   [columns]="columns"

@@ -1,0 +1,83 @@
+@if (items().length > 0) {
+  @if (reorderable()) {
+    <ul
+      class="mk-repeater__rows"
+      mkDropList
+      [mkDropListData]="items()"
+      [mkDropListDisabled]="isDisabled()"
+      (mkDropListDropped)="onDrop($event)"
+    >
+      @for (item of items(); track item) {
+        <li class="mk-repeater__row" mkDrag [mkDragData]="item">
+          <button
+            type="button"
+            class="mk-repeater__handle"
+            mkDragHandle
+            [attr.aria-label]="i18n.repeaterReorderRow($index + 1)"
+            [disabled]="isDisabled()"
+          >
+            <span aria-hidden="true">⠿</span>
+          </button>
+          <ng-container
+            [ngTemplateOutlet]="rowInner"
+            [ngTemplateOutletContext]="{ $implicit: item, index: $index }"
+          />
+        </li>
+      }
+    </ul>
+  } @else {
+    <ul class="mk-repeater__rows">
+      @for (item of items(); track item) {
+        <li class="mk-repeater__row">
+          <ng-container
+            [ngTemplateOutlet]="rowInner"
+            [ngTemplateOutletContext]="{ $implicit: item, index: $index }"
+          />
+        </li>
+      }
+    </ul>
+  }
+} @else {
+  @if (emptyTemplate(); as empty) {
+    <div class="mk-repeater__empty">
+      <ng-container [ngTemplateOutlet]="empty.template" />
+    </div>
+  }
+}
+
+<button
+  mkButton
+  variant="outline"
+  size="sm"
+  type="button"
+  class="mk-repeater__add"
+  [disabled]="isDisabled() || atMax()"
+  (click)="add()"
+>
+  {{ effectiveAddLabel() }}
+</button>
+
+<!-- Shared row body: projected content + remove button (both branches). -->
+<ng-template #rowInner let-item let-i="index">
+  <div class="mk-repeater__content" (keydown)="onContentKeydown($event)">
+    <ng-container
+      [ngTemplateOutlet]="rowTemplate().template"
+      [ngTemplateOutletContext]="{ $implicit: item, index: i }"
+    />
+  </div>
+  <button
+    mkButton
+    variant="ghost"
+    tone="neutral"
+    size="sm"
+    iconOnly
+    type="button"
+    class="mk-repeater__remove"
+    [attr.aria-label]="i18n.repeaterRemoveRow(i + 1)"
+    [disabled]="isDisabled() || atMin()"
+    (click)="removeAt(i)"
+    (keydown)="onContentKeydown($event)"
+  >
+    <span aria-hidden="true">&times;</span>
+  </button>
+</ng-template>

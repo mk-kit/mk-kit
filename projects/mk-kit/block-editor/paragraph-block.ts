@@ -8,18 +8,18 @@ import {
 } from '@angular/core';
 import { MK_I18N } from '@mkornas/ui/core';
 import type { MkBlock } from './block-model';
-import { MkRichText, type MkRichTextSplit } from './rich-text';
+import { MkRichTextEngine, type MkRichTextSplit } from '@mkornas/ui/rich-text';
 
 /**
  * Paragraph block — rich text stored as sanitised HTML in `block.data.html`,
- * with the floating inline toolbar provided by {@link MkRichText}.
+ * with the floating inline toolbar provided by {@link MkRichTextEngine}.
  */
 @Component({
   selector: 'mk-paragraph-block',
-  imports: [MkRichText],
+  imports: [MkRichTextEngine],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
-    <mk-rich-text
+    <mk-rich-text-engine
       [html]="block().data['html'] ?? ''"
       [placeholder]="placeholder()"
       [disabled]="readonly()"

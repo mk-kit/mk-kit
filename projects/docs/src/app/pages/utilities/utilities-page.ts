@@ -1,7 +1,19 @@
-import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import {
+  ChangeDetectionStrategy,
+  Component,
+  Injectable,
+  type Signal,
+  computed,
+  inject,
+  signal,
+} from '@angular/core';
 import {
   MkAutofocus,
   MkButton,
+  MkCan,
+  MkCanDisable,
+  MkCannot,
+  MkCheckbox,
   MkClickOutside,
   MkCopyToClipboard,
   MkHotkey,
@@ -9,10 +21,35 @@ import {
   MkIntersect,
   MkInput,
   MkMask,
+  MkPermissionPolicy,
   MkRipple,
   MkScrollspy,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
+
+/**
+ * Demo permission policy for this page: a signal-backed set of granted
+ * permission strings, toggled by the checkboxes below. In a real app you'd
+ * provide one policy at bootstrap, fed from your auth service.
+ */
+@Injectable()
+class DocsPermissionPolicy extends MkPermissionPolicy {
+  /** The permissions currently granted. */
+  readonly granted = signal<ReadonlySet<string>>(new Set(['posts.edit']));
+
+  can(permission: string): Signal<boolean> {
+    return computed(() => this.granted().has(permission));
+  }
+
+  toggle(permission: string, on: boolean): void {
+    this.granted.update((current) => {
+      const next = new Set(current);
+      if (on) next.add(permission);
+      else next.delete(permission);
+      return next;
+    });
+  }
+}
 
 /**
  * Documentation + live demo page for the utility directives of `@mkornas/ui`:
@@ -34,6 +71,14 @@ import { DocsExample } from '../../shared/docs-example';
     MkRipple,
     MkInput,
     MkMask,
+    MkCheckbox,
+    MkCan,
+    MkCannot,
+    MkCanDisable,
+  ],
+  providers: [
+    DocsPermissionPolicy,
+    { provide: MkPermissionPolicy, useExisting: DocsPermissionPolicy },
   ],
   template: `
     <div class="docs-page docs-container">
@@ -385,6 +430,81 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>(mkHotkeyPressed)</code></td><td><code>KeyboardEvent</code></td><td>—</td><td>Fires when the combo triggers and the host is not a button/link (those are clicked instead).</td></tr>
         </tbody>
       </table>
+
+      <!-- permissions -->
+      <h2>Permissions</h2>
+      <p>
+        <code class="docs-inline">*mkCan</code> renders its template only while
+        the app's <code class="docs-inline">MkPermissionPolicy</code> grants a
+        permission, <code class="docs-inline">*mkCannot</code> only while it is
+        denied, and <code class="docs-inline">[mkCanDisable]</code> keeps the
+        host visible but disabled
+        (<code class="docs-inline">aria-disabled</code> + the native
+        <code class="docs-inline">disabled</code> property where the element
+        has one). With a signal-based policy the checks are live — toggle the
+        grants below and watch all three react.
+      </p>
+      <docs-example [code]="permissionsCode" [column]="true">
+        <div class="perm-toggles">
+          <mk-checkbox
+            [checked]="policy.granted().has('posts.edit')"
+            (checkedChange)="policy.toggle('posts.edit', $event)"
+          >
+            Grant <code class="docs-inline">posts.edit</code>
+          </mk-checkbox>
+          <mk-checkbox
+            [checked]="policy.granted().has('posts.delete')"
+            (checkedChange)="policy.toggle('posts.delete', $event)"
+          >
+            Grant <code class="docs-inline">posts.delete</code>
+          </mk-checkbox>
+        </div>
+        <div class="perm-demo">
+          <!-- 1. render / hide -->
+          <button mkButton variant="outline" *mkCan="'posts.edit'">
+            Edit post
+          </button>
+          <!-- 2. else template -->
+          <button mkButton variant="outline" *mkCan="'posts.delete'; else noDelete">
+            Delete post
+          </button>
+          <ng-template #noDelete>
+            <span class="perm-note">Deleting requires <code class="docs-inline">posts.delete</code>.</span>
+          </ng-template>
+          <!-- 3. keep visible, disable -->
+          <button mkButton tone="danger" [mkCanDisable]="'posts.delete'">
+            Delete (disabled, not hidden)
+          </button>
+        </div>
+        <p class="perm-note" *mkCannot="'posts.edit'">
+          <em>*mkCannot:</em> you can't edit posts — ask an admin for access.
+        </p>
+        <p class="echo">Granted: {{ grantedList() || '(none)' }}</p>
+      </docs-example>
+      <p>
+        In a real app, provide one policy at bootstrap and back it with your
+        auth service — return a <code class="docs-inline">Signal</code> from
+        <code class="docs-inline">can()</code> (e.g.
+        <code class="docs-inline">computed(() =>
+        auth.permissions().includes(permission))</code>) and every check stays
+        live across login, logout and role changes. A plain
+        <code class="docs-inline">boolean</code> return is treated as static.
+        When no policy is provided at all, every permission is treated as
+        granted, so an app that never wires permissions keeps its whole UI.
+      </p>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / API</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>*mkCan</code></td><td><code>string</code></td><td>required</td><td>Permission key; the template renders only while it is granted.</td></tr>
+          <tr><td><code>*mkCan="…; else ref"</code></td><td><code>TemplateRef</code></td><td><code>null</code></td><td>Fallback template rendered while the permission is denied.</td></tr>
+          <tr><td><code>*mkCannot</code></td><td><code>string</code></td><td>required</td><td>Negation: the template renders only while the permission is <em>denied</em> (supports <code>else</code> too).</td></tr>
+          <tr><td><code>[mkCanDisable]</code></td><td><code>string</code></td><td>required</td><td>Disables the host while the permission is denied: <code>aria-disabled="true"</code>, plus native <code>disabled</code> on form controls. Re-enables when granted.</td></tr>
+          <tr><td><code>MkPermissionPolicy.can()</code></td><td><code>boolean | Signal&lt;boolean&gt;</code></td><td>—</td><td>The one method to implement. Provide the policy once (e.g. at bootstrap); no policy means everything is granted.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -538,6 +658,30 @@ import { DocsExample } from '../../shared/docs-example';
         flex-wrap: wrap;
         gap: var(--mk-space-3);
       }
+      .perm-toggles {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mk-space-4);
+      }
+      .perm-demo {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--mk-space-3);
+        margin-top: var(--mk-space-3);
+        padding: var(--mk-space-4);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        background: var(--mk-surface);
+      }
+      .perm-note {
+        margin: var(--mk-space-2) 0 0;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+      .perm-demo .perm-note {
+        margin: 0;
+      }
     `,
   ],
 })
@@ -636,4 +780,36 @@ export class UtilitiesPage {
 
 <!-- non-button host emits (mkHotkeyPressed) instead -->
 <div mkHotkey="?" (mkHotkeyPressed)="showHelp()">…</div>`;
+
+  // --- Permissions ----------------------------------------------------------
+  protected readonly policy = inject(DocsPermissionPolicy);
+  protected readonly grantedList = computed(() =>
+    [...this.policy.granted()].sort().join(', '),
+  );
+
+  protected readonly permissionsCode = `<!-- render only while granted -->
+<button mkButton *mkCan="'posts.edit'">Edit post</button>
+
+<!-- else template while denied -->
+<button mkButton *mkCan="'posts.delete'; else noDelete">Delete post</button>
+<ng-template #noDelete>Deleting requires posts.delete.</ng-template>
+
+<!-- render only while DENIED -->
+<p *mkCannot="'posts.edit'">Ask an admin for edit access.</p>
+
+<!-- keep visible, but disabled -->
+<button mkButton [mkCanDisable]="'posts.delete'">Delete</button>
+
+// Provide one policy for the app, backed by your auth service:
+@Injectable()
+class AppPermissionPolicy extends MkPermissionPolicy {
+  private readonly auth = inject(AuthService);
+  can(permission: string): Signal<boolean> {
+    return computed(() => this.auth.permissions().includes(permission));
+  }
+}
+
+bootstrapApplication(App, {
+  providers: [{ provide: MkPermissionPolicy, useClass: AppPermissionPolicy }],
+});`;
 }

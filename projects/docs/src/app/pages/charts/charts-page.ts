@@ -1,8 +1,11 @@
-import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
+  type MkCalendarHeatmapCell,
+  type MkCalendarHeatmapEntry,
   type MkChartSeries,
   type MkScatterSeries,
   MkBarChart,
+  MkCalendarHeatmap,
   MkHeatmap,
   MkLineChart,
   MkScatterChart,
@@ -12,7 +15,8 @@ import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the trend & comparison chart components
- * of `@mkornas/ui`: sparkline, bar, line, scatter/bubble and heatmap.
+ * of `@mkornas/ui`: sparkline, bar, line, scatter/bubble, heatmap and
+ * calendar heatmap.
  */
 @Component({
   selector: 'docs-charts-page',
@@ -24,13 +28,15 @@ import { DocsExample } from '../../shared/docs-example';
     MkLineChart,
     MkScatterChart,
     MkHeatmap,
+    MkCalendarHeatmap,
   ],
   template: `
     <div class="docs-page docs-container">
       <h1>Trend charts</h1>
       <p class="docs-lead">
         Charts for change over time and comparison across categories —
-        sparklines, bars, lines, scatter plots and heatmaps. Dependency-free,
+        sparklines, bars, lines, scatter plots, heatmaps and calendar
+        heatmaps. Dependency-free,
         SVG dashboard charts themed by a validated, colorblind-safe categorical
         palette (<code class="docs-inline">--mk-chart-1…8</code>). Every
         multi-series chart carries a legend (identity is never color-alone), a
@@ -217,8 +223,68 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>format</code></td><td><code>(value: number) => string</code></td><td>compact</td><td>Formatter for cell + legend values.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Calendar heatmap</h2>
+      <p>
+        A GitHub-style year of daily squares — weeks as columns, weekdays as
+        rows, each day shaded by its value. Feed it
+        <code class="docs-inline">&#123; date, value &#125;</code> entries
+        (dates as <code class="docs-inline">Date</code> or
+        <code class="docs-inline">YYYY-MM-DD</code> strings; duplicate days are
+        summed, missing days count as 0). It shows the last 12 months ending
+        today by default; set <code class="docs-inline">year</code> for a fixed
+        calendar year. Rendered as a semantic table with intensities mixed from
+        <code class="docs-inline">color</code> over the surface, so it tracks
+        the theme. Click a day — it emits the date and value.
+      </p>
+      <docs-example [code]="calendarCode" column>
+        <div style="width: 100%; overflow-x: auto;">
+          <mk-calendar-heatmap
+            [data]="contributions"
+            (cellClick)="lastDay.set($event)"
+          />
+        </div>
+        <p class="echo">
+          Last clicked:
+          @if (lastDay(); as day) {
+            {{ day.date.toLocaleDateString() }} — {{ day.value }}
+            {{ day.value === 1 ? 'contribution' : 'contributions' }}
+          } @else {
+            — (click a square)
+          }
+        </p>
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>data</code></td><td><code>MkCalendarHeatmapEntry[]</code></td><td><code>[]</code></td><td>Daily values: <code>&#123; date: Date | string; value: number &#125;</code>. Same-day entries are summed; days without an entry count as 0.</td></tr>
+          <tr><td><code>year</code></td><td><code>number | null</code></td><td><code>null</code></td><td>Show a fixed calendar year; unset shows the last 12 months ending today.</td></tr>
+          <tr><td><code>firstDayOfWeek</code></td><td><code>number (0–6)</code></td><td><code>1</code></td><td>First weekday of the columns: 0 = Sunday … 6 = Saturday.</td></tr>
+          <tr><td><code>color</code></td><td><code>string</code></td><td><code>'var(--mk-primary)'</code></td><td>Base colour mixed over the surface for intensity.</td></tr>
+          <tr><td><code>levels</code></td><td><code>number</code></td><td><code>5</code></td><td>Number of intensity buckets in the ramp (values bucket linearly against the range max).</td></tr>
+          <tr><td><code>format</code></td><td><code>(date: Date, value: number) => string</code></td><td>locale date + value</td><td>Formatter for each cell's title / screen-reader text (and legend max).</td></tr>
+          <tr><td><code>showScale</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the less → more colour ramp legend.</td></tr>
+          <tr><td><code>label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible summary; generated from the data when omitted.</td></tr>
+          <tr><td><code>(cellClick)</code></td><td><code>MkCalendarHeatmapCell</code></td><td>—</td><td>The clicked day: <code>&#123; date: Date; value: number &#125;</code> (0 when the day has no entry).</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
+  styles: [
+    `
+      :host {
+        display: block;
+      }
+      .echo {
+        margin: var(--mk-space-2) 0 0;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+    `,
+  ],
 })
 export class ChartsPage {
   protected readonly trend = [4, 6, 5, 8, 7, 10, 9, 12, 11, 14];
@@ -311,4 +377,26 @@ export class ChartsPage {
 
   protected readonly heatmapCode = `<mk-heatmap [xLabels]="hours" [yLabels]="days"
   [data]="activity" showValues />`;
+
+  // --- Calendar heatmap -----------------------------------------------------
+  // ~90 deterministic "contribution" days spread across the last 12 months
+  // (37 is coprime with 364, so the offsets never collide).
+  protected readonly contributions: MkCalendarHeatmapEntry[] = Array.from(
+    { length: 90 },
+    (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - ((i * 37 + 11) % 364));
+      return { date, value: ((i * 5) % 9) + 1 };
+    },
+  );
+
+  protected readonly lastDay = signal<MkCalendarHeatmapCell | null>(null);
+
+  protected readonly calendarCode = `<mk-calendar-heatmap
+  [data]="contributions"
+  (cellClick)="openDay($event.date)" />
+
+<!-- entries: { date: Date | 'YYYY-MM-DD'; value: number } -->
+<!-- fixed year instead of the trailing 12 months: -->
+<mk-calendar-heatmap [data]="contributions" [year]="2026" />`;
 }

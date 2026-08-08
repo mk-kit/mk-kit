@@ -1,0 +1,114 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  display: inline-flex;
+  flex-direction: column;
+  gap: var(--mk-space-3);
+  width: 16rem;
+  max-width: 100%;
+  font-family: var(--mk-font-sans);
+  user-select: none;
+}
+
+.mk-numeric-keypad__echo {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mk-control-height-md);
+  padding: var(--mk-space-1) var(--mk-space-3);
+  background: var(--mk-surface-2);
+  border-radius: var(--mk-radius-md);
+}
+
+.mk-numeric-keypad__readout {
+  font-size: var(--mk-font-size-2xl);
+  font-weight: var(--mk-font-weight-semibold);
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.mk-numeric-keypad__dots {
+  display: inline-flex;
+  gap: var(--mk-space-3);
+}
+.mk-numeric-keypad__dot {
+  width: 0.75rem;
+  height: 0.75rem;
+  border-radius: var(--mk-radius-circle);
+  border: var(--mk-border-width-strong) solid var(--mk-border-strong);
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-numeric-keypad__dot--filled {
+  background: var(--mk-primary);
+  border-color: var(--mk-primary);
+}
+
+.mk-numeric-keypad__grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: var(--mk-space-2);
+}
+
+.mk-numeric-keypad__key {
+  @include mk.touch-target(44px);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: var(--mk-control-height-lg);
+  padding: 0;
+  font-family: inherit;
+  font-size: var(--mk-font-size-xl);
+  font-weight: var(--mk-font-weight-medium);
+  font-variant-numeric: tabular-nums;
+  color: var(--mk-text);
+  background: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    transform var(--mk-duration-instant) var(--mk-ease-standard);
+}
+
+.mk-numeric-keypad__key--action {
+  background: var(--mk-surface-2);
+  font-size: var(--mk-font-size-lg);
+  color: var(--mk-text-muted);
+}
+.mk-numeric-keypad__key-text {
+  font-weight: var(--mk-font-weight-semibold);
+}
+
+.mk-numeric-keypad__key:hover:not(:disabled) {
+  background: var(--mk-hover-overlay);
+  border-color: var(--mk-border-strong);
+}
+.mk-numeric-keypad__key:active:not(:disabled) {
+  transform: scale(0.96);
+}
+.mk-numeric-keypad__key:focus-visible {
+  @include mk.focus-ring;
+}
+.mk-numeric-keypad__key:disabled {
+  color: var(--mk-text-disabled);
+  background: var(--mk-surface-2);
+  cursor: not-allowed;
+}
+
+:host(.mk-numeric-keypad--invalid) .mk-numeric-keypad__echo {
+  outline: var(--mk-border-width) solid var(--mk-danger);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-numeric-keypad__key,
+  .mk-numeric-keypad__dot {
+    transition: none;
+  }
+  .mk-numeric-keypad__key:active:not(:disabled) {
+    transform: none;
+  }
+}
