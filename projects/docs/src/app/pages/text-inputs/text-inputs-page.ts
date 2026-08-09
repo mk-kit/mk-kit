@@ -202,6 +202,7 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>showStrength</td><td>boolean</td><td>false</td><td>Show the 0–4 strength meter below the field.</td></tr>
           <tr><td>showRules</td><td>boolean</td><td>false</td><td>Show the rules checklist below the field.</td></tr>
           <tr><td>minLength</td><td>number</td><td>8</td><td>Minimum length used by the strength score and rules.</td></tr>
+          <tr><td>autocomplete</td><td>'current-password' | 'new-password'</td><td>'current-password'</td><td>Autocomplete hint for the native input. Use 'new-password' on signup and change-password forms (where the strength meter and rules belong) so the browser offers a generated password instead of filling the saved one.</td></tr>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
           <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling when standalone.</td></tr>
           <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>

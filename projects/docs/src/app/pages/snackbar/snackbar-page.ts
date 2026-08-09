@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { MkButton, MkSnackbarService } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -8,7 +9,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-snackbar-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkButton],
+  imports: [DocsExample, MkButton, RouterLink],
   template: `
     <div class="docs-page docs-container">
       <h1>Snackbar</h1>
@@ -19,6 +20,19 @@ import { DocsExample } from '../../shared/docs-example';
         replaces the current. For stacked, persistent notifications use
         <code class="docs-inline">MkToastService</code> (on the Feedback page)
         instead.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2>Snackbar or toast?</h2>
+      <p>
+        A snackbar is the transient status line for the user's <em>own</em>
+        action: a single bar at the bottom-centre, one at a time (a new one
+        replaces the current), with at most one action such as "Undo". A toast
+        is a notification: several can stack, they announce events arriving
+        from outside the user's current task, and they can persist.
+        <code class="docs-inline">MkToastService</code> is documented on the
+        <a routerLink="/components/feedback">Feedback page</a>; both share the
+        same tone vocabulary.
       </p>
 
       <!-- ============================================================ -->
@@ -46,8 +60,11 @@ import { DocsExample } from '../../shared/docs-example';
       <!-- ============================================================ -->
       <h2>Tones</h2>
       <p>
-        A tone adds a coloured accent stripe. Danger and warning are announced
-        assertively.
+        A tone adds a coloured accent stripe and sets the announcement urgency:
+        the snackbar element is itself the live region, rendered with
+        <code class="docs-inline">role="alert"</code> (assertive) for danger and
+        warning, and <code class="docs-inline">role="status"</code> (polite) for
+        every other tone.
       </p>
       <docs-example [code]="toneCode">
         <div style="display: flex; gap: var(--mk-space-3); flex-wrap: wrap;">
@@ -93,7 +110,7 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>tone</code></td><td><code>'neutral' | 'info' | 'success' | 'warning' | 'danger'</code></td><td><code>'neutral'</code></td><td>Semantic tone; adds the coloured accent stripe.</td></tr>
           <tr><td><code>duration</code></td><td><code>number</code></td><td><code>5000</code></td><td>Auto-dismiss delay in ms. <code>0</code> keeps it open until dismissed.</td></tr>
           <tr><td><code>dismissible</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a close (×) button.</td></tr>
-          <tr><td><code>politeness</code></td><td><code>'polite' | 'assertive'</code></td><td><code>'polite'</code></td><td>Live-region politeness for the screen-reader announcement.</td></tr>
+          <tr><td><code>politeness</code></td><td><code>'polite' | 'assertive'</code></td><td>—</td><td>Deprecated — has no effect. Announcement urgency derives from <code>tone</code>: <code>role="alert"</code> for danger/warning, else <code>role="status"</code>.</td></tr>
         </tbody>
       </table>
 

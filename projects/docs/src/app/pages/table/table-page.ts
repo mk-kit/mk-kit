@@ -111,6 +111,7 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
           <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Notes</th></tr>
         </thead>
         <tbody>
+          <tr><td colspan="4"><strong>Data &amp; identity</strong></td></tr>
           <tr>
             <td><code class="docs-inline">columns</code> <em>(required)</em></td>
             <td><code class="docs-inline">MkTableColumn&lt;T&gt;[]</code></td>
@@ -123,6 +124,25 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td><code class="docs-inline">[]</code></td>
             <td>Row objects to render.</td>
           </tr>
+          <tr>
+            <td><code class="docs-inline">trackKey</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Property identifying a row (selection / expansion equality, <code class="docs-inline">&#64;for</code> tracking). Omitted, rows match by reference.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">rowClass</code></td>
+            <td><code class="docs-inline">((row: T) =&gt; string | null) | null</code></td>
+            <td><code class="docs-inline">null</code></td>
+            <td>Per-row CSS class for consumer-owned state (falsy = none).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">emptyMessage</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'No data to display'</code></td>
+            <td>Shown when there are no rows.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Display &amp; interaction</strong></td></tr>
           <tr>
             <td><code class="docs-inline">stickyHeader</code></td>
             <td><code class="docs-inline">boolean</code></td>
@@ -154,12 +174,6 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td>Style rows as clickable and emit <code class="docs-inline">rowClick</code>.</td>
           </tr>
           <tr>
-            <td><code class="docs-inline">emptyMessage</code></td>
-            <td><code class="docs-inline">string</code></td>
-            <td><code class="docs-inline">'No data to display'</code></td>
-            <td>Shown when there are no rows.</td>
-          </tr>
-          <tr>
             <td><code class="docs-inline">sortChange</code></td>
             <td><code class="docs-inline">output&lt;MkSortChange&gt;</code></td>
             <td>—</td>
@@ -169,8 +183,47 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td><code class="docs-inline">rowClick</code></td>
             <td><code class="docs-inline">output&lt;T&gt;</code></td>
             <td>—</td>
-            <td>Emitted when a row is clicked.</td>
+            <td>Emitted when a row is clicked (enable via <code class="docs-inline">clickableRows</code>).</td>
           </tr>
+          <tr><td colspan="4"><strong>Selection</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">selectable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Render a leading checkbox column (with a tri-state select-all).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">selected</code></td>
+            <td><code class="docs-inline">model&lt;T[]&gt;</code></td>
+            <td><code class="docs-inline">[]</code></td>
+            <td>Two-way <code class="docs-inline">[(selected)]</code> array; rows compared by <code class="docs-inline">trackKey</code> when set.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">selectionChange</code></td>
+            <td><code class="docs-inline">output&lt;T[]&gt;</code></td>
+            <td>—</td>
+            <td>The new selection on every change.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Expansion</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">expandable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Leading expander column; detail via <code class="docs-inline">&lt;ng-template mkTableRowDetail&gt;</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">singleExpand</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Only one row expanded at a time (accordion).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">expandedChange</code></td>
+            <td><code class="docs-inline">output&lt;T[]&gt;</code></td>
+            <td>—</td>
+            <td>The currently expanded rows whenever they change.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Grouping</strong></td></tr>
           <tr>
             <td><code class="docs-inline">groupBy</code></td>
             <td><code class="docs-inline">string | ((row: T) =&gt; unknown) | null</code></td>
@@ -187,19 +240,132 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td><code class="docs-inline">groupToggle</code></td>
             <td><code class="docs-inline">output&lt;MkGroupToggle&gt;</code></td>
             <td>—</td>
-            <td><code class="docs-inline">{{ '{' }} key, collapsed {{ '}' }}</code> per header toggle.</td>
+            <td><code class="docs-inline">{{ '{' }} key, collapsed {{ '}' }}</code> per header toggle. Also: <code class="docs-inline">collapseAllGroups()</code> / <code class="docs-inline">expandAllGroups()</code> methods.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Columns &amp; sizing</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">resizableColumns</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Enable drag-to-resize on columns marked <code class="docs-inline">resizable</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">reorderableColumns</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Enable drag-to-reorder of column headers (pinned columns stay put).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">columnResize</code></td>
+            <td><code class="docs-inline">output&lt;MkColumnResize&gt;</code></td>
+            <td>—</td>
+            <td><code class="docs-inline">{{ '{' }} key, width {{ '}' }}</code> (px) after a resize.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">columnReorder</code></td>
+            <td><code class="docs-inline">output&lt;string[]&gt;</code></td>
+            <td>—</td>
+            <td>The new column key order after a reorder.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Editing</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">cellEdit</code></td>
+            <td><code class="docs-inline">output&lt;MkCellEdit&lt;T&gt;&gt;</code></td>
+            <td>—</td>
+            <td><code class="docs-inline">{{ '{' }} row, key, value {{ '}' }}</code> when an <code class="docs-inline">editable</code> cell is saved.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Stacked mode</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">stackAt</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">0</code></td>
+            <td>Table width (px) below which rows render as cards; <code class="docs-inline">0</code> never stacks. Measured on the table's own box, not the viewport.</td>
           </tr>
         </tbody>
       </table>
       <p>
-        Each column is an <code class="docs-inline">MkTableColumn</code> with
-        <code class="docs-inline">key</code>,
-        <code class="docs-inline">header</code>, optional
-        <code class="docs-inline">sortable</code>,
-        <code class="docs-inline">align</code>,
-        <code class="docs-inline">width</code> and a
-        <code class="docs-inline">format</code> callback.
+        Selection is demoed on the
+        <a href="/examples/data-table">data-table example page</a> — a full admin
+        screen wiring <code class="docs-inline">selectable</code> +
+        <code class="docs-inline">[(selected)]</code> to a bulk-actions bar.
       </p>
+      <p>
+        <strong>Helpers:</strong> the <code class="docs-inline">table</code>
+        entry point also exports the
+        <code class="docs-inline">MkTableRowDetail</code> and
+        <code class="docs-inline">MkTableCell</code> template directives (used
+        below) and the payload types
+        <code class="docs-inline">MkSortChange</code>,
+        <code class="docs-inline">MkColumnResize</code>,
+        <code class="docs-inline">MkCellEdit</code>,
+        <code class="docs-inline">MkTableGroup</code> and
+        <code class="docs-inline">MkGroupToggle</code>, alongside the sort
+        directives and <code class="docs-inline">MkTableDataSource</code>.
+      </p>
+
+      <h3>MkTableColumn</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">key</code> <em>(required)</em></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>Property key on each row supplying the cell value.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">header</code> <em>(required)</em></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>Visible column header text.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">sortable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td>Allow sorting by this column.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">align</code></td>
+            <td><code class="docs-inline">'start' | 'center' | 'end'</code></td>
+            <td>Cell/header alignment (default <code class="docs-inline">'start'</code>).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">width</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>Fixed column width (any CSS length).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">format</code></td>
+            <td><code class="docs-inline">(value, row) =&gt; string</code></td>
+            <td>Formatter turning the raw value into display text.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">resizable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td>Allow drag-resizing (needs <code class="docs-inline">resizableColumns</code>).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">editable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td>Inline-editable cells (double-click / Enter / F2).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">pinned</code></td>
+            <td><code class="docs-inline">'left' | 'right'</code></td>
+            <td>Freeze the column to a side while the body scrolls horizontally.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">minWidth</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Resize floor in px (default 60).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">stack</code></td>
+            <td><code class="docs-inline">'title' | 'footer' | 'hide'</code></td>
+            <td>Role in stacked-card mode: card heading, unlabelled footer, or not rendered at all. Omitted = labelled field.</td>
+          </tr>
+        </tbody>
+      </table>
 
       <h2>Custom cell templates</h2>
       <p>

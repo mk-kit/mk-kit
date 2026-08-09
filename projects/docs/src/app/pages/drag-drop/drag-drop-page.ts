@@ -131,6 +131,12 @@ interface BoardColumn {
             <td>Layout axis; drives hit-testing and arrow-key direction.</td>
           </tr>
           <tr>
+            <td><code class="docs-inline">mkDropListLabel</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><em>the id</em></td>
+            <td>Human-readable list name used in screen-reader announcements when an item crosses into the list.</td>
+          </tr>
+          <tr>
             <td><code class="docs-inline">mkDropListDisabled</code></td>
             <td><code class="docs-inline">boolean</code></td>
             <td><code class="docs-inline">false</code></td>
@@ -163,8 +169,35 @@ interface BoardColumn {
             <td><code class="docs-inline">false</code></td>
             <td>Disable dragging this specific item.</td>
           </tr>
+          <tr>
+            <td><code class="docs-inline">mkDragTouchDelay</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">300</code></td>
+            <td>Long-press delay (ms) before a <em>touch</em> pointer arms the drag; <code class="docs-inline">0</code> arms immediately. Mouse and pen are never delayed.</td>
+          </tr>
         </tbody>
       </table>
+
+      <h3>Touch behavior</h3>
+      <p>
+        On touch screens a swipe scrolls the page as usual — the drag only arms
+        after a long-press of about 300&nbsp;ms
+        (<code class="docs-inline">mkDragTouchDelay</code>). Moving more than a
+        few pixels before the delay elapses is treated as a scroll and the
+        pending drag is abandoned. Once armed, the item gets the
+        <code class="docs-inline">mk-drag--armed</code> class so you can style
+        the lift moment (a subtle scale or shadow works well). Mouse and pen
+        drags start immediately, gated only by the usual 5&nbsp;px movement
+        threshold.
+      </p>
+      <p>
+        For advanced coordination, the root-provided
+        <code class="docs-inline">MkDragDropRegistry</code> service tracks every
+        live <code class="docs-inline">[mkDropList]</code> by id and resolves
+        the connected travel groups — registration is automatic and you never
+        call it yourself; it is exported so tooling and tests can inspect the
+        wiring.
+      </p>
 
       <h3>mk-sortable-list</h3>
       <table class="docs-props">

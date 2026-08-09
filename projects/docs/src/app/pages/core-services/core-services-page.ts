@@ -1,16 +1,15 @@
 import {
   ChangeDetectionStrategy,
   Component,
-  DestroyRef,
   inject,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   MkAlert,
   MkButton,
   MkChip,
   MkHistoryService,
-  MkHotkeysService,
   MkLiveAnnouncer,
   type MkTone,
 } from '@mkornas/ui';
@@ -35,7 +34,7 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
 @Component({
   selector: 'docs-core-services-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkAlert, MkButton, MkChip],
+  imports: [DocsExample, MkAlert, MkButton, MkChip, RouterLink],
   template: `
     <div class="docs-page docs-container">
       <h1>Core &amp; services</h1>
@@ -234,9 +233,11 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
         the rest falls back to the English defaults. Interpolated strings are
         functions, so translators control word order. The nested
         <code class="docs-inline">dateNames</code> (month/weekday tables used by
-        the calendar and date pickers) and
-        <code class="docs-inline">blockEditor</code> groups are merged deeply —
-        partial overrides of those work too.
+        the calendar and date pickers),
+        <code class="docs-inline">blockEditor</code> and
+        <code class="docs-inline">validation</code> (the messages
+        <code class="docs-inline">mk-form-field</code> renders per error key)
+        groups are merged deeply — partial overrides of those work too.
       </p>
       <pre class="core-code"><code>{{ i18nCode }}</code></pre>
       <table class="docs-props">
@@ -244,11 +245,43 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
           <tr><th>Export</th><th>Type</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>provideMkI18n(overrides)</code></td><td><code>Provider</code></td><td>Merge a partial <code>MkI18nStrings</code> over the English defaults (deep for <code>dateNames</code> / <code>blockEditor</code>).</td></tr>
+          <tr><td><code>provideMkI18n(overrides)</code></td><td><code>Provider</code></td><td>Merge a partial <code>MkI18nStrings</code> over the English defaults (deep for <code>dateNames</code> / <code>blockEditor</code> / <code>validation</code>).</td></tr>
           <tr><td><code>MK_I18N</code></td><td><code>InjectionToken&lt;MkI18nStrings&gt;</code></td><td>The active string map — inject it to render library strings yourself.</td></tr>
           <tr><td><code>MkI18nStrings</code></td><td><code>interface</code></td><td>All user-facing strings; interpolations are functions like <code>removeItem(name)</code>.</td></tr>
           <tr><td><code>dateNames</code></td><td><code>MkDateNames</code></td><td>Full-length name tables: <code>months</code>, <code>monthsShort</code>, <code>weekdays</code> (Sunday-first), <code>weekdaysShort</code>, <code>weekdaysNarrow</code>.</td></tr>
-          <tr><td><code>MK_DEFAULT_I18N</code> / <code>MK_DEFAULT_DATE_NAMES</code></td><td><code>const</code></td><td>The built-in English defaults, exported for reuse.</td></tr>
+          <tr><td><code>MK_DEFAULT_I18N</code> / <code>MK_DEFAULT_DATE_NAMES</code> / <code>MK_DEFAULT_VALIDATION</code></td><td><code>const</code></td><td>The built-in English defaults, exported for reuse.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>What's in the map</h3>
+      <p>
+        The map holds roughly two hundred keys. The catalog below shows the
+        groups with a few example keys each — the authoritative, fully
+        documented list is the <code class="docs-inline">MkI18nStrings</code>
+        interface in
+        <code class="docs-inline">core/i18n/mk-i18n.ts</code>, where every key
+        carries a doc comment naming the component(s) it serves.
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Group</th><th>Example keys</th><th>Serves</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>General &amp; actions</td><td><code>close</code>, <code>clear</code>, <code>removeItem(name)</code></td><td>Dialogs, drawers, chips, tag inputs, inline edit, popconfirm.</td></tr>
+          <tr><td>Forms &amp; validation</td><td><code>validation.required</code>, <code>validation.iban(err)</code>, <code>showPassword</code></td><td>Per-error-key messages rendered by <code>mk-form-field</code> (the <code>validation</code> group is deep-merged like <code>dateNames</code>), password rules, OTP, rating, color picker.</td></tr>
+          <tr><td>Async &amp; empty states</td><td><code>loading</code>, <code>noResults</code>, <code>resultsCount(count)</code></td><td>Select, autocomplete, multi-select, command palette, table.</td></tr>
+          <tr><td>Table &amp; sorting</td><td><code>selectAllRows</code>, <code>sortedBy(column, direction)</code>, <code>editCell</code></td><td>Table selection, grouping, resize/reorder and sort announcements.</td></tr>
+          <tr><td>Dates &amp; time</td><td><code>dateNames</code>, <code>selectDate</code>, <code>eventCalendarMoved(…)</code></td><td>Calendar, date/month/week/time pickers, countdown, and the <code>eventCalendar*</code> keyboard-editing announcements.</td></tr>
+          <tr><td>Drag &amp; drop</td><td><code>dndPickedUp(position, total)</code>, <code>dndCancelled</code></td><td>Keyboard-drag announcements in dnd lists and kanban.</td></tr>
+          <tr><td>File upload</td><td><code>dropzoneLabel</code>, <code>fileRejectedSize(name, limit)</code></td><td>Dropzone label, upload states and rejection reasons.</td></tr>
+          <tr><td>Charts &amp; QR</td><td><code>chartCategory</code>, <code>chartValue</code>, <code>qrCodeLabel(text)</code></td><td>Screen-reader data tables behind every chart; QR label.</td></tr>
+          <tr><td>Command palette &amp; navigation</td><td><code>commandPalettePlaceholder</code>, <code>backToTop</code>, <code>skipToContent</code></td><td>Command palette, breadcrumb, pagination, app shell.</td></tr>
+          <tr><td>Carousel &amp; slideshow</td><td><code>previousSlide</code>, <code>slideOf(slide, total)</code>, <code>pauseSlideshow</code></td><td>Carousel controls, position labels and autoplay toggle.</td></tr>
+          <tr><td>Repeater</td><td><code>repeaterAddRow</code>, <code>repeaterRowMoved(from, to)</code></td><td>Repeater row controls and reorder announcements.</td></tr>
+          <tr><td>Numeric keypad &amp; on-screen keyboard</td><td><code>numericKeypadLabel</code>, <code>keypadDigitsEntered(count, length)</code>, <code>keyboardShift</code></td><td>Touch keypad and on-screen keyboard key labels.</td></tr>
+          <tr><td>Log viewer</td><td><code>logViewerLabel</code>, <code>logFollow</code>, <code>logWrapLines</code></td><td>Log region label and toolbar controls.</td></tr>
+          <tr><td>Tour &amp; notifications</td><td><code>tourStepOf(step, total)</code>, <code>markAllRead</code>, <code>unread</code></td><td>Product tour chrome and the notification center.</td></tr>
+          <tr><td>Block editor</td><td><code>blockEditor.addBlock</code>, <code>blockEditor.turnInto(label)</code></td><td>All block-editor chrome (deep-merged group).</td></tr>
         </tbody>
       </table>
 
@@ -260,43 +293,19 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
         <code class="docs-inline">keydown</code> listener. Combos join tokens
         with <code class="docs-inline">+</code>
         (<code class="docs-inline">mod</code> resolves to &#8984; on macOS and
-        Ctrl elsewhere), and space-separated two-step chords like
-        <code class="docs-inline">g i</code> are supported. Hotkeys are ignored
-        while an editable field is focused unless
+        Ctrl elsewhere), space-separated two-step chords like
+        <code class="docs-inline">g i</code> are supported, and hotkeys are
+        ignored while an editable field is focused unless
         <code class="docs-inline">allowInInput</code> is set. The returned
         disposer unregisters the shortcut.
       </p>
-      <docs-example [code]="hotkeysCode">
-        <div class="core-demo">
-          <button mkButton (click)="toggleHotkey()">
-            {{ hotkeyActive() ? 'Unregister' : 'Register' }} mod+shift+k
-          </button>
-          <span class="core-demo__note">
-            @if (hotkeyActive()) {
-              Press <kbd>Ctrl/&#8984;</kbd> + <kbd>Shift</kbd> + <kbd>K</kbd>.
-              @if (lastFired()) {
-                Last fired at {{ lastFired() }}.
-              } @else {
-                Not fired yet.
-              }
-            } @else {
-              Register the temporary hotkey, then press it anywhere on the page.
-            }
-          </span>
-        </div>
-      </docs-example>
-      <table class="docs-props">
-        <thead>
-          <tr><th>Member</th><th>Type</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td><code>register(combo, handler, options?)</code></td><td><code>() =&gt; void</code></td><td>Register a combo (<code>'mod+k'</code>, <code>'?'</code>) or two-step chord (<code>'g i'</code>); returns a disposer.</td></tr>
-          <tr><td><code>preventDefault</code></td><td><code>boolean</code></td><td>Call <code>preventDefault()</code> when the hotkey fires. Default <code>false</code>.</td></tr>
-          <tr><td><code>allowInInput</code></td><td><code>boolean</code></td><td>Also fire while an editable field is focused. Default <code>false</code>.</td></tr>
-          <tr><td><code>unregisterAll()</code></td><td><code>method</code></td><td>Remove every registration and detach the listener.</td></tr>
-          <tr><td><code>mkParseHotkey(combo)</code> / <code>mkMatchesHotkey(event, combo)</code></td><td><code>function</code></td><td>Pure, SSR-safe helpers behind the service — usable standalone.</td></tr>
-        </tbody>
-      </table>
+      <pre class="core-code"><code>{{ hotkeysCode }}</code></pre>
+      <p>
+        Full docs — the declarative
+        <code class="docs-inline">[mkHotkey]</code> directive, live demos and
+        the complete service &amp; helper API — live on the
+        <a routerLink="/components/utilities">Utilities page</a>.
+      </p>
 
       <!-- ============================================================ -->
       <h2>History (undo / redo)</h2>
@@ -405,6 +414,42 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
           <tr><td><code>registerHistoryHotkeys(history?)</code></td><td><code>() =&gt; void</code></td><td>Wire <code>mod+z</code> / <code>mod+shift+z</code> / <code>mod+y</code> to a stack (the service by default). Returns a disposer; auto-disposed with the injection context.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Small utilities</h2>
+      <p>
+        A handful of core exports the components are built from — useful when
+        you build custom controls of your own.
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Export</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkUniqueId(prefix?)</code></td><td><code>string</code></td><td>Stable, SSR-safe unique DOM id (<code>mk-input-7</code>) for wiring <code>aria-*</code> relationships — prefer it over <code>Math.random()</code>.</td></tr>
+          <tr><td><code>MkFieldContext</code></td><td><code>abstract class / DI token</code></td><td>The contract <code>mk-form-field</code> exposes to the control nested inside it — see below.</td></tr>
+          <tr><td><code>mkValidatorChange(deps)</code></td><td><code>MkValidatorChangeRef</code></td><td>Re-validates the bound control when a validator's inputs change: wire the returned ref into <code>registerOnValidatorChange</code> and read every constraint signal inside <code>deps</code>. Call in an injection context.</td></tr>
+          <tr><td><code>mkFirstErrorMessage(errors, strings, overrides?)</code></td><td><code>string | null</code></td><td>Resolves the message for the <em>first</em> error on a control: per-field overrides, then the i18n <code>validation</code> table, then the payload's own <code>message</code>, then the generic fallback.</td></tr>
+          <tr><td><code>MK_DEFAULT_VALIDATION</code></td><td><code>MkValidationStrings</code></td><td>The built-in English validation messages, exported for reuse in your own error rendering.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>MkFieldContext — custom controls inside mk-form-field</h3>
+      <p>
+        <code class="docs-inline">MkFieldContext</code> is how a custom form
+        control cooperates with a wrapping
+        <code class="docs-inline">&lt;mk-form-field&gt;</code> without depending
+        on the forms entry point: the wrapper provides itself under this token,
+        and the control injects it <em>optionally</em> to adopt the field's
+        control id (so the label focuses it), mirror its
+        <code class="docs-inline">size()</code>,
+        <code class="docs-inline">isRequired()</code> and
+        <code class="docs-inline">hasError()</code> signals, and wire
+        <code class="docs-inline">describedBy()</code> into
+        <code class="docs-inline">aria-describedby</code>. Standalone usage
+        simply yields <code class="docs-inline">null</code>.
+      </p>
+      <pre class="core-code"><code>{{ fieldContextCode }}</code></pre>
     </div>
   `,
   styles: [
@@ -437,21 +482,11 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
         margin-top: var(--mk-space-3);
         gap: var(--mk-space-2);
       }
-      .core-demo__note kbd {
-        font-family: var(--mk-font-mono);
-        font-size: var(--mk-font-size-xs);
-        padding: 0 var(--mk-space-1);
-        border: var(--mk-border-width) solid var(--mk-border);
-        border-radius: var(--mk-radius-sm);
-        background: var(--mk-surface);
-      }
     `,
   ],
 })
 export class CoreServicesPage {
   private readonly announcer = inject(MkLiveAnnouncer);
-  private readonly hotkeys = inject(MkHotkeysService);
-  private readonly destroyRef = inject(DestroyRef);
 
   /**
    * The history demo runs on an isolated scope of the app-wide service, so
@@ -490,34 +525,10 @@ export class CoreServicesPage {
   }
 
   protected readonly announceCount = signal(0);
-  protected readonly hotkeyActive = signal(false);
-  protected readonly lastFired = signal('');
-
-  private disposeHotkey?: () => void;
-
-  constructor() {
-    this.destroyRef.onDestroy(() => this.disposeHotkey?.());
-  }
 
   protected announceHello(): void {
     this.announcer.announce('Hello from the announcer');
     this.announceCount.update((n) => n + 1);
-  }
-
-  protected toggleHotkey(): void {
-    if (this.hotkeyActive()) {
-      this.disposeHotkey?.();
-      this.disposeHotkey = undefined;
-      this.hotkeyActive.set(false);
-      return;
-    }
-    this.disposeHotkey = this.hotkeys.register(
-      'mod+shift+k',
-      () => this.lastFired.set(new Date().toLocaleTimeString()),
-      { preventDefault: true },
-    );
-    this.lastFired.set('');
-    this.hotkeyActive.set(true);
   }
 
   protected readonly overlayCode = `// Anywhere in the app:
@@ -588,6 +599,17 @@ this.theme.toggle();        // flip light <-> dark`;
     }),
   ],
 });`;
+
+  protected readonly fieldContextCode = `@Component({ selector: 'my-color-swatch-picker', /* … */ })
+export class MyColorSwatchPicker implements ControlValueAccessor {
+  // null when used outside an <mk-form-field> — every read falls back.
+  private readonly field = inject(MkFieldContext, { optional: true });
+
+  protected readonly id = this.field?.controlId ?? mkUniqueId('swatch');
+  protected readonly size = computed(() => this.field?.size() ?? 'md');
+  protected readonly invalid = computed(() => this.field?.hasError() ?? false);
+  // Host bindings: [id]="id", [attr.aria-describedby]="field?.describedBy()"
+}`;
 
   protected readonly hotkeysCode = `private readonly hotkeys = inject(MkHotkeysService);
 

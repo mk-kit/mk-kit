@@ -45,13 +45,32 @@ import { DocsExample } from '../../shared/docs-example';
         the top layer and fully accessible.
       </p>
 
+      <!-- ============================================================ -->
+      <h2>Tooltip, popover, or hovercard?</h2>
+      <p>
+        A <strong>tooltip</strong> is a short text label and never interactive:
+        it names or clarifies its trigger on hover/focus and can hold no links
+        or buttons. A <strong>popover</strong> is an interactive panel opened by
+        a deliberate click — it receives focus and can contain forms and
+        actions. A <strong>hovercard</strong> sits in between: a rich,
+        read-mostly preview that opens on hover after a delay, like a profile
+        card on a mention. All three are documented below — pick by content, not
+        by looks.
+      </p>
+
       <!-- =========================== TOOLTIP =========================== -->
       <h2>Tooltip</h2>
       <p>
         The <code class="docs-inline">[mkTooltip]</code> directive shows a themed
-        tooltip on hover <em>and</em> keyboard focus, hides on blur, mouse-leave,
-        or <kbd>Escape</kbd>, and wires the trigger to the tooltip via
-        <code class="docs-inline">aria-describedby</code>. Set
+        tooltip on hover <em>and</em> keyboard focus, wired to the trigger via
+        <code class="docs-inline">aria-describedby</code>. Pointer hover opens it
+        after a 400&nbsp;ms delay; keyboard focus opens it instantly. It hides on
+        blur and on mouse-leave — but leaving the trigger starts a 150&nbsp;ms
+        grace period, so the pointer can travel onto the tooltip itself and keep
+        it open, and a visible tooltip is dismissed by <kbd>Escape</kbd> no
+        matter where focus is (WCAG 1.4.13 hoverable + dismissible). On touch
+        screens, where hover doesn't exist, tapping the trigger toggles the
+        tooltip and tapping anywhere else dismisses it. Set
         <code class="docs-inline">mkTooltipPlacement</code> to position it.
         Hover or focus the buttons below.
       </p>

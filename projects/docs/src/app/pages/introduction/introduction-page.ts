@@ -56,18 +56,28 @@ interface Feature {
       </p>
 
       <h2>What's inside</h2>
-      <div class="intro-inventory">
+      <p>
+        140+ standalone components, directives and services, organised into nine
+        component groups:
+      </p>
+      <ul class="intro-inventory">
         @for (group of inventory; track group.title) {
-          <div class="intro-inventory__group">
-            <h3>{{ group.title }}</h3>
-            <div class="intro-chips">
-              @for (name of group.items; track name) {
-                <span class="intro-chip">{{ name }}</span>
-              }
-            </div>
-          </div>
+          <li class="intro-inventory__row">
+            <span class="intro-inventory__name">{{ group.title }}</span>
+            <span class="intro-inventory__desc">{{ group.blurb }}</span>
+          </li>
         }
-      </div>
+      </ul>
+      <p>
+        <button
+          mkButton
+          variant="outline"
+          tone="neutral"
+          (click)="go('/components-index')"
+        >
+          Browse the full component index →
+        </button>
+      </p>
 
       <h2>Accessibility, by default</h2>
       <p>
@@ -133,26 +143,35 @@ interface Feature {
         line-height: var(--mk-line-height-normal);
       }
       .intro-inventory {
-        display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-        gap: var(--mk-space-6);
+        list-style: none;
         margin: var(--mk-space-4) 0;
-      }
-      .intro-inventory__group h3 {
-        margin: 0 0 var(--mk-space-3);
-      }
-      .intro-chips {
-        display: flex;
-        flex-wrap: wrap;
-        gap: var(--mk-space-2);
-      }
-      .intro-chip {
-        font-size: var(--mk-font-size-sm);
-        padding: var(--mk-space-1) var(--mk-space-3);
-        border-radius: var(--mk-radius-pill);
-        background: var(--mk-surface-2);
-        color: var(--mk-text-muted);
+        padding: 0;
         border: 1px solid var(--mk-border);
+        border-radius: var(--mk-radius-lg);
+        overflow: hidden;
+      }
+      .intro-inventory__row {
+        display: grid;
+        grid-template-columns: minmax(160px, 220px) 1fr;
+        gap: var(--mk-space-4);
+        padding: var(--mk-space-3) var(--mk-space-4);
+      }
+      .intro-inventory__row + .intro-inventory__row {
+        border-top: 1px solid var(--mk-border-subtle, var(--mk-border));
+      }
+      .intro-inventory__name {
+        font-weight: var(--mk-font-weight-semibold);
+      }
+      .intro-inventory__desc {
+        color: var(--mk-text-muted);
+        font-size: var(--mk-font-size-md);
+        line-height: var(--mk-line-height-normal);
+      }
+      @media (max-width: 560px) {
+        .intro-inventory__row {
+          grid-template-columns: 1fr;
+          gap: var(--mk-space-1);
+        }
       }
       .intro-footcta {
         margin-top: var(--mk-space-10);
@@ -198,11 +217,51 @@ export class IntroductionPage {
     },
   ];
 
-  protected readonly inventory = [
-    { title: 'Forms', items: ['Button', 'FormField', 'Input', 'Select', 'Checkbox', 'Radio', 'Switch', 'Slider'] },
-    { title: 'Data display', items: ['Table', 'Card', 'Badge', 'Tag', 'Chip', 'Avatar', 'List', 'StatCard', 'ProgressBar', 'Spinner', 'Skeleton', 'Divider'] },
-    { title: 'Feedback', items: ['Alert', 'Toast', 'Dialog', 'Tooltip'] },
-    { title: 'Navigation & layout', items: ['Tabs', 'Accordion', 'Breadcrumb', 'Pagination', 'Menu', 'AppShell', 'NavList'] },
+  protected readonly inventory: { title: string; blurb: string }[] = [
+    {
+      title: 'Forms & inputs',
+      blurb:
+        'Around 40 controls: buttons, form fields, text/number/password/OTP inputs, selects & autocomplete, multi-select, tag input, mentions, transfer list, date & time pickers, phone/postal/payment inputs, signature pad, on-screen keypad & keyboard, toggles, sliders, rating and color picker.',
+    },
+    {
+      title: 'Media',
+      blurb:
+        'Images with lightbox, image gallery, carousel, cropper and a full media manager.',
+    },
+    {
+      title: 'Data display',
+      blurb:
+        'Badges, chips, tags, avatars, cards, lists, description lists, tree, icons, empty states, timeline, kanban board, countdown, QR code, diff, JSON viewer, virtual scroll, markdown and log rendering.',
+    },
+    {
+      title: 'Tables & grids',
+      blurb:
+        'Sortable, paginated data table & grid with inline editing, row details, grouping, sticky headers and a reactive data source.',
+    },
+    {
+      title: 'Charts',
+      blurb:
+        'Line, bar, scatter, sparkline and heatmaps for trends; donut, gauge, funnel, radar, treemap and progress ring for proportion & KPI.',
+    },
+    {
+      title: 'Navigation & layout',
+      blurb:
+        'App shell, tabs, accordion, breadcrumbs, menus, drawer, stepper, command palette, context menu, toolbar, page header, splitter and scroll area.',
+    },
+    {
+      title: 'Feedback & overlays',
+      blurb:
+        'Dialogs, toasts, snackbar, alerts, banners, tooltips, popovers, hovercard, popconfirm, bottom sheet, notification center, result pages, product tours, spinners, progress and skeletons.',
+    },
+    {
+      title: 'Editors',
+      blurb: 'Block-based content editor and a rich-text (WYSIWYG) editor.',
+    },
+    {
+      title: 'Directives & utilities',
+      blurb:
+        'Drag & drop, hotkeys, input mask, ripple, scrollspy, copy-to-clipboard, click-outside, autofocus, infinite scroll, intersection observer and permission directives.',
+    },
   ];
 
   protected go(path: string): void {

@@ -271,6 +271,37 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>(cellClick)</code></td><td><code>MkCalendarHeatmapCell</code></td><td>—</td><td>The clicked day: <code>&#123; date: Date; value: number &#125;</code> (0 when the day has no entry).</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Build your own chart</h2>
+      <p>
+        Every built-in chart is drawn with a small set of pure, exported
+        helpers — scales, tick generation, SVG path builders, the palette and
+        two Angular utilities for responsive width and touch tooltips. If you
+        need a chart the library doesn't ship, build it from the same parts and
+        it will match the theme, the palette and the responsive behaviour for
+        free.
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Export</th><th>Signature / type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkChartColor</code></td><td><code>(index: number) =&gt; string</code></td><td>Categorical colour for a series index — a <code>var(--mk-chart-N)</code> reference, wrapped past 8 (prefer folding a 9th series into "Other").</td></tr>
+          <tr><td><code>MK_CHART_PALETTE_SIZE</code></td><td><code>8</code></td><td>Number of hues in the validated palette.</td></tr>
+          <tr><td><code>mkLinearScale</code></td><td><code>(d0, d1, r0, r1) =&gt; (value) =&gt; number</code></td><td>Linear scale mapping the domain <code>[d0, d1]</code> onto the range <code>[r0, r1]</code>.</td></tr>
+          <tr><td><code>mkNiceTicks</code></td><td><code>(min, max, count?) =&gt; number[]</code></td><td>"Nice" rounded tick values covering the domain with roughly <code>count</code> (default 5) steps — gridlines land on human numbers.</td></tr>
+          <tr><td><code>mkFormatCompact</code></td><td><code>(value: number) =&gt; string</code></td><td>Compact number formatting for axes/tooltips (1.2k, 3.4M).</td></tr>
+          <tr><td><code>mkLinePath</code></td><td><code>(points: MkPoint[]) =&gt; string</code></td><td>Straight-segment SVG path (<code>M … L …</code>) through the points.</td></tr>
+          <tr><td><code>mkAreaPath</code></td><td><code>(points, baselineY) =&gt; string</code></td><td>Closed area path under a line, dropped to <code>baselineY</code> at each end.</td></tr>
+          <tr><td><code>mkArcPath</code></td><td><code>(cx, cy, outer, inner, start, end) =&gt; string</code></td><td>Arc path for a donut/pie slice (radians, clockwise from 12 o'clock); <code>inner</code> 0 = pie wedge, &gt; 0 = ring segment.</td></tr>
+          <tr><td><code>mkSquarify</code></td><td><code>(items, x, y, w, h) =&gt; MkTreemapRect[]</code></td><td>Squarified-treemap layout (Bruls/Huizing/van Wijk): one rect per item, areas proportional to <code>value</code>, tagged with the input index.</td></tr>
+          <tr><td><code>mkChartAutoWidth</code></td><td><code>(fallback: Signal&lt;number&gt;) =&gt; Signal&lt;number&gt;</code></td><td>Tracks the host's rendered width so the viewBox can match it (ResizeObserver; SSR falls back to the declared width). Call in an injection context.</td></tr>
+          <tr><td><code>mkChartTapPin</code></td><td><code>(apply: (key | null) =&gt; void) =&gt; MkChartTapPin</code></td><td>Tap-to-pin controller making hover tooltips work on touch: a tap pins, tapping elsewhere clears, mouse hover stays untouched. Call in an injection context.</td></tr>
+        </tbody>
+      </table>
+      <p>A minimal custom SVG column chart from those parts:</p>
+      <pre class="chart-code"><code>{{ customChartCode }}</code></pre>
     </div>
   `,
   styles: [
@@ -282,6 +313,18 @@ import { DocsExample } from '../../shared/docs-example';
         margin: var(--mk-space-2) 0 0;
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
+      }
+      .chart-code {
+        margin: var(--mk-space-3) 0 var(--mk-space-5);
+        padding: var(--mk-space-4) var(--mk-space-5);
+        background: var(--mk-code-bg);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        font-family: var(--mk-font-mono);
+        font-size: var(--mk-font-size-sm);
+        line-height: var(--mk-line-height-normal);
+        color: var(--mk-text);
+        overflow-x: auto;
       }
     `,
   ],
@@ -399,4 +442,28 @@ export class ChartsPage {
 <!-- entries: { date: Date | 'YYYY-MM-DD'; value: number } -->
 <!-- fixed year instead of the trailing 12 months: -->
 <mk-calendar-heatmap [data]="contributions" [year]="2026" />`;
+
+  // --- Build your own chart -------------------------------------------------
+  protected readonly customChartCode = `// A minimal column chart: ticks, scale and palette from chart-utils.
+const values = [12, 19, 15, 22];
+const W = 480, H = 240, PAD = 24;
+
+const ticks = mkNiceTicks(0, Math.max(...values));          // [0, 5, 10, 15, 20, 25]
+const y = mkLinearScale(0, ticks.at(-1)!, H - PAD, PAD);    // value -> px (inverted)
+const barW = (W - PAD * 2) / values.length;
+
+<svg [attr.viewBox]="'0 0 ' + W + ' ' + H">
+  @for (t of ticks; track t) {
+    <line [attr.y1]="y(t)" [attr.y2]="y(t)" [attr.x1]="PAD" [attr.x2]="W - PAD"
+          stroke="var(--mk-chart-grid)" />
+    <text [attr.y]="y(t)" [attr.x]="PAD - 4" fill="var(--mk-chart-axis)">
+      {{ mkFormatCompact(t) }}
+    </text>
+  }
+  @for (v of values; track $index) {
+    <rect [attr.x]="PAD + $index * barW + 4" [attr.y]="y(v)"
+          [attr.width]="barW - 8" [attr.height]="H - PAD - y(v)"
+          [attr.fill]="mkChartColor($index)" />
+  }
+</svg>`;
 }

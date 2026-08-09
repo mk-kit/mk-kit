@@ -228,7 +228,7 @@ export const routes: Routes = [
   },
   {
     path: 'components/markdown',
-    title: 'Markdown & logs — mk-kit',
+    title: 'Code & content — mk-kit',
     loadComponent: () =>
       import('./pages/markdown/markdown-page').then((m) => m.MarkdownPage),
   },
@@ -306,7 +306,7 @@ export const routes: Routes = [
   },
   {
     path: 'components/data',
-    title: 'Data display — mk-kit',
+    title: 'Misc display — mk-kit',
     loadComponent: () =>
       import('./pages/data/data-page').then((m) => m.DataPage),
   },
@@ -329,6 +329,26 @@ export const routes: Routes = [
     title: 'Utilities — mk-kit',
     loadComponent: () =>
       import('./pages/utilities/utilities-page').then((m) => m.UtilitiesPage),
+  },
+  {
+    path: 'components/kanban',
+    title: 'Kanban — mk-kit',
+    loadComponent: () =>
+      import('./pages/kanban/kanban-page').then((m) => m.KanbanPage),
+  },
+  {
+    path: 'components-index',
+    title: 'All components — mk-kit',
+    loadComponent: () =>
+      import('./pages/components-index/components-index-page').then(
+        (m) => m.ComponentsIndexPage,
+      ),
+  },
+  {
+    path: 'changelog',
+    title: 'Changelog — mk-kit',
+    loadComponent: () =>
+      import('./pages/changelog/changelog-page').then((m) => m.ChangelogPage),
   },
   { path: '**', redirectTo: 'introduction' },
 ];

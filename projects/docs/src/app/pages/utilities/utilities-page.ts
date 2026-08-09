@@ -382,10 +382,21 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
         </thead>
         <tbody>
           <tr><td><code>mkMask</code></td><td><code>string</code></td><td>required</td><td>The token pattern: <code>0</code> digit, <code>A</code> letter, <code>*</code> alphanumeric; other characters are literals.</td></tr>
+          <tr><td><code>mkMaskInputmode</code></td><td><code>string | null</code></td><td><code>null</code></td><td>Override the derived <code>inputmode</code> (defaults to <code>numeric</code> for digit-only patterns).</td></tr>
           <tr><td><code>(maskedChange)</code></td><td><code>string</code></td><td>—</td><td>The formatted value, on every change.</td></tr>
           <tr><td><code>(unmaskedChange)</code></td><td><code>string</code></td><td>—</td><td>The raw value (token characters only), on every change.</td></tr>
         </tbody>
       </table>
+      <p>
+        The pure functions behind the directive are exported too —
+        <code class="docs-inline">mkApplyMask(value, pattern)</code> returns
+        <code class="docs-inline">{{ '{' }} masked, unmasked {{ '}' }}</code>
+        for any string, and
+        <code class="docs-inline">mkMaskCaret(oldValue, oldCaret, masked)</code>
+        computes where the caret belongs after re-masking. The masked form
+        controls (card number, IBAN, phone, postal code) are built on them; use
+        them to mask values outside an input, e.g. for display formatting.
+      </p>
 
       <!-- hotkeys -->
       <h2>Hotkeys</h2>
@@ -428,6 +439,31 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
           <tr><td><code>mkHotkeyAllowInInput</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Fire even while an editable field is focused.</td></tr>
           <tr><td><code>mkHotkeyPreventDefault</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Call <code>preventDefault()</code> when the hotkey fires.</td></tr>
           <tr><td><code>(mkHotkeyPressed)</code></td><td><code>KeyboardEvent</code></td><td>—</td><td>Fires when the combo triggers and the host is not a button/link (those are clicked instead).</td></tr>
+        </tbody>
+      </table>
+
+      <h3>The service behind it</h3>
+      <p>
+        The directive is a thin wrapper over
+        <code class="docs-inline">MkHotkeysService</code> — inject it to
+        register shortcuts imperatively, without an element to hang them on
+        (global palettes, page-level shortcuts). All registrations share one
+        lazily-attached <code class="docs-inline">keydown</code> listener, and
+        the same rules apply: <code class="docs-inline">mod</code>, two-step
+        chords, editable fields ignored unless opted in.
+      </p>
+      <pre class="hotkey-code"><code>{{ hotkeysServiceCode }}</code></pre>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>register(combo, handler, options?)</code></td><td><code>() =&gt; void</code></td><td>Register a combo (<code>'mod+k'</code>, <code>'?'</code>) or two-step chord (<code>'g i'</code>); returns a disposer.</td></tr>
+          <tr><td><code>preventDefault</code></td><td><code>boolean</code></td><td>Option: call <code>preventDefault()</code> when the hotkey fires. Default <code>false</code> (the directive defaults to <code>true</code>).</td></tr>
+          <tr><td><code>allowInInput</code></td><td><code>boolean</code></td><td>Option: also fire while an editable field is focused. Default <code>false</code>.</td></tr>
+          <tr><td><code>unregisterAll()</code></td><td><code>method</code></td><td>Remove every registration and detach the listener.</td></tr>
+          <tr><td><code>mkParseHotkey(combo)</code> / <code>mkMatchesHotkey(event, combo)</code></td><td><code>function</code></td><td>Pure, SSR-safe helpers behind the service — parse a combo / test a <code>KeyboardEvent</code> against one, usable standalone.</td></tr>
+          <tr><td><code>mkIsMacPlatform()</code></td><td><code>boolean</code></td><td>Whether the runtime is macOS — how <code>mod</code> picks &#8984; vs Ctrl; SSR-safe (false on the server). Handy for rendering shortcut hints.</td></tr>
         </tbody>
       </table>
 
@@ -503,6 +539,7 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
           <tr><td><code>*mkCannot</code></td><td><code>string</code></td><td>required</td><td>Negation: the template renders only while the permission is <em>denied</em> (supports <code>else</code> too).</td></tr>
           <tr><td><code>[mkCanDisable]</code></td><td><code>string</code></td><td>required</td><td>Disables the host while the permission is denied: <code>aria-disabled="true"</code>, plus native <code>disabled</code> on form controls. Re-enables when granted.</td></tr>
           <tr><td><code>MkPermissionPolicy.can()</code></td><td><code>boolean | Signal&lt;boolean&gt;</code></td><td>—</td><td>The one method to implement. Provide the policy once (e.g. at bootstrap); no policy means everything is granted.</td></tr>
+          <tr><td><code>mkPermissionGranted(policy, permission)</code></td><td><code>boolean</code></td><td>—</td><td>Helper for imperative checks (guards, effects): resolves a policy verdict to a boolean, unwrapping signal results. Call inside a reactive context to stay live; a <code>null</code> policy grants everything.</td></tr>
         </tbody>
       </table>
     </div>
@@ -658,6 +695,18 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
         flex-wrap: wrap;
         gap: var(--mk-space-3);
       }
+      .hotkey-code {
+        margin: var(--mk-space-3) 0 var(--mk-space-5);
+        padding: var(--mk-space-4) var(--mk-space-5);
+        background: var(--mk-code-bg);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-md);
+        font-family: var(--mk-font-mono);
+        font-size: var(--mk-font-size-sm);
+        line-height: var(--mk-line-height-normal);
+        color: var(--mk-text);
+        overflow-x: auto;
+      }
       .perm-toggles {
         display: flex;
         flex-wrap: wrap;
@@ -780,6 +829,19 @@ export class UtilitiesPage {
 
 <!-- non-button host emits (mkHotkeyPressed) instead -->
 <div mkHotkey="?" (mkHotkeyPressed)="showHelp()">…</div>`;
+
+  protected readonly hotkeysServiceCode = `private readonly hotkeys = inject(MkHotkeysService);
+
+const off = this.hotkeys.register('mod+k', () => this.openPalette(), {
+  preventDefault: true,
+});
+this.hotkeys.register('g i', () => this.goToInbox()); // two-step chord
+
+// … later
+off();
+
+// Render the right hint for the platform:
+readonly modKey = mkIsMacPlatform() ? '⌘' : 'Ctrl';`;
 
   // --- Permissions ----------------------------------------------------------
   protected readonly policy = inject(DocsPermissionPolicy);

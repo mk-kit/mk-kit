@@ -1,6 +1,8 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import {
   MkButton,
+  MkCarousel,
+  MkCarouselSlide,
   MkImage,
   MkImageGallery,
   type MkGalleryItem,
@@ -9,24 +11,27 @@ import {
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the IMAGE components of `@mkornas/ui`:
- * Image block, Image gallery (grid/masonry/strip) and the Lightbox service.
+ * Documentation + live demo page for the media display components of
+ * `@mkornas/ui`: Image block, Image gallery (grid/masonry/strip), the Lightbox
+ * service and the Carousel.
  */
 @Component({
   selector: 'docs-images-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkButton, MkImage, MkImageGallery],
+  imports: [DocsExample, MkButton, MkCarousel, MkCarouselSlide, MkImage, MkImageGallery],
   template: `
     <div class="docs-page docs-container">
       <h1>Images &amp; lightbox</h1>
       <p class="docs-lead">
-        The media group's display trio.
+        The media group's display components.
         <code class="docs-inline">&lt;mk-image&gt;</code> is an image block with
         aspect-ratio, skeleton loading and an error fallback;
         <code class="docs-inline">&lt;mk-image-gallery&gt;</code> lays image sets
         out as a grid, masonry or scroll strip and opens them in the
         <code class="docs-inline">MkLightboxService</code> — a fullscreen,
-        keyboard-navigable viewer you can also drive yourself.
+        keyboard-navigable viewer you can also drive yourself. For sequential
+        slides there is <code class="docs-inline">&lt;mk-carousel&gt;</code>,
+        with swipe, keyboard navigation and accessible autoplay.
       </p>
 
       <!-- ============================================================ -->
@@ -141,6 +146,58 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>Esc</td><td>Close (also backdrop click).</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Carousel</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-carousel&gt;</code> is an accessible
+        slides/gallery — prev/next arrows, dot indicators, Arrow-key navigation
+        and pointer swipe (touch or mouse drag; vertical page scrolling stays
+        native). Mark each slide with
+        <code class="docs-inline">mkCarouselSlide</code>; the current slide is
+        a two-way <code class="docs-inline">index</code> model.
+      </p>
+      <docs-example [code]="carouselCode" [column]="true">
+        <div style="max-width: 30rem; width: 100%;">
+          <mk-carousel ariaLabel="Highlights">
+            @for (c of slides; track c.title) {
+              <div mkCarouselSlide [style.background]="c.bg" style="padding: var(--mk-space-8) var(--mk-space-4); text-align: center; color: #fff;">
+                <h3 style="margin: 0 0 var(--mk-space-1);">{{ c.title }}</h3>
+                <p style="margin: 0; opacity: 0.85;">{{ c.body }}</p>
+              </div>
+            }
+          </mk-carousel>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>[(index)]</code></td><td><code>number</code></td><td><code>0</code></td><td>Two-way current slide index.</td></tr>
+          <tr><td><code>loop</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Wrap around at the ends.</td></tr>
+          <tr><td><code>showDots</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the dot indicators.</td></tr>
+          <tr><td><code>showArrows</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the prev/next arrows.</td></tr>
+          <tr><td><code>autoplay</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Advance automatically; also renders a persistent pause/play toggle.</td></tr>
+          <tr><td><code>interval</code></td><td><code>number</code></td><td><code>5000</code></td><td>Autoplay interval in ms.</td></tr>
+          <tr><td><code>[(userPaused)]</code></td><td><code>boolean</code></td><td><code>false</code></td><td>The pause/play toggle's latched state (two-way, WCAG 2.2.2).</td></tr>
+          <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td>i18n</td><td>Accessible label for the carousel region.</td></tr>
+          <tr><td><code>mkCarouselSlide</code></td><td>slot</td><td>—</td><td>Marks each projected slide element (ARIA + visibility are wired for you).</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Autoplay is deliberately conservative: it pauses transiently on
+        hover, focus and while a pointer is held down; the on-carousel
+        pause/play button latches a persistent pause
+        (<code class="docs-inline">userPaused</code>) that hover never
+        overrides; and it <strong>never runs</strong> under
+        <code class="docs-inline">prefers-reduced-motion</code>, while the
+        browser tab is hidden or while the carousel is scrolled fully
+        offscreen. Swiping past a quarter of the width (or flicking fast)
+        changes slide; the click that would follow a drag is swallowed so links
+        inside slides don't activate from a swipe.
+      </p>
     </div>
   `,
   styles: [
@@ -189,4 +246,16 @@ export class ImagesPage {
 open(): void {
   this.lightbox.open(this.items, 0); // { src, alt?, caption? }[]
 }`;
+
+  // ----- Carousel ------------------------------------------------------
+  protected readonly slides = [
+    { title: 'Fast', body: 'Signals + OnPush everywhere.', bg: 'var(--mk-primary)' },
+    { title: 'Accessible', body: 'WCAG 2.1 AA out of the box.', bg: 'var(--mk-success)' },
+    { title: 'Themeable', body: 'Every colour is a CSS variable.', bg: 'var(--mk-info)' },
+  ];
+
+  protected readonly carouselCode = `<mk-carousel ariaLabel="Highlights" autoplay [interval]="6000">
+  <div mkCarouselSlide>…</div>
+  <div mkCarouselSlide>…</div>
+</mk-carousel>`;
 }
