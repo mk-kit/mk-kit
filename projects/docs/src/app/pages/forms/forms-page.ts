@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   FormControl,
   FormGroup,
@@ -8,8 +9,6 @@ import {
 } from '@angular/forms';
 import {
   MkButton,
-  MkCodeEditor,
-  type MkCodeValidity,
   MkFileUpload,
   type MkUploadFile,
   type MkUploadFn,
@@ -34,7 +33,7 @@ interface OrderLine {
 
 /**
  * Documentation + live demo page for the FORM structure components of `@mkornas/ui`:
- * FormField, Form error summary, Select, Submit input, File upload and Code editor.
+ * FormField, Form error summary, Select, Submit input, File upload and Repeater.
  */
 @Component({
   selector: 'docs-forms-page',
@@ -42,6 +41,7 @@ interface OrderLine {
   imports: [
     FormsModule,
     ReactiveFormsModule,
+    RouterLink,
     DocsExample,
     MkFormField,
     MkFormErrorSummary,
@@ -49,7 +49,6 @@ interface OrderLine {
     MkSelect,
     MkNumberInput,
     MkFileUpload,
-    MkCodeEditor,
     MkButton,
     MkRepeater,
     MkRepeaterEmpty,
@@ -63,7 +62,8 @@ interface OrderLine {
         Form structure and composite fields: the accessible
         <code class="docs-inline">&lt;mk-form-field&gt;</code> wrapper, a
         submit-time error summary, a custom select, a code-and-apply submit
-        input, a file-upload dropzone and a code editor. Every control implements
+        input, a file-upload dropzone and a repeater for editable lists. Every
+        control implements
         <code class="docs-inline">ControlValueAccessor</code> and exposes a
         two-way model, so it works with <code class="docs-inline">[(ngModel)]</code>,
         reactive forms and native <code class="docs-inline">[(value)]</code>
@@ -174,18 +174,22 @@ interface OrderLine {
         <code class="docs-inline">&lt;mk-form-error-summary&gt;</code> lists a
         form's validation errors at the top on a failed submit; each entry links
         to — and focuses — its field. Following the WAI/GOV.UK pattern it is an
-        <code class="docs-inline">alert</code> region; call
-        <code class="docs-inline">focus()</code> after a failed submit to send
-        screen-reader and keyboard users straight to the problems. Submit the
-        form empty to see it.
+        <code class="docs-inline">alert</code> region, and when the surrounding
+        form is submitted with errors <strong>focus moves to the summary
+        automatically</strong>, taking screen-reader and keyboard users straight
+        to the problems. Opt out with
+        <code class="docs-inline">[autoFocus]="false"</code>; the public
+        <code class="docs-inline">focus()</code> method remains for manual
+        flows, e.g. errors that only arrive from the server. Submit the form
+        empty to see it.
       </p>
 
       <docs-example [code]="errorSummaryCode" [column]="true">
         <form
           class="es-form"
-          (ngSubmit)="submitErrorDemo(esSummary, esEmailField, esAgeField)"
+          (ngSubmit)="submitErrorDemo()"
         >
-          <mk-form-error-summary #esSummary [errors]="esErrors(esEmailField, esAgeField)" />
+          <mk-form-error-summary [errors]="esErrors(esEmailField, esAgeField)" />
           <mk-form-field
             #esEmailField
             label="Email"
@@ -205,6 +209,22 @@ interface OrderLine {
           <button mkButton type="submit">Submit</button>
         </form>
       </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>errors</td><td>readonly MkFormError[]</td><td>[]</td><td>Explicit {{ '{ fieldId, message }' }} entries. When non-empty they win over <code class="docs-inline">form</code> — useful for server-side errors.</td></tr>
+          <tr><td>form</td><td>AbstractControl | null</td><td>null</td><td>Collect entries from this control tree instead: one per invalid control, worded from the <code class="docs-inline">validation</code> i18n table.</td></tr>
+          <tr><td>labels</td><td>Record&lt;string, string&gt;</td><td>{{ '{}' }}</td><td>Field names for automatic entries, keyed by control path (the path itself is used without one).</td></tr>
+          <tr><td>errorMessages</td><td>MkErrorMessages | null</td><td>null</td><td>Per-key wording overrides for automatic entries, as on mk-form-field.</td></tr>
+          <tr><td>showOn</td><td>'submit' | 'always'</td><td>'submit'</td><td>When automatic entries appear: after the form is submitted, or as soon as they exist.</td></tr>
+          <tr><td>summaryTitle</td><td>string</td><td>i18n 'There is a problem'</td><td>Heading shown above the list.</td></tr>
+          <tr><td>autoFocus</td><td>boolean</td><td>true</td><td>Move focus to the summary automatically when the surrounding form is submitted with errors. Disable to drive focus yourself.</td></tr>
+          <tr><td>focus()</td><td>method</td><td>—</td><td>Move keyboard focus to the summary (no-op while there are no errors) — for manual flows.</td></tr>
+        </tbody>
+      </table>
 
       <!-- ============================================================ -->
       <!-- SELECT -->
@@ -353,52 +373,12 @@ interface OrderLine {
       <!-- ============================================================ -->
       <h2>Code editor</h2>
       <p>
-        <code class="docs-inline">&lt;mk-code-editor&gt;</code> is a lightweight,
-        dependency-free code field with syntax highlighting. With
-        <code class="docs-inline">language="json"</code> it validates on every
-        change (inline error + <code class="docs-inline">(validate)</code>) and
-        offers <code class="docs-inline">format()</code> to pretty-print — ideal
-        for a CMS <code class="docs-inline">json</code> field. Tab inserts spaces;
-        press Escape then Tab to move focus out (never a keyboard trap).
+        The <code class="docs-inline">&lt;mk-code-editor&gt;</code> field —
+        a lightweight, dependency-free code textarea with syntax highlighting,
+        JSON validation and <code class="docs-inline">format()</code> — is
+        documented with the other code &amp; content components.
+        <a routerLink="/components/markdown">See the Code &amp; content docs →</a>
       </p>
-
-      <docs-example [code]="codeEditorCode" [column]="true">
-        <div style="width: 100%;">
-          <mk-code-editor
-            #jsonEditor
-            language="json"
-            [rows]="9"
-            ariaLabel="Configuration JSON"
-            [(value)]="config"
-            (validate)="jsonValid.set($event)"
-          />
-          <div style="display: flex; align-items: center; gap: var(--mk-space-2); margin-top: var(--mk-space-2);">
-            <button mkButton variant="outline" size="sm" (click)="jsonEditor.format()">
-              Format
-            </button>
-            <span class="echo">
-              {{ jsonValid().valid ? '✓ valid JSON' : '✗ ' + jsonValid().error }}
-            </span>
-          </div>
-        </div>
-      </docs-example>
-
-      <table class="docs-props">
-        <thead>
-          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
-        </thead>
-        <tbody>
-          <tr><td>language</td><td>'json' | 'plaintext'</td><td>'plaintext'</td><td>Highlighting + validation mode.</td></tr>
-          <tr><td>value</td><td>model&lt;string&gt;</td><td>''</td><td>Two-way editor content.</td></tr>
-          <tr><td>rows</td><td>number</td><td>8</td><td>Visible rows (minimum height).</td></tr>
-          <tr><td>lineNumbers</td><td>boolean</td><td>true</td><td>Show a line-number gutter.</td></tr>
-          <tr><td>tabSize</td><td>number</td><td>2</td><td>Spaces inserted by Tab / used by format().</td></tr>
-          <tr><td>wrap</td><td>boolean</td><td>false</td><td>Soft-wrap instead of horizontal scroll.</td></tr>
-          <tr><td>readOnly / disabled</td><td>boolean</td><td>false</td><td>Read-only / disabled states.</td></tr>
-          <tr><td>format()</td><td>method</td><td>—</td><td>Pretty-print valid JSON (via exportAs template ref).</td></tr>
-          <tr><td>(validate)</td><td>MkCodeValidity</td><td>—</td><td>Emits {{ '{ valid, error }' }} on change.</td></tr>
-        </tbody>
-      </table>
 
       <!-- ============================================================ -->
       <!-- REPEATER -->
@@ -536,14 +516,9 @@ export class FormsPage {
       errors.push({ fieldId: age.controlId, message: 'Age must be a whole number' });
     return errors;
   }
-  protected submitErrorDemo(
-    summary: MkFormErrorSummary,
-    email: MkFormField,
-    age: MkFormField,
-  ): void {
+  protected submitErrorDemo(): void {
+    // The summary focuses itself on a submit with errors (autoFocus).
     this.esSubmitted.set(true);
-    // Focus the summary once it has rendered with the new errors.
-    if (this.esErrors(email, age).length) setTimeout(() => summary.focus());
   }
 
   // --- Select ---------------------------------------------------------------
@@ -592,15 +567,6 @@ export class FormsPage {
       setTimeout(tick, 220);
     });
 
-  // --- Code editor ----------------------------------------------------------
-  protected readonly config = signal(
-    '{"theme":"dark","features":{"search":true,"beta":false},"limits":[10,20,30]}',
-  );
-  protected readonly jsonValid = signal<MkCodeValidity>({
-    valid: true,
-    error: null,
-  });
-
   // --- Reactive forms demo ---------------------------------------------------
   protected readonly profileLabels = { email: 'Email address', age: 'Age' };
   protected readonly ageMessages = { min: 'You must be 18 or over' };
@@ -640,7 +606,9 @@ export class FormsPage {
 </mk-form-field>`;
 
   protected readonly errorSummaryCode = `<form (ngSubmit)="onSubmit()">
-  <mk-form-error-summary #summary [errors]="errors()" />
+  <!-- Focuses itself when the form is submitted with errors
+       (opt out with [autoFocus]="false" and call focus() yourself). -->
+  <mk-form-error-summary [errors]="errors()" />
 
   <mk-form-field #emailField label="Email" [error]="emailError()">
     <input mkInput [(ngModel)]="email" name="email" />
@@ -649,10 +617,7 @@ export class FormsPage {
   <button mkButton type="submit">Submit</button>
 </form>
 
-onSubmit() {
-  this.submitted.set(true);
-  if (this.errors().length) this.summary.focus();  // move focus to the list
-}
+onSubmit() { this.submitted.set(true); }
 // errors(): { fieldId: field.controlId, message: '…' }[]`;
 
   protected readonly reactiveCode = `profile = new FormGroup({
@@ -707,10 +672,6 @@ onSubmit() {
   hint="PNG, JPG or GIF up to 5 MB — max 4 files"
   [uploadFn]="upload"
   [(files)]="uploads" />`;
-
-  protected readonly codeEditorCode = `<mk-code-editor #editor language="json" [rows]="9" [(value)]="config"
-  (validate)="jsonValid.set($event)" />
-<button mkButton variant="outline" size="sm" (click)="editor.format()">Format</button>`;
 
   protected readonly repeaterCode = `interface OrderLine { name: string; qty: number; }
 

@@ -1,66 +1,110 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import {
-  MkCarousel,
-  MkCarouselSlide,
-  MkCode,
-  MkCountdown,
-  MkDiff,
-  MkInput,
-  MkJsonViewer,
-  MkKanban,
-  MkQrCode,
-  type MkKanbanColumn,
-  MkVirtualScroll,
-} from '@mkornas/ui';
+import { RouterLink } from '@angular/router';
+import { MkCountdown, MkInput, MkQrCode, MkVirtualScroll } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Data display components demo page — Code block, Virtual scroll, Carousel,
- * Diff, QR code, Kanban and Countdown.
+ * Misc display components demo page — Countdown, QR code and Virtual scroll.
+ * The former residents of this page moved to their own homes: Kanban to
+ * `/components/kanban`, the code/diff/JSON-viewer trio to
+ * `/components/markdown` and the Carousel to `/components/images`.
  */
 @Component({
   selector: 'docs-data-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [
-    DocsExample,
-    MkCode,
-    MkCountdown,
-    MkInput,
-    MkJsonViewer,
-    MkKanban,
-    MkQrCode,
-    MkVirtualScroll,
-    MkCarousel,
-    MkCarouselSlide,
-    MkDiff,
-  ],
+  imports: [DocsExample, RouterLink, MkCountdown, MkInput, MkQrCode, MkVirtualScroll],
   template: `
     <div class="docs-page docs-container">
-      <h1>Data display</h1>
+      <h1>Misc display</h1>
       <p class="docs-lead">
-        Rich content renderers for specialised data: syntax-highlighted code
-        blocks, a virtualised list for huge datasets, a carousel, text diffs,
-        SVG QR codes, a drag-and-drop kanban board and a live countdown. Every
-        component is themed with
-        <code class="docs-inline">--mk-*</code> tokens and ships with sensible
-        accessibility defaults.
+        Specialised display components that don't belong to a bigger family: a
+        live <strong>countdown</strong>, dependency-free SVG
+        <strong>QR codes</strong> and a <strong>virtual scroll</strong> list
+        for huge datasets. Each ships with a pure, standalone helper
+        (<code class="docs-inline">mkSplitDuration</code>,
+        <code class="docs-inline">mkEncodeQr</code>) and is themed with
+        <code class="docs-inline">--mk-*</code> tokens.
       </p>
 
-      <h2>Code block</h2>
+      <!-- ========================== COUNTDOWN ======================== -->
+      <h2>Countdown</h2>
       <p>
-        <code class="docs-inline">&lt;mk-code&gt;</code> is a read-only, themed code
-        block with syntax highlighting, an optional filename header, line numbers
-        and a copy button (it reuses the tokenizer + copy directive).
+        <code class="docs-inline">&lt;mk-countdown&gt;</code> counts down
+        <strong>live</strong>, ticking every second toward a target
+        <code class="docs-inline">to</code> date and showing the remaining days,
+        hours, minutes and seconds. It emits
+        <code class="docs-inline">finished</code> once the instant passes, stops
+        ticking while the tab is hidden (resyncing on return) and re-arms when
+        <code class="docs-inline">to</code> moves into the future again.
       </p>
-      <docs-example [code]="codeBlockCode" [column]="true">
-        <mk-code
-          language="json"
-          filename="config.json"
-          [lineNumbers]="true"
-          [code]="sampleJson"
-        />
+      <docs-example [code]="countdownCode" [column]="true">
+        <mk-countdown [to]="launchDate" />
       </docs-example>
 
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>to</code></td><td><code>Date | null</code></td><td><code>null</code></td><td>The target instant to count down to.</td></tr>
+          <tr><td><code>showDays</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the days segment; when off, days roll into the hours value.</td></tr>
+          <tr><td><code>showLabels</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the textual label beneath each value.</td></tr>
+          <tr><td><code>pad</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Zero-pad values to two digits.</td></tr>
+          <tr><td><code>finishedText</code></td><td><code>string</code></td><td><code>''</code></td><td>Text to show instead of zeros once the countdown finishes.</td></tr>
+          <tr><td><code>(finished)</code></td><td><code>void</code></td><td>—</td><td>Fires exactly once when the target instant is reached.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The splitter is exported standalone:
+        <code class="docs-inline">mkSplitDuration(ms)</code> turns a
+        millisecond duration into
+        <code class="docs-inline">{{ '{' }} days, hours, minutes, seconds {{ '}' }}</code>
+        (negative inputs clamp to zero). Screen readers get a polite live
+        region that only announces on minute rollovers — never every second.
+      </p>
+
+      <!-- =========================== QR CODE ========================= -->
+      <h2>QR code</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-qr-code&gt;</code> renders a QR code as
+        crisp SVG — no dependencies (the encoder, Reed–Solomon ECC and masking
+        are implemented in-house; byte mode / UTF-8, versions 1–10). Set
+        <code class="docs-inline">value</code>,
+        <code class="docs-inline">ecc</code> (L/M/Q/H) and
+        <code class="docs-inline">size</code>; it's theme-aware by default.
+      </p>
+      <docs-example [code]="qrCode" [column]="true">
+        <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: flex-start;">
+          <mk-qr-code [value]="qrValue()" [size]="160" />
+          <div style="display: grid; gap: var(--mk-space-2); max-width: 22rem; width: 100%;">
+            <input mkInput [value]="qrValue()" (input)="qrValue.set($any($event.target).value)" />
+            <p class="echo">Encodes the text above — try editing it.</p>
+          </div>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>value</code></td><td><code>string</code></td><td>required</td><td>The text to encode (UTF-8, byte mode).</td></tr>
+          <tr><td><code>ecc</code></td><td><code>'L' | 'M' | 'Q' | 'H'</code></td><td><code>'M'</code></td><td>Error-correction level (~7% / ~15% / ~25% / ~30%).</td></tr>
+          <tr><td><code>size</code></td><td><code>number</code></td><td><code>160</code></td><td>Rendered pixel size of the (square) SVG.</td></tr>
+          <tr><td><code>quietZone</code></td><td><code>number</code></td><td><code>4</code></td><td>Light margin around the code, in modules (spec recommends 4).</td></tr>
+          <tr><td><code>color</code></td><td><code>string</code></td><td><code>'var(--mk-text)'</code></td><td>Dark-module colour.</td></tr>
+          <tr><td><code>background</code></td><td><code>string</code></td><td><code>'var(--mk-surface)'</code></td><td>Background / quiet-zone colour.</td></tr>
+          <tr><td><code>label</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible label; when omitted it carries the encoded content ("QR code: …").</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The encoder is exported standalone:
+        <code class="docs-inline">mkEncodeQr(value, ecc)</code> returns the raw
+        module matrix (<code class="docs-inline">boolean[][]</code>,
+        <code class="docs-inline">true</code> = dark) for custom renderers.
+      </p>
+
+      <!-- ======================== VIRTUAL SCROLL ===================== -->
       <h2>Virtual scroll</h2>
       <p>
         <code class="docs-inline">&lt;mk-virtual-scroll&gt;</code> renders only the
@@ -83,115 +127,42 @@ import { DocsExample } from '../../shared/docs-example';
         </mk-virtual-scroll>
       </docs-example>
 
-      <h2>Carousel</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-carousel&gt;</code> is an accessible
-        slides/gallery — prev/next arrows, dot indicators, Arrow-key navigation
-        and optional autoplay (pauses on hover/focus). Mark each slide with
-        <code class="docs-inline">mkCarouselSlide</code>.
-      </p>
-      <docs-example [code]="carouselCode" [column]="true">
-        <div style="max-width: 30rem; width: 100%;">
-          <mk-carousel ariaLabel="Highlights">
-            @for (c of slides; track c.title) {
-              <div mkCarouselSlide [style.background]="c.bg" style="padding: var(--mk-space-8) var(--mk-space-4); text-align: center; color: #fff;">
-                <h3 style="margin: 0 0 var(--mk-space-1);">{{ c.title }}</h3>
-                <p style="margin: 0; opacity: 0.85;">{{ c.body }}</p>
-              </div>
-            }
-          </mk-carousel>
-        </div>
-      </docs-example>
-
-      <h2>Diff</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-diff&gt;</code> compares two versions of
-        text (a revision "before → after") with an LCS line diff and intra-line
-        word highlighting. Render <code class="docs-inline">unified</code>
-        (single column, +/−) or <code class="docs-inline">split</code>
-        (side-by-side).
-      </p>
-      <docs-example [code]="diffCode" [column]="true">
-        <div style="display: flex; flex-direction: column; gap: var(--mk-space-4); width: 100%;">
-          <mk-diff [before]="diffBefore" [after]="diffAfter" />
-          <mk-diff [before]="diffBefore" [after]="diffAfter" mode="split" beforeLabel="v3" afterLabel="v4" />
-        </div>
-      </docs-example>
-
-      <!-- =========================== QR CODE ========================= -->
-      <h2>QR code</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-qr-code&gt;</code> renders a QR code as
-        crisp SVG — no dependencies (the encoder, Reed–Solomon ECC and masking are
-        implemented in-house). Set <code class="docs-inline">value</code>,
-        <code class="docs-inline">ecc</code> (L/M/Q/H) and
-        <code class="docs-inline">size</code>; it's theme-aware by default.
-      </p>
-      <docs-example [code]="qrCode" [column]="true">
-        <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: flex-start;">
-          <mk-qr-code [value]="qrValue()" [size]="160" />
-          <div style="display: grid; gap: var(--mk-space-2); max-width: 22rem; width: 100%;">
-            <input mkInput [value]="qrValue()" (input)="qrValue.set($any($event.target).value)" />
-            <p class="echo">Encodes the text above — try editing it.</p>
-          </div>
-        </div>
-      </docs-example>
-
-      <!-- =========================== KANBAN ========================== -->
-      <h2>Kanban</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-kanban&gt;</code> is a board of columns
-        whose cards are <strong>draggable between columns</strong> (and reorderable
-        within one) with both pointer and keyboard dragging. Bind
-        <code class="docs-inline">columns</code> two-way — the model is updated
-        immutably on every drop — and listen to
-        <code class="docs-inline">cardMoved</code> for move events.
-      </p>
-      <docs-example [code]="kanbanCode" [column]="true">
-        <mk-kanban [(columns)]="board" style="width: 100%" />
-      </docs-example>
-
-      <!-- ========================== COUNTDOWN ======================== -->
-      <h2>Countdown</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-countdown&gt;</code> counts down
-        <strong>live</strong>, ticking every second toward a target
-        <code class="docs-inline">to</code> date and showing the remaining days,
-        hours, minutes and seconds. It emits
-        <code class="docs-inline">finished</code> once the instant passes.
-      </p>
-      <docs-example [code]="countdownCode" [column]="true">
-        <mk-countdown [to]="launchDate" />
-      </docs-example>
-
-      <h2>JSON viewer</h2>
-      <p>
-        <code class="docs-inline">&lt;mk-json-viewer&gt;</code> renders JSON-ish
-        data as a read-only collapsible tree: objects and arrays fold behind
-        disclosure buttons with a
-        <code class="docs-inline">{{ '{' }}…{{ '}' }} n items</code> preview,
-        primitives are colour-coded by type and circular references render as
-        <code class="docs-inline">[Circular]</code>.
-        <code class="docs-inline">expandDepth</code> sets the initial expansion;
-        <code class="docs-inline">expandAll()</code> /
-        <code class="docs-inline">collapseAll()</code> are available via
-        <code class="docs-inline">exportAs</code>. The complement of the code
-        editor: that edits JSON <em>text</em>, this explores JSON
-        <em>data</em>.
-      </p>
-      <docs-example [code]="jsonViewerCode" [column]="true">
-        <mk-json-viewer [data]="jsonSample" [expandDepth]="2" />
-      </docs-example>
       <table class="docs-props">
         <thead>
           <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td>data</td><td>unknown</td><td>required</td><td>Any JSON-serialisable value to display.</td></tr>
-          <tr><td>expandDepth</td><td>number</td><td>1</td><td>How many levels start expanded (root = level 1).</td></tr>
-          <tr><td>aria-label</td><td>string</td><td>'JSON'</td><td>Accessible label of the tree region.</td></tr>
+          <tr><td><code>items</code></td><td><code>readonly unknown[]</code></td><td><code>[]</code></td><td>The full list of items.</td></tr>
+          <tr><td><code>itemHeight</code></td><td><code>number</code></td><td><code>40</code></td><td>Fixed height of each row in px.</td></tr>
+          <tr><td><code>overscan</code></td><td><code>number</code></td><td><code>4</code></td><td>Extra rows rendered above/below the viewport to smooth fast scrolls.</td></tr>
+          <tr><td><code>ng-template</code></td><td>slot</td><td>—</td><td>The row template: <code>&lt;ng-template let-row let-i="index"&gt;</code>.</td></tr>
         </tbody>
       </table>
+
+      <!-- ========================= MOVED SECTIONS ==================== -->
+      <h2>Kanban</h2>
+      <p>
+        The drag-and-drop <code class="docs-inline">&lt;mk-kanban&gt;</code>
+        board — pointer, touch and keyboard dragging, custom card templates —
+        has its own page now.
+        <a routerLink="/components/kanban">See the Kanban docs →</a>
+      </p>
+
+      <h2>Code block, diff &amp; JSON viewer</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-code&gt;</code>,
+        <code class="docs-inline">&lt;mk-diff&gt;</code> and
+        <code class="docs-inline">&lt;mk-json-viewer&gt;</code> moved to the
+        Code &amp; content page, alongside the code editor and markdown.
+        <a routerLink="/components/markdown">See the Code &amp; content docs →</a>
+      </p>
+
+      <h2>Carousel</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-carousel&gt;</code> lives with the
+        rest of the media components now.
+        <a routerLink="/components/images">See the Images &amp; lightbox docs →</a>
+      </p>
     </div>
   `,
   styles: [
@@ -206,47 +177,9 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class DataPage {
-  protected readonly sampleJson =
-    '{\n  "theme": "dark",\n  "retries": 3,\n  "features": ["search", "export"]\n}';
   protected readonly bigList = Array.from({ length: 10000 }, (_, i) => ({
     name: `Item number ${i + 1}`,
   }));
-  protected readonly slides = [
-    { title: 'Fast', body: 'Signals + OnPush everywhere.', bg: 'var(--mk-primary)' },
-    { title: 'Accessible', body: 'WCAG 2.1 AA out of the box.', bg: 'var(--mk-success)' },
-    { title: 'Themeable', body: 'Every colour is a CSS variable.', bg: 'var(--mk-info)' },
-  ];
-
-  // ----- Kanban --------------------------------------------------------
-  protected readonly board = signal<MkKanbanColumn[]>([
-    {
-      id: 'todo',
-      title: 'To do',
-      cards: [
-        { id: 't1', title: 'Draft release notes' },
-        { id: 't2', title: 'Audit colour tokens' },
-        { id: 't3', title: 'Write kanban docs' },
-      ],
-    },
-    {
-      id: 'doing',
-      title: 'In progress',
-      cards: [
-        { id: 'd1', title: 'Ship countdown component' },
-        { id: 'd2', title: 'Review DnD a11y' },
-      ],
-    },
-    {
-      id: 'done',
-      title: 'Done',
-      cards: [
-        { id: 'x1', title: 'Set up docs site' },
-        { id: 'x2', title: 'Publish v1 to npm' },
-      ],
-    },
-  ]);
-
-  protected readonly kanbanCode = `<mk-kanban [(columns)]="board" (cardMoved)="onMoved($event)" />`;
 
   // ----- Countdown -----------------------------------------------------
   /** A few days out; computed at construction so SSR/build stays stable. */
@@ -254,43 +187,12 @@ export class DataPage {
 
   protected readonly countdownCode = `<mk-countdown [to]="launchDate" (finished)="onLaunch()" />`;
 
-  protected readonly codeBlockCode = `<mk-code language="json" filename="config.json"
-  lineNumbers [code]="json" />`;
   protected readonly virtualScrollCode = `<mk-virtual-scroll [items]="rows" [itemHeight]="36"
   style="height: 16rem;">
   <ng-template let-row let-i="index">#{{ '{{ i }}' }} — {{ '{{ row.name }}' }}</ng-template>
 </mk-virtual-scroll>`;
-  protected readonly carouselCode = `<mk-carousel ariaLabel="Highlights">
-  <div mkCarouselSlide>…</div>
-  <div mkCarouselSlide>…</div>
-</mk-carousel>`;
-
-  protected readonly diffBefore = `title: Getting started
-theme: light
-retries: 3
-Draft the quick brown fox.`;
-  protected readonly diffAfter = `title: Getting started
-theme: dark
-retries: 5
-Draft the slow brown fox.
-published: true`;
-  protected readonly diffCode = `<mk-diff [before]="v1" [after]="v2" />
-<mk-diff [before]="v1" [after]="v2" mode="split" />`;
 
   // ----- QR code -------------------------------------------------------
   protected readonly qrValue = signal('https://github.com/mkornas/mk-kit');
   protected readonly qrCode = `<mk-qr-code value="https://example.com" ecc="M" [size]="160" />`;
-
-  // ----- JSON viewer ---------------------------------------------------
-  protected readonly jsonSample = {
-    id: 'ord_1042',
-    total: 249.99,
-    paid: true,
-    customer: { name: 'Ada Lovelace', vip: null },
-    items: [
-      { sku: 'KB-01', qty: 1 },
-      { sku: 'MS-77', qty: 2 },
-    ],
-  };
-  protected readonly jsonViewerCode = `<mk-json-viewer [data]="order" [expandDepth]="2" />`;
 }

@@ -13,6 +13,8 @@ import {
   type MkDateRange,
   type MkWeek,
   formatDate,
+  getISOWeek,
+  startOfWeek,
 } from '@mkornas/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -79,8 +81,14 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>max</td><td>Date | null</td><td>null</td><td>Latest selectable date (inclusive, day granularity).</td></tr>
           <tr><td>firstDayOfWeek</td><td>number (0–6)</td><td>0</td><td>First column of the week; 0 = Sunday … 6 = Saturday.</td></tr>
           <tr><td>disabledDate</td><td>((d: Date) =&gt; boolean) | null</td><td>null</td><td>Predicate marking individual days disabled.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the whole calendar (forms' setDisabledState also applies).</td></tr>
+          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling + aria-invalid when used standalone.</td></tr>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size.</td></tr>
+          <tr><td>fullWidth</td><td>boolean</td><td>false</td><td>Stretch to fill the container (page/sidebar layouts) instead of sizing to content.</td></tr>
+          <tr><td>rangeMode</td><td>boolean</td><td>false</td><td>Enable range highlighting (additive; hosts drive selection via dateSelected).</td></tr>
+          <tr><td>rangeStart / rangeEnd</td><td>Date | null</td><td>null</td><td>Range endpoints to highlight in range mode.</td></tr>
           <tr><td>dateSelected</td><td>output&lt;Date&gt;</td><td>—</td><td>Emitted whenever a non-disabled day is activated.</td></tr>
+          <tr><td>dateHovered</td><td>output&lt;Date | null&gt;</td><td>—</td><td>Range mode: the hovered day (null on leave) — lets hosts preview a selection.</td></tr>
         </tbody>
       </table>
 
@@ -472,6 +480,49 @@ import { DocsExample } from '../../shared/docs-example';
         </tbody>
       </table>
 
+      <!-- ============================================================ -->
+      <!-- DATE HELPERS -->
+      <!-- ============================================================ -->
+      <h2>Date helpers</h2>
+      <p>
+        The <code class="docs-inline">datetime</code> entry point exports the
+        dependency-free, pure date functions the components are built on — all
+        operate on native <code class="docs-inline">Date</code> in the local
+        time zone. Name-producing helpers default to English and accept an
+        optional <code class="docs-inline">MkDateNames</code> table (from
+        <code class="docs-inline">MK_I18N</code>) for localisation.
+      </p>
+      <docs-example [code]="dateHelpersCode" [column]="true">
+        <p class="echo">
+          Today is ISO week {{ isoWeekDemo }} · week starts
+          {{ weekStartDemo }}
+        </p>
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Function</th><th>Signature</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code class="docs-inline">isSameDay</code></td><td>(a: Date, b: Date) =&gt; boolean</td><td>Both dates fall on the same calendar day.</td></tr>
+          <tr><td><code class="docs-inline">isSameMonth</code></td><td>(a: Date, b: Date) =&gt; boolean</td><td>Both dates fall in the same month of the same year.</td></tr>
+          <tr><td><code class="docs-inline">isBefore</code> / <code class="docs-inline">isAfter</code></td><td>(a: Date, b: Date) =&gt; boolean</td><td>Strict full-timestamp comparison.</td></tr>
+          <tr><td><code class="docs-inline">startOfDay</code></td><td>(date: Date) =&gt; Date</td><td>Midnight on the date's calendar day.</td></tr>
+          <tr><td><code class="docs-inline">startOfMonth</code> / <code class="docs-inline">endOfMonth</code></td><td>(date: Date) =&gt; Date</td><td>Midnight on the first / last day of the month.</td></tr>
+          <tr><td><code class="docs-inline">startOfWeek</code> / <code class="docs-inline">endOfWeek</code></td><td>(date: Date, firstDayOfWeek = 0) =&gt; Date</td><td>First / last day of the containing week, at midnight.</td></tr>
+          <tr><td><code class="docs-inline">addDays</code></td><td>(date: Date, count: number) =&gt; Date</td><td>New date shifted by whole days (negative subtracts).</td></tr>
+          <tr><td><code class="docs-inline">addMonths</code></td><td>(date: Date, count: number) =&gt; Date</td><td>Shift by months, clamping the day (Jan 31 + 1 = Feb 28/29).</td></tr>
+          <tr><td><code class="docs-inline">clampDate</code></td><td>(date: Date, min?, max?) =&gt; Date</td><td>Clamp into an inclusive [min, max] range (either bound optional).</td></tr>
+          <tr><td><code class="docs-inline">getISOWeek</code></td><td>(date: Date) =&gt; number</td><td>ISO-8601 week number (1–53; Monday weeks, first-Thursday rule).</td></tr>
+          <tr><td><code class="docs-inline">formatDate</code></td><td>(date: Date, pattern: string, names?) =&gt; string</td><td>Small pattern set: yyyy, MMMM, MMM, MM, ddd, dd, d.</td></tr>
+          <tr><td><code class="docs-inline">formatISODate</code></td><td>(date: Date) =&gt; string</td><td>Local-time ISO calendar date, YYYY-MM-DD.</td></tr>
+          <tr><td><code class="docs-inline">parseISODate</code></td><td>(value: string | null) =&gt; Date | null</td><td>Parse YYYY-MM-DD (rollovers like 02-31 rejected) or null.</td></tr>
+          <tr><td><code class="docs-inline">buildMonthMatrix</code></td><td>(viewDate: Date, firstDayOfWeek = 0) =&gt; Date[][]</td><td>Fixed 6×7 month grid including leading/trailing outside days.</td></tr>
+          <tr><td><code class="docs-inline">getMonthNames</code></td><td>(names?) =&gt; readonly string[]</td><td>Full month names, index 0 = January.</td></tr>
+          <tr><td><code class="docs-inline">getWeekdayNames</code></td><td>(firstDayOfWeek = 0, format = 'short', names?) =&gt; string[]</td><td>Weekday header labels ('short' or 'narrow'), ordered from firstDayOfWeek.</td></tr>
+          <tr><td><code class="docs-inline">getWeekdayFullName</code></td><td>(date: Date, names?) =&gt; string</td><td>Full weekday name (for screen-reader labels).</td></tr>
+        </tbody>
+      </table>
+
     </div>
   `,
   styles: [
@@ -624,6 +675,19 @@ inThirtyDays = new Date(this.today.getTime() + 30 * 864e5);
 
 <!-- The value is a Date; its local hours/minutes carry the picked time. -->
 <mk-time-picker valueFormat="date" [(value)]="pickupAt" [step]="15" clearable />`;
+
+  // --- Date helpers ---------------------------------------------------------
+  protected readonly isoWeekDemo = getISOWeek(new Date());
+  protected readonly weekStartDemo = formatDate(
+    startOfWeek(new Date(), 1),
+    'ddd, MMM d',
+  );
+
+  protected readonly dateHelpersCode = `import { formatDate, startOfWeek, getISOWeek } from '@mkornas/ui';
+
+const monday = startOfWeek(new Date(), 1);          // week starts Monday
+const label = formatDate(monday, 'ddd, MMM d');     // e.g. 'Mon, Aug 3'
+const week = getISOWeek(new Date());                // e.g. 32`;
 
   protected readonly rangePickerCode = `range = signal<MkDateRange>({ start: null, end: null });
 

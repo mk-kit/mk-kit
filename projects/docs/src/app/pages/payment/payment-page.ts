@@ -198,6 +198,34 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>size / invalid / disabled / placeholder</td><td>—</td><td>—</td><td>Standard control inputs.</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Validation helpers</h2>
+      <p>
+        The pure functions and data tables behind these controls are exported —
+        use them server-side, in custom validators, or to render brand/format
+        information yourself. (The reactive-forms validators
+        <code class="docs-inline">mkIbanValidator()</code> and
+        <code class="docs-inline">mkTaxIdValidator(country)</code> shown above
+        are built on them.)
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Export</th><th>Signature / type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkLuhnCheck</code></td><td><code>(digits: string) =&gt; boolean</code></td><td>Luhn (mod-10) checksum over a digit string — the card-number check.</td></tr>
+          <tr><td><code>mkDetectCardBrand</code></td><td><code>(digits: string) =&gt; MkCardBrand | null</code></td><td>Detect the network from the leading digits (IIN ranges): visa, mastercard, amex, discover, diners, jcb.</td></tr>
+          <tr><td><code>MK_CARD_BRAND_NAMES</code></td><td><code>Record&lt;MkCardBrand, string&gt;</code></td><td>Human-readable names for the recognised brands ("American Express").</td></tr>
+          <tr><td><code>mkIbanIsValid</code></td><td><code>(compact: string) =&gt; boolean</code></td><td>Full IBAN validity: known country, exact length, mod-97 check.</td></tr>
+          <tr><td><code>mkIbanChecksum</code></td><td><code>(compact: string) =&gt; boolean</code></td><td>The ISO 13616 mod-97 check alone, over a compact uppercase IBAN.</td></tr>
+          <tr><td><code>MK_IBAN_LENGTHS</code></td><td><code>Record&lt;string, number&gt;</code></td><td>Exact IBAN length per ISO country code — the 65 built-in countries.</td></tr>
+          <tr><td><code>mkTaxIdIsValid</code></td><td><code>(value: string, country: string) =&gt; boolean</code></td><td>Shape + national checksum for a country; masked and compact input both accepted; unknown countries pass.</td></tr>
+          <tr><td><code>mkTaxIdFormat</code></td><td><code>(country: string) =&gt; MkTaxIdFormat | undefined</code></td><td>Look up a country's built-in format (label, mask, pattern, example, checksum).</td></tr>
+          <tr><td><code>mkNipChecksum</code></td><td><code>(compact: string) =&gt; boolean</code></td><td>Polish NIP checksum: weighted sum of the first nine digits mod 11 equals the tenth.</td></tr>
+          <tr><td><code>MK_TAX_ID_FORMATS</code></td><td><code>readonly MkTaxIdFormat[]</code></td><td>The built-in tax-ID formats (CZ, DE, IT, PL, SK); only PL carries a checksum.</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [

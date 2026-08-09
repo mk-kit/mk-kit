@@ -12,8 +12,8 @@ import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
  * Panel width preset. The panel is always `min(target, 92vw)`, so it shrinks to
  * fit a phone and grows to its target on a desktop.
  *
- * - `sm` (32rem) — confirmations, single-field prompts
- * - `md` (45rem) — the default; two-column forms
+ * - `sm` (32rem) — the default; confirmations, single-field prompts
+ * - `md` (45rem) — two-column forms
  * - `lg` (56rem) — forms with nested sections
  * - `xl` (75rem) — tables or side-by-side content inside a modal
  */

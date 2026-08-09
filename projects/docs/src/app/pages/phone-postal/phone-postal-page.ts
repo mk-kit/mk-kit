@@ -159,6 +159,26 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>valid()</td><td>Signal&lt;boolean | null&gt;</td><td>—</td><td>true/false for a complete/incomplete code; null when empty or unknown country (via exportAs "mkPostalCodeInput").</td></tr>
         </tbody>
       </table>
+
+      <!-- ============================================================ -->
+      <h2>Data tables &amp; helpers</h2>
+      <p>
+        The country data behind both controls is exported — extend it via the
+        <code class="docs-inline">countries</code> /
+        <code class="docs-inline">formats</code> inputs, or reuse it for your
+        own rendering (country pickers, address displays).
+      </p>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Export</th><th>Signature / type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>MK_PHONE_COUNTRIES</code></td><td><code>readonly MkPhoneCountry[]</code></td><td>The 60 built-in dialing entries: ISO <code>code</code>, <code>dialCode</code> (digits, no "+") and the national-number <code>mask</code>.</td></tr>
+          <tr><td><code>mkCountryFlag</code></td><td><code>(code: string) =&gt; string</code></td><td>Regional-indicator flag emoji for an ISO 3166-1 alpha-2 code ("PL" → 🇵🇱); empty string for a malformed code.</td></tr>
+          <tr><td><code>MK_POSTAL_FORMATS</code></td><td><code>readonly MkPostalFormat[]</code></td><td>The 36 built-in postal formats: ISO <code>code</code>, optional <code>mask</code> (free-form countries like GB omit it), validation <code>pattern</code> and <code>example</code>.</td></tr>
+          <tr><td><code>mkPostalFormat</code></td><td><code>(code: string) =&gt; MkPostalFormat | undefined</code></td><td>Look up a country's built-in postal format (case-insensitive).</td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [

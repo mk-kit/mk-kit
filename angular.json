@@ -58,6 +58,11 @@
               {
                 "glob": "**/*",
                 "input": "projects/docs/public"
+              },
+              {
+                "glob": "CHANGELOG.md",
+                "input": ".",
+                "output": "."
               }
             ],
             "styles": [

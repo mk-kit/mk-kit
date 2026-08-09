@@ -4,6 +4,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import {
   MkButton,
   MkDialog,
@@ -59,7 +60,7 @@ export class DemoDialogContent {
 @Component({
   selector: 'docs-dialogs-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkButton],
+  imports: [DocsExample, MkButton, RouterLink],
   template: `
     <div class="docs-page docs-container">
       <h1>Dialogs</h1>
@@ -74,15 +75,35 @@ export class DemoDialogContent {
         and fully accessible.
       </p>
 
-      <!-- ============================ DIALOG =========================== -->
-      <h2>Dialog</h2>
+      <!-- ======================== BASIC DIALOG ========================= -->
+      <h2>Basic dialog</h2>
       <p>
         <code class="docs-inline">MkDialogService</code> renders content on a
         themed <code class="docs-inline">--mk-surface</code> panel with a
-        backdrop, focus trap, and Escape handling. Use
-        <code class="docs-inline">confirm()</code> for a yes/no prompt, or
-        <code class="docs-inline">open()</code> to mount your own standalone
-        component.
+        backdrop, focus trap, and Escape handling. Pass a standalone component
+        to <code class="docs-inline">open()</code>: lay it out with
+        <code class="docs-inline">mk-dialog</code> (sticky header, scrollable
+        body, sticky footer) and close it through the injected
+        <code class="docs-inline">MkOverlayRef</code>, optionally returning a
+        result to <code class="docs-inline">afterClosed</code>.
+      </p>
+      <docs-example [code]="openCode">
+        <button mkButton (click)="openCustom()">Open dialog…</button>
+        <span class="docs-status">
+          @if (openResult(); as r) {
+            Closed with: {{ r }}
+          }
+        </span>
+      </docs-example>
+
+      <p>The projected <code class="docs-inline">mk-dialog</code> markup:</p>
+      <docs-example [code]="dialogMarkupCode"></docs-example>
+
+      <!-- ==================== CONFIRM & PROMPT ========================= -->
+      <h2>Confirm &amp; prompt (service)</h2>
+      <p>
+        For the common one-question cases you don't need a component at all —
+        the service ships promise-based helpers.
       </p>
 
       <h3>Confirm</h3>
@@ -124,25 +145,69 @@ export class DemoDialogContent {
         </span>
       </docs-example>
 
-      <h3>Custom dialog</h3>
-      <p>
-        Pass a standalone component to
-        <code class="docs-inline">open()</code>. Lay it out with
-        <code class="docs-inline">mk-dialog</code> and close it through the
-        injected <code class="docs-inline">MkOverlayRef</code>, optionally
-        returning a result to <code class="docs-inline">afterClosed</code>.
-      </p>
-      <docs-example [code]="openCode">
-        <button mkButton (click)="openCustom()">Open dialog…</button>
-        <span class="docs-status">
-          @if (openResult(); as r) {
-            Closed with: {{ r }}
-          }
-        </span>
-      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr>
+            <th>confirm() data</th>
+            <th>Type</th>
+            <th>Default</th>
+            <th>Description</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">title</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Heading text (required).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">message</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>—</td>
+            <td>Body message (required).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">confirmText</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'Confirm'</code></td>
+            <td>Confirm button label.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">cancelText</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td><code class="docs-inline">'Cancel'</code></td>
+            <td>Cancel button label.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">tone</code></td>
+            <td><code class="docs-inline">'primary' | 'danger' | 'warning' | 'success'</code></td>
+            <td><code class="docs-inline">'primary'</code></td>
+            <td>Confirm button tone; <code class="docs-inline">'danger'</code> switches the panel to <code class="docs-inline">alertdialog</code>.</td>
+          </tr>
+        </tbody>
+      </table>
 
-      <p>The projected <code class="docs-inline">mk-dialog</code> markup:</p>
-      <docs-example [code]="dialogMarkupCode"></docs-example>
+      <!-- ====================== SIZING & PANELS ======================== -->
+      <h2>Sizing &amp; panels</h2>
+      <p>
+        <code class="docs-inline">MkDialogConfig.size</code> picks a panel width
+        preset: <code class="docs-inline">sm</code> (32rem, the default) for
+        confirmations and single-field prompts,
+        <code class="docs-inline">md</code> (45rem) for two-column forms,
+        <code class="docs-inline">lg</code> (56rem) for forms with nested
+        sections, and <code class="docs-inline">xl</code> (75rem) for tables or
+        side-by-side content inside a modal. The panel is always
+        <code class="docs-inline">min(target, 92vw)</code>, so it shrinks to fit
+        a phone and grows to its target on a desktop. Use
+        <code class="docs-inline">panelClass</code> to add your own class(es) to
+        the overlay panel for further styling.
+      </p>
+      <docs-example [code]="sizeCode">
+        <button mkButton variant="outline" (click)="openLarge()">
+          Open lg dialog…
+        </button>
+      </docs-example>
 
       <table class="docs-props">
         <thead>
@@ -197,6 +262,12 @@ export class DemoDialogContent {
             <td>Accessible role for the panel.</td>
           </tr>
           <tr>
+            <td><code class="docs-inline">size</code></td>
+            <td><code class="docs-inline">'sm' | 'md' | 'lg' | 'xl'</code></td>
+            <td><code class="docs-inline">'sm'</code></td>
+            <td>Panel width preset — see above.</td>
+          </tr>
+          <tr>
             <td><code class="docs-inline">ariaLabel</code></td>
             <td><code class="docs-inline">string</code></td>
             <td><code class="docs-inline">undefined</code></td>
@@ -205,48 +276,16 @@ export class DemoDialogContent {
         </tbody>
       </table>
 
-      <table class="docs-props">
-        <thead>
-          <tr>
-            <th>confirm() data</th>
-            <th>Type</th>
-            <th>Default</th>
-            <th>Description</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td><code class="docs-inline">title</code></td>
-            <td><code class="docs-inline">string</code></td>
-            <td>—</td>
-            <td>Heading text (required).</td>
-          </tr>
-          <tr>
-            <td><code class="docs-inline">message</code></td>
-            <td><code class="docs-inline">string</code></td>
-            <td>—</td>
-            <td>Body message (required).</td>
-          </tr>
-          <tr>
-            <td><code class="docs-inline">confirmText</code></td>
-            <td><code class="docs-inline">string</code></td>
-            <td><code class="docs-inline">'Confirm'</code></td>
-            <td>Confirm button label.</td>
-          </tr>
-          <tr>
-            <td><code class="docs-inline">cancelText</code></td>
-            <td><code class="docs-inline">string</code></td>
-            <td><code class="docs-inline">'Cancel'</code></td>
-            <td>Cancel button label.</td>
-          </tr>
-          <tr>
-            <td><code class="docs-inline">tone</code></td>
-            <td><code class="docs-inline">'primary' | 'danger' | 'warning' | 'success'</code></td>
-            <td><code class="docs-inline">'primary'</code></td>
-            <td>Confirm button tone; <code class="docs-inline">'danger'</code> switches the panel to <code class="docs-inline">alertdialog</code>.</td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- =================== FOCUS & ACCESSIBILITY ===================== -->
+      <h2>Focus &amp; accessibility</h2>
+      <p>
+        The panel gets <code class="docs-inline">role="dialog"</code> (or
+        <code class="docs-inline">alertdialog</code>), and a projected
+        <code class="docs-inline">mk-dialog-title</code> is wired to the panel's
+        <code class="docs-inline">aria-labelledby</code> automatically; use
+        <code class="docs-inline">ariaLabel</code> when there is no visible
+        title.
+      </p>
 
       <h3>Keyboard</h3>
       <table class="docs-props">
@@ -263,6 +302,19 @@ export class DemoDialogContent {
         On open, focus moves to the first focusable element in the panel (or the
         panel itself); on close, focus is restored to the element that had it
         before the dialog opened.
+      </p>
+
+      <!-- ==================== WHICH SURFACE? =========================== -->
+      <h2>Dialog, bottom sheet, or drawer?</h2>
+      <p>
+        Use a <strong>dialog</strong> for a focal decision or a short task that
+        must be resolved before continuing. Prefer a
+        <a routerLink="/components/bottom-sheet">bottom sheet</a> for a
+        mobile-friendly task surface that slides up from the edge and can be
+        dismissed with a swipe. Reach for a
+        <a routerLink="/components/drawer">drawer</a> when you need a side
+        workspace — filters, details, or secondary navigation — that can stay
+        open next to the page.
       </p>
     </div>
   `,
@@ -305,6 +357,13 @@ export class DialogsPage {
     });
     const result = await ref.afterClosed;
     this.openResult.set(result ?? 'dismissed');
+  }
+
+  protected openLarge(): void {
+    this.dialog.open<DemoDialogContent, string>(DemoDialogContent, {
+      ariaLabel: 'Invite teammate',
+      size: 'lg',
+    });
   }
 
   protected async openAlert(): Promise<void> {
@@ -359,6 +418,11 @@ if (name !== null) rename(name);`;
   ariaLabel: 'Invite teammate',
 });
 const result = await ref.afterClosed; // string | undefined`;
+
+  protected readonly sizeCode = `this.dialog.open(EditUserDialog, {
+  size: 'lg', // 'sm' (default) | 'md' | 'lg' | 'xl' — always min(target, 92vw)
+  panelClass: 'app-edit-user-panel',
+});`;
 
   protected readonly dialogMarkupCode = `@Component({
   selector: 'app-invite-dialog',

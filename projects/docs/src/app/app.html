@@ -17,8 +17,14 @@
       <a class="docs-brand" routerLink="/introduction">
         <span class="docs-brand__mark">mk</span>
         <span class="docs-brand__name">mk-kit</span>
-        <span class="docs-brand__ver">v{{ uiVersion }}</span>
       </a>
+      <a
+        class="docs-brand__ver"
+        routerLink="/changelog"
+        style="text-decoration: none"
+        [attr.aria-label]="'Version ' + uiVersion + ' — view changelog'"
+        >v{{ uiVersion }}</a
+      >
     </div>
 
     <div class="docs-header__right">

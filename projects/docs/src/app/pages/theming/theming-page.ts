@@ -281,7 +281,18 @@ export class ThemingPage {
         { name: '--mk-surface-2 / -3', desc: 'Raised & hover surfaces' },
         { name: '--mk-text', desc: 'Primary text color' },
         { name: '--mk-text-muted / -subtle', desc: 'Secondary & tertiary text' },
+        { name: '--mk-text-inverse / -disabled', desc: 'Text on inverse surfaces & disabled text' },
+        { name: '--mk-surface-inverse', desc: 'Inverted surface (tooltip & snackbar background)' },
+        { name: '--mk-overlay-scrim', desc: 'Dimmed backdrop behind dialogs, drawers & sheets' },
         { name: '--mk-border / -strong / -subtle', desc: 'Divider & border colors' },
+      ],
+    },
+    {
+      title: 'Interaction states',
+      tokens: [
+        { name: '--mk-hover-overlay', desc: 'Translucent wash layered over any surface on hover' },
+        { name: '--mk-active-overlay', desc: 'Stronger wash while pressed / active' },
+        { name: '--mk-selected-bg / -text', desc: 'Background & text of selected options, rows and calendar days' },
       ],
     },
     {
@@ -291,20 +302,40 @@ export class ThemingPage {
         { name: '--mk-success*', desc: 'Positive / success family' },
         { name: '--mk-warning*', desc: 'Caution family' },
         { name: '--mk-danger*', desc: 'Destructive / error family' },
+        { name: '--mk-danger-text', desc: 'Danger as TEXT on surfaces (error messages). Same as --mk-danger in light; lighter in dark, where the base danger is tuned for white button labels and falls below 4.5:1 as body text' },
         { name: '--mk-info*', desc: 'Informational family' },
         { name: '--mk-neutral-subtle*', desc: 'Neutral secondary family' },
         { name: '--mk-focus-ring', desc: 'Keyboard focus ring color' },
       ],
     },
     {
+      title: 'Charts',
+      tokens: [
+        { name: '--mk-chart-1 … --mk-chart-8', desc: 'Validated colorblind-safe categorical palette, assigned by series index in fixed order (fold a 9th series into "Other" rather than cycling). Defined in three places — the light :root block, the OS-dark media block and [data-mk-theme="dark"] — so a re-theme must cover all three; dark uses its own validated values, not an auto-flip' },
+        { name: '--mk-chart-grid / -axis', desc: 'Recessive chart chrome; alias --mk-border-subtle / --mk-text-subtle, so they re-resolve per theme' },
+      ],
+    },
+    {
       title: 'Geometry & type',
       tokens: [
         { name: '--mk-space-0…16', desc: 'Spacing scale (4px base)' },
-        { name: '--mk-radius-xs…2xl, -pill', desc: 'Corner radii' },
+        { name: '--mk-radius-xs…2xl, -pill, -circle', desc: 'Corner radii' },
         { name: '--mk-control-height-sm|md|lg', desc: 'Input & button heights' },
+        { name: '--mk-border-width / -strong', desc: 'Standard (1px) & emphasis (2px) border widths' },
+        { name: '--mk-focus-ring-width / -offset', desc: 'Focus ring thickness & offset from the element' },
         { name: '--mk-font-sans / -mono', desc: 'Font families' },
         { name: '--mk-font-size-xs…4xl', desc: 'Type scale' },
         { name: '--mk-font-weight-*', desc: 'Font weights' },
+        { name: '--mk-line-height-tight|snug|normal|relaxed', desc: 'Line heights (1.2 / 1.35 / 1.5 / 1.7)' },
+        { name: '--mk-letter-spacing-tight|normal|wide', desc: 'Letter spacing' },
+      ],
+    },
+    {
+      title: 'Component surfaces',
+      tokens: [
+        { name: '--mk-skeleton-base / -shine', desc: 'Skeleton placeholder base & shimmer highlight' },
+        { name: '--mk-scrollbar-thumb / -hover', desc: 'Themed scrollbar thumb (rest & hover)' },
+        { name: '--mk-code-bg', desc: 'Background of code blocks & the code editor' },
       ],
     },
     {

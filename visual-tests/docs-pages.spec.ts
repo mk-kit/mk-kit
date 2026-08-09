@@ -27,7 +27,19 @@ const DENSITY_STORAGE_KEY = 'mk-kit-density';
  * Note: there is no dedicated "touch" route in the docs — the signature pad
  * (the touch-input component page) stands in for that slot.
  */
-const ROUTES: ReadonlyArray<{ path: string; slug: string }> = [
+const ROUTES: ReadonlyArray<{
+  path: string;
+  slug: string;
+  /** CSS selector that must exist before capturing (async-loaded content). */
+  waitFor?: string;
+  /**
+   * Capture the viewport only. The changelog renders the whole release
+   * history through mk-markdown — its full-page height never stabilizes for
+   * Playwright (content pops in after the async fetch) and a tens-of-
+   *-thousands-of-pixels baseline would bloat the repo for no extra signal.
+   */
+  viewportOnly?: boolean;
+}> = [
   { path: '/getting-started', slug: 'getting-started' },
   { path: '/components/buttons', slug: 'buttons' },
   { path: '/components/forms', slug: 'forms' },
@@ -42,6 +54,14 @@ const ROUTES: ReadonlyArray<{ path: string; slug: string }> = [
   { path: '/components/markdown', slug: 'markdown' },
   { path: '/touch', slug: 'touch' },
   { path: '/components/touch-keys', slug: 'touch-keys' },
+  { path: '/components/kanban', slug: 'kanban' },
+  { path: '/components-index', slug: 'components-index' },
+  {
+    path: '/changelog',
+    slug: 'changelog',
+    waitFor: '.mk-markdown h2',
+    viewportOnly: true,
+  },
   { path: '/components/signature', slug: 'signature' },
 ];
 
@@ -71,14 +91,16 @@ async function preparePage(page: Page, theme: 'light' | 'dark'): Promise<void> {
   );
 }
 
-async function settle(page: Page): Promise<void> {
+async function settle(page: Page, viewportOnly = false): Promise<void> {
   await page.addStyleTag({ content: FREEZE_CSS });
   // Warm-up capture: rasterizing the full page for the first time makes
   // Chromium load lazy fallback fonts for below-the-fold glyphs, which
   // reflows text across the whole page ONCE (observed ~90px height change on
   // the table page). Take a throwaway full-page shot so the comparison only
-  // ever sees the post-reflow, stable layout.
-  await page.screenshot({ fullPage: true });
+  // ever sees the post-reflow, stable layout. Viewport-only routes (the
+  // changelog) skip the full-page pass — their rendered height exceeds what
+  // Chromium will rasterize in one texture and the capture never returns.
+  await page.screenshot({ fullPage: !viewportOnly });
   await page.evaluate(async () => {
     await document.fonts.ready;
     // Two frames so the reflow + any resize observers settle.
@@ -88,13 +110,14 @@ async function settle(page: Page): Promise<void> {
 
 for (const theme of ['light', 'dark'] as const) {
   test.describe(`docs pages — ${theme}`, () => {
-    for (const { path, slug } of ROUTES) {
+    for (const { path, slug, waitFor, viewportOnly } of ROUTES) {
       test(`${slug} (${theme})`, async ({ page }) => {
         await preparePage(page, theme);
         await page.goto(path, { waitUntil: 'networkidle' });
-        await settle(page);
+        if (waitFor) await page.waitForSelector(waitFor);
+        await settle(page, viewportOnly);
         await expect(page).toHaveScreenshot(`${slug}-${theme}.png`, {
-          fullPage: true,
+          fullPage: !viewportOnly,
         });
       });
     }

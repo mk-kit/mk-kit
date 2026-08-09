@@ -10,7 +10,12 @@ import {
   MkAlert,
   MkButton,
   MkCheckbox,
+  MkCode,
+  MkCodeEditor,
+  type MkCodeValidity,
+  MkDiff,
   MkInput,
+  MkJsonViewer,
   MkLogViewer,
   MkMarkdown,
 } from '@mkornas/ui';
@@ -20,26 +25,140 @@ const LOG_SERVICES = ['api', 'worker', 'scheduler', 'mailer'] as const;
 const LOG_PATHS = ['/orders', '/users/42', '/health', '/invoices', '/search?q=mk'] as const;
 
 /**
- * Documentation + live demo page for the two text-output components of
- * `@mkornas/ui/data`: `<mk-markdown>` and `<mk-log-viewer>`.
+ * Documentation + live demo page for the code & content components of
+ * `@mkornas/ui`: authoring with `<mk-code-editor>` and rendering with
+ * `<mk-markdown>`, `<mk-code>`, `<mk-diff>`, `<mk-json-viewer>` and
+ * `<mk-log-viewer>`.
  */
 @Component({
   selector: 'docs-markdown-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, FormsModule, MkAlert, MkButton, MkCheckbox, MkInput, MkLogViewer, MkMarkdown],
+  imports: [
+    DocsExample,
+    FormsModule,
+    MkAlert,
+    MkButton,
+    MkCheckbox,
+    MkCode,
+    MkCodeEditor,
+    MkDiff,
+    MkInput,
+    MkJsonViewer,
+    MkLogViewer,
+    MkMarkdown,
+  ],
   template: `
     <div class="docs-page docs-container">
-      <h1>Markdown &amp; log viewer</h1>
+      <h1>Code &amp; content</h1>
       <p class="docs-lead">
-        Two output components for rendering text your app did not author:
-        <code class="docs-inline">&lt;mk-markdown&gt;</code> renders a
-        CommonMark subset with zero runtime dependencies — built for
-        changelogs, AI output and user notes — and
-        <code class="docs-inline">&lt;mk-log-viewer&gt;</code> is a
-        virtualized, tail-following log pane that parses ANSI colour codes and
-        highlights search matches. Both live in
-        <code class="docs-inline">&#64;mkornas/ui/data</code>.
+        Everything for authoring and rendering structured text.
+        <strong>Authoring:</strong>
+        <code class="docs-inline">&lt;mk-code-editor&gt;</code>, a lightweight
+        code field with highlighting and JSON validation.
+        <strong>Rendering:</strong>
+        <code class="docs-inline">&lt;mk-markdown&gt;</code> (a safe,
+        zero-dependency CommonMark subset),
+        <code class="docs-inline">&lt;mk-code&gt;</code> (read-only code
+        blocks), <code class="docs-inline">&lt;mk-diff&gt;</code> (before/after
+        text comparison),
+        <code class="docs-inline">&lt;mk-json-viewer&gt;</code> (collapsible
+        JSON trees) and <code class="docs-inline">&lt;mk-log-viewer&gt;</code>
+        (a virtualized, ANSI-aware log pane). The pure helpers behind them —
+        <code class="docs-inline">mkHighlight</code> /
+        <code class="docs-inline">mkHighlightJson</code>,
+        <code class="docs-inline">mkComputeDiff</code> /
+        <code class="docs-inline">mkDiffStats</code> and
+        <code class="docs-inline">mkBuildJsonTree</code> — are exported
+        standalone.
       </p>
+
+      <!-- ============================================================ -->
+      <h2>Code editor</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-code-editor&gt;</code> is a
+        dependency-free code <em>field</em>: a real
+        <code class="docs-inline">&lt;textarea&gt;</code> with a synced syntax
+        highlight layer behind it, so it keeps native editing semantics and
+        accessibility without a heavyweight editor. With
+        <code class="docs-inline">language="json"</code> it validates on every
+        change (debounced) — an inline error appears and
+        <code class="docs-inline">(validate)</code> emits
+        <code class="docs-inline">{{ '{' }} valid, error {{ '}' }}</code> — and
+        <code class="docs-inline">format()</code> pretty-prints valid JSON with
+        <code class="docs-inline">tabSize</code> indentation. Try breaking the
+        JSON below, then format it.
+      </p>
+      <docs-example [code]="codeEditorCode" [column]="true">
+        <div class="editor-demo">
+          <mk-code-editor
+            #editor="mkCodeEditor"
+            language="json"
+            [rows]="9"
+            [(value)]="editorValue"
+            (validate)="editorValidity.set($event)"
+            ariaLabel="JSON configuration"
+          />
+          <div class="editor-demo__bar">
+            <button mkButton size="sm" variant="outline" (click)="editor.format()">
+              Format
+            </button>
+            <span class="editor-demo__echo">
+              @if (editorValidity(); as v) {
+                {{ v.valid ? 'Valid JSON' : 'Invalid: ' + v.error }}
+              }
+            </span>
+          </div>
+        </div>
+      </docs-example>
+
+      <h3>API</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>[(value)]</code></td><td><code>string</code></td><td><code>''</code></td><td>Two-way editor content (also a <code>ControlValueAccessor</code>).</td></tr>
+          <tr><td><code>language</code></td><td><code>'json' | 'plaintext'</code></td><td><code>'plaintext'</code></td><td>Highlighting + validation; only <code>json</code> validates.</td></tr>
+          <tr><td><code>placeholder</code></td><td><code>string</code></td><td><code>''</code></td><td>Shown when empty.</td></tr>
+          <tr><td><code>rows</code></td><td><code>number</code></td><td><code>8</code></td><td>Visible rows (minimum height).</td></tr>
+          <tr><td><code>lineNumbers</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the line-number gutter.</td></tr>
+          <tr><td><code>tabSize</code></td><td><code>number</code></td><td><code>2</code></td><td>Spaces inserted by Tab; also <code>format()</code> indentation.</td></tr>
+          <tr><td><code>wrap</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Soft-wrap long lines instead of scrolling horizontally.</td></tr>
+          <tr><td><code>readOnly</code> / <code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Read-only (still focusable), disabled, or forced invalid styling.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size; ignored inside an <code>mk-form-field</code>.</td></tr>
+          <tr><td><code>ariaLabel</code></td><td><code>string</code></td><td><code>''</code></td><td>Accessible label when used standalone (no form field).</td></tr>
+          <tr><td><code>(validate)</code></td><td><code>MkCodeValidity</code></td><td>—</td><td>Emits <code>{{ '{' }} valid, error {{ '}' }}</code> whenever JSON validity changes.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        Via <code class="docs-inline">exportAs="mkCodeEditor"</code> the
+        component also exposes <code class="docs-inline">format()</code>
+        (pretty-print valid JSON; no-op otherwise) and
+        <code class="docs-inline">parsed()</code> (the parsed JSON value, or
+        <code class="docs-inline">undefined</code> when empty / invalid /
+        plaintext).
+      </p>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Key</th><th>Action</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Tab</td><td>Inserts <code>tabSize</code> spaces at the caret (undo-friendly).</td></tr>
+          <tr><td>Esc, then Tab</td><td>The escape hatch: Escape arms the next Tab to move focus out instead of indenting, so the editor is never a keyboard trap.</td></tr>
+        </tbody>
+      </table>
+
+      <mk-alert tone="info" variant="soft" title="Form-field integration">
+        The editor implements <code class="docs-inline">ControlValueAccessor</code>
+        over its string value, so it works with
+        <code class="docs-inline">ngModel</code> and reactive forms. Nested in
+        an <code class="docs-inline">mk-form-field</code> it inherits the
+        field's size, label, description ids and error state automatically —
+        the JSON parse error is merged into
+        <code class="docs-inline">aria-describedby</code> either way.
+      </mk-alert>
 
       <!-- ============================================================ -->
       <h2>Markdown</h2>
@@ -136,6 +255,116 @@ const LOG_PATHS = ['/orders', '/users/42', '/health', '/invoices', '/search?q=mk
         <code class="docs-inline">---</code> underlines — a
         <code class="docs-inline">---</code> line is always a horizontal rule
         here), reference-style links, and loose lists.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2>Code block</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-code&gt;</code> is the read-only
+        counterpart of the editor: a themed code block with syntax
+        highlighting, an optional filename header, line numbers and a copy
+        button (it reuses the same tokenizer and the copy directive).
+      </p>
+      <docs-example [code]="codeBlockCode" [column]="true">
+        <mk-code
+          language="json"
+          filename="config.json"
+          [lineNumbers]="true"
+          [code]="sampleJson"
+        />
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>code</code></td><td><code>string</code></td><td><code>''</code></td><td>The source to display.</td></tr>
+          <tr><td><code>language</code></td><td><code>'json' | 'plaintext'</code></td><td><code>'plaintext'</code></td><td>Language for highlighting.</td></tr>
+          <tr><td><code>filename</code></td><td><code>string</code></td><td><code>''</code></td><td>Optional filename shown in a header bar.</td></tr>
+          <tr><td><code>lineNumbers</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Show a line-number gutter.</td></tr>
+          <tr><td><code>copyable</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the copy button.</td></tr>
+          <tr><td><code>wrap</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Soft-wrap long lines instead of scrolling horizontally.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The highlighter itself is exported from core as
+        <code class="docs-inline">mkHighlight(code, language)</code> (plus the
+        JSON-specific <code class="docs-inline">mkHighlightJson</code>) —
+        useful for rendering highlighted snippets outside these components.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2>Diff</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-diff&gt;</code> compares two versions
+        of text (a revision "before → after") with an LCS line diff and
+        intra-line word highlighting. Render
+        <code class="docs-inline">unified</code> (single column, +/−) or
+        <code class="docs-inline">split</code> (side-by-side).
+      </p>
+      <docs-example [code]="diffCode" [column]="true">
+        <div style="display: flex; flex-direction: column; gap: var(--mk-space-4); width: 100%;">
+          <mk-diff [before]="diffBefore" [after]="diffAfter" />
+          <mk-diff [before]="diffBefore" [after]="diffAfter" mode="split" beforeLabel="v3" afterLabel="v4" />
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>before</code> / <code>after</code></td><td><code>string</code></td><td><code>''</code></td><td>The original and the new text.</td></tr>
+          <tr><td><code>mode</code></td><td><code>'unified' | 'split'</code></td><td><code>'unified'</code></td><td>Single-column (+/−) or side-by-side layout.</td></tr>
+          <tr><td><code>wordHighlight</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Highlight the specific words that changed within a line.</td></tr>
+          <tr><td><code>lineNumbers</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show line-number gutters.</td></tr>
+          <tr><td><code>ignoreTrailingWhitespace</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Ignore trailing whitespace when comparing lines.</td></tr>
+          <tr><td><code>showStats</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show the +added / −removed summary header.</td></tr>
+          <tr><td><code>beforeLabel</code> / <code>afterLabel</code></td><td><code>string</code></td><td>i18n</td><td>Column labels (split-view header / a11y).</td></tr>
+        </tbody>
+      </table>
+      <p>
+        The diff engine is pure and exported standalone:
+        <code class="docs-inline">mkComputeDiff(before, after, options?)</code>
+        returns typed <code class="docs-inline">MkDiffRow[]</code> and
+        <code class="docs-inline">mkDiffStats(rows)</code> counts additions and
+        removals — handy for badges ("+12 −3") without rendering the view.
+      </p>
+
+      <!-- ============================================================ -->
+      <h2>JSON viewer</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-json-viewer&gt;</code> renders JSON-ish
+        data as a read-only collapsible tree: objects and arrays fold behind
+        disclosure buttons with a
+        <code class="docs-inline">{{ '{' }}…{{ '}' }} n items</code> preview,
+        primitives are colour-coded by type and circular references render as
+        <code class="docs-inline">[Circular]</code>. The complement of the code
+        editor: that edits JSON <em>text</em>, this explores JSON
+        <em>data</em>.
+      </p>
+      <docs-example [code]="jsonViewerCode" [column]="true">
+        <mk-json-viewer [data]="jsonSample" [expandDepth]="2" />
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>data</code></td><td><code>unknown</code></td><td>required</td><td>Any JSON-serialisable value to display.</td></tr>
+          <tr><td><code>expandDepth</code></td><td><code>number</code></td><td><code>1</code></td><td>How many levels start expanded (root = level 1).</td></tr>
+          <tr><td><code>aria-label</code></td><td><code>string</code></td><td>i18n</td><td>Accessible label of the tree region.</td></tr>
+        </tbody>
+      </table>
+      <p>
+        <code class="docs-inline">expandAll()</code> /
+        <code class="docs-inline">collapseAll()</code> are callable via
+        <code class="docs-inline">exportAs="mkJsonViewer"</code>, and the tree
+        builder is exported standalone as
+        <code class="docs-inline">mkBuildJsonTree(value)</code> (circular
+        references marked, not recursed).
       </p>
 
       <!-- ============================================================ -->
@@ -251,6 +480,21 @@ const LOG_PATHS = ['/orders', '/users/42', '/health', '/invoices', '/search?q=mk
         border-radius: var(--mk-radius-md);
         overflow-x: auto;
       }
+      .editor-demo {
+        display: grid;
+        gap: var(--mk-space-3);
+        width: 100%;
+      }
+      .editor-demo__bar {
+        display: flex;
+        align-items: center;
+        gap: var(--mk-space-3);
+        flex-wrap: wrap;
+      }
+      .editor-demo__echo {
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
       .log-controls {
         display: flex;
         align-items: center;
@@ -267,6 +511,52 @@ const LOG_PATHS = ['/orders', '/users/42', '/health', '/invoices', '/search?q=mk
 })
 export class MarkdownPage {
   private readonly destroyRef = inject(DestroyRef);
+
+  // --- Code editor ----------------------------------------------------------
+
+  protected readonly editorValue = signal(
+    '{\n  "site": "mk-kit docs",\n  "theme": "dark",\n  "retries": 3,\n  "features": ["search", "export"]\n}',
+  );
+  protected readonly editorValidity = signal<MkCodeValidity | null>(null);
+
+  protected readonly codeEditorCode = `<mk-code-editor #editor="mkCodeEditor" language="json"
+  [(value)]="config" [rows]="9" (validate)="validity.set($event)" />
+<button mkButton (click)="editor.format()">Format</button>`;
+
+  // --- Code block -----------------------------------------------------------
+
+  protected readonly sampleJson =
+    '{\n  "theme": "dark",\n  "retries": 3,\n  "features": ["search", "export"]\n}';
+  protected readonly codeBlockCode = `<mk-code language="json" filename="config.json"
+  lineNumbers [code]="json" />`;
+
+  // --- Diff -----------------------------------------------------------------
+
+  protected readonly diffBefore = `title: Getting started
+theme: light
+retries: 3
+Draft the quick brown fox.`;
+  protected readonly diffAfter = `title: Getting started
+theme: dark
+retries: 5
+Draft the slow brown fox.
+published: true`;
+  protected readonly diffCode = `<mk-diff [before]="v1" [after]="v2" />
+<mk-diff [before]="v1" [after]="v2" mode="split" />`;
+
+  // --- JSON viewer ----------------------------------------------------------
+
+  protected readonly jsonSample = {
+    id: 'ord_1042',
+    total: 249.99,
+    paid: true,
+    customer: { name: 'Ada Lovelace', vip: null },
+    items: [
+      { sku: 'KB-01', qty: 1 },
+      { sku: 'MS-77', qty: 2 },
+    ],
+  };
+  protected readonly jsonViewerCode = `<mk-json-viewer [data]="order" [expandDepth]="2" />`;
 
   // --- Markdown -------------------------------------------------------------
 
