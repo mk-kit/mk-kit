@@ -148,7 +148,15 @@ export class DocsToc {
     if (!target) return;
     event.preventDefault();
     target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-    this.document.defaultView?.history.replaceState(null, '', `#${id}`);
+    // Write the fragment against the CURRENT path. A bare `#id` would be
+    // resolved against `<base href="/">`, replacing `/components/utilities`
+    // with `/` — so reloading or sharing the link landed on the home page.
+    const { pathname, search } = this.document.location;
+    this.document.defaultView?.history.replaceState(
+      null,
+      '',
+      `${pathname}${search}#${id}`,
+    );
   }
 }
 
