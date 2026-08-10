@@ -44,7 +44,18 @@ interface Band {
   label: string;
   labelX: number;
   labelY: number;
+  /** SVG transform when the axis is tilted; `null` when labels sit flat. */
+  transform: string | null;
 }
+
+/**
+ * Rough width of a label in px at the axis font-size (11px). Measuring for
+ * real needs a laid-out DOM and a synchronous read per label per frame; a
+ * per-character estimate is deterministic, testable, and only has to be good
+ * enough to decide "do these collide".
+ */
+const CHAR_PX = 6.2;
+const estimateLabelPx = (label: string) => label.length * CHAR_PX;
 
 /** Bar orientation. */
 export type MkBarOrientation = 'vertical' | 'horizontal';
@@ -104,6 +115,17 @@ export class MkBarChart {
   readonly showGrid = input(true, { transform: booleanAttribute });
   /** Force the legend on/off (defaults to on when there are ≥ 2 series). */
   readonly showLegend = input<boolean | undefined>(undefined);
+  /**
+   * Category-label tilt in degrees. `'auto'` (the default) leaves labels flat
+   * while they fit and tilts them 45° when they would collide — the axis of a
+   * narrow chart is otherwise an unreadable smear. A number pins the angle
+   * (0 = always flat, 30/45 = always tilted); values are clamped to 0…90.
+   *
+   * Tilting reserves the extra vertical room it needs, so `height` still means
+   * the height you asked for. When even tilted labels cannot fit, the chart
+   * thins them — every Nth label is dropped rather than overlapped.
+   */
+  readonly labelAngle = input<number | 'auto'>('auto');
   /** Accessible summary; generated from the data when omitted. */
   readonly label = input<string>('');
 
@@ -116,11 +138,63 @@ export class MkBarChart {
     () => this.orientation() === 'horizontal',
   );
 
-  private readonly margin = computed(() =>
-    this.horizontal()
-      ? { top: 10, right: 18, bottom: 28, left: 72 }
-      : { top: 14, right: 14, bottom: 30, left: 44 },
+  /** Widest category label, in estimated px. */
+  private readonly widestLabelPx = computed(() =>
+    this.categories().reduce((w, c) => Math.max(w, estimateLabelPx(c)), 0),
   );
+
+  /**
+   * The tilt actually applied. `auto` stays flat while the labels fit their
+   * band and tilts 45° otherwise; an explicit number always wins (clamped).
+   * Horizontal bars put categories on the Y axis, where tilting makes no
+   * sense, so they are always flat.
+   */
+  protected readonly resolvedAngle = computed(() => {
+    if (this.horizontal()) return 0;
+    const requested = this.labelAngle();
+    if (requested !== 'auto') {
+      return Math.min(90, Math.max(0, requested));
+    }
+    const count = this.categories().length;
+    if (!count) return 0;
+    const band = Math.max(this.drawWidth() - 58, 1) / count;
+    return this.widestLabelPx() <= band ? 0 : 45;
+  });
+
+  /**
+   * Show every Nth label. Tilting buys room but not unlimited room: at 45° a
+   * label still occupies `width * cos(45°)` horizontally, so a 24-category
+   * chart in a card can need thinning on top of the tilt. Dropping labels
+   * beats overlapping them — the bars all still draw.
+   */
+  protected readonly labelStep = computed(() => {
+    const count = this.categories().length;
+    if (!count) return 1;
+    const band = Math.max(this.drawWidth() - 58, 1) / count;
+    const angle = this.resolvedAngle();
+    const footprint =
+      this.widestLabelPx() * Math.cos((angle * Math.PI) / 180) || 1;
+    return Math.max(1, Math.ceil(footprint / band));
+  });
+
+  private readonly margin = computed(() => {
+    if (this.horizontal()) {
+      return { top: 10, right: 18, bottom: 28, left: 72 };
+    }
+    // Tilted labels lean below the axis; reserve what they need so `height`
+    // keeps meaning what the caller asked for instead of clipping at the
+    // viewBox edge.
+    const angle = this.resolvedAngle();
+    const lean = angle
+      ? this.widestLabelPx() * Math.sin((angle * Math.PI) / 180)
+      : 0;
+    return {
+      top: 14,
+      right: 14,
+      bottom: 30 + Math.min(lean, 64),
+      left: 44,
+    };
+  });
 
   protected readonly plot = computed(() => {
     const m = this.margin();
@@ -196,14 +270,27 @@ export class MkBarChart {
         label,
         labelX: x - 8,
         labelY: y + i * bandH + bandH / 2,
+        transform: null,
       }));
     }
     const bandW = w / (cats.length || 1);
-    return cats.map((label, i) => ({
-      label,
-      labelX: x + i * bandW + bandW / 2,
-      labelY: this.height() - 10,
-    }));
+    const angle = this.resolvedAngle();
+    const step = this.labelStep();
+    const baselineY = y + h + 12;
+    return cats.map((label, i) => {
+      const cx = x + i * bandW + bandW / 2;
+      // Thinned-out ticks keep their slot (so bars stay aligned) but render
+      // nothing.
+      const shown = i % step === 0 ? label : '';
+      return {
+        label: shown,
+        labelX: cx,
+        labelY: baselineY,
+        // Rotate about the tick itself so the label's END sits under its bar
+        // — anchoring at the start would walk the text off to the right.
+        transform: angle ? `rotate(-${angle} ${cx} ${baselineY})` : null,
+      };
+    });
   });
 
   /** All bar rectangles (grouped or stacked, vertical or horizontal). */

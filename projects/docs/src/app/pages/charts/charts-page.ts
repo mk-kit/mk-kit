@@ -101,6 +101,21 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-bar-chart orientation="horizontal" [categories]="channels" [series]="channelSeries" [height]="220" />
         </div>
       </docs-example>
+      <h3>Crowded axes</h3>
+      <p>
+        A narrow chart with many categories cannot lay its labels out flat — they
+        collide into a smear. The axis handles that itself: labels stay flat while
+        they fit, tilt 45° when they would collide, and thin out when even tilting
+        is not enough. Pin the angle with
+        <code class="docs-inline">[labelAngle]="30"</code> (or
+        <code class="docs-inline">0</code> to force flat).
+      </p>
+      <docs-example [code]="labelAngleCode" column>
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(18rem, 1fr)); gap: var(--mk-space-5); width: 100%;">
+          <mk-bar-chart [categories]="dayHours" [series]="dayHourSeries" [height]="220" />
+          <mk-bar-chart [categories]="quarters" [series]="revenue" [labelAngle]="30" [height]="220" />
+        </div>
+      </docs-example>
       <table class="docs-props">
         <thead>
           <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
@@ -114,6 +129,7 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>stacked</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Stack series into one bar per category instead of grouping.</td></tr>
           <tr><td><code>showGrid</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Show gridlines behind the bars.</td></tr>
           <tr><td><code>showLegend</code></td><td><code>boolean | undefined</code></td><td><code>undefined</code></td><td>Force the legend on/off (defaults to on when there are ≥ 2 series).</td></tr>
+          <tr><td><code>labelAngle</code></td><td><code>number | 'auto'</code></td><td><code>'auto'</code></td><td>Category-label tilt in degrees. <code>'auto'</code> stays flat while labels fit and tilts 45° when they would collide; a number pins it (clamped 0…90). Tilting reserves the room it needs, and labels thin out when even tilting cannot fit them.</td></tr>
         </tbody>
       </table>
 
@@ -332,6 +348,17 @@ import { DocsExample } from '../../shared/docs-example';
 export class ChartsPage {
   protected readonly trend = [4, 6, 5, 8, 7, 10, 9, 12, 11, 14];
   protected readonly quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
+  /** A full day — the canonical axis that cannot fit its labels flat. */
+  protected readonly dayHours = Array.from(
+    { length: 24 },
+    (_, h) => `${String(h).padStart(2, '0')}:00`,
+  );
+  protected readonly dayHourSeries: MkChartSeries[] = [
+    {
+      name: 'Orders',
+      data: [1, 0, 0, 0, 0, 0, 2, 6, 9, 7, 5, 8, 14, 16, 11, 7, 6, 9, 13, 15, 10, 6, 3, 2],
+    },
+  ];
   protected readonly months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'];
 
   protected readonly revenue: MkChartSeries[] = [
@@ -399,6 +426,12 @@ export class ChartsPage {
   protected readonly barCode = `<mk-bar-chart
   [categories]="['Q1','Q2','Q3','Q4']"
   [series]="[{ name: 'Revenue', data: [12,19,15,22] }]" />`;
+
+  protected readonly labelAngleCode = `<!-- auto: flat while they fit, tilted when they collide -->
+<mk-bar-chart [categories]="dayHours" [series]="dayHourSeries" [height]="220" />
+
+<!-- pinned angle -->
+<mk-bar-chart [categories]="quarters" [series]="revenue" [labelAngle]="30" [height]="220" />`;
 
   protected readonly stackedCode = `<mk-bar-chart [categories]="quarters" [series]="twoSeries" />
 <mk-bar-chart [categories]="quarters" [series]="twoSeries" stacked />`;
