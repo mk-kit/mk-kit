@@ -34,6 +34,12 @@
   text-anchor: middle;
   dominant-baseline: hanging;
 }
+/* Tilted category labels hang from their tick, ending under the bar they
+   describe — so they anchor at the end, not the middle. */
+.mk-chart__axis-label--tilted {
+  text-anchor: end;
+  dominant-baseline: middle;
+}
 
 /* Bars */
 .mk-chart__bar {

@@ -4,6 +4,37 @@ All notable changes to **`@mkornas/ui`**. The format follows
 [Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
 Packages releases published on `v*` tags. Dates are ISO-8601.
 
+## [0.33.0] — 2026-08-10
+
+### Added
+
+- **Bar chart fits its own category labels.** A narrow chart with many
+  categories used to render every label flat at its band centre, so they
+  overlapped into an unreadable smear — a 24-hour axis in a card is the
+  canonical case (at 326px the band is 13.6px and "00:00" is 31.5px, so 23 of
+  24 neighbouring pairs collided). `labelAngle` defaults to `'auto'`: labels
+  stay flat while they fit, tilt 45° when they would collide, and thin to
+  every Nth when even tilting cannot fit them — dropping a label beats
+  overlapping it, and every category keeps its bar either way. A number pins
+  the angle (clamped 0…90); `0` forces flat. Tilting grows the bottom margin
+  by `maxLabelWidth × sin(angle)` (bounded), so `height` still means the
+  height you asked for instead of clipping at the viewBox edge. Horizontal
+  bars are never tilted — their categories run down the Y axis.
+
+### Fixed
+
+- **Category labels tracked by value, not index (NG0955).** `@for (band of
+  bands(); track band.label)` produced duplicate keys whenever two categories
+  shared a label — a rolling 12-month window that starts and ends in the same
+  month is enough, and any thinned axis repeats the empty string. Tracks
+  `$index` now.
+
+### Changed
+
+- `'auto'` label fitting is on by default, so existing crowded bar charts will
+  start tilting and thinning without a code change. Pass `[labelAngle]="0"` to
+  keep the old always-flat rendering.
+
 ## [0.32.0] — 2026-08-08
 
 The scheduler, output & tooling wave — ROADMAP Round 4.

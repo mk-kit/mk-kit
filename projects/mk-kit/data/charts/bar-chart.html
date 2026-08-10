@@ -45,17 +45,23 @@
       />
     }
 
-    <!-- Category labels -->
-    @for (band of bands(); track band.label) {
-      <text
-        class="mk-chart__axis-label"
-        [class.mk-chart__axis-label--x]="!horizontal()"
-        [class.mk-chart__axis-label--y]="horizontal()"
-        [attr.x]="band.labelX"
-        [attr.y]="band.labelY"
-      >
-        {{ band.label }}
-      </text>
+    <!-- Category labels. Tracked by index, not label: a 12-month window can
+         start and end in the same month, and thinned axes repeat the empty
+         string — both are duplicate keys (NG0955). -->
+    @for (band of bands(); track $index) {
+      @if (band.label) {
+        <text
+          class="mk-chart__axis-label"
+          [class.mk-chart__axis-label--x]="!horizontal() && !band.transform"
+          [class.mk-chart__axis-label--tilted]="band.transform"
+          [class.mk-chart__axis-label--y]="horizontal()"
+          [attr.x]="band.labelX"
+          [attr.y]="band.labelY"
+          [attr.transform]="band.transform"
+        >
+          {{ band.label }}
+        </text>
+      }
     }
   </svg>
 
