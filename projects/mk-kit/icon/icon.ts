@@ -6,7 +6,7 @@ import {
   inject,
   input,
 } from '@angular/core';
-import type { MkSize } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
 import { MkIconRegistry } from './icon-registry';
 
 /**

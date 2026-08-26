@@ -13,7 +13,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Payload for a split (Enter) event: text before/after the caret. */
 export interface MkRichTextSplit {

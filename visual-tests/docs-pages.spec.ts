@@ -119,6 +119,9 @@ for (const theme of ['light', 'dark'] as const) {
         await settle(page, viewportOnly);
         await expect(page).toHaveScreenshot(`${slug}-${theme}.png`, {
           fullPage: !viewportOnly,
+          // The header's version badge changes on every release; masking it
+          // keeps a version bump from invalidating every baseline.
+          mask: [page.locator('.docs-brand__ver')],
         });
       });
     }

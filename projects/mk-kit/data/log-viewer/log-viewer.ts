@@ -18,8 +18,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkCopyToClipboard } from '@mkornas/ui/directives';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkCopyToClipboard } from '@mk-kit/ui/directives';
 import { type MkAnsiSpan, mkParseAnsi, mkStripAnsi } from './ansi';
 
 /** One render token of a log line: a styled run, optionally a search match. */

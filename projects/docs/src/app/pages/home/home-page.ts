@@ -40,7 +40,7 @@ import {
   type MkChartSeries,
   type MkChartSlice,
   type MkTableColumn,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { version as uiVersion } from '../../../../../mk-kit/package.json';
 
 interface Feature {
@@ -163,7 +163,7 @@ interface Mapping {
             </div>
             <div class="install">
               <code class="install__cmd" aria-label="Install command">
-                <span class="install__prompt" aria-hidden="true">$</span>ng add &#64;mkornas/ui
+                <span class="install__prompt" aria-hidden="true">$</span>ng add &#64;mk-kit/ui
               </code>
               <button
                 mkButton
@@ -370,7 +370,7 @@ interface Mapping {
           <p class="eyebrow">What's inside</p>
           <h2 class="section__title" id="index-title">Eight groups, eight entry points, one theme.</h2>
           <p class="section__lead">
-            Import <code>&#64;mkornas/ui/table</code> or <code>&#64;mkornas/ui/charts</code>
+            Import <code>&#64;mk-kit/ui/table</code> or <code>&#64;mk-kit/ui/charts</code>
             and ship only what you use. No NgModules, no runtime dependency beyond
             Angular itself.
           </p>
@@ -534,7 +534,7 @@ interface Mapping {
         <div class="hero__cta hero__cta--center">
           <a mkButton tone="primary" size="lg" routerLink="/getting-started">Get started</a>
           <a mkButton variant="ghost" tone="neutral" size="lg"
-             href="https://github.com/mkornas/mk-kit" target="_blank" rel="noopener">
+             href="https://github.com/mk-kit/mk-kit" target="_blank" rel="noopener">
             GitHub ↗
           </a>
         </div>
@@ -547,7 +547,7 @@ interface Mapping {
             <a routerLink="/introduction">Docs</a>
             <a routerLink="/components-index">Components</a>
             <a routerLink="/changelog">Changelog</a>
-            <a href="https://github.com/mkornas/mk-kit" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://github.com/mk-kit/mk-kit" target="_blank" rel="noopener">GitHub</a>
           </nav>
         </div>
       </footer>
@@ -1205,7 +1205,7 @@ export class HomePage {
 
   protected async copyInstall(): Promise<void> {
     try {
-      await navigator.clipboard.writeText('ng add @mkornas/ui');
+      await navigator.clipboard.writeText('ng add @mk-kit/ui');
       this.copied.set(true);
       this.toast.success('Copied to clipboard');
       setTimeout(() => this.copied.set(false), 2000);
@@ -1268,7 +1268,7 @@ export class HomePage {
     { tag: 'WCAG 2.1 AA', title: 'Accessible by construction', body: 'Roving tabindex, focus traps, live regions, contrast-checked tokens, an Escape that closes only the top overlay. Axe runs in the test suite.' },
     { tag: 'provideMkI18n()', title: 'Every string is translatable', body: 'One provider swaps every label the library renders — scoped per subtree for mixed locales. RTL flips arrows and layout.' },
     { tag: 'pointer: coarse', title: 'Touch is not an afterthought', body: 'Long-press drag, 16px inputs on touch, safe-area insets, bottom sheets, a touch density that grows every hit target.' },
-    { tag: '@mkornas/ui/<entry>', title: 'Tree-shakeable entry points', body: 'Import only the groups you use. SSR-safe, sideEffects: false, and ng add wires the stylesheet for you.' },
+    { tag: '@mk-kit/ui/<entry>', title: 'Tree-shakeable entry points', body: 'Import only the groups you use. SSR-safe, sideEffects: false, and ng add wires the stylesheet for you.' },
   ];
 
   protected readonly mappings: Mapping[] = [

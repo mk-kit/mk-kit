@@ -1,4 +1,4 @@
-import { sanitizeInlineHtml } from '@mkornas/ui/rich-text';
+import { sanitizeInlineHtml } from '@mk-kit/ui/rich-text';
 import type { MkBlock, MkBlockDocument } from './block-model';
 
 /**
@@ -7,7 +7,7 @@ import type { MkBlock, MkBlockDocument } from './block-model';
  * SECURITY MODEL: text blocks (`paragraph`, `heading`, `quote`, `list`) store
  * HTML authored through the editor's restricted formatting commands. Before it
  * ever reaches a string of markup here it is passed through
- * {@link sanitizeInlineHtml} (from `@mkornas/ui/rich-text`), an allow-list
+ * {@link sanitizeInlineHtml} (from `@mk-kit/ui/rich-text`), an allow-list
  * cleaner that strips scripts, event handlers and dangerous URLs.
  * `mk-block-renderer` additionally re-sanitises through Angular's
  * `DomSanitizer` at display time. These serialisers are dependency-free so

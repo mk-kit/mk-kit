@@ -12,7 +12,7 @@ import {
   MkHistoryService,
   MkLiveAnnouncer,
   type MkTone,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /** One chip of the history demo's tiny list editor. */
@@ -27,7 +27,7 @@ const CHIP_NAMES = ['plum', 'mint', 'amber', 'coral', 'iris', 'slate'] as const;
 const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger', 'info', 'neutral'];
 
 /**
- * Documentation page for the core primitives of `@mkornas/ui`: the overlay
+ * Documentation page for the core primitives of `@mk-kit/ui`: the overlay
  * engine, anchored positioning, a11y helpers (focus trap, live announcer),
  * theming, i18n and app-wide hotkeys.
  */

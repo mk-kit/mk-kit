@@ -1,6 +1,6 @@
 import { ApplicationRef, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkSnackbarService } from './snackbar.service';
 
 describe('MkSnackbarService', () => {

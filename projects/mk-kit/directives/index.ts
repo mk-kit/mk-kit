@@ -1,5 +1,5 @@
 /**
- * DIRECTIVES / utilities group barrel for @mkornas/ui.
+ * DIRECTIVES / utilities group barrel for @mk-kit/ui.
  */
 export * from './directives';
 export * from './history';

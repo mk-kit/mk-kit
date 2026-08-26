@@ -5,7 +5,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 
 /**
  * A single tab + its panel. Declared inside `<mk-tabs>`; the projected content

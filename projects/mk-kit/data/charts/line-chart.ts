@@ -8,7 +8,7 @@ import {
   numberAttribute,
   signal,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import { mkChartAutoWidth } from './chart-autowidth';
 import { mkChartTapPin } from './chart-tap-pin';
 import {

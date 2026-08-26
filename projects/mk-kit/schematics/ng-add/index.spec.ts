@@ -4,7 +4,7 @@ import { lastValueFrom } from 'rxjs';
 
 import { ngAdd } from './index';
 
-const THEME_STYLE_PATH = 'node_modules/@mkornas/ui/styles/mk-kit.css';
+const THEME_STYLE_PATH = 'node_modules/@mk-kit/ui/styles/mk-kit.css';
 
 const STANDARD_APP_CONFIG = `import { ApplicationConfig } from '@angular/core';
 import { provideRouter } from '@angular/router';
@@ -106,7 +106,7 @@ describe('ng-add schematic', () => {
     const { tree } = await runNgAdd(createTree(), { project: 'app', i18n: true });
 
     const appConfig = tree.read('/src/app/app.config.ts')!.toString();
-    expect(appConfig).toContain(`import { provideMkI18n } from '@mkornas/ui/core';`);
+    expect(appConfig).toContain(`import { provideMkI18n } from '@mk-kit/ui/core';`);
     expect(appConfig).toContain('provideMkI18n({})');
     expect(readStyles(tree)).toEqual([THEME_STYLE_PATH, 'src/styles.css']);
   });

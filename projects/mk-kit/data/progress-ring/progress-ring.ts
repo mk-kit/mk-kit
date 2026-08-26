@@ -6,7 +6,7 @@ import {
   input,
   numberAttribute,
 } from '@angular/core';
-import type { MkTone } from '@mkornas/ui/core';
+import type { MkTone } from '@mk-kit/ui/core';
 
 /**
  * ProgressRing — a circular progress indicator. Determinate by default (an arc

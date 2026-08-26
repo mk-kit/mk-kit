@@ -8,7 +8,7 @@ import {
   output,
 } from '@angular/core';
 import { DomSanitizer, type SafeResourceUrl } from '@angular/platform-browser';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import type { MkBlock } from './block-model';
 import { MkBlockEditorContext } from './block-context';
 import { mkIsSafeUrl } from './block-serializer';

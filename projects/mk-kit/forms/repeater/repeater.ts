@@ -16,15 +16,15 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
+import { MK_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
 import {
   MkDrag,
   MkDragHandle,
   MkDropList,
   mkMoveItemInArray,
   type MkDropEvent,
-} from '@mkornas/ui/dnd';
+} from '@mk-kit/ui/dnd';
 
 /** Template context for a {@link MkRepeaterRow} row template. */
 export interface MkRepeaterRowContext<T> {

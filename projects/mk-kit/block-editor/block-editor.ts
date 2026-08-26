@@ -12,7 +12,7 @@ import {
   signal,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import { MK_I18N, type MkBlockEditorStrings } from '@mkornas/ui/core';
+import { MK_I18N, type MkBlockEditorStrings } from '@mk-kit/ui/core';
 import {
   MK_BLOCK_DOCUMENT_VERSION,
   type MkBlock,

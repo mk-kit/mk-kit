@@ -8,7 +8,7 @@ import {
   linkedSignal,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** How the picture is scaled inside its frame (`object-fit`). */
 export type MkImageFit = 'cover' | 'contain';

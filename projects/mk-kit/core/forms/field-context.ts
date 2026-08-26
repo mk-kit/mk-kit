@@ -6,7 +6,7 @@ import type { MkSize } from '../types';
  * the control nested inside it. Controls inject it optionally
  * (`inject(MkFieldContext, { optional: true })`) to adopt the wrapper's
  * control id and to reflect its required/error state and `aria-describedby`
- * wiring — without depending on the `@mkornas/ui/forms` entry point.
+ * wiring — without depending on the `@mk-kit/ui/forms` entry point.
  *
  * `MkFormField` provides itself under this token; standalone usage (no
  * wrapper) simply yields `null`.

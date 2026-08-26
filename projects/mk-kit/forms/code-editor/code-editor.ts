@@ -17,12 +17,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
-import { mkHighlight, type MkCodeLanguage } from '@mkornas/ui/core';
+import { mkHighlight, type MkCodeLanguage } from '@mk-kit/ui/core';
 
-export type { MkCodeLanguage } from '@mkornas/ui/core';
+export type { MkCodeLanguage } from '@mk-kit/ui/core';
 
 /** The validity of the editor's current content. */
 export interface MkCodeValidity {

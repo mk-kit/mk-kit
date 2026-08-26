@@ -1,18 +1,24 @@
 name: Release
 
-# Publishes @mkornas/ui privately to GitHub Packages. Auth uses the built-in
-# GITHUB_TOKEN — no secret to configure. Package visibility follows the
-# repository (private repo → private package); consumers need a PAT with
-# `read:packages` to install.
+# Publishes @mk-kit/ui to the public npm registry with a provenance
+# attestation, then tags the release and opens a GitHub Release with that
+# version's CHANGELOG section.
+#
+# Auth: npm trusted publishing (OIDC). No long-lived token lives in this repo.
+# One-time setup on npmjs.com → package @mk-kit/ui → Settings → Trusted
+# publisher: GitHub Actions, repository mk-kit/mk-kit, workflow release.yml.
+# (The very first version of a package cannot be published this way — it is
+# published once by hand with `npm publish` from dist/mk-kit, which also
+# creates the package so the trusted publisher can be configured.)
 #
 # Normal flow — fully automatic: land a commit on `main` that changes the
 # version in projects/mk-kit/package.json. This workflow verifies the build,
-# publishes, creates the `v<version>` tag and opens a GitHub Release with that
-# version's CHANGELOG section. No manual tagging.
+# publishes, creates the `v<version>` tag and opens the GitHub Release. No
+# manual tagging.
 #
 # Escape hatches:
-#   - push a `v*` tag yourself (the pre-0.7.0 flow); the tag must match the
-#     version in package.json or the run fails rather than shipping a mismatch.
+#   - push a `v*` tag yourself; the tag must match the version in package.json
+#     or the run fails rather than shipping a mismatch.
 #   - run the workflow manually from the Actions tab.
 #
 # Every path is idempotent: a version already tagged or already on the registry
@@ -20,8 +26,7 @@ name: Release
 #
 # Note there is deliberately no `paths:` filter: a path filter would also apply
 # to tag pushes (which change no files) and silently disable that trigger. The
-# "is this version already published?" check below is the real gate, and it is
-# accurate even when the bump lands alongside other changes.
+# "is this version already published?" check below is the real gate.
 on:
   push:
     branches: [main]
@@ -30,7 +35,7 @@ on:
 
 permissions:
   contents: write # create the tag + GitHub Release
-  packages: write # publish to GitHub Packages
+  id-token: write # OIDC token for npm trusted publishing + provenance
 
 # Serialize the whole workflow, never cancel. Two runs starting together (a
 # branch push and a tag push for the same version, say) would both pass the
@@ -57,13 +62,9 @@ jobs:
         uses: actions/setup-node@v5
         with:
           node-version: 24.18.0
-          registry-url: https://npm.pkg.github.com
-          scope: '@mkornas'
 
       - name: Resolve version and decide whether to publish
         id: resolve
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           set -euo pipefail
           PKG_VERSION="$(node -p "require('./projects/mk-kit/package.json').version")"
@@ -86,8 +87,8 @@ jobs:
           node scripts/changelog-section.mjs "$PKG_VERSION" > /dev/null
 
           # Already on the registry? Then this is a re-run; nothing to do.
-          if npm view "@mkornas/ui@$PKG_VERSION" version >/dev/null 2>&1; then
-            echo "::notice::@mkornas/ui@$PKG_VERSION is already published — skipping."
+          if npm view "@mk-kit/ui@$PKG_VERSION" version >/dev/null 2>&1; then
+            echo "::notice::@mk-kit/ui@$PKG_VERSION is already published — skipping."
             echo "should_release=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
@@ -105,6 +106,7 @@ jobs:
     needs: [resolve, verify]
     if: needs.resolve.outputs.should_release == 'true'
     runs-on: ubuntu-latest
+    environment: npm # optional protection rules / required reviewers live here
     steps:
       - uses: actions/checkout@v5
         with:
@@ -115,8 +117,12 @@ jobs:
         with:
           node-version: 24.18.0
           cache: npm
-          registry-url: https://npm.pkg.github.com
-          scope: '@mkornas'
+          registry-url: https://registry.npmjs.org
+
+      # Trusted publishing needs npm ≥ 11.5.1; Node 24 bundles 11.x but pin
+      # the floor explicitly so a runner image change cannot silently break it.
+      - name: Ensure npm supports trusted publishing
+        run: npm install -g npm@^11.5.1 && npm --version
 
       - name: Install dependencies
         run: npm ci
@@ -124,11 +130,9 @@ jobs:
       - name: Build library
         run: npm run build:lib
 
-      - name: Publish to GitHub Packages
-        run: npm publish
+      - name: Publish to npm (provenance)
+        run: npm publish --access public --provenance
         working-directory: dist/mk-kit
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Tag the release
         env:

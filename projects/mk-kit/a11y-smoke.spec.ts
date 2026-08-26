@@ -1,5 +1,5 @@
 /**
- * Accessibility smoke test (axe-core) for the @mkornas/ui component library.
+ * Accessibility smoke test (axe-core) for the @mk-kit/ui component library.
  *
  * Renders a representative set of statically-renderable components through
  * TestBed host fixtures and runs axe-core (WCAG 2.x A/AA rule set) against
@@ -22,44 +22,44 @@ import {
 import { TestBed } from '@angular/core/testing';
 import axe from 'axe-core';
 
-import { MkButton } from '@mkornas/ui/button';
-import { MkChip } from '@mkornas/ui/chip';
-import { MkFormField } from '@mkornas/ui/forms/form-field';
-import { MkInput } from '@mkornas/ui/forms/input';
-import { MkInputGroup } from '@mkornas/ui/forms/input-group';
-import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
-import { MkCheckbox } from '@mkornas/ui/checkbox';
-import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
-import { MkSwitch } from '@mkornas/ui/forms/switch';
-import { MkSelect } from '@mkornas/ui/forms/select';
-import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
-import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
-import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
-import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
-import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
+import { MkButton } from '@mk-kit/ui/button';
+import { MkChip } from '@mk-kit/ui/chip';
+import { MkFormField } from '@mk-kit/ui/forms/form-field';
+import { MkInput } from '@mk-kit/ui/forms/input';
+import { MkInputGroup } from '@mk-kit/ui/forms/input-group';
+import { MkSubmitInput } from '@mk-kit/ui/forms/submit-input';
+import { MkCheckbox } from '@mk-kit/ui/checkbox';
+import { MkRadio, MkRadioGroup } from '@mk-kit/ui/forms/radio';
+import { MkSwitch } from '@mk-kit/ui/forms/switch';
+import { MkSelect } from '@mk-kit/ui/forms/select';
+import { MkPhoneInput } from '@mk-kit/ui/forms/phone-input';
+import { MkPostalCodeInput } from '@mk-kit/ui/forms/postal-code-input';
+import { MkCurrencyInput } from '@mk-kit/ui/forms/currency-input';
+import { MkCardNumberInput } from '@mk-kit/ui/forms/card-number-input';
+import { MkNumericKeypad } from '@mk-kit/ui/forms/numeric-keypad';
 import {
   MkOnScreenKeyboard,
   MkOnScreenKeyboardTrigger,
-} from '@mkornas/ui/forms/on-screen-keyboard';
-import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
-import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
-import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
-import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
-import { MkImage } from '@mkornas/ui/media/image';
-import { MkImageGallery } from '@mkornas/ui/media/image-gallery';
-import { MkImageCropper } from '@mkornas/ui/media/image-cropper';
-import { MkMediaGallery, type MkMediaItem } from '@mkornas/ui/media/media-gallery';
-import { MkProfileCard, MkProfileMeta, MkProfileActions } from '@mkornas/ui/data/profile-card';
-import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
-import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
-import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
-import { MkPagination } from '@mkornas/ui/navigation/pagination';
-import { MkStep, MkStepper } from '@mkornas/ui/navigation/stepper';
-import { MkTree, type MkTreeNode } from '@mkornas/ui/navigation/tree';
-import { MkAlert } from '@mkornas/ui/feedback/alert';
-import { MkBadge } from '@mkornas/ui/data/badge';
-import { MkProgressBar } from '@mkornas/ui/data/progress-bar';
-import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mkornas/ui/data/card';
+} from '@mk-kit/ui/forms/on-screen-keyboard';
+import { MkIbanInput } from '@mk-kit/ui/forms/iban-input';
+import { MkTaxIdInput } from '@mk-kit/ui/forms/tax-id-input';
+import { MkSignaturePad } from '@mk-kit/ui/forms/signature-pad';
+import { MkJsonViewer } from '@mk-kit/ui/data/json-viewer';
+import { MkImage } from '@mk-kit/ui/media/image';
+import { MkImageGallery } from '@mk-kit/ui/media/image-gallery';
+import { MkImageCropper } from '@mk-kit/ui/media/image-cropper';
+import { MkMediaGallery, type MkMediaItem } from '@mk-kit/ui/media/media-gallery';
+import { MkProfileCard, MkProfileMeta, MkProfileActions } from '@mk-kit/ui/data/profile-card';
+import { MkTab, MkTabs } from '@mk-kit/ui/navigation/tabs';
+import { MkAccordion, MkAccordionItem } from '@mk-kit/ui/navigation/accordion';
+import { MkBreadcrumb, MkBreadcrumbItem } from '@mk-kit/ui/navigation/breadcrumb';
+import { MkPagination } from '@mk-kit/ui/navigation/pagination';
+import { MkStep, MkStepper } from '@mk-kit/ui/navigation/stepper';
+import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation/tree';
+import { MkAlert } from '@mk-kit/ui/feedback/alert';
+import { MkBadge } from '@mk-kit/ui/data/badge';
+import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
+import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
 
 /**
  * axe run options shared by every fixture.

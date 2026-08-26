@@ -9,12 +9,12 @@ import {
   MkSelect,
   type MkSelectOption,
   MkTaxIdInput,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the MONEY & PAYMENT inputs of
- * `@mkornas/ui`: Currency/amount input, Card number input, IBAN input and
+ * `@mk-kit/ui`: Currency/amount input, Card number input, IBAN input and
  * Tax-ID input.
  */
 @Component({

@@ -1,8 +1,8 @@
 /**
- * Data Display components group barrel for @mkornas/ui.
+ * Data Display components group barrel for @mk-kit/ui.
  * Re-exports every public symbol from each component folder.
  * (Icon, chip and table are their own entry points — import
- * `@mkornas/ui/icon` / `/chip` / `/table` directly.)
+ * `@mk-kit/ui/icon` / `/chip` / `/table` directly.)
  */
 export * from './card';
 export * from './divider';

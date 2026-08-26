@@ -14,8 +14,8 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
+import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
 
 /** Corner placement for a fixed {@link MkFab}. `static` renders it inline. */
 export type MkFabPosition =

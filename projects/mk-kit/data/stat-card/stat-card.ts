@@ -4,7 +4,7 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 
 /** Direction of a {@link MkStatCard} delta. */
 export type MkStatTrend = 'up' | 'down' | 'neutral';

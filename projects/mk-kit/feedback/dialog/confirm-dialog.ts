@@ -4,10 +4,10 @@ import {
   computed,
   inject,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MK_OVERLAY_DATA, MkOverlayRef } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
-import { MkIcon } from '@mkornas/ui/icon';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MK_OVERLAY_DATA, MkOverlayRef } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
+import { MkIcon } from '@mk-kit/ui/icon';
 import { MkDialog } from './dialog';
 
 /** Data contract for {@link MkConfirmDialog} / `MkDialogService.confirm`. */

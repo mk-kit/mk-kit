@@ -7,12 +7,12 @@ import {
   MkImageGallery,
   type MkGalleryItem,
   MkLightboxService,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the media display components of
- * `@mkornas/ui`: Image block, Image gallery (grid/masonry/strip), the Lightbox
+ * `@mk-kit/ui`: Image block, Image gallery (grid/masonry/strip), the Lightbox
  * service and the Carousel.
  */
 @Component({

@@ -5,7 +5,7 @@ import {
   input,
   signal,
 } from '@angular/core';
-import type { MkSize } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
 
 /** Outline shape of an {@link MkAvatar}. */
 export type MkAvatarShape = 'circle' | 'rounded';

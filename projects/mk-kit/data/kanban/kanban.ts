@@ -10,9 +10,9 @@ import {
   model,
   output,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MkDrag, MkDropList, mkMoveItemInArray } from '@mkornas/ui/dnd';
-import type { MkDropEvent } from '@mkornas/ui/dnd';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MkDrag, MkDropList, mkMoveItemInArray } from '@mk-kit/ui/dnd';
+import type { MkDropEvent } from '@mk-kit/ui/dnd';
 
 /** Stable empty fallback so out-of-range lookups don't allocate per call. */
 const NO_CONNECTIONS: string[] = [];

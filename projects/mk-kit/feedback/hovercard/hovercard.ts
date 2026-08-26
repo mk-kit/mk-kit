@@ -12,9 +12,9 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import type { MkPlacement } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MkAnchoredPanel } from '@mkornas/ui/core';
+import type { MkPlacement } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MkAnchoredPanel } from '@mk-kit/ui/core';
 
 /**
  * Hovercard — a rich hover-preview panel anchored to a trigger, in the spirit of

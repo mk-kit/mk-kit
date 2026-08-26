@@ -1,8 +1,8 @@
 import { Component, provideZonelessChangeDetection, signal, type Type } from '@angular/core';
 import { FormControl, ReactiveFormsModule, Validators } from '@angular/forms';
 import { TestBed } from '@angular/core/testing';
-import { MkFormField } from '@mkornas/ui/forms/form-field';
-import { MkInput } from '@mkornas/ui/forms/input';
+import { MkFormField } from '@mk-kit/ui/forms/form-field';
+import { MkInput } from '@mk-kit/ui/forms/input';
 import { MK_FIELD_PRESETS, MkField, type MkFieldKind } from './field';
 
 @Component({

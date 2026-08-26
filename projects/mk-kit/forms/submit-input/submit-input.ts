@@ -13,10 +13,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize, MkTone, MkVariant } from '@mkornas/ui/core';
-import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
-import { MkIcon } from '@mkornas/ui/icon';
+import type { MkSize, MkTone, MkVariant } from '@mk-kit/ui/core';
+import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
+import { MkIcon } from '@mk-kit/ui/icon';
 import { MkFormField } from '../form-field/form-field';
 import { MkInputGroup } from '../input-group/input-group';
 

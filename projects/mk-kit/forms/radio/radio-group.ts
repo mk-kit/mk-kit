@@ -19,9 +19,9 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import type { MkRadio } from './radio';
 

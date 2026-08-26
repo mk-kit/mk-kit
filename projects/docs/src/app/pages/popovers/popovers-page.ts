@@ -12,7 +12,7 @@ import {
   MkPopover,
   MkPopoverTrigger,
   MkTooltip,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**

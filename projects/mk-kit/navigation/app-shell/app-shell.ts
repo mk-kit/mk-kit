@@ -12,8 +12,8 @@ import {
   viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MkFocusTrap } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MkFocusTrap } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Viewport width (px) at/below which the sidebar becomes an off-canvas drawer. */
 const MOBILE_BREAKPOINT = 1024;

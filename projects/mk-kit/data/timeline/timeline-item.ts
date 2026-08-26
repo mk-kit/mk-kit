@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { MkTone } from '@mkornas/ui/core';
-import { MkIcon } from '@mkornas/ui/icon';
+import type { MkTone } from '@mk-kit/ui/core';
+import { MkIcon } from '@mk-kit/ui/icon';
 
 /**
  * A single event in an `<mk-timeline>`: a tone-coloured marker (optionally an

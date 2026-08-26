@@ -1,6 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MK_DEFAULT_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MK_DEFAULT_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkMultiSelect, MkMultiSelectOption } from './multi-select';
 
 const OPTIONS: MkMultiSelectOption[] = [

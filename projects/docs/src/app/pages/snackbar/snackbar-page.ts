@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MkButton, MkSnackbarService } from '@mkornas/ui';
+import { MkButton, MkSnackbarService } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the `MkSnackbarService` of `@mkornas/ui`.
+ * Documentation + live demo page for the `MkSnackbarService` of `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-snackbar-page',

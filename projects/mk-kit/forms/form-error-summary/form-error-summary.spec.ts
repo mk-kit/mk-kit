@@ -6,7 +6,7 @@ import {
   ReactiveFormsModule,
   Validators,
 } from '@angular/forms';
-import { MK_DEFAULT_I18N } from '@mkornas/ui/core';
+import { MK_DEFAULT_I18N } from '@mk-kit/ui/core';
 import { MkFormErrorSummary, type MkFormError } from './form-error-summary';
 
 const ERRORS: MkFormError[] = [

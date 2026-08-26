@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MkTreeSelect } from './tree-select';
-import type { MkTreeNode } from '@mkornas/ui/navigation';
+import type { MkTreeNode } from '@mk-kit/ui/navigation';
 
 const NODES: MkTreeNode[] = [
   {

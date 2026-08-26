@@ -10,7 +10,7 @@ import {
   output,
 } from '@angular/core';
 import { NgTemplateOutlet } from '@angular/common';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkNavList } from './nav-list';
 
 /**

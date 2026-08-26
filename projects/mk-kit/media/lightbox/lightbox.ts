@@ -5,7 +5,7 @@ import {
   inject,
   signal,
 } from '@angular/core';
-import { MK_I18N, MK_OVERLAY_DATA, MkOverlayRef } from '@mkornas/ui/core';
+import { MK_I18N, MK_OVERLAY_DATA, MkOverlayRef } from '@mk-kit/ui/core';
 import type { MkLightboxData, MkLightboxItem } from './lightbox.service';
 
 /**

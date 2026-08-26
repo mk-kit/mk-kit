@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkCheckbox, MkRadio, MkRadioGroup, MkSwitch } from '@mkornas/ui';
+import { MkCheckbox, MkRadio, MkRadioGroup, MkSwitch } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the TOGGLE components of `@mkornas/ui`:
+ * Documentation + live demo page for the TOGGLE components of `@mk-kit/ui`:
  * Checkbox, Radio group and Switch.
  */
 @Component({

@@ -10,12 +10,12 @@ import {
   MkRadarChart,
   MkTreemap,
   type MkTreemapItem,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the part-to-whole and KPI chart
- * components of `@mkornas/ui`: progress ring, gauge, donut, radar, funnel
+ * components of `@mk-kit/ui`: progress ring, gauge, donut, radar, funnel
  * and treemap.
  */
 @Component({

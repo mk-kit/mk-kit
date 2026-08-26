@@ -7,7 +7,7 @@ import {
   input,
   numberAttribute,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import {
   MkChartSeries,
   mkChartColor,

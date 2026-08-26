@@ -8,8 +8,8 @@ import {
   model,
   output,
 } from '@angular/core';
-import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
+import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
 
 /** Visual treatment for a {@link MkChip}. */
 export type MkChipVariant = 'solid' | 'soft' | 'outline';

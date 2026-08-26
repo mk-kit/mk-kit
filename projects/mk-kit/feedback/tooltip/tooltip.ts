@@ -14,9 +14,9 @@ import {
   booleanAttribute,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { mkComputeAnchoredPosition } from '@mkornas/ui/core';
-import type { MkPlacement } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { mkComputeAnchoredPosition } from '@mk-kit/ui/core';
+import type { MkPlacement } from '@mk-kit/ui/core';
 
 /** Delay (ms) before a pointer-triggered tooltip opens. Focus opens instantly. */
 const OPEN_DELAY = 400;

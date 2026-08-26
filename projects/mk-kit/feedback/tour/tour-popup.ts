@@ -9,10 +9,10 @@ import {
   inject,
   viewChild,
 } from '@angular/core';
-import type { MkPlacement } from '@mkornas/ui/core';
-import { mkGetFocusable } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkAnchoredPanel } from '@mkornas/ui/core';
+import type { MkPlacement } from '@mk-kit/ui/core';
+import { mkGetFocusable } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkAnchoredPanel } from '@mk-kit/ui/core';
 
 /**
  * A single coach-mark step in a product tour. The `target` is the element the

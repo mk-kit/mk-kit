@@ -5,7 +5,7 @@ import {
   MkSkeleton,
   MkSkeletonPreset,
   MkSpinner,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**

@@ -15,10 +15,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkFieldContext } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkFieldContext } from '@mk-kit/ui/core';
 
 /**
  * InlineEdit — click a piece of text to edit it in place. The display is a

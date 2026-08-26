@@ -19,10 +19,10 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
-import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
-import { mkMaskCaret } from '@mkornas/ui/directives';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
+import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 
 /** Locale-derived formatting facts used while editing. */

@@ -1,8 +1,28 @@
 # Changelog
 
-All notable changes to **`@mkornas/ui`**. The format follows
-[Keep a Changelog](https://keepachangelog.com/); versions are private GitHub
-Packages releases published on `v*` tags. Dates are ISO-8601.
+All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
+0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
+versions are published to npm on `v*` tags. Dates are ISO-8601.
+
+## [0.34.0] — 2026-08-26
+
+### Changed
+
+- **Package renamed to `@mk-kit/ui` and published to the public npm registry.**
+  Up to 0.33.0 the library shipped as `@mkornas/ui` from GitHub Packages.
+  Migrate with a find-and-replace of `@mkornas/ui` → `@mk-kit/ui` in imports
+  and stylesheets, remove the `@mkornas:registry` line from `.npmrc`, then
+  `npm install @mk-kit/ui`. No API changes. The repository now lives at
+  <https://github.com/mk-kit/mk-kit>.
+- Releases are published from CI with npm provenance attestations
+  (`npm audit signatures` verifies them).
+
+### Added
+
+- **Landing page** at the docs root: a live, page-wide theming demo (the brand
+  swatches rewrite the `--mk-primary` token family), a wall of live
+  components, a PrimeNG → mk-kit mapping and the open-core pricing outline.
+- `CONTRIBUTING.md` (DCO 1.1 sign-off), `TRADEMARK.md` and `SECURITY.md`.
 
 ## [0.33.0] — 2026-08-10
 
@@ -75,7 +95,7 @@ The scheduler, output & tooling wave — ROADMAP Round 4.
   two subtle stabilizations (forced scrollbar gutter; a font-warm-up pass)
   discovered the hard way. Linux baselines committed; weekly + manual
   GitHub workflow (not in the PR-blocking CI).
-- **`ng add @mkornas/ui`** — wires the theme stylesheet into angular.json
+- **`ng add @mk-kit/ui`** — wires the theme stylesheet into angular.json
   (prepended, so app styles win) and optionally scaffolds
   `provideMkI18n({})` (`--i18n`); ships as compiled schematics in the
   package.
@@ -97,7 +117,7 @@ worktree; also repairs a 0.30.0 packaging slip (see Fixed).
 
 ### Added
 
-- **`MkTableDataSource<T>`** (`@mkornas/ui/table`) — the server-side data
+- **`MkTableDataSource<T>`** (`@mk-kit/ui/table`) — the server-side data
   adapter for `mk-table`: signal state (`rows`/`total`/`loading`/`error`/
   `empty`), `setPage`/`setPageSize`/`setSort`/`setFilter` (debounced) /
   `refresh`, Promise or Observable fetchers, epoch-based latest-wins race
@@ -105,7 +125,7 @@ worktree; also repairs a 0.30.0 packaging slip (see Fixed).
   on screen during loads, `connectSort(mkSort)`, and auto-cleanup when
   created in an injection context. `setSort` accepts both the `mkSort`
   directive's state and `mk-table`'s `(sortChange)` payload.
-- **`@mkornas/ui/rich-text`** — new entry point. The block editor's
+- **`@mk-kit/ui/rich-text`** — new entry point. The block editor's
   internal rich-text engine moved here (block-editor shrank 222→205 KiB and
   re-exports everything it used to), plus the new standalone
   **`mk-rich-text`**: a sanitized-HTML-string CVA field with toolbar for
@@ -213,14 +233,14 @@ detection pass).
 
 ### Changed — packaging
 
-- **New `@mkornas/ui/checkbox` entry point.** `mk-table` imported
+- **New `@mk-kit/ui/checkbox` entry point.** `mk-table` imported
   `MkCheckbox` from the 714 KiB forms entry, dragging the whole forms module
   graph into table-only consumers. Checkbox is now its own entry depending
   only on core, via a new **`MkFieldContext`** DI token in core (the
   abstract field-wrapper contract; `MkFormField` provides it) — also adopted
-  by `mk-inline-edit`, cutting the data→forms edge. `@mkornas/ui/forms`
+  by `mk-inline-edit`, cutting the data→forms edge. `@mk-kit/ui/forms`
   re-exports `MkCheckbox`, so existing imports keep working.
-- **`mkHighlight` moved to `@mkornas/ui/core`** (with `MkCodeLanguage`);
+- **`mkHighlight` moved to `@mk-kit/ui/core`** (with `MkCodeLanguage`);
   `mk-code` no longer pulls the forms entry for a pure function. The forms
   entry re-exports it for compat.
 - Docs site preloads lazy routes (`withPreloading(PreloadAllModules)`).
@@ -1019,7 +1039,7 @@ form-field that words its own errors.
   bound control now reports the constraint as a validation error instead of the
   input only clamping the UI, and re-validates when the constraint changes
   (`registerOnValidatorChange`, wired by the new `mkValidatorChange()` helper in
-  `@mkornas/ui/core`):
+  `@mk-kit/ui/core`):
   - Standard Angular keys where they map — `min` / `max` (`mk-number-input`,
     `mk-currency-input`, `mk-slider`, `mk-range-slider`, `mk-rating`),
     `minlength` (`mk-password-input` `[minLength]`, `mk-otp` `[length]`),
@@ -1050,7 +1070,7 @@ form-field that words its own errors.
 - **`validation` i18n group** — messages for every key above plus the standard
   `Validators` keys, deep-merged by `provideMkI18n({ validation: … })` like
   `dateNames` and `blockEditor`. `mkFirstErrorMessage()` and the
-  `MkErrorMessages` type are exported from `@mkornas/ui/core`.
+  `MkErrorMessages` type are exported from `@mk-kit/ui/core`.
 - **`mk-file-upload` is a form control** — `ControlValueAccessor` + `Validator`.
   The form value is `File[]`, or the tracked `MkUploadFile[]` via the new
   `[valueFormat]="'item'"` (`MkUploadValueFormat`). Upload-progress ticks do not
@@ -1087,7 +1107,7 @@ form-field that words its own errors.
 ### Infrastructure
 
 - **Releases are automatic.** Pushing a version bump to `main` now publishes
-  `@mkornas/ui`, creates the `v<version>` tag and opens a GitHub Release with
+  `@mk-kit/ui`, creates the `v<version>` tag and opens a GitHub Release with
   that version's changelog section — no manual tagging. Pushing a `v*` tag
   still works and now fails loudly if the tag and `package.json` disagree
   instead of shipping a mismatch; every path skips a version that is already
@@ -1122,7 +1142,7 @@ form-field that words its own errors.
 
 ### Added
 
-- **Media group** (`@mkornas/ui/media`) — a new entry point for image-heavy
+- **Media group** (`@mk-kit/ui/media`) — a new entry point for image-heavy
   UIs:
   - **Image** (`mk-image`) — figure-based image block: skeleton shimmer
     while loading, labelled error fallback, caption, `aspectRatio`/`fit`/
@@ -1233,9 +1253,9 @@ form-field that words its own errors.
 
 ### Changed
 
-- **`@mkornas/ui/data` no longer re-exports the icon, chip and table entry
-  points** — import `@mkornas/ui/icon`, `/chip` and `/table` directly (the
-  root `@mkornas/ui` barrel still exports everything). This removes an
+- **`@mk-kit/ui/data` no longer re-exports the icon, chip and table entry
+  points** — import `@mk-kit/ui/icon`, `/chip` and `/table` directly (the
+  root `@mk-kit/ui` barrel still exports everything). This removes an
   implicit `data → table` coupling that dragged the table into any chunk
   importing the data group.
 - **Docs redesigned** — flat text-only sidebar (no icons, no collapsing
@@ -1253,7 +1273,7 @@ form-field that words its own errors.
 - `MkThemeService` detaches its `prefers-color-scheme` media-query listener
   on injector destroy (repeated bootstraps in SSR/HMR/tests no longer leak).
 - `PATTERN.md` updated to the real per-group entry-point layout,
-  `@mkornas/ui/*` import convention and `.scss` styling (it still described
+  `@mk-kit/ui/*` import convention and `.scss` styling (it still described
   the pre-audit `src/lib/components/` tree).
 
 ## [0.4.0] — 2026-07-10
@@ -1342,7 +1362,7 @@ form-field that words its own errors.
 ### Added
 
 - **Secondary entry points** — the library now ships 15 Material-style entry
-  points (`@mkornas/ui/core`, `/forms`, `/table`, `/data`, `/feedback`,
+  points (`@mk-kit/ui/core`, `/forms`, `/table`, `/data`, `/feedback`,
   `/navigation`, `/datetime`, `/charts`-in-`/data`, `/dnd`, `/block-editor`,
   `/directives`, `/button`, `/icon`, `/chip`, `/context-menu`) plus the root
   umbrella. Code-split apps no longer carry the whole library in their initial
@@ -1382,7 +1402,7 @@ form-field that words its own errors.
 ### Changed
 
 - `MkColumnResize` payload type exported; `mkHighlight` exported from the
-  forms group; deep import paths (`@mkornas/ui/src/...`) are replaced by the
+  forms group; deep import paths (`@mk-kit/ui/src/...`) are replaced by the
   documented entry points.
 
 ## [0.1.9] — 2026-07-10
@@ -1577,7 +1597,7 @@ form-field that words its own errors.
 
 ## [0.1.0] — 2026-07-09
 
-Initial private release as `@mkornas/ui` on GitHub Packages.
+Initial private release as `@mk-kit/ui` on GitHub Packages.
 
 ### Added
 
@@ -1594,16 +1614,16 @@ Initial private release as `@mkornas/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mkornas/mk-kit/compare/v0.7.0...HEAD
-[0.7.0]: https://github.com/mkornas/mk-kit/compare/v0.6.0...v0.7.0
-[0.2.0]: https://github.com/mkornas/mk-kit/compare/v0.1.9...v0.2.0
-[0.1.9]: https://github.com/mkornas/mk-kit/compare/v0.1.8...v0.1.9
-[0.1.8]: https://github.com/mkornas/mk-kit/compare/v0.1.7...v0.1.8
-[0.1.7]: https://github.com/mkornas/mk-kit/compare/v0.1.6...v0.1.7
-[0.1.6]: https://github.com/mkornas/mk-kit/compare/v0.1.5...v0.1.6
-[0.1.5]: https://github.com/mkornas/mk-kit/compare/v0.1.4...v0.1.5
-[0.1.4]: https://github.com/mkornas/mk-kit/compare/v0.1.3...v0.1.4
-[0.1.3]: https://github.com/mkornas/mk-kit/compare/v0.1.2...v0.1.3
-[0.1.2]: https://github.com/mkornas/mk-kit/compare/v0.1.1...v0.1.2
-[0.1.1]: https://github.com/mkornas/mk-kit/compare/v0.1.0...v0.1.1
-[0.1.0]: https://github.com/mkornas/mk-kit/releases/tag/v0.1.0
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.7.0...HEAD
+[0.7.0]: https://github.com/mk-kit/mk-kit/compare/v0.6.0...v0.7.0
+[0.2.0]: https://github.com/mk-kit/mk-kit/compare/v0.1.9...v0.2.0
+[0.1.9]: https://github.com/mk-kit/mk-kit/compare/v0.1.8...v0.1.9
+[0.1.8]: https://github.com/mk-kit/mk-kit/compare/v0.1.7...v0.1.8
+[0.1.7]: https://github.com/mk-kit/mk-kit/compare/v0.1.6...v0.1.7
+[0.1.6]: https://github.com/mk-kit/mk-kit/compare/v0.1.5...v0.1.6
+[0.1.5]: https://github.com/mk-kit/mk-kit/compare/v0.1.4...v0.1.5
+[0.1.4]: https://github.com/mk-kit/mk-kit/compare/v0.1.3...v0.1.4
+[0.1.3]: https://github.com/mk-kit/mk-kit/compare/v0.1.2...v0.1.3
+[0.1.2]: https://github.com/mk-kit/mk-kit/compare/v0.1.1...v0.1.2
+[0.1.1]: https://github.com/mk-kit/mk-kit/compare/v0.1.0...v0.1.1
+[0.1.0]: https://github.com/mk-kit/mk-kit/releases/tag/v0.1.0

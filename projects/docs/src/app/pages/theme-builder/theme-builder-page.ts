@@ -29,7 +29,7 @@ import {
   MkTabs,
   type MkSelectOption,
   type MkTableColumn,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 
 type TokenMap = Record<string, string>;
 

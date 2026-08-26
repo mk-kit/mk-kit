@@ -6,9 +6,9 @@ import {
   input,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import type { MkBlock } from './block-model';
-import { MkRichTextEngine, type MkRichTextSplit } from '@mkornas/ui/rich-text';
+import { MkRichTextEngine, type MkRichTextSplit } from '@mk-kit/ui/rich-text';
 
 /**
  * Paragraph block — rich text stored as sanitised HTML in `block.data.html`,

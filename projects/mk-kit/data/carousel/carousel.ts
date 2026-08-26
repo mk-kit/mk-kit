@@ -17,7 +17,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Horizontal movement (px) before a pointer gesture commits to a swipe. */
 const SWIPE_START_PX = 30;

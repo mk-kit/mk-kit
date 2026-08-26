@@ -23,7 +23,7 @@ import {
   MkSelect,
   type MkSelectOption,
   MkSubmitInput,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface OrderLine {
@@ -32,7 +32,7 @@ interface OrderLine {
 }
 
 /**
- * Documentation + live demo page for the FORM structure components of `@mkornas/ui`:
+ * Documentation + live demo page for the FORM structure components of `@mk-kit/ui`:
  * FormField, Form error summary, Select, Submit input, File upload and Repeater.
  */
 @Component({

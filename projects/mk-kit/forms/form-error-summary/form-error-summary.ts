@@ -21,8 +21,8 @@ import {
   NgForm,
 } from '@angular/forms';
 import type { Subscription } from 'rxjs';
-import type { MkErrorMessages } from '@mkornas/ui/core';
-import { MK_I18N, mkFirstErrorMessage } from '@mkornas/ui/core';
+import type { MkErrorMessages } from '@mk-kit/ui/core';
+import { MK_I18N, mkFirstErrorMessage } from '@mk-kit/ui/core';
 
 /** One field-level error to surface in {@link MkFormErrorSummary}. */
 export interface MkFormError {

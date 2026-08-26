@@ -5,8 +5,8 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { MkCopyToClipboard } from '@mkornas/ui/directives';
-import { mkHighlight, type MkCodeLanguage } from '@mkornas/ui/core';
+import { MkCopyToClipboard } from '@mk-kit/ui/directives';
+import { mkHighlight, type MkCodeLanguage } from '@mk-kit/ui/core';
 
 /**
  * Code — a read-only, themed code block with syntax highlighting, an optional

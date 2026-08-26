@@ -31,7 +31,7 @@
  * - Footnotes, setext headings (`===` / `---` underlines — a `---` line is
  *   always a horizontal rule here), reference-style links, loose lists.
  */
-import { mkHighlight } from '@mkornas/ui/core';
+import { mkHighlight } from '@mk-kit/ui/core';
 
 /** Column alignment of a table, from the delimiter row's colons. */
 export type MkMarkdownAlign = 'left' | 'center' | 'right' | null;

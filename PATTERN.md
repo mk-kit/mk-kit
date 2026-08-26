@@ -1,6 +1,6 @@
 # mk-kit Component Authoring Spec (READ FIRST)
 
-You are building components for **@mkornas/ui**, an Angular 22 admin/dashboard
+You are building components for **@mk-kit/ui**, an Angular 22 admin/dashboard
 component library. Every component MUST follow this spec exactly so the whole
 library compiles and looks like one coherent system. The reference
 implementation is `projects/mk-kit/button/` — read it and mirror its structure
@@ -49,11 +49,11 @@ precisely.
    components (e.g. `mk-card`, `mk-alert`). Prefix everything `mk`/`mk-`.
 8. **Imports** only from `@angular/core`, `@angular/common`, `@angular/forms`.
    Shared helpers come from the SECONDARY ENTRY POINTS, e.g.
-   `import { MkSize, mkUniqueId, MK_I18N, MkAnchoredPanel } from '@mkornas/ui/core';`
-   `import { mkApplyMask } from '@mkornas/ui/directives';`
+   `import { MkSize, mkUniqueId, MK_I18N, MkAnchoredPanel } from '@mk-kit/ui/core';`
+   `import { mkApplyMask } from '@mk-kit/ui/directives';`
    Sibling components in the SAME group are imported via relative paths, e.g.
    `import { MkFormField } from '../form-field/form-field';`
-   Do NOT import from the ROOT `'@mkornas/ui'` or `'mk-kit'` (circular).
+   Do NOT import from the ROOT `'@mk-kit/ui'` or `'mk-kit'` (circular).
 9. **Do NOT run `ng build`** (parallel builds race on the dist folder). Do NOT
    edit `public-api.ts`, `angular.json`, or any file outside your assigned
    component folders and your group barrel. Do NOT edit the Button. Do NOT

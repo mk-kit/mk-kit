@@ -24,7 +24,7 @@ import {
   mkMoveItemInArray,
   type MkDropEvent,
   type MkTableColumn,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /** A row in the stacked-table demos. */
@@ -106,7 +106,7 @@ export class TouchSortSheet {
 }
 
 /**
- * Touch & mobile showcase — how `@mkornas/ui` adapts to fingers and small
+ * Touch & mobile showcase — how `@mk-kit/ui` adapts to fingers and small
  * viewports: the `touch` density, stacked tables, bottom sheets, gesture
  * components, and coarse-pointer guidance.
  */

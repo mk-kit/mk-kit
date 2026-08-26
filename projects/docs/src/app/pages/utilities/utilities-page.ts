@@ -24,7 +24,7 @@ import {
   MkPermissionPolicy,
   MkRipple,
   MkScrollspy,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
@@ -52,7 +52,7 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
 }
 
 /**
- * Documentation + live demo page for the utility directives of `@mkornas/ui`:
+ * Documentation + live demo page for the utility directives of `@mk-kit/ui`:
  * `mkClickOutside` and `mkCopyToClipboard`.
  */
 @Component({

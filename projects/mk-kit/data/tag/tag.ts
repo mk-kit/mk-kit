@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, input } from '@angular/core';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
 
 /** Visual treatment for a {@link MkTag}. */
 export type MkTagVariant = 'solid' | 'soft' | 'outline';

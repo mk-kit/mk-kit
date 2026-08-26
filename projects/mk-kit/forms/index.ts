@@ -1,5 +1,5 @@
 /**
- * FORM COMPONENTS group barrel for @mkornas/ui.
+ * FORM COMPONENTS group barrel for @mk-kit/ui.
  * Re-exports every public component and type in the form group.
  */
 export * from './form-field';
@@ -32,14 +32,14 @@ export * from './iban-input';
 export * from './tax-id-input';
 export * from './signature-pad';
 export * from './button-toggle';
-// Checkbox moved to its own entry (`@mkornas/ui/checkbox`) so non-forms
+// Checkbox moved to its own entry (`@mk-kit/ui/checkbox`) so non-forms
 // consumers (mk-table row selection) don't drag the whole forms group;
 // re-exported here for backward compatibility.
-export * from '@mkornas/ui/checkbox';
+export * from '@mk-kit/ui/checkbox';
 export * from './radio';
 export * from './switch';
 export * from './slider';
 export * from './color-picker';
 export * from './range-slider';
 // Shared JSON/code highlighter — moved to core; re-exported for compat.
-export { mkHighlight } from '@mkornas/ui/core';
+export { mkHighlight } from '@mk-kit/ui/core';

@@ -7,12 +7,12 @@ import {
   MkSplitter,
   MkScrollArea,
   MkToolbar,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the admin/CMS structural components of
- * `@mkornas/ui`: PageHeader, Toolbar, Splitter and Scroll area. The Drawer has
+ * `@mk-kit/ui`: PageHeader, Toolbar, Splitter and Scroll area. The Drawer has
  * its own page (`/components/drawer`).
  */
 @Component({

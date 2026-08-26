@@ -6,7 +6,7 @@ import {
   MkSelect,
   MkThemeService,
   provideMkI18n,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 
 /** A subtree with Polish strings, to show `provideMkI18n` scoping. */
 @Component({
@@ -44,11 +44,11 @@ export class I18nDemo {}
 
       <h2>1. Install</h2>
       <p>The fastest path is the <code class="docs-inline">ng add</code> schematic:</p>
-      <pre class="gs-code"><code>ng add &#64;mkornas/ui</code></pre>
+      <pre class="gs-code"><code>ng add &#64;mk-kit/ui</code></pre>
       <p>
         It installs the package and wires the theme stylesheet into your
         project automatically: the compiled theme
-        (<code class="docs-inline">node_modules/&#64;mkornas/ui/styles/mk-kit.css</code>)
+        (<code class="docs-inline">node_modules/&#64;mk-kit/ui/styles/mk-kit.css</code>)
         is <em>prepended</em> to the app's <code class="docs-inline">styles</code>
         array in <code class="docs-inline">angular.json</code>, so your own
         styles keep the last word for overrides. It targets the first
@@ -60,7 +60,7 @@ export class I18nDemo {}
         If you use it, step 2 below is already done — continue at step 3.
       </p>
       <p>Or install manually:</p>
-      <pre class="gs-code"><code>npm install &#64;mkornas/ui</code></pre>
+      <pre class="gs-code"><code>npm install &#64;mk-kit/ui</code></pre>
       <p>
         Peer dependencies: <code class="docs-inline">&#64;angular/core</code>,
         <code class="docs-inline">&#64;angular/common</code> and
@@ -73,7 +73,7 @@ export class I18nDemo {}
         design token plus the base reset. Add it to your global
         <code class="docs-inline">styles.css</code>:
       </p>
-      <pre class="gs-code"><code>&#64;import '&#64;mkornas/ui/styles.css';</code></pre>
+      <pre class="gs-code"><code>&#64;import '&#64;mk-kit/ui/styles.css';</code></pre>
       <p>or reference it from the <code class="docs-inline">styles</code> array in <code class="docs-inline">angular.json</code>.</p>
 
       <h2>3. Enable the theme surface</h2>
@@ -158,7 +158,7 @@ export class GettingStartedPage {
   protected readonly theme = inject(MkThemeService);
 
   protected readonly i18nSnippet = `import { bootstrapApplication } from '@angular/platform-browser';
-import { provideMkI18n } from '@mkornas/ui';
+import { provideMkI18n } from '@mk-kit/ui';
 
 bootstrapApplication(App, {
   providers: [
@@ -173,7 +173,7 @@ bootstrapApplication(App, {
 });`;
 
   protected readonly usageSnippet = `import { Component, inject } from '@angular/core';
-import { MkButton, MkCard, MkThemeService } from '@mkornas/ui';
+import { MkButton, MkCard, MkThemeService } from '@mk-kit/ui';
 
 @Component({
   selector: 'app-root',

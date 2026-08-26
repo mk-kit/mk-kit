@@ -1,12 +1,12 @@
 {
   "$schema": "http://json-schema.org/schema",
   "$id": "MkKitNgAdd",
-  "title": "@mkornas/ui ng-add schematic",
+  "title": "@mk-kit/ui ng-add schematic",
   "type": "object",
   "properties": {
     "project": {
       "type": "string",
-      "description": "The name of the project to add @mkornas/ui to.",
+      "description": "The name of the project to add @mk-kit/ui to.",
       "$default": {
         "$source": "projectName"
       }

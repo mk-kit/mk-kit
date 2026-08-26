@@ -9,7 +9,7 @@ import {
 } from '@angular/core';
 import { NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs/operators';
-import { MkScrollspy } from '@mkornas/ui';
+import { MkScrollspy } from '@mk-kit/ui';
 
 interface TocItem {
   id: string;

@@ -6,12 +6,12 @@ import {
   MkMediaActions,
   type MkMediaItem,
   type MkMediaReorderEvent,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the media MANAGEMENT components of
- * `@mkornas/ui`: Media gallery (select / reorder / actions) and Image cropper.
+ * `@mk-kit/ui`: Media gallery (select / reorder / actions) and Image cropper.
  */
 @Component({
   selector: 'docs-media-manager-page',

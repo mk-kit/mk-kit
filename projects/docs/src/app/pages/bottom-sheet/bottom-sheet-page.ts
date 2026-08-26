@@ -5,7 +5,7 @@ import {
   MkBottomSheetService,
   MkButton,
   MkOverlayRef,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /** Data passed into the share sheet. */
@@ -48,7 +48,7 @@ export class ShareSheet {
 
 /**
  * Documentation + live demo page for the `MkBottomSheetService` /
- * `mk-bottom-sheet` of `@mkornas/ui`.
+ * `mk-bottom-sheet` of `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-bottom-sheet-page',

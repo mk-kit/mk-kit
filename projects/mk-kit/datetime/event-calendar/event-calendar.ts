@@ -13,8 +13,8 @@ import {
   output,
   signal,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
 import {
   addDays,
   addMonths,

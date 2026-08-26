@@ -13,7 +13,7 @@ import {
   numberAttribute,
   signal,
 } from '@angular/core';
-import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MK_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkDragDropRegistry } from './drag-drop-registry';
 import { MkDragHandle } from './drag-handle';
 import { MkDropList } from './drop-list';

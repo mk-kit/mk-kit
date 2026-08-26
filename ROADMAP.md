@@ -1,6 +1,6 @@
 # Roadmap — missing components & features
 
-A curated gap analysis for `@mkornas/ui`, measured against Angular Material and
+A curated gap analysis for `@mk-kit/ui`, measured against Angular Material and
 common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 **P2** useful, **P3** nice-to-have. This is a planning doc, not a commitment.
 
@@ -63,7 +63,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 | P3 | Color palette / gradient picker variants | K | color-picker | S |
 | P3 | Comment thread (`mk-comment`) | Z T | avatar, timeline | S |
 | P3 | Swipe-to-reveal list actions (mobile) | T | dnd pointer handling | S |
-| P3 | Test harnesses (`@mkornas/ui/testing`) | M | — | M |
+| P3 | Test harnesses (`@mk-kit/ui/testing`) | M | — | M |
 | — | Spreadsheet, geo maps, PDF viewer, image editor, word processor | K S / K S D / P K S T / S / S | out of scope — huge, and not admin-panel core |
 
 Size: S ≤ 2 days, M ≤ 1 week, L ≤ 2 weeks (single dev, with tests + docs).
@@ -75,7 +75,7 @@ from what the free core can already fake.
 
 | # | Widget | Charged for by | Effort | Notes |
 |---|--------|----------------|--------|-------|
-| 1 | **Admin Starter** — auth/2FA, dashboard, CRUD list + detail + form, settings, users & roles, billing, notifications, audit log (12 screens, mock API, tests) | PrimeBlocks, Kendo templates, every ThemeForest admin | 3–4 wk | Lift and generalise the mk-cms admin. The product; ships first. |
+| 1 | **Admin Starter** — auth/2FA, dashboard, CRUD list + detail + form, settings, users & roles, billing, notifications, audit log (12 screens, mock API, tests) | PrimeBlocks, Kendo templates, every ThemeForest admin | 3–4 wk | Lift and generalise the internal CMS admin. The product; ships first. |
 | 2 | **`mk-dashboard-grid`** — draggable/resizable widget layout with breakpoints + persisted layout JSON | Syncfusion Dashboard Layout, Kendo TileLayout | 2 wk | Highest demand-to-effort ratio; every "build your own dashboard" admin. |
 | 3 | **Resource scheduler / timeline view** on `mk-event-calendar` (resources as rows, day/week timeline, drag across resources) | PrimeUI Scheduler, Kendo, Syncfusion, DevExtreme | 2–3 wk | Free calendar stays; Pro adds the resource axis. |
 | 4 | **`mk-gantt`** — tasks, dependencies, drag/resize, baseline, critical path, zoom | PrimeUI (soon), Kendo, Syncfusion, DevExtreme | 3–4 wk | |
@@ -117,9 +117,9 @@ from what the free core can already fake.
 
 ---
 
-## ⭑ mk-cms admin blockers
+## ⭑ CMS admin blockers
 
-Driven by the **mk-cms** admin panel (schema-driven CRUD). The original blockers
+Driven by an internal **CMS** admin panel (schema-driven CRUD). The original blockers
 — **file-upload**, **multi-select + chips**, **JSON/code editor**,
 **popover/popconfirm** and **description-list** — plus the **block-editor ↔ HTML bridge** — are all ✅ **shipped** (details in the
 component sections below), including the **revision diff / comparison view**
@@ -279,7 +279,7 @@ live-announcer core.
   coverage as components land.)
 - ✅ **CI pipeline** — `.github/workflows/ci.yml` (build lib → test lib → test
   docs → build docs → publish dry-run, on push/PR) + `release.yml` (publish to
-  GitHub Packages on `v*` tags). (shipped.)
+  npm on `v*` tags). (shipped.)
 - ✅ **i18n of built-in strings** — `MK_I18N` token + `provideMkI18n(overrides)`
   over English defaults (`MkI18nStrings`); wired through select/autocomplete/
   multi-select/table/command-palette (empty text), dialog/drawer/bottom-sheet
@@ -326,7 +326,7 @@ live-announcer core.
 
 ## Suggested near-term order
 
-Tests, CI, the SCSS migration, i18n and all mk-cms blockers are done. All P1s
+Tests, CI, the SCSS migration, i18n and all CMS blockers are done. All P1s
 are shipped. What's left of Round 1 is P2/P3:
 
 1. RTL audit + density mode; high-contrast / forced-colors theme (remaining P2/P3).
@@ -392,7 +392,7 @@ consumers still had to hand-roll):
   `mk-table` + `mkSort` + `mk-pagination`: signal state (`rows/total/loading/
   error/empty`), debounced filter, latest-wins race handling, Promise or
   Observable fetchers (shipped).
-- ✅ **`@mkornas/ui/rich-text`** — the block editor's rich-text engine as its
+- ✅ **`@mk-kit/ui/rich-text`** — the block editor's rich-text engine as its
   own entry + standalone **`mk-rich-text`** field: sanitized-HTML-string CVA
   with toolbar, for single description/notes fields (shipped).
 - ✅ **`mk-repeater`** — add/remove/reorder rows of a projected template, CVA
@@ -424,7 +424,7 @@ consumers still had to hand-roll):
   wiring (shipped).
 - ✅ **Playwright visual regression** — 12 docs routes × light/dark, frozen
   clock, Linux baselines, weekly + manual workflow (shipped).
-- ✅ **`ng add @mkornas/ui`** — wires the theme stylesheet, optional
+- ✅ **`ng add @mk-kit/ui`** — wires the theme stylesheet, optional
   `provideMkI18n` scaffold (shipped).
 
 Still open: org-chart (P3), generated API reference (P2), test harnesses

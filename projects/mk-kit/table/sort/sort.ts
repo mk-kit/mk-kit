@@ -6,8 +6,8 @@ import {
   model,
   output,
 } from '@angular/core';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import type { MkSortDirection } from '../table/table';
 
 /** Current sort state emitted by {@link MkSort.mkSortChange}. */

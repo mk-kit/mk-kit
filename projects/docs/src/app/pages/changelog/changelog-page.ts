@@ -4,7 +4,7 @@ import {
   afterNextRender,
   signal,
 } from '@angular/core';
-import { MkAlert, MkMarkdown, MkSpinner } from '@mkornas/ui';
+import { MkAlert, MkMarkdown, MkSpinner } from '@mk-kit/ui';
 
 /**
  * Renders the repository's `CHANGELOG.md` with the library's own
@@ -29,14 +29,14 @@ import { MkAlert, MkMarkdown, MkSpinner } from '@mkornas/ui';
       <header class="changelog-header">
         <h1>Changelog</h1>
         <p class="docs-lead">
-          Every release of <strong>&#64;mkornas/ui</strong>, rendered straight
+          Every release of <strong>&#64;mk-kit/ui</strong>, rendered straight
           from the repository's <code class="docs-inline">CHANGELOG.md</code>
           by the library's own
           <code class="docs-inline">&lt;mk-markdown&gt;</code> component.
           Also available
           <a
             class="changelog-header__link"
-            href="https://github.com/mkornas/mk-kit/blob/main/CHANGELOG.md"
+            href="https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md"
             target="_blank"
             rel="noopener noreferrer"
             >on GitHub</a
@@ -56,7 +56,7 @@ import { MkAlert, MkMarkdown, MkSpinner } from '@mkornas/ui';
             The changelog file isn't reachable right now. You can always read
             it
             <a
-              href="https://github.com/mkornas/mk-kit/blob/main/CHANGELOG.md"
+              href="https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md"
               target="_blank"
               rel="noopener noreferrer"
               >on GitHub</a

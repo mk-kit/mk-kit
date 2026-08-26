@@ -18,10 +18,10 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /**
  * Rating — a star rating input (and read-only display). Implements the ARIA

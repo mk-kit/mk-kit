@@ -20,11 +20,11 @@ import {
   type MkFieldKind,
   type MkI18nLocale,
   type MkI18nValue,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the TEXT INPUT components of `@mkornas/ui`:
+ * Documentation + live demo page for the TEXT INPUT components of `@mk-kit/ui`:
  * Input/Textarea, Textarea autosize, Password input, Number input, OTP/PIN input
  * and the multi-locale I18n input.
  */

@@ -14,9 +14,9 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { MK_I18N, MkAnchoredPanel, mkUniqueId } from '@mkornas/ui/core';
-import { MkMask, mkApplyMask } from '@mkornas/ui/directives';
+import type { MkSize } from '@mk-kit/ui/core';
+import { MK_I18N, MkAnchoredPanel, mkUniqueId } from '@mk-kit/ui/core';
+import { MkMask, mkApplyMask } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 import {
   MK_PHONE_COUNTRIES,

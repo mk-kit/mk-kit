@@ -7,7 +7,7 @@
 // node environment keeps the domino globals from clobbering the shared jsdom
 // realm used by every other spec (e.g. jsdom's KeyboardEvent).
 /**
- * SSR render smoke test for the @mkornas/ui component library.
+ * SSR render smoke test for the @mk-kit/ui component library.
  *
  * Server-renders (via `renderApplication` from @angular/platform-server) a
  * standalone root component whose template composes a broad set of mk
@@ -35,46 +35,46 @@ import {
 } from '@angular/platform-browser';
 import { provideServerRendering, renderApplication } from '@angular/platform-server';
 
-import { MkButton } from '@mkornas/ui/button';
-import { MkChip } from '@mkornas/ui/chip';
-import { MkFormField } from '@mkornas/ui/forms/form-field';
-import { MkInput } from '@mkornas/ui/forms/input';
-import { MkInputGroup } from '@mkornas/ui/forms/input-group';
-import { MkCheckbox } from '@mkornas/ui/checkbox';
-import { MkRadio, MkRadioGroup } from '@mkornas/ui/forms/radio';
-import { MkSwitch } from '@mkornas/ui/forms/switch';
-import { MkSelect, type MkSelectOption } from '@mkornas/ui/forms/select';
-import { MkPhoneInput } from '@mkornas/ui/forms/phone-input';
-import { MkPostalCodeInput } from '@mkornas/ui/forms/postal-code-input';
-import { MkCurrencyInput } from '@mkornas/ui/forms/currency-input';
-import { MkCardNumberInput } from '@mkornas/ui/forms/card-number-input';
-import { MkNumericKeypad } from '@mkornas/ui/forms/numeric-keypad';
-import { MkOnScreenKeyboard } from '@mkornas/ui/forms/on-screen-keyboard';
-import { MkIbanInput } from '@mkornas/ui/forms/iban-input';
-import { MkSubmitInput } from '@mkornas/ui/forms/submit-input';
-import { MkTaxIdInput } from '@mkornas/ui/forms/tax-id-input';
-import { MkSignaturePad } from '@mkornas/ui/forms/signature-pad';
-import { MkBlockEditor, mkHtmlToBlocks } from '@mkornas/ui/block-editor';
-import { MkJsonViewer } from '@mkornas/ui/data/json-viewer';
-import { MkImage } from '@mkornas/ui/media/image';
-import { MkImageGallery } from '@mkornas/ui/media/image-gallery';
-import { MkImageCropper } from '@mkornas/ui/media/image-cropper';
-import { MkMediaGallery, type MkMediaItem } from '@mkornas/ui/media/media-gallery';
-import { MkProfileCard } from '@mkornas/ui/data/profile-card';
-import { MkTab, MkTabs } from '@mkornas/ui/navigation/tabs';
-import { MkAccordion, MkAccordionItem } from '@mkornas/ui/navigation/accordion';
-import { MkBreadcrumb, MkBreadcrumbItem } from '@mkornas/ui/navigation/breadcrumb';
-import { MkPagination } from '@mkornas/ui/navigation/pagination';
-import { MkStep, MkStepper } from '@mkornas/ui/navigation/stepper';
-import { MkTree, type MkTreeNode } from '@mkornas/ui/navigation/tree';
-import { MkScrollArea } from '@mkornas/ui/navigation/scroll-area';
-import { MkBackToTop } from '@mkornas/ui/navigation/back-to-top';
-import { MkAlert } from '@mkornas/ui/feedback/alert';
-import { MkTooltip } from '@mkornas/ui/feedback/tooltip';
-import { MkBadge } from '@mkornas/ui/data/badge';
-import { MkProgressBar } from '@mkornas/ui/data/progress-bar';
-import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mkornas/ui/data/card';
-import { MkVirtualScroll } from '@mkornas/ui/data/virtual-scroll';
+import { MkButton } from '@mk-kit/ui/button';
+import { MkChip } from '@mk-kit/ui/chip';
+import { MkFormField } from '@mk-kit/ui/forms/form-field';
+import { MkInput } from '@mk-kit/ui/forms/input';
+import { MkInputGroup } from '@mk-kit/ui/forms/input-group';
+import { MkCheckbox } from '@mk-kit/ui/checkbox';
+import { MkRadio, MkRadioGroup } from '@mk-kit/ui/forms/radio';
+import { MkSwitch } from '@mk-kit/ui/forms/switch';
+import { MkSelect, type MkSelectOption } from '@mk-kit/ui/forms/select';
+import { MkPhoneInput } from '@mk-kit/ui/forms/phone-input';
+import { MkPostalCodeInput } from '@mk-kit/ui/forms/postal-code-input';
+import { MkCurrencyInput } from '@mk-kit/ui/forms/currency-input';
+import { MkCardNumberInput } from '@mk-kit/ui/forms/card-number-input';
+import { MkNumericKeypad } from '@mk-kit/ui/forms/numeric-keypad';
+import { MkOnScreenKeyboard } from '@mk-kit/ui/forms/on-screen-keyboard';
+import { MkIbanInput } from '@mk-kit/ui/forms/iban-input';
+import { MkSubmitInput } from '@mk-kit/ui/forms/submit-input';
+import { MkTaxIdInput } from '@mk-kit/ui/forms/tax-id-input';
+import { MkSignaturePad } from '@mk-kit/ui/forms/signature-pad';
+import { MkBlockEditor, mkHtmlToBlocks } from '@mk-kit/ui/block-editor';
+import { MkJsonViewer } from '@mk-kit/ui/data/json-viewer';
+import { MkImage } from '@mk-kit/ui/media/image';
+import { MkImageGallery } from '@mk-kit/ui/media/image-gallery';
+import { MkImageCropper } from '@mk-kit/ui/media/image-cropper';
+import { MkMediaGallery, type MkMediaItem } from '@mk-kit/ui/media/media-gallery';
+import { MkProfileCard } from '@mk-kit/ui/data/profile-card';
+import { MkTab, MkTabs } from '@mk-kit/ui/navigation/tabs';
+import { MkAccordion, MkAccordionItem } from '@mk-kit/ui/navigation/accordion';
+import { MkBreadcrumb, MkBreadcrumbItem } from '@mk-kit/ui/navigation/breadcrumb';
+import { MkPagination } from '@mk-kit/ui/navigation/pagination';
+import { MkStep, MkStepper } from '@mk-kit/ui/navigation/stepper';
+import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation/tree';
+import { MkScrollArea } from '@mk-kit/ui/navigation/scroll-area';
+import { MkBackToTop } from '@mk-kit/ui/navigation/back-to-top';
+import { MkAlert } from '@mk-kit/ui/feedback/alert';
+import { MkTooltip } from '@mk-kit/ui/feedback/tooltip';
+import { MkBadge } from '@mk-kit/ui/data/badge';
+import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
+import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
+import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
 
 /**
  * Gallery root: composes static components plus browser-API-dependent ones

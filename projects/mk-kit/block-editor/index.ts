@@ -1,5 +1,5 @@
 /**
- * BLOCK EDITOR group barrel for @mkornas/ui.
+ * BLOCK EDITOR group barrel for @mk-kit/ui.
  *
  * Public surface for the Gutenberg-style block content editor and its
  * read-only renderer. Built-in block edit components stay internal — consumers

@@ -6,8 +6,8 @@ import {
   input,
   numberAttribute,
 } from '@angular/core';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 
 /**
  * Progress bar — a determinate (0–100) or indeterminate progress indicator

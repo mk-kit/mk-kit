@@ -1,5 +1,5 @@
 import { Directive, ElementRef, OnDestroy, inject, input } from '@angular/core';
-import { MkMenu } from '@mkornas/ui/navigation';
+import { MkMenu } from '@mk-kit/ui/navigation';
 
 /** Hold time before a touch press opens the context menu. */
 const LONG_PRESS_MS = 500;

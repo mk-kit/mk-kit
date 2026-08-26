@@ -8,8 +8,8 @@ import {
   output,
   inject,
 } from '@angular/core';
-import type { MkTone } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import type { MkTone } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /**
  * Banner — a persistent, full-width page/section message with a tone, optional

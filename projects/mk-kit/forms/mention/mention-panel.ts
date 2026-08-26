@@ -9,7 +9,7 @@ import {
   untracked,
   viewChild,
 } from '@angular/core';
-import { MK_I18N, MkAnchoredPanel } from '@mkornas/ui/core';
+import { MK_I18N, MkAnchoredPanel } from '@mk-kit/ui/core';
 import type { MkMentionOption } from './mention';
 
 /**

@@ -11,7 +11,7 @@ import {
   MkCard,
   MkProgressBar,
   MkSwitch,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 
 interface TokenRow {
   name: string;
