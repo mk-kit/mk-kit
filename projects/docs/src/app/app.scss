@@ -40,6 +40,7 @@
   font-weight: var(--mk-font-weight-bold);
 }
 .docs-brand__name {
+  white-space: nowrap;
   font-size: var(--mk-font-size-lg);
   letter-spacing: var(--mk-letter-spacing-tight);
 }
