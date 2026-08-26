@@ -2,6 +2,8 @@ import {
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  ElementRef,
+  afterNextRender,
   booleanAttribute,
   computed,
   contentChild,
@@ -77,6 +79,13 @@ import {
     '[class.mk-form-field--invalid]': 'hasError()',
     '[class.mk-form-field--required]': 'isRequired()',
     '[class.mk-form-field--disabled]': 'isDisabled()',
+    '[class.mk-form-field--float]': "labelPosition() === 'float'",
+    '[class.mk-form-field--focused]': 'focused()',
+    '[class.mk-form-field--filled]': 'hasValue()',
+    '(focusin)': 'focused.set(true)',
+    '(focusout)': 'focused.set(false)',
+    '(input)': 'readDomValue($event.target)',
+    '(change)': 'readDomValue($event.target)',
   },
   providers: [
     {
@@ -124,9 +133,39 @@ export class MkFormField implements MkFieldContext {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Control size; nested controls inherit it. */
   readonly size = input<MkSize>('md');
+  /**
+   * Where the label sits: above the control (default), or `float` — inside
+   * the control, sliding up once it is focused or has a value. Floating works
+   * with `mkInput` / textarea and any control bound with `ngModel` or a
+   * `formControl`; the placeholder stays hidden until the label has moved.
+   */
+  readonly labelPosition = input<'top' | 'float'>('top');
+
+  private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** The projected control's form binding, when it has one. */
   private readonly ngControl = contentChild(NgControl, { descendants: true });
+
+  /** A control inside the field has focus. */
+  protected readonly focused = signal(false);
+  /** Last value read straight from a native control (fallback when no NgControl). */
+  private readonly domValue = signal<string | null>(null);
+  /** The field holds a non-empty value (drives the floating label). */
+  protected readonly hasValue = computed(() => {
+    this.controlTick();
+    const control = this.ngControl();
+    const v = control ? control.value : this.domValue();
+    if (v == null || v === '') return false;
+    if (Array.isArray(v)) return v.length > 0;
+    return true;
+  });
+
+  /** Track a native control's value for the floating label when nothing else reports it. */
+  protected readDomValue(target: EventTarget | null): void {
+    const el = target as HTMLInputElement | null;
+    if (!el || typeof el.value !== 'string') return;
+    this.domValue.set(el.value);
+  }
 
   /**
    * Bumped on every change of the bound control so the computed state below
@@ -145,6 +184,10 @@ export class MkFormField implements MkFieldContext {
   readonly errorId = `${this.controlId}-error`;
 
   constructor() {
+    afterNextRender(() => {
+      const el = this.host.nativeElement.querySelector<HTMLInputElement>('input, textarea, select');
+      if (el) this.readDomValue(el);
+    });
     const bump = () => this.controlTick.update((n) => n + 1);
     let sub: Subscription | null = null;
 

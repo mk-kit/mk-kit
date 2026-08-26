@@ -1,4 +1,4 @@
-@if (label()) {
+@if (label() && labelPosition() !== 'float') {
   <label class="mk-form-field__label" [id]="labelId" [attr.for]="controlId">
     <span class="mk-form-field__label-text">{{ label() }}</span>
     @if (isRequired()) {
@@ -9,6 +9,14 @@
 
 <div class="mk-form-field__control">
   <ng-content />
+  @if (label() && labelPosition() === 'float') {
+    <label class="mk-form-field__label mk-form-field__label--float" [id]="labelId" [attr.for]="controlId">
+      <span class="mk-form-field__label-text">{{ label() }}</span>
+      @if (isRequired()) {
+        <span class="mk-form-field__required" aria-hidden="true">*</span>
+      }
+    </label>
+  }
 </div>
 
 @if (hintVisible()) {

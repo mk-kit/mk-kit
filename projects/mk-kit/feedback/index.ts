@@ -15,3 +15,4 @@ export * from './bottom-sheet';
 export * from './banner';
 export * from './loading-bar';
 export * from './tour';
+export * from './block-ui';

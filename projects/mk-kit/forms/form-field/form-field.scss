@@ -54,3 +54,64 @@
 :host(.mk-form-field--disabled) {
   opacity: 0.6;
 }
+
+/* --- Floating label ----------------------------------------------------------
+   The label sits inside the control and slides up once the field is focused
+   or holds a value. The projected control gets extra top padding so the text
+   never collides with the floated label; its placeholder stays hidden until
+   then, so the two never overlap. */
+:host(.mk-form-field--float) .mk-form-field__control {
+  position: relative;
+}
+
+.mk-form-field__label--float {
+  position: absolute;
+  inset-inline-start: var(--mk-space-3);
+  top: 50%;
+  translate: 0 -50%;
+  max-width: calc(100% - 2 * var(--mk-space-3));
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
+  font-size: var(--mk-font-size-md);
+  font-weight: var(--mk-font-weight-normal);
+  color: var(--mk-text-muted);
+  pointer-events: none;
+  transition:
+    top var(--mk-duration-fast) var(--mk-ease-standard),
+    translate var(--mk-duration-fast) var(--mk-ease-standard),
+    font-size var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+:host(.mk-form-field--focused) .mk-form-field__label--float,
+:host(.mk-form-field--filled) .mk-form-field__label--float {
+  top: 0.35rem;
+  translate: 0 0;
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+}
+:host(.mk-form-field--focused) .mk-form-field__label--float {
+  color: var(--mk-primary);
+}
+:host(.mk-form-field--invalid) .mk-form-field__label--float {
+  color: var(--mk-danger-text);
+}
+
+/* Room for the floated label inside native controls. */
+:host(.mk-form-field--float) ::ng-deep .mk-input:not(textarea) {
+  height: calc(var(--mk-control-height-md) + 0.75rem);
+  padding-top: 1.05rem;
+}
+:host(.mk-form-field--float) ::ng-deep textarea.mk-input {
+  padding-top: 1.5rem;
+}
+:host(.mk-form-field--float:not(.mk-form-field--focused):not(.mk-form-field--filled)) ::ng-deep .mk-input::placeholder {
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-form-field__label--float {
+    transition: none;
+  }
+}

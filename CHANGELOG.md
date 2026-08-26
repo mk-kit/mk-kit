@@ -8,6 +8,16 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Floating labels** — `labelPosition="float"` on `mk-form-field`: the
+  label sits inside the control and slides up on focus or value (native
+  `mkInput` / textarea, or any control bound with `ngModel` / `formControl`);
+  the placeholder stays hidden until then. Hints, errors and `required`
+  unchanged.
+- **Block UI** (Wave B) — `[mkBlockUi]` covers any element with a translucent
+  panel and spinner while busy: children become `inert`, the host gets
+  `aria-busy`, optional `mkBlockUiMessage` and `mkBlockUiDelay` (no flash on
+  fast operations). `MkBlockUiService.block(message)` does the same for the
+  whole page, reference-counted, returning a release function.
 - **`mk-cascader`** (Wave B) — a select for hierarchies shown as side-by-side
   columns: each pick opens the next column, a leaf commits the whole path
   (`['eu', 'pl', 'krk']`) or just the leaf value with `valueMode="leaf"`;
