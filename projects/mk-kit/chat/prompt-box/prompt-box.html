@@ -1,0 +1,74 @@
+@if (suggestions().length) {
+  <div class="mk-prompt-box__suggestions" role="group" [attr.aria-label]="i18n.chatSuggestions">
+    @for (s of suggestions(); track s) {
+      <button type="button" class="mk-prompt-box__suggestion" [disabled]="disabled() || busy()" (click)="onSuggestion(s)">
+        {{ s }}
+      </button>
+    }
+  </div>
+}
+
+<div class="mk-prompt-box__frame">
+  @if (files().length) {
+    <ul class="mk-prompt-box__files" [attr.aria-label]="i18n.chatAttachments">
+      @for (file of files(); track $index) {
+        <li>
+          <mk-chip size="sm" removable [removeLabel]="i18n.chatRemoveAttachment" (removed)="removeFile($index)">
+            <mk-icon [name]="file.type.startsWith('image/') ? 'image' : 'file'" size="sm" />
+            {{ file.name }}
+            <span class="mk-prompt-box__size">{{ formatSize(file.size) }}</span>
+          </mk-chip>
+        </li>
+      }
+    </ul>
+  }
+
+  <textarea
+    #textarea
+    class="mk-prompt-box__input"
+    [id]="id"
+    [value]="value()"
+    [placeholder]="placeholder()"
+    [disabled]="disabled()"
+    [attr.maxlength]="maxLength() > 0 ? maxLength() : null"
+    [attr.aria-label]="i18n.chatComposerLabel"
+    rows="1"
+    (input)="onInput($event)"
+    (keydown)="onKeydown($event)"
+    (paste)="onPaste($event)"
+  ></textarea>
+
+  <div class="mk-prompt-box__actions">
+    @if (attachments()) {
+      <input #fileInput type="file" class="mk-prompt-box__file-input" multiple [accept]="accept()" tabindex="-1" aria-hidden="true" (change)="onFilesPicked($event)" />
+      <button
+        mkButton
+        type="button"
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        class="mk-prompt-box__attach"
+        [disabled]="disabled()"
+        [attr.aria-label]="i18n.chatAttach"
+        (click)="openPicker()"
+      >
+        <mk-icon name="paperclip" />
+      </button>
+    }
+    @if (remaining() !== null) {
+      <span class="mk-prompt-box__counter" [class.mk-prompt-box__counter--over]="remaining()! < 0" aria-live="polite">{{ remaining() }}</span>
+    }
+    <button
+      mkButton
+      type="button"
+      size="sm"
+      class="mk-prompt-box__send"
+      [tone]="busy() ? 'neutral' : 'primary'"
+      [disabled]="disabled() || (!busy() && !canSend())"
+      [attr.aria-label]="busy() ? i18n.chatStop : i18n.chatSend"
+      (click)="onPrimary()"
+    >
+      <mk-icon [name]="busy() ? 'square' : 'send'" />
+    </button>
+  </div>
+</div>

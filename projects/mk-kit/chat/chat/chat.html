@@ -1,0 +1,71 @@
+<div class="mk-chat__header">
+  <ng-content select="[mkChatHeader]" />
+</div>
+
+<div class="mk-chat__viewport">
+  <div
+    #log
+    class="mk-chat__log"
+    role="log"
+    aria-live="polite"
+    aria-relevant="additions text"
+    [attr.aria-label]="ariaLabel() ?? i18n.chatLabel"
+    (scroll)="onScroll()"
+  >
+    @if (!messages().length) {
+      <div class="mk-chat__empty">
+        <ng-content select="[mkChatEmpty]">
+          <mk-icon name="message-circle" size="lg" />
+          <p>{{ resolvedEmpty() }}</p>
+        </ng-content>
+      </div>
+    }
+    @for (m of messages(); track m.id; let i = $index) {
+      @if (messageDef(); as def) {
+        <ng-container *ngTemplateOutlet="def.template; context: { $implicit: m, own: isOwn(m), index: i }" />
+      } @else {
+        <mk-chat-message
+          [message]="m"
+          [own]="isOwn(m)"
+          [markdown]="markdown()"
+          [showAvatar]="showAvatars()"
+          [showTimestamp]="showTimestamps()"
+          (retry)="retry.emit($event)"
+        />
+      }
+    }
+    @if (typing()) {
+      <div class="mk-chat__typing" [attr.aria-label]="i18n.chatTyping" role="status">
+        <span></span><span></span><span></span>
+      </div>
+    }
+  </div>
+
+  @if (!atBottom()) {
+    <button mkButton type="button" size="sm" variant="outline" tone="neutral" class="mk-chat__jump" (click)="scrollToBottom()">
+      <mk-icon name="arrow-down" size="sm" />
+      {{ i18n.chatJumpToLatest }}
+      @if (unseen() > 0) { <span class="mk-chat__badge">{{ unseen() }}</span> }
+    </button>
+  }
+</div>
+
+@if (!readonly()) {
+  <div class="mk-chat__composer">
+    <mk-prompt-box
+      [placeholder]="resolvedPlaceholder()"
+      [disabled]="disabled()"
+      [busy]="busy()"
+      [attachments]="attachments()"
+      [accept]="accept()"
+      [maxFiles]="maxFiles()"
+      [maxLength]="maxLength()"
+      [suggestions]="suggestions()"
+      (send)="send.emit($event)"
+      (stop)="stop.emit()"
+    />
+    <div class="mk-chat__footer">
+      <ng-content select="[mkChatFooter]" />
+    </div>
+  </div>
+}

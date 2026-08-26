@@ -4,6 +4,23 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Chat** — new `@mk-kit/ui/chat` entry point (Wave B): `mk-chat` (a
+  `role="log"` conversation that stays pinned to the newest message while
+  text streams in, *jump to latest* with an unseen count, typing indicator,
+  empty state, `[mkChatHeader]` / `[mkChatEmpty]` / `[mkChatFooter]` slots
+  and an `ng-template mkChatMessageDef` for custom bubbles), `mk-chat-message`
+  (Markdown for assistants, plain text for users, image / file attachments,
+  collapsible tool-call cards with status, streaming cursor, copy and retry)
+  and `mk-prompt-box` (auto-growing textarea, Enter sends / Shift+Enter
+  newline or the reverse, attachments by button, drop or paste with `accept`
+  and `maxFiles`, quick-reply suggestions, character counter, send ↔ stop).
+  i18n keys `chat*`. Size budget: new `chat` entry 96 KiB; TOTAL raised
+  3072 → 3200 KiB for the new entry point.
+
 ## [0.36.0] — 2026-08-26
 
 ### Added

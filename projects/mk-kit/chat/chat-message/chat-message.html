@@ -1,0 +1,87 @@
+@let m = message();
+@if (m.role === 'system') {
+  <div class="mk-chat-message__system">{{ m.text }}</div>
+} @else {
+  @if (showAvatar()) {
+    <mk-avatar class="mk-chat-message__avatar" [name]="authorName()" [src]="m.author?.avatar" size="sm" />
+  }
+  <div class="mk-chat-message__body">
+    <div class="mk-chat-message__meta">
+      <span class="mk-chat-message__author">{{ authorName() }}</span>
+      @if (showTimestamp() && time()) {
+        <span class="mk-chat-message__time">{{ time() }}</span>
+      }
+    </div>
+
+    <div class="mk-chat-message__bubble">
+      @if (m.tools?.length) {
+        <div class="mk-chat-message__tools">
+          @for (tool of m.tools; track tool.id ?? $index) {
+            <details class="mk-chat-message__tool" [class.mk-chat-message__tool--error]="tool.status === 'error'">
+              <summary>
+                <mk-icon [name]="toolIcon(tool)" size="sm" [class.mk-chat-message__spin]="tool.status === 'running'" />
+                <code>{{ tool.name }}</code>
+                @if (tool.summary) { <span class="mk-chat-message__tool-summary">{{ tool.summary }}</span> }
+                <span class="mk-visually-hidden">{{ toolStatus(tool) }}</span>
+              </summary>
+              @if (tool.input) { <pre class="mk-chat-message__tool-io"><code>{{ tool.input }}</code></pre> }
+              @if (tool.output) { <pre class="mk-chat-message__tool-io"><code>{{ tool.output }}</code></pre> }
+            </details>
+          }
+        </div>
+      }
+
+      @if (m.attachments?.length) {
+        <ul class="mk-chat-message__attachments" [attr.aria-label]="i18n.chatAttachments">
+          @for (a of m.attachments; track $index) {
+            <li>
+              @if (isImage(a)) {
+                <a [href]="a.url" target="_blank" rel="noopener noreferrer" class="mk-chat-message__image">
+                  <img [src]="a.url" [alt]="a.name" loading="lazy" />
+                </a>
+              } @else {
+                <a [href]="a.url || null" [attr.download]="a.url ? a.name : null" class="mk-chat-message__file">
+                  <mk-icon name="file" size="sm" />
+                  <span>{{ a.name }}</span>
+                  @if (a.size != null) { <span class="mk-chat-message__file-size">{{ formatSize(a.size) }}</span> }
+                </a>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (m.text || m.streaming) {
+        <div class="mk-chat-message__text">
+          @if (useMarkdown()) {
+            <mk-markdown [source]="m.text" linkTarget="_blank" />
+          } @else {
+            <p class="mk-chat-message__plain">{{ m.text }}</p>
+          }
+          @if (m.streaming) {
+            <span class="mk-chat-message__cursor" aria-hidden="true"></span>
+            <span class="mk-visually-hidden">{{ i18n.chatStreaming }}</span>
+          }
+        </div>
+      }
+    </div>
+
+    @if (m.error) {
+      <div class="mk-chat-message__error" role="alert">
+        <mk-icon name="circle-alert" size="sm" />
+        <span>{{ m.error }}</span>
+        <button mkButton type="button" variant="ghost" tone="danger" size="sm" (click)="retry.emit(m)">
+          <mk-icon name="refresh-cw" size="sm" /> {{ i18n.chatRetry }}
+        </button>
+      </div>
+    }
+
+    @if (copyable() && m.text && !m.streaming) {
+      <div class="mk-chat-message__actions">
+        <button mkButton type="button" variant="ghost" tone="neutral" size="sm" [mkCopyToClipboard]="m.text" [attr.aria-label]="i18n.chatCopy">
+          <mk-icon name="copy" size="sm" />
+        </button>
+      </div>
+    }
+  </div>
+}
