@@ -53,7 +53,9 @@
 }
 
 @media (max-width: 560px) {
-  .docs-brand__ver {
+  .docs-brand__ver,
+  .docs-github,
+  .docs-search-btn .docs-kbd {
     display: none;
   }
 }
