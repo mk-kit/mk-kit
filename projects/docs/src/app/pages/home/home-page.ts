@@ -1175,7 +1175,7 @@ export class HomePage {
   private readonly toast = inject(MkToastService);
 
   protected readonly uiVersion = uiVersion;
-  protected readonly total = 165;
+  protected readonly total = 167;
   protected readonly copied = signal(false);
 
   /* Brand-swap: rewrites the primary token family on the host ------------ */
@@ -1252,11 +1252,11 @@ export class HomePage {
 
   /* Copy --------------------------------------------------------------- */
   protected readonly groups: Group[] = [
-    { title: 'Forms & inputs', count: 49, blurb: 'Text, number, phone, IBAN, tax id, OTP, date & time, selects, multi-select, sliders, file upload, colour, rating, signature, keypad.' },
+    { title: 'Forms & inputs', count: 51, blurb: 'Text, number, phone, IBAN, tax id, OTP, date, time & date-time pickers, selects, multi-select, sliders, file upload, colour, rating, signature, keypad, split button.' },
     { title: 'Data display', count: 25, blurb: 'Cards, lists, stat cards, badges, tags, chips, avatars, timeline, description lists, tree, empty states, QR, diff, JSON viewer.' },
     { title: 'Editors & interactions', count: 22, blurb: 'Block editor, rich text, markdown, log viewer, drag & drop, sortable list, mentions, hotkeys, masks, permissions.' },
     { title: 'Feedback & overlays', count: 20, blurb: 'Dialogs, sheets, drawers, toasts, snackbars, banners, tooltips, popovers, hovercards, tours, progress, skeletons.' },
-    { title: 'Navigation & layout', count: 18, blurb: 'App shell, nav lists, tabs, stepper, breadcrumbs, pagination, menus, context menu, command palette, splitter.' },
+    { title: 'Navigation & layout', count: 18, blurb: 'App shell, nav lists, tabs, stepper, breadcrumbs, pagination, menus with nested submenus, context menu, command palette, splitter.' },
     { title: 'Charts', count: 12, blurb: 'Line, bar, donut, gauge, scatter, radar, funnel, treemap, heatmaps, sparklines — SVG, themed, accessible.' },
     { title: 'Tables & grids', count: 6, blurb: 'Sortable, selectable, expandable, groupable, resizable, editable data table with a server-side data source.' },
     { title: 'Media', count: 6, blurb: 'Images, galleries, lightbox, carousel, cropper, media manager.' },
