@@ -4,6 +4,19 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Tree rows in `mk-table`** — set `childrenKey` to the property holding each
+  row's child rows and the table renders a tree grid: children indented under
+  their parent behind a toggle in the first column, per-sibling-group sorting,
+  ArrowRight / ArrowLeft to open / close a row (swapped in RTL), select-all
+  across the whole tree, `aria-level` / `aria-expanded` rows inside a
+  `treegrid`, `(treeToggle)`, `expandAllRows()` / `collapseAllRows()`. Composes
+  with detail rows, grouping and stacked cards. i18n keys `expandTreeRow`,
+  `collapseTreeRow`.
+
 ## [0.35.0] — 2026-08-26
 
 ### Added

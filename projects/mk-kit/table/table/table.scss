@@ -326,6 +326,43 @@
   color: var(--mk-text-subtle);
 }
 
+/* Tree rows (childrenKey): indent grows with depth; the toggle sits in the
+   first cell so caret + indent read as one column. */
+.mk-table__td--tree {
+  padding-inline-start: calc(var(--_cell-pad-x) + var(--mk-tree-depth, 0) * 1.25rem);
+  white-space: nowrap;
+}
+.mk-table__tree-toggle,
+.mk-table__tree-spacer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-inline-end: var(--mk-space-1);
+  vertical-align: middle;
+  flex: none;
+}
+.mk-table__tree-toggle {
+  padding: 0;
+  border: 0;
+  border-radius: var(--mk-radius-sm);
+  background: transparent;
+  color: var(--mk-text-muted);
+  cursor: pointer;
+}
+.mk-table__tree-toggle:hover {
+  color: var(--mk-text);
+  background: var(--mk-hover-overlay);
+}
+.mk-table__tree-toggle:focus-visible {
+  @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
+}
+.mk-table__td--tree .mk-table__cell-value {
+  display: inline;
+  vertical-align: middle;
+}
+
 /* Group headers (groupBy) */
 .mk-table__group {
   padding: 0;

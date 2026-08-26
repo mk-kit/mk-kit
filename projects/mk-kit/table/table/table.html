@@ -4,7 +4,10 @@
        being announced as tabular data at all. Redundant in the grid, so
        they are left off there rather than duplicating what the element
        already says. -->
-  <table class="mk-table__table" [attr.role]="stacked() ? 'table' : null">
+  <table
+    class="mk-table__table"
+    [attr.role]="childrenKey() ? 'treegrid' : stacked() ? 'table' : null"
+  >
     <thead class="mk-table__head" [attr.role]="stacked() ? 'rowgroup' : null">
       <tr>
         @if (expandable()) {
@@ -114,10 +117,15 @@
         <ng-container>
         <tr
           class="mk-table__row"
-          [attr.role]="stacked() ? 'row' : null"
+          [attr.role]="stacked() || childrenKey() ? 'row' : null"
           [class]="rowClassFor(item.row)"
           [class.mk-table__row--selected]="selectable() && isSelected(item.row)"
           [class.mk-table__row--expanded]="expandable() && isExpanded(item.row)"
+          [class.mk-table__row--parent]="item.hasChildren"
+          [style.--mk-tree-depth]="childrenKey() ? item.depth : null"
+          [style.margin-inline-start.px]="stacked() && item.depth ? item.depth * 16 : null"
+          [attr.aria-level]="childrenKey() ? item.depth + 1 : null"
+          [attr.aria-expanded]="item.hasChildren ? item.expanded : null"
           [attr.tabindex]="clickableRows() ? 0 : null"
           (click)="onRowClick(item.row)"
           (keydown)="onRowKeydown($event, item.row)"
@@ -155,20 +163,20 @@
             </td>
           }
           @if (!stacked()) {
-            @for (col of orderedColumns(); track col.key) {
+            @for (col of orderedColumns(); track col.key; let first = $first) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: null }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: null, tree: first ? item : null }"
               />
             }
           } @else {
             <!-- Card layout. Same <td> elements, restyled — keeping the table
                  DOM means selection, expansion, inline edit and every cell
                  template keep working, since all of them reach for a `td`. -->
-            @for (col of stackTitleColumns(); track col.key) {
+            @for (col of stackTitleColumns(); track col.key; let first = $first) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'title' }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'title', tree: first ? item : null }"
               />
             }
             @for (col of stackFieldColumns(); track col.key) {
@@ -223,9 +231,10 @@
      'title' | 'field' | 'footer' in a card; everything else — the editor, the
      consumer's mkTableCell template, the formatted fallback — is identical, so
      a card can never drift from the grid it replaces. -->
-<ng-template #cellTpl let-col="col" let-row="row" let-i="i" let-slot="slot">
+<ng-template #cellTpl let-col="col" let-row="row" let-i="i" let-slot="slot" let-tree="tree">
   <td
     class="mk-table__td"
+    [class.mk-table__td--tree]="!!tree && !!childrenKey()"
     [class.mk-table__td--pinned]="isPinned(col, 'left') || isPinned(col, 'right')"
     [class.mk-table__td--pinned-right]="isPinned(col, 'right')"
     [class.mk-table__td--editable]="col.editable"
@@ -246,6 +255,24 @@
            <thead> is display:none while stacked, so this label is the only
            thing naming the value for a screen reader. -->
       <span class="mk-table__cell-label">{{ col.header }}</span>
+    }
+    @if (tree && childrenKey()) {
+      <!-- Tree toggle (or a spacer on leaves) ahead of the first cell's value,
+           so the indent and the caret read as one column. -->
+      @if (tree.hasChildren) {
+        <button
+          type="button"
+          class="mk-table__tree-toggle"
+          [class.mk-table__tree-toggle--open]="tree.expanded"
+          [attr.aria-expanded]="tree.expanded"
+          [attr.aria-label]="tree.expanded ? i18n.collapseTreeRow : i18n.expandTreeRow"
+          (click)="toggleTreeRow(row, $event)"
+        >
+          <span class="mk-table__expander-icon" [class.mk-table__expander-icon--open]="tree.expanded" aria-hidden="true">›</span>
+        </button>
+      } @else {
+        <span class="mk-table__tree-spacer" aria-hidden="true"></span>
+      }
     }
     <span class="mk-table__cell-value">
       @if (isEditing(i, col)) {

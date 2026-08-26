@@ -112,6 +112,14 @@ export interface MkTableGroup<T = Record<string, unknown>> {
 }
 
 /** Payload emitted by {@link MkTable.groupToggle}. */
+/** Payload of `(treeToggle)`: a parent row was expanded or collapsed. */
+export interface MkTreeToggle<T = Record<string, unknown>> {
+  /** The parent row. */
+  row: T;
+  /** Whether its child rows are now shown. */
+  expanded: boolean;
+}
+
 export interface MkGroupToggle {
   /** The toggled group's value. */
   key: unknown;
@@ -127,7 +135,16 @@ const MAX_COL_WIDTH = 2000;
 /** One rendered tbody entry: either a group header or a data row. */
 type MkTableItem<T> =
   | { kind: 'group'; group: MkTableGroup<T> }
-  | { kind: 'row'; row: T };
+  | {
+      kind: 'row';
+      row: T;
+      /** Nesting depth in tree mode (0 for roots and for flat tables). */
+      depth: number;
+      /** Whether the row has child rows (tree mode). */
+      hasChildren: boolean;
+      /** Whether its children are currently shown (tree mode). */
+      expanded: boolean;
+    };
 
 /**
  * Table — a themed data table built on a native `<table>` for accessibility.
@@ -326,6 +343,15 @@ export class MkTable<T = Record<string, unknown>> {
   readonly cellEdit = output<MkCellEdit<T>>();
   /** Emitted when a group header is expanded or collapsed. */
   readonly groupToggle = output<MkGroupToggle>();
+  /**
+   * Tree rows: the property on each row holding its child rows (`T[]`). When
+   * set, the table renders a tree grid — child rows are indented under their
+   * parent behind an expand toggle in the first column, sorting applies per
+   * sibling group, and ArrowRight / ArrowLeft on a row open / close it.
+   */
+  readonly childrenKey = input<string | null>(null);
+  /** Emitted when a parent row is expanded or collapsed (tree mode). */
+  readonly treeToggle = output<MkTreeToggle<T>>();
 
   /** User-set column widths (px), keyed by column key. */
   private readonly colWidths = signal<Record<string, number>>({});
@@ -728,10 +754,12 @@ export class MkTable<T = Record<string, unknown>> {
   private static readonly sortCollator = new Intl.Collator();
 
   /** Data sorted by the active column, or the input order when unsorted. */
-  protected readonly sortedData = computed<T[]>(() => {
+  protected readonly sortedData = computed<T[]>(() => this.sortRows(this.data()));
+
+  /** Sort one sibling group by the active column (input order when unsorted). */
+  private sortRows(rows: T[]): T[] {
     const key = this.sortKey();
     const dir = this.sortDir();
-    const rows = this.data();
     if (!key || !dir) return rows;
     const compare = (a: T, b: T): number => {
       const av = (a as Record<string, unknown>)[key];
@@ -745,7 +773,7 @@ export class MkTable<T = Record<string, unknown>> {
     // Negate the comparator for desc (instead of reversing) so the sort stays
     // stable and null ordering is consistent in both directions.
     return [...rows].sort(dir === 'desc' ? (a, b) => -compare(a, b) : compare);
-  });
+  }
 
   /** `aria-sort` value for a header cell. */
   protected ariaSort(col: MkTableColumn<T>): string | null {
@@ -800,8 +828,9 @@ export class MkTable<T = Record<string, unknown>> {
     if (this.clickableRows()) this.rowClick.emit(row);
   }
 
-  /** Keyboard activation for clickable rows (Enter / Space). */
+  /** Keyboard activation for clickable rows (Enter / Space) and tree keys. */
   protected onRowKeydown(event: KeyboardEvent, row: T): void {
+    if (this.onTreeKeydown(event, row)) return;
     if (!this.clickableRows()) return;
     if (event.target !== event.currentTarget) return; // ignore inner controls
     if (event.key === 'Enter' || event.key === ' ') {
@@ -835,9 +864,27 @@ export class MkTable<T = Record<string, unknown>> {
     return this.selectedKeys().has(this.rowKey(row));
   }
 
+  /**
+   * Every data row, in display order, ignoring tree expansion — what
+   * "select all" and the header checkbox reason about. Equals `sortedData`
+   * for flat tables.
+   */
+  private readonly allRows = computed<T[]>(() => {
+    if (!this.childrenKey()) return this.sortedData();
+    const out: T[] = [];
+    const walk = (rows: T[]): void => {
+      for (const row of this.sortRows(rows)) {
+        out.push(row);
+        walk(this.childrenOf(row));
+      }
+    };
+    walk(this.data());
+    return out;
+  });
+
   /** True when every visible row is selected. */
   protected readonly allSelected = computed<boolean>(() => {
-    const rows = this.sortedData();
+    const rows = this.allRows();
     const keys = this.selectedKeys();
     return rows.length > 0 && rows.every((row) => keys.has(this.rowKey(row)));
   });
@@ -846,7 +893,7 @@ export class MkTable<T = Record<string, unknown>> {
   protected readonly someSelected = computed<boolean>(() => {
     const keys = this.selectedKeys();
     return (
-      this.sortedData().some((row) => keys.has(this.rowKey(row))) &&
+      this.allRows().some((row) => keys.has(this.rowKey(row))) &&
       !this.allSelected()
     );
   });
@@ -866,9 +913,9 @@ export class MkTable<T = Record<string, unknown>> {
     this.commitSelection(next);
   }
 
-  /** Select or deselect all visible rows. */
+  /** Select or deselect all rows (every tree row, expanded or not). */
   protected toggleAll(): void {
-    const rows = this.sortedData();
+    const rows = this.allRows();
     const current = this.selected();
     if (this.allSelected()) {
       const visible = new Set(rows.map((r) => this.rowKey(r)));
@@ -915,19 +962,111 @@ export class MkTable<T = Record<string, unknown>> {
    */
   protected readonly displayItems = computed<MkTableItem<T>[]>(() => {
     const groups = this.groups();
+    const items: MkTableItem<T>[] = [];
     if (!groups) {
-      return this.sortedData().map((row) => ({ kind: 'row' as const, row }));
+      this.pushRows(items, this.sortedData(), 0);
+      return items;
     }
     const collapsed = this.collapsedGroups();
-    const items: MkTableItem<T>[] = [];
     for (const group of groups) {
       items.push({ kind: 'group', group });
-      if (!collapsed.has(group.key)) {
-        for (const row of group.rows) items.push({ kind: 'row', row });
-      }
+      if (!collapsed.has(group.key)) this.pushRows(items, group.rows, 0);
     }
     return items;
   });
+
+  /**
+   * Append `rows` as render items. In tree mode each row is followed by its
+   * (sorted) children while it is expanded, one level deeper.
+   */
+  private pushRows(items: MkTableItem<T>[], rows: T[], depth: number): void {
+    const tree = !!this.childrenKey();
+    const expandedKeys = this.treeExpanded();
+    for (const row of rows) {
+      const children = tree ? this.childrenOf(row) : [];
+      const hasChildren = children.length > 0;
+      const expanded = hasChildren && expandedKeys.has(this.rowKey(row));
+      items.push({ kind: 'row', row, depth, hasChildren, expanded });
+      if (expanded) this.pushRows(items, this.sortRows(children), depth + 1);
+    }
+  }
+
+  /** The child rows of `row` (tree mode), or an empty list. */
+  private childrenOf(row: T): T[] {
+    const key = this.childrenKey();
+    if (!key) return [];
+    const value = (row as Record<string, unknown>)[key];
+    return Array.isArray(value) ? (value as T[]) : [];
+  }
+
+  // --- Tree rows ------------------------------------------------------------
+  /** Keys of parent rows whose children are shown. */
+  private readonly treeExpanded = signal<Set<unknown>>(new Set());
+
+  /** Whether a parent row's children are currently shown (tree mode). */
+  isTreeExpanded(row: T): boolean {
+    return this.treeExpanded().has(this.rowKey(row));
+  }
+
+  /** Show or hide a parent row's children (tree mode). */
+  toggleTreeRow(row: T, event?: Event): void {
+    event?.stopPropagation();
+    if (this.childrenOf(row).length === 0) return;
+    this.setTreeExpanded(row, !this.isTreeExpanded(row));
+  }
+
+  /** Expand every parent row (tree mode). */
+  expandAllRows(): void {
+    const keys = new Set<unknown>();
+    const walk = (rows: T[]): void => {
+      for (const row of rows) {
+        const children = this.childrenOf(row);
+        if (children.length) {
+          keys.add(this.rowKey(row));
+          walk(children);
+        }
+      }
+    };
+    walk(this.data());
+    this.treeExpanded.set(keys);
+  }
+
+  /** Collapse every parent row (tree mode). */
+  collapseAllRows(): void {
+    this.treeExpanded.set(new Set());
+  }
+
+  private setTreeExpanded(row: T, expanded: boolean): void {
+    const rk = this.rowKey(row);
+    if (this.treeExpanded().has(rk) === expanded) return;
+    const next = new Set(this.treeExpanded());
+    if (expanded) next.add(rk);
+    else next.delete(rk);
+    this.treeExpanded.set(next);
+    this.treeToggle.emit({ row, expanded });
+  }
+
+  /**
+   * ArrowRight opens and ArrowLeft closes a parent row's children (swapped in
+   * RTL). Handled for keys pressed on the row itself or on its tree toggle.
+   */
+  protected onTreeKeydown(event: KeyboardEvent, row: T): boolean {
+    if (!this.childrenKey() || this.childrenOf(row).length === 0) return false;
+    const rtl = this.document.defaultView?.getComputedStyle(this.host.nativeElement).direction === 'rtl';
+    const openKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const closeKey = rtl ? 'ArrowRight' : 'ArrowLeft';
+    if (event.key === openKey && !this.isTreeExpanded(row)) {
+      event.preventDefault();
+      this.setTreeExpanded(row, true);
+      return true;
+    }
+    if (event.key === closeKey && this.isTreeExpanded(row)) {
+      event.preventDefault();
+      this.setTreeExpanded(row, false);
+      return true;
+    }
+    return false;
+  }
 
   /** `@for` identity: group headers by value, rows by {@link trackRow}. */
   protected trackItem = (item: MkTableItem<T>): unknown =>

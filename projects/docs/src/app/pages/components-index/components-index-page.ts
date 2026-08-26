@@ -148,7 +148,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
   {
     group: 'Tables & grids',
     items: [
-      { name: 'mk-table', desc: 'Data table: sticky headers, selection, row detail, stacked mobile layout.', path: '/components/table' },
+      { name: 'mk-table', desc: 'Data table: sticky headers, selection, row detail, stacked mobile layout, tree rows (childrenKey).', path: '/components/table' },
       { name: 'mkTableCell', desc: 'Custom cell template per column.', path: '/components/table' },
       { name: 'mkTableRowDetail', desc: 'Expandable per-row detail template.', path: '/components/table' },
       { name: 'MkTableDataSource', desc: 'Server-side data adapter: paging, sorting, debounced filter, race-safe.', path: '/components/table', fragment: 'data-source' },
