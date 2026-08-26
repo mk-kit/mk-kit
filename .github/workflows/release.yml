@@ -132,9 +132,22 @@ jobs:
       - name: Build library
         run: npm run build:lib
 
-      - name: Publish to npm (provenance)
-        run: npm publish --access public --provenance
+      # npm only accepts provenance attestations from public repositories, so
+      # the flag follows the repository's visibility. OIDC trusted publishing
+      # works either way.
+      - name: Publish to npm
         working-directory: dist/mk-kit
+        env:
+          REPO_PRIVATE: ${{ github.event.repository.private }}
+        run: |
+          set -euo pipefail
+          if [ "$REPO_PRIVATE" = "false" ]; then
+            echo "Public repository — publishing with provenance."
+            npm publish --access public --provenance
+          else
+            echo "::warning::Private repository — publishing WITHOUT provenance (npm only attests public sources)."
+            npm publish --access public
+          fi
 
       - name: Tag the release
         env:
