@@ -8,6 +8,13 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-listbox`** (Wave B) — a standalone, always-visible selection list:
+  single value or, with `multiple`, an array (checkbox rows, Shift ranges,
+  Ctrl/Cmd+A); options with `description`, `disabled` and `group` headings;
+  `filterable` search box; typeahead, Home / End / PageUp / PageDown,
+  `selectionFollowsFocus`; `aria-activedescendant` listbox semantics;
+  `ControlValueAccessor` + `mk-form-field` aware. i18n `listboxFilter`,
+  `listboxEmpty`. Budgets: forms 800 → 820 KiB, TOTAL 3200 → 3280 KiB.
 - **Draggable / resizable dialogs** — `draggable` and `resizable` inputs on
   `<mk-dialog>`. The header becomes a move handle (pointer, touch, or arrow
   keys on the grip beside the title; Shift for bigger steps), a corner grip

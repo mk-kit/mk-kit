@@ -1,0 +1,71 @@
+@if (filterable()) {
+  <div class="mk-listbox__filter">
+    <input
+      class="mk-listbox__filter-input"
+      type="search"
+      [id]="filterId"
+      [value]="query()"
+      [placeholder]="filterPlaceholder() ?? i18n.listboxFilter"
+      [disabled]="isDisabled()"
+      [attr.aria-controls]="listId"
+      [attr.aria-label]="i18n.listboxFilter"
+      autocomplete="off"
+      (input)="onFilterInput($event)"
+      (keydown)="onFilterKeydown($event)"
+    />
+  </div>
+}
+
+<ul
+  #list
+  class="mk-listbox__list"
+  role="listbox"
+  [id]="listId"
+  [tabindex]="isDisabled() ? -1 : 0"
+  [attr.aria-multiselectable]="multiple() ? 'true' : null"
+  [attr.aria-activedescendant]="activeId()"
+  [attr.aria-label]="ariaLabel() ?? null"
+  [attr.aria-labelledby]="labelledBy()"
+  [attr.aria-describedby]="describedBy()"
+  [attr.aria-invalid]="isInvalid() || null"
+  [attr.aria-disabled]="isDisabled() || null"
+  (keydown)="onKeydown($event)"
+  (blur)="onBlur()"
+>
+  @for (row of rows(); track row.kind === 'group' ? row.id : row.option.value) {
+    @if (row.kind === 'group') {
+      <li class="mk-listbox__group" role="presentation" [id]="row.id">{{ row.label }}</li>
+    } @else {
+      @let selected = isSelected(row.option);
+      <li
+        class="mk-listbox__option"
+        role="option"
+        [id]="optionId(row.index)"
+        [attr.aria-selected]="selected"
+        [attr.aria-disabled]="row.option.disabled || null"
+        [class.mk-listbox__option--active]="row.index === activeIndex()"
+        [class.mk-listbox__option--selected]="selected"
+        [class.mk-listbox__option--disabled]="row.option.disabled"
+        (click)="onOptionClick(row.index, $event)"
+      >
+        @if (multiple()) {
+          <span class="mk-listbox__box" aria-hidden="true">
+            <svg viewBox="0 0 12 12" width="12" height="12" focusable="false"><path d="M2.5 6.5l2.5 2.5 4.5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" /></svg>
+          </span>
+        }
+        <span class="mk-listbox__text">
+          <span class="mk-listbox__label">{{ row.option.label }}</span>
+          @if (row.option.description) {
+            <span class="mk-listbox__description">{{ row.option.description }}</span>
+          }
+        </span>
+        @if (!multiple() && selected) {
+          <span class="mk-listbox__check" aria-hidden="true"></span>
+        }
+      </li>
+    }
+  }
+  @if (!rows().length) {
+    <li class="mk-listbox__empty" role="presentation">{{ emptyText() ?? i18n.listboxEmpty }}</li>
+  }
+</ul>

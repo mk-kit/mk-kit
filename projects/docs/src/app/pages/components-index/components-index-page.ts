@@ -91,6 +91,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-multi-select', desc: 'Multi-select with removable chips and async options.', path: '/components/selection' },
       { name: 'mk-tag-input', desc: 'Type-and-enter tag entry with suggestions.', path: '/components/selection' },
       { name: 'mk-transfer-list', desc: 'Two-pane picker moving items between lists.', path: '/components/selection' },
+      { name: 'mk-listbox', desc: 'Always-visible single / multi selection list with groups, filter and full keyboard support.', path: '/components/selection' },
       { name: 'mk-tree-select', desc: 'Hierarchical dropdown selecting tree nodes.', path: '/components/selection' },
       { name: 'mk-button-toggle-group', desc: 'Segmented single/multi choice of buttons.', path: '/components/selection' },
       { name: 'mkMention', desc: '@mention/#tag autocomplete for native textareas and inputs.', path: '/components/selection', fragment: 'mention' },

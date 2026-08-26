@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import {
   MkAutocomplete,
@@ -7,6 +7,8 @@ import {
   MkButtonToggleGroup,
   MkFormField,
   MkInput,
+  MkListbox,
+  type MkListboxOption,
   MkMention,
   type MkMentionOption,
   type MkMentionSearchEvent,
@@ -44,8 +46,13 @@ interface Framework {
     MkMultiSelect,
     MkTagInput,
     MkTransferList,
+    MkListbox,
     MkTreeSelect,
   ],
+  styles: `
+    .listbox-demo { display: grid; grid-template-columns: repeat(auto-fit, minmax(16rem, 1fr)); gap: var(--mk-space-6); }
+    .listbox-demo__label { margin: 0 0 var(--mk-space-2); font-size: var(--mk-font-size-sm); font-weight: var(--mk-font-weight-semibold); }
+  `,
   template: `
     <div class="docs-page docs-container">
       <h1>Selection</h1>
@@ -370,6 +377,57 @@ interface Framework {
       <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
       <!-- ============================================================ -->
+      <h2>Listbox</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-listbox&gt;</code> is a selection list
+        that stays open — for settings panes, template pickers and anywhere a
+        dropdown would hide choices the user should see at once. One value by
+        default, an array with <code class="docs-inline">multiple</code>;
+        options can carry a <code class="docs-inline">description</code> and a
+        <code class="docs-inline">group</code> heading, and
+        <code class="docs-inline">filterable</code> adds a search box. Keyboard:
+        arrows move (and select, unless
+        <code class="docs-inline">selectionFollowsFocus="false"</code>),
+        Home / End / PageUp / PageDown jump, typing jumps to a label, Space
+        toggles, Shift extends a range and Ctrl/Cmd+A selects all. Works with
+        <code class="docs-inline">[(value)]</code>,
+        <code class="docs-inline">ngModel</code>, reactive forms and
+        <code class="docs-inline">mk-form-field</code>.
+      </p>
+      <docs-example [code]="listboxCode" column>
+        <div class="listbox-demo">
+          <div>
+            <p class="listbox-demo__label" id="plan-label">Plan</p>
+            <mk-listbox [options]="plans" [(value)]="plan" ariaLabelledby="plan-label" />
+            <p class="echo">Plan: <code class="docs-inline">{{ plan() ?? '—' }}</code></p>
+          </div>
+          <div>
+            <p class="listbox-demo__label" id="reviewers-label">Reviewers</p>
+            <mk-listbox multiple filterable [options]="people" [(value)]="listReviewers" ariaLabelledby="reviewers-label" size="sm" />
+            <p class="echo">Reviewers: <code class="docs-inline">{{ reviewerNames() || '—' }}</code></p>
+          </div>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>options</code></td><td><code>MkListboxOption[]</code></td><td><code>[]</code></td><td>Rows: <code>label</code>, <code>value</code>, optional <code>description</code>, <code>disabled</code>, <code>group</code>.</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown&gt;</code></td><td><code>null</code></td><td>Two-way value — one value, or an array when <code>multiple</code>.</td></tr>
+          <tr><td><code>multiple</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Select several values (checkbox rows, Shift ranges, Ctrl+A).</td></tr>
+          <tr><td><code>filterable</code> / <code>filterPlaceholder</code></td><td><code>boolean</code> / <code>string</code></td><td><code>false</code></td><td>Search box narrowing by label or description.</td></tr>
+          <tr><td><code>selectionFollowsFocus</code></td><td><code>boolean</code></td><td><code>true</code></td><td>Single-select: arrows select immediately; <code>false</code> waits for Enter / Space.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size (ignored inside <code>mk-form-field</code>).</td></tr>
+          <tr><td><code>ariaLabel</code> / <code>ariaLabelledby</code></td><td><code>string</code></td><td>—</td><td>Accessible name when there is no form-field label.</td></tr>
+          <tr><td><code>emptyText</code></td><td><code>string</code></td><td>i18n</td><td>Shown when the filter matches nothing.</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(change)</code></td><td><code>unknown</code></td><td>—</td><td>The new value after a user change.</td></tr>
+          <tr><td><code>--mk-listbox-max-height</code></td><td><code>length</code></td><td><code>16rem</code></td><td>Height at which the list starts scrolling.</td></tr>
+        </tbody>
+      </table>
+
       <h2>Button toggle</h2>
       <p>
         A segmented control. In single-select mode (default) the group is a
@@ -741,6 +799,38 @@ assigned = signal<unknown[]>(['editor', 'reviewer']);
   [(value)]="category"
   clearable
   placeholder="Choose a category…" />`;
+
+  protected readonly plans: MkListboxOption[] = [
+    { label: 'Starter', value: 'starter', description: 'Up to 3 seats', group: 'Free' },
+    { label: 'Team', value: 'team', description: '€29 / seat / month', group: 'Paid' },
+    { label: 'Business', value: 'business', description: 'SSO, audit log, priority support', group: 'Paid' },
+    { label: 'Enterprise', value: 'enterprise', description: 'Contact sales', group: 'Paid', disabled: true },
+  ];
+  protected readonly plan = signal<unknown>('team');
+
+  protected readonly people: MkListboxOption[] = [
+    { label: 'Ada Lovelace', value: 'ada', description: 'Engineering' },
+    { label: 'Grace Hopper', value: 'grace', description: 'Engineering' },
+    { label: 'Alan Turing', value: 'alan', description: 'Research' },
+    { label: 'Katherine Johnson', value: 'kat', description: 'Research' },
+    { label: 'Edsger Dijkstra', value: 'edsger', description: 'Engineering' },
+    { label: 'Barbara Liskov', value: 'barbara', description: 'Product' },
+    { label: 'Linus Torvalds', value: 'linus', description: 'Platform' },
+  ];
+  protected readonly listReviewers = signal<unknown>(['ada', 'kat']);
+  protected readonly reviewerNames = computed(() =>
+    (this.listReviewers() as string[]).map((v) => this.people.find((p) => p.value === v)?.label ?? v).join(', '),
+  );
+
+  protected readonly listboxCode = `<mk-listbox [options]="plans" [(value)]="plan" ariaLabel="Plan" />
+
+<mk-listbox multiple filterable [options]="people" [(ngModel)]="reviewers" size="sm" />
+
+plans: MkListboxOption[] = [
+  { label: 'Starter',  value: 'starter',  description: 'Up to 3 seats', group: 'Free' },
+  { label: 'Team',     value: 'team',     description: '€29 / seat / month', group: 'Paid' },
+  { label: 'Enterprise', value: 'enterprise', group: 'Paid', disabled: true },
+];`;
 
   protected readonly toggleCode = `<mk-button-toggle-group [(value)]="view" aria-label="View mode">
   <mk-button-toggle value="grid">Grid</mk-button-toggle>
