@@ -127,3 +127,73 @@
   color: var(--mk-text);
   @include mk.focus-ring;
 }
+
+/* --- Draggable / resizable ------------------------------------------------- */
+
+.mk-dialog__header--draggable {
+  cursor: move;
+  touch-action: none;
+  user-select: none;
+}
+
+.mk-dialog__grip,
+.mk-dialog__resizer {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--mk-text-muted);
+  cursor: move;
+  touch-action: none;
+
+  &:hover {
+    color: var(--mk-text);
+  }
+  &:focus-visible {
+    @include mk.focus-ring;
+  }
+}
+
+.mk-dialog__grip {
+  flex: none;
+  width: 1.5rem;
+  height: 1.5rem;
+  margin-inline-start: calc(-1 * var(--mk-space-2));
+  border-radius: var(--mk-radius-sm);
+}
+
+.mk-dialog__resizer {
+  position: absolute;
+  inset-inline-end: 0;
+  bottom: 0;
+  width: 1.25rem;
+  height: 1.25rem;
+  cursor: nwse-resize;
+  border-start-start-radius: var(--mk-radius-sm);
+}
+
+[dir='rtl'] .mk-dialog__resizer,
+.mk-dialog-panel:dir(rtl) .mk-dialog__resizer {
+  cursor: nesw-resize;
+  transform: scaleX(-1);
+}
+
+/* Once the user takes hold, the entrance animation is dropped for good (a
+   transient class would restart it on release and make the panel blink) and,
+   while dragging, so is any transition, so the panel follows the pointer 1:1.
+   `translate` is a separate property from `transform`, so the pop keyframes
+   never fight the drag offset. */
+.mk-dialog-panel--moved {
+  animation: none;
+}
+.mk-dialog-panel--dragging {
+  transition: none;
+  user-select: none;
+}
+
+.mk-dialog-panel--resizable .mk-dialog {
+  /* The panel may now be taller than the content; keep the footer at the bottom. */
+  height: 100%;
+}
