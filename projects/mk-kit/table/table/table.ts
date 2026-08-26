@@ -26,6 +26,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkCheckbox } from '@mk-kit/ui/checkbox';
 import { MkTableRowDetail } from './table-row-detail';
 import { MkTableCell } from './table-cell';
+import { mkDownloadText, mkToCsv, type MkCsvExportOptions } from '../export';
 
 /** Horizontal text alignment for a table column. */
 export type MkTableAlign = 'start' | 'center' | 'end';
@@ -125,6 +126,16 @@ export interface MkGroupToggle {
   key: unknown;
   /** Whether the group is now collapsed. */
   collapsed: boolean;
+}
+
+/** Options for {@link MkTable.exportCsv}. */
+export interface MkTableExportOptions extends MkCsvExportOptions {
+  /** Export only the selected rows (default: every row). */
+  selectedOnly?: boolean;
+  /** Restrict to these column keys, in table order (default: every column). */
+  columns?: readonly string[];
+  /** Start the browser download (default `true`); `false` just returns the text. */
+  download?: boolean;
 }
 
 /** Hard floor (px) for column resize when a column sets no `minWidth`. */
@@ -1034,6 +1045,33 @@ export class MkTable<T = Record<string, unknown>> {
   /** Collapse every parent row (tree mode). */
   collapseAllRows(): void {
     this.treeExpanded.set(new Set());
+  }
+
+  // --- Export -----------------------------------------------------------------
+  /**
+   * The table's rows as CSV: current column order, column formatters applied,
+   * sorted the way they are shown, tree children flattened under their parent
+   * whether or not they are expanded. Downloads the file (default name
+   * `table.csv`) and returns the text.
+   */
+  exportCsv(options: MkTableExportOptions = {}): string {
+    let rows = this.allRows();
+    if (options.selectedOnly) {
+      const keys = this.selectedKeys();
+      rows = rows.filter((r) => keys.has(this.rowKey(r)));
+    }
+    const only = options.columns ? new Set(options.columns) : null;
+    const columns = this.orderedColumns()
+      .filter((c) => !only || only.has(c.key))
+      .map((c) => ({ key: c.key, header: c.header, format: c.format }));
+    // `allRows` is already flat, so no childrenKey is passed through.
+    const csv = mkToCsv(rows, columns, { ...options, childrenKey: undefined });
+    if (options.download !== false) {
+      let filename = options.filename ?? 'table.csv';
+      if (!/\.csv$/i.test(filename)) filename += '.csv';
+      mkDownloadText(csv, filename);
+    }
+    return csv;
   }
 
   private setTreeExpanded(row: T, expanded: boolean): void {

@@ -381,6 +381,22 @@ body.mk-app {
   border: 0;
 }
 
+/* Print helpers: `.mk-print-hidden` drops page chrome (toolbars, filters)
+   from paper; `.mk-print-only` shows something (a title, a date) only there.
+   Components ship their own `@media print` rules — mk-table prints as one
+   unbroken sheet with repeating headers and no controls. */
+.mk-print-only {
+  display: none;
+}
+
+@media print {
+  .mk-print-hidden {
+    display: none !important;
+  }
+  .mk-print-only {
+    display: revert;
+  }
+}
 /* mk-drag-handle — the grip a pointer drag must start on. MkDragHandle is a
  * DIRECTIVE (so it composes onto any element, including other components'
  * hosts like mk-icon), and directives cannot carry styles — hence the global

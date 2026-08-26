@@ -17,6 +17,7 @@ import {
   type MkTableColumn,
   type MkTone,
   MkButton,
+  MkIcon,
   type MkTreeToggle,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
@@ -80,6 +81,7 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
     MkTableRowDetail,
     MkTag,
     MkButton,
+    MkIcon,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -562,6 +564,46 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
         <mk-table [columns]="stackColumns" [data]="stackRows" [stackAt]="640" />
       </docs-example>
 
+      <h2>Export to CSV &amp; print</h2>
+      <p>
+        <code class="docs-inline">table.exportCsv()</code> downloads what the
+        user sees: the current column order and sort, column formatters applied,
+        tree children flattened under their parent. Options narrow it to
+        <code class="docs-inline">selectedOnly</code> or a
+        <code class="docs-inline">columns</code> subset, change the
+        <code class="docs-inline">filename</code> or
+        <code class="docs-inline">delimiter</code>, and
+        <code class="docs-inline">download: false</code> just returns the text.
+        The standalone <code class="docs-inline">mkToCsv()</code> /
+        <code class="docs-inline">mkExportCsv()</code> work on any array — a
+        UTF-8 BOM keeps Excel happy and text cells that look like formulas are
+        neutralised. On paper the table drops its scroll box, sticky offsets and
+        controls, repeats the header on every page and keeps rows whole; wrap
+        page chrome in <code class="docs-inline">.mk-print-hidden</code>.
+      </p>
+      <docs-example [code]="exportCode" column>
+        <div class="mk-print-hidden" style="display: flex; flex-wrap: wrap; gap: var(--mk-space-2); margin-bottom: var(--mk-space-3)">
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="exportTable.exportCsv({ filename: 'users' })">
+            <mk-icon name="download" size="sm" /> Download CSV
+          </button>
+          <button mkButton size="sm" variant="outline" tone="neutral" [disabled]="!exportSelected().length" (click)="exportTable.exportCsv({ filename: 'users-selected', selectedOnly: true })">
+            Download selected ({{ exportSelected().length }})
+          </button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="print()">
+            <mk-icon name="printer" size="sm" /> Print
+          </button>
+        </div>
+        <mk-table
+          #exportTable
+          [columns]="columns"
+          [data]="users"
+          trackKey="email"
+          selectable
+          [(selected)]="exportSelected"
+          style="width: 100%"
+        />
+      </docs-example>
+
       <h2>Data-grid pro</h2>
       <p>
         Opt-in power features on the same <code class="docs-inline">mk-table</code>:
@@ -964,6 +1006,29 @@ export class TablePage {
       id: 'ord_9f2b',
     },
   ];
+
+  protected readonly exportCode = `<button mkButton (click)="table.exportCsv({ filename: 'users' })">Download CSV</button>
+<button mkButton (click)="table.exportCsv({ selectedOnly: true })">Download selected</button>
+<button mkButton (click)="print()">Print</button>
+
+<mk-table #table [columns]="columns" [data]="users" selectable [(selected)]="selected" />
+
+// Any array, no table needed:
+import { mkExportCsv, mkToCsv } from '@mk-kit/ui/table';
+mkExportCsv(orders, [
+  { key: 'id', header: 'Order' },
+  { key: 'total', header: 'Total', format: (v) => \`\${v} zł\` },
+], { filename: 'orders', delimiter: ';' });
+const text = mkToCsv(orders);   // just the string
+
+// Print: keep toolbars off paper
+<div class="mk-print-hidden">…filters…</div>`;
+
+  protected readonly exportSelected = signal<DemoUser[]>([]);
+
+  protected print(): void {
+    window.print();
+  }
 
   protected readonly stackCode = `columns: MkTableColumn<Order>[] = [
   { key: 'order',    header: 'Order', stack: 'title' },   // card heading

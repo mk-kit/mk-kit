@@ -556,3 +556,44 @@
     font-size: max(var(--mk-font-size-md), 16px);
   }
 }
+
+/* Print: the whole table on paper — no scroll box, no sticky/pinned offsets,
+   no controls (sort, resize, select, expand). Headers repeat per page. */
+@media print {
+  .mk-table__scroll {
+    overflow: visible;
+    border-radius: 0;
+  }
+  .mk-table__head {
+    display: table-header-group;
+  }
+  .mk-table__th,
+  .mk-table__td {
+    position: static;
+    box-shadow: none;
+    /* Beats selected / hover / zebra tints, which mean nothing on paper. */
+    background-color: transparent !important;
+    color: inherit !important;
+    border-bottom: 1px solid var(--mk-border);
+  }
+  .mk-table__row,
+  .mk-table__group-row,
+  .mk-table__detail-row {
+    break-inside: avoid;
+  }
+  .mk-table__sort,
+  .mk-table__resize,
+  .mk-table__th--select,
+  .mk-table__td--select,
+  .mk-table__th--expand,
+  .mk-table__td--expand,
+  .mk-table__tree-toggle .mk-table__expander-icon {
+    display: none;
+  }
+  .mk-table__th-button,
+  .mk-table__tree-toggle,
+  .mk-table__group-toggle {
+    color: inherit;
+    cursor: default;
+  }
+}

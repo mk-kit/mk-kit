@@ -1,6 +1,6 @@
 <mk-app-shell #shell>
   <!-- Header -->
-  <div mkAppHeader class="docs-header">
+  <div mkAppHeader class="docs-header mk-print-hidden">
     <div class="docs-header__left">
       @if (shell.isMobile() && !isHome()) {
         <button
@@ -78,7 +78,7 @@
   </div>
 
   <!-- Sidebar: flat, text-only navigation (hidden on the landing page) -->
-  <nav mkAppSidebar class="docs-nav" aria-label="Documentation" [hidden]="isHome()">
+  <nav mkAppSidebar class="docs-nav mk-print-hidden" aria-label="Documentation" [hidden]="isHome()">
     @for (section of sections; track section.title) {
       <div class="docs-nav__group">
         <p class="docs-nav__heading">{{ section.title }}</p>
@@ -99,7 +99,7 @@
   <router-outlet />
 
   <!-- On-this-page rail (auto-generated from the routed page's h2 headings) -->
-  <docs-toc />
+  <docs-toc class="mk-print-hidden" />
 </mk-app-shell>
 
 <!-- ⌘K docs search -->

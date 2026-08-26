@@ -150,3 +150,27 @@
     animation: none;
   }
 }
+
+/* Print: only the main content goes to paper. Header and sidebar are app
+   chrome; sticky positioning and the viewport-height minimums would otherwise
+   leave blank bands and columns on every page. */
+@media print {
+  :host {
+    min-height: 0;
+    background: none;
+  }
+  .mk-app-shell__header,
+  .mk-app-shell__sidebar,
+  .mk-app-shell__scrim,
+  .mk-app-shell__skip {
+    display: none;
+  }
+  .mk-app-shell__body {
+    display: block;
+    min-height: 0;
+  }
+  .mk-app-shell__main {
+    padding: 0;
+    overflow: visible;
+  }
+}
