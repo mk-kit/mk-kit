@@ -4,6 +4,37 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **`mk-datetime-picker`** — one field for a date and a time of day: an
+  `mk-calendar` paired with a time list generated from `step`, a single
+  local `Date` value, typed input (`2026-08-26 14:30`, ISO `T`, `2:30 pm`,
+  bare ISO date → midnight), `min`/`max` at minute precision (boundary days
+  trim the time list; validation reports `mkMinDate`/`mkMaxDate`), `hour12`,
+  `clearable`, `mk-form-field` integration. Picking a day keeps the panel
+  open and hands focus to the time list; picking a time commits and closes.
+  Wave A of the Round-5 roadmap.
+- `formatDate` understands time tokens: `HH`, `H`, `hh`, `h`, `mm`, `a`.
+- i18n keys `selectDateTime`, `chooseDateTime`, `chooseTime`,
+  `openDateTimePicker`.
+
+### Fixed
+
+- `mk-page-header` actions and `mk-toolbar` end slots: buttons projected
+  inside a wrapper element (`<div mkPageHeaderActions>`, `<span mkToolbarEnd>`)
+  had no spacing between them; the wrapper now lays out its children with
+  the slot's gap.
+- `mk-date-picker`: typing an unparsable date and pressing Enter left the
+  text in the field even though the value reverted; the field now shows the
+  reverted value.
+
+### Changed
+
+- Docs: mk-kit favicon (SVG + ICO + touch icon) instead of the Angular
+  default; wider header padding.
+
 ## [0.34.1] — 2026-08-26
 
 ### Changed

@@ -70,6 +70,14 @@
 .mk-page-header__actions:empty {
   display: none;
 }
+/* Consumers usually project one wrapper into the slot; lay its children out
+   with the same gap so the actions never touch. */
+:host ::ng-deep [mkPageHeaderActions] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+  flex-wrap: wrap;
+}
 
 .mk-page-header__tabs {
   margin-top: var(--mk-space-4);

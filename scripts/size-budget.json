@@ -6,7 +6,7 @@
     "mk-kit-ui-data.mjs": 640,
     "mk-kit-ui-navigation.mjs": 320,
     "mk-kit-ui-block-editor.mjs": 300,
-    "mk-kit-ui-datetime.mjs": 280,
+    "mk-kit-ui-datetime.mjs": 330,
     "mk-kit-ui-feedback.mjs": 260,
     "mk-kit-ui-media.mjs": 140,
     "mk-kit-ui-table.mjs": 120,

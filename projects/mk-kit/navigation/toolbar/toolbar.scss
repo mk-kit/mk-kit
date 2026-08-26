@@ -28,6 +28,13 @@
   gap: var(--mk-space-2);
   flex: none;
 }
+/* A projected wrapper (`<span mkToolbarEnd>`) gets the same layout, so the
+   actions inside it are spaced like direct children. */
+:host ::ng-deep [mkToolbarEnd] {
+  display: inline-flex;
+  align-items: center;
+  gap: var(--mk-space-2);
+}
 .mk-toolbar__end:empty {
   display: none;
 }

@@ -211,9 +211,11 @@ export function parseISODate(value: string | null | undefined): Date | null {
 /**
  * Format `date` using a small pattern set. Supported tokens:
  * `yyyy` (4-digit year), `MMMM` (full month), `MMM` (short month),
- * `MM` (2-digit month), `dd` (2-digit day), `d` (day), `ddd` (short weekday).
- * Longer tokens are matched first so `MMMM` wins over `MM`.
- * Month/weekday names come from `names` when given, else English.
+ * `MM` (2-digit month), `dd` (2-digit day), `d` (day), `ddd` (short weekday),
+ * `HH` / `H` (24-hour, padded / bare), `hh` / `h` (12-hour, padded / bare),
+ * `mm` (2-digit minutes) and `a` (`AM` / `PM`). Longer tokens are matched
+ * first so `MMMM` wins over `MM`. Month/weekday names come from `names` when
+ * given, else English.
  */
 export function formatDate(
   date: Date,
@@ -230,6 +232,12 @@ export function formatDate(
     ['ddd', () => (names?.weekdaysShort ?? WEEKDAY_NAMES_SHORT)[date.getDay()]],
     ['dd', () => pad2(date.getDate())],
     ['d', () => date.getDate().toString()],
+    ['HH', () => pad2(date.getHours())],
+    ['H', () => date.getHours().toString()],
+    ['hh', () => pad2(date.getHours() % 12 || 12)],
+    ['h', () => (date.getHours() % 12 || 12).toString()],
+    ['mm', () => pad2(date.getMinutes())],
+    ['a', () => (date.getHours() < 12 ? 'AM' : 'PM')],
   ];
   let result = '';
   let i = 0;

@@ -96,6 +96,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-date-picker', desc: 'Date input with calendar popover.', path: '/components/date-time' },
       { name: 'mk-date-range-picker', desc: 'Start/end date pair with one calendar.', path: '/components/date-time' },
       { name: 'mk-time-picker', desc: 'Time input with dropdown steps.', path: '/components/date-time' },
+      { name: 'mk-datetime-picker', desc: 'Date and time in one field: calendar + time list, single Date value.', path: '/components/date-time' },
       { name: 'mk-month-picker', desc: 'Month + year picker.', path: '/components/date-time' },
       { name: 'mk-week-picker', desc: 'ISO week picker.', path: '/components/date-time' },
       { name: 'mk-mini-date', desc: 'Compact date badge for lists and tables.', path: '/components/date-time' },

@@ -335,6 +335,14 @@ export interface MkI18nStrings {
   chooseWeek: string;
   openCalendar: string;
   openTimeList: string;
+  /** Placeholder of `mk-datetime-picker`. */
+  selectDateTime: string;
+  /** Dialog label of the `mk-datetime-picker` panel. */
+  chooseDateTime: string;
+  /** Listbox label of the time list inside `mk-datetime-picker`. */
+  chooseTime: string;
+  /** Toggle-button label of `mk-datetime-picker`. */
+  openDateTimePicker: string;
   /** Mini-date segment names. */
   daySegment: string;
   monthSegment: string;
@@ -714,6 +722,10 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chooseWeek: 'Choose week',
   openCalendar: 'Open calendar',
   openTimeList: 'Open time list',
+  selectDateTime: 'Select date and time…',
+  chooseDateTime: 'Choose date and time',
+  chooseTime: 'Choose time',
+  openDateTimePicker: 'Open date and time picker',
   daySegment: 'Day',
   monthSegment: 'Month',
   yearSegment: 'Year',
