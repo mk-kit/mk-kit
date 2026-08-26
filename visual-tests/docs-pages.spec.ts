@@ -106,6 +106,16 @@ async function settle(page: Page, viewportOnly = false): Promise<void> {
   // Chromium will rasterize in one texture and the capture never returns.
   await page.screenshot({ fullPage: !viewportOnly });
   await page.evaluate(async () => {
+    // Below-the-fold images are `loading="lazy"`; the warm-up shot starts
+    // them but the comparison shot can land before they decode (the creator
+    // photo on the homepage). Force every image eager and wait for it.
+    await Promise.all(
+      Array.from(document.images).map(async (img) => {
+        img.loading = 'eager';
+        if (!img.complete) await new Promise((r) => { img.onload = img.onerror = () => r(null); });
+        try { await img.decode(); } catch { /* broken image — still stable */ }
+      }),
+    );
     await document.fonts.ready;
     // Two frames so the reflow + any resize observers settle.
     await new Promise((r) => requestAnimationFrame(() => requestAnimationFrame(r)));
