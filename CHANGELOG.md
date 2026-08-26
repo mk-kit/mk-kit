@@ -8,6 +8,13 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Docs: Open in StackBlitz** (Wave B) — every example on mk-kit.dev has a
+  StackBlitz button that opens the snippet as a complete zoneless Angular 22
+  app on `@mk-kit/ui` from npm (imports worked out from the selectors the
+  snippet uses; leftover class code kept as a comment), plus a hello-world
+  starter on the homepage and Getting started. No SDK: a plain form POST to
+  `stackblitz.com/run`. `scripts/gen-selectors.mjs` keeps the selector →
+  class map current (checked in CI).
 - **Floating labels** — `labelPosition="float"` on `mk-form-field`: the
   label sits inside the control and slides up on focus or value (native
   `mkInput` / textarea, or any control bound with `ngModel` / `formControl`);

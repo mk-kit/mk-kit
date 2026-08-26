@@ -27,6 +27,8 @@ jobs:
 
       - name: Check bundle-size budget
         run: node scripts/check-size.mjs
+      - name: Selector map for the docs is current
+        run: node scripts/gen-selectors.mjs --check
 
       - name: Test library
         run: npm run test:lib

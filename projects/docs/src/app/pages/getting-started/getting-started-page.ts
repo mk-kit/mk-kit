@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { openInStackBlitz, starterApp } from '../../shared/stackblitz';
 import {
   MkAlert,
   MkAutocomplete,
@@ -87,6 +88,16 @@ export class I18nDemo {}
       <h2>4. Use a component</h2>
       <p>Everything is standalone — import only what you need:</p>
       <pre class="gs-code"><code>{{ usageSnippet }}</code></pre>
+      <p>
+        Prefer to try it before installing anything? The starter below is a
+        complete zoneless Angular 22 app on <code class="docs-inline">&#64;mk-kit/ui</code>
+        from npm — every example on this site has the same button under its code.
+      </p>
+      <p>
+        <button mkButton variant="outline" tone="neutral" (click)="openStarter()">
+          Open the starter in StackBlitz ↗
+        </button>
+      </p>
 
       <mk-alert tone="info" variant="soft" title="Zoneless-ready">
         mk-kit is built entirely on signals and <code class="docs-inline">OnPush</code>,
@@ -171,6 +182,10 @@ bootstrapApplication(App, {
     }),
   ],
 });`;
+
+  protected openStarter(): void {
+    openInStackBlitz(starterApp());
+  }
 
   protected readonly usageSnippet = `import { Component, inject } from '@angular/core';
 import { MkButton, MkCard, MkThemeService } from '@mk-kit/ui';
