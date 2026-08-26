@@ -8,6 +8,13 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-cascader`** (Wave B) — a select for hierarchies shown as side-by-side
+  columns: each pick opens the next column, a leaf commits the whole path
+  (`['eu', 'pl', 'krk']`) or just the leaf value with `valueMode="leaf"`;
+  `selectParents`, `expandTrigger="hover"`, `clearable`, `separator`; full
+  keyboard (arrows across columns, typeahead, Home / End, Escape) with
+  `aria-activedescendant`; columns stack on narrow screens; CVA +
+  `mk-form-field` aware. Budget: forms 820 → 850 KiB.
 - **`mk-listbox`** (Wave B) — a standalone, always-visible selection list:
   single value or, with `multiple`, an array (checkbox rows, Shift ranges,
   Ctrl/Cmd+A); options with `description`, `disabled` and `group` headings;

@@ -1,0 +1,77 @@
+<div #field class="mk-cascader__field">
+  <button
+    #trigger
+    type="button"
+    class="mk-cascader__trigger"
+    [id]="triggerId"
+    role="combobox"
+    aria-haspopup="listbox"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [attr.aria-labelledby]="labelledBy() ? labelledBy() + ' ' + valueId : null"
+    [attr.aria-describedby]="describedBy()"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+    (keydown)="onTriggerKeydown($event)"
+  >
+    @if (displayLabel()) {
+      <span class="mk-cascader__value" [id]="valueId">{{ displayLabel() }}</span>
+    } @else {
+      <span class="mk-cascader__value mk-cascader__value--placeholder" [id]="valueId">{{ placeholder() }}</span>
+    }
+    <span class="mk-cascader__icon" aria-hidden="true"></span>
+  </button>
+
+  @if (clearable() && selectedPath().length && !isDisabled()) {
+    <button type="button" class="mk-cascader__clear" [attr.aria-label]="i18n.clear" (click)="clear($event)">
+      <span class="mk-cascader__clear-icon" aria-hidden="true"></span>
+    </button>
+  }
+</div>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-cascader__panel"
+    role="listbox"
+    tabindex="-1"
+    [id]="panelId"
+    [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-activedescendant]="activeId()"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    (dismiss)="close()"
+    (keydown)="onPanelKeydown($event)"
+    (focusout)="onPanelFocusout($event)"
+  >
+    @for (column of columns(); track $index; let c = $index) {
+      <ul class="mk-cascader__column" role="group">
+        @for (opt of column; track $index; let r = $index) {
+          <li
+            class="mk-cascader__option"
+            role="option"
+            [id]="optionId(c, r)"
+            [attr.aria-selected]="isSelected(c, opt)"
+            [attr.aria-disabled]="opt.disabled || null"
+            [class.mk-cascader__option--path]="isOnPath(c, r)"
+            [class.mk-cascader__option--cursor]="isCursor(c, r)"
+            [class.mk-cascader__option--selected]="isSelected(c, opt)"
+            [class.mk-cascader__option--disabled]="opt.disabled"
+            (mousedown)="$event.preventDefault()"
+            (mouseenter)="onOptionHover(c, r)"
+            (click)="onOptionClick(c, r)"
+          >
+            <span class="mk-cascader__option-label">{{ opt.label }}</span>
+            @if (opt.children?.length) {
+              <span class="mk-cascader__chevron" aria-hidden="true"></span>
+            }
+          </li>
+        } @empty {
+          <li class="mk-cascader__empty" role="presentation">{{ i18n.noOptions }}</li>
+        }
+      </ul>
+    }
+  </div>
+}

@@ -183,7 +183,7 @@ export class App {
           label: 'Selection',
           path: '/components/selection',
           keywords:
-            'autocomplete multi-select tag-input mention transfer-list tree-select button-toggle listbox combobox typeahead chips',
+            'autocomplete multi-select tag-input mention transfer-list tree-select cascader button-toggle listbox combobox typeahead chips',
         },
         {
           label: 'Date & time',
