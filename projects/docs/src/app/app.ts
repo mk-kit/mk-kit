@@ -302,6 +302,11 @@ export class App {
           keywords: 'toolbar page-header scroll-area splitter layout panes',
         },
         {
+          label: 'Layout',
+          path: '/components/layout',
+          keywords: 'layout stack flex grid gap responsive breakpoints columns spacing',
+        },
+        {
           label: 'Drawer',
           path: '/components/drawer',
           keywords: 'drawer side-panel slide-over off-canvas sidebar',

@@ -296,6 +296,12 @@ export const routes: Routes = [
       import('./pages/structure/structure-page').then((m) => m.StructurePage),
   },
   {
+    path: 'components/layout',
+    title: 'Layout — mk-kit',
+    loadComponent: () =>
+      import('./pages/layout/layout-page').then((m) => m.LayoutPage),
+  },
+  {
     path: 'components/drawer',
     title: 'Drawer — mk-kit',
     loadComponent: () =>

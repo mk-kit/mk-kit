@@ -8,6 +8,19 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Layout primitives** — new `@mk-kit/ui/layout` entry point: `mk-stack`
+  (row / column with a `--mk-space-*` gap), `mk-flex` (flexbox with `align`,
+  `justify`, `wrap`, `inline` inputs) and `mk-grid` (column count, raw track
+  list or `minColumnWidth` auto-fill / `autoFit`), plus `mkFlexItem` (`grow`,
+  `shrink`, `basis`, `alignSelf`, `order`) and `mkGridItem` (`colSpan` incl.
+  `'all'`, `rowSpan`, `colStart`, `rowStart`). Every input accepts a
+  mobile-first per-breakpoint map: `[columns]="{ xs: 1, md: 2, xl: 4 }"`.
+- **`MkBreakpointService`** (`@mk-kit/ui/core`) — viewport breakpoints as
+  signals: `current()`, `up()`, `down()`, `between()`, `observe(query)` and
+  `resolve(map)` for `MkResponsive<T>` values; scale overridable through
+  `MK_BREAKPOINTS` (defaults sm 640 / md 768 / lg 1024 / xl 1280 / 2xl 1536);
+  reports `xs` on the server.
+
 - **CSV export + print stylesheet.** `table.exportCsv()` downloads the table
   as the user sees it — column order, sort, formatters, tree rows flattened —
   with `selectedOnly`, `columns`, `filename`, `delimiter` and

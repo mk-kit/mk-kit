@@ -43,7 +43,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 | P1 | **`mk-chat`** + **`mk-prompt-box`** — message list, streaming text, tool/attachment cards, composer | K S D | virtual scroll, markdown, file-upload, autosize | M |
 | P1 | **`mk-query-builder`** — rule/group tree → JSON, pairs with `MkTableDataSource` filters | K S D | select, inputs, date pickers, repeater | M |
 | ✅ | **CSV export + print stylesheet** — `table.exportCsv()`, `mkToCsv` / `mkExportCsv`, `@media print` table styles (shipped, Wave A) | K S D | table columns | S |
-| P1 | Layout primitives — `mk-stack`, `mk-grid`, `mk-flex` + `MkBreakpointService` | K M Z D S T | app-shell media query | S |
+| ✅ | **Layout primitives** — `mk-stack`, `mk-grid`, `mk-flex` + `mkFlexItem` / `mkGridItem` + `MkBreakpointService` (shipped, Wave A) | K M Z D S T | app-shell media query | S |
 | P2 | **Draggable / resizable dialog** (`draggable`, `resizable` on `mk-dialog`) | P K S D | dialog, dnd rect-snapshot | S |
 | P2 | `mk-cascader` — multi-level dependent select | P Z | select, anchored panel | M |
 | P2 | `mk-listbox` — standalone single/multi selection list (keyboard, typeahead) | P K S M D | list, roving tabindex | S |
