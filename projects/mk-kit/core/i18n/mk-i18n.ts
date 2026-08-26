@@ -468,6 +468,48 @@ export interface MkI18nStrings {
   /** Log viewer: soft-wrap toolbar toggle. */
   logWrapLines: string;
 
+  // --- Chat -------------------------------------------------------------------
+  /** Chat: accessible name of the message log. */
+  chatLabel: string;
+  /** Chat: accessible name of the composer textarea. */
+  chatComposerLabel: string;
+  /** Chat: composer placeholder. */
+  chatPlaceholder: string;
+  /** Chat: send button. */
+  chatSend: string;
+  /** Chat: stop-generating button (replaces send while busy). */
+  chatStop: string;
+  /** Chat: attach-files button. */
+  chatAttach: string;
+  /** Chat: remove one pending attachment. */
+  chatRemoveAttachment: string;
+  /** Chat: group label of pending / shown attachments. */
+  chatAttachments: string;
+  /** Chat: group label of quick-reply suggestions. */
+  chatSuggestions: string;
+  /** Chat: copy-message button. */
+  chatCopy: string;
+  /** Chat: retry a failed message. */
+  chatRetry: string;
+  /** Chat: typing indicator. */
+  chatTyping: string;
+  /** Chat: screen-reader text while a reply streams in. */
+  chatStreaming: string;
+  /** Chat: scroll-to-newest button. */
+  chatJumpToLatest: string;
+  /** Chat: empty-state text. */
+  chatEmpty: string;
+  /** Chat: author fallback for the user's own messages. */
+  chatYou: string;
+  /** Chat: author fallback for assistant messages. */
+  chatAssistant: string;
+  /** Chat: tool call in progress. */
+  chatToolRunning: string;
+  /** Chat: tool call finished. */
+  chatToolDone: string;
+  /** Chat: tool call failed. */
+  chatToolError: string;
+
   // --- Event calendar editing --------------------------------------------------
   /** Announced when an event is picked up in keyboard move mode. */
   eventCalendarGrabbed: (title: string, from: string, to: string) => string;
@@ -810,6 +852,27 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   logFollow: 'Follow',
   logCopyAll: 'Copy log',
   logWrapLines: 'Wrap lines',
+
+  chatLabel: 'Conversation',
+  chatComposerLabel: 'Message',
+  chatPlaceholder: 'Type a message…',
+  chatSend: 'Send',
+  chatStop: 'Stop generating',
+  chatAttach: 'Attach files',
+  chatRemoveAttachment: 'Remove attachment',
+  chatAttachments: 'Attachments',
+  chatSuggestions: 'Suggestions',
+  chatCopy: 'Copy message',
+  chatRetry: 'Retry',
+  chatTyping: 'Typing…',
+  chatStreaming: 'Generating…',
+  chatJumpToLatest: 'Jump to latest',
+  chatEmpty: 'No messages yet',
+  chatYou: 'You',
+  chatAssistant: 'Assistant',
+  chatToolRunning: 'Running',
+  chatToolDone: 'Done',
+  chatToolError: 'Failed',
 
   eventCalendarGrabbed: (title, from, to) =>
     `${title} grabbed, ${from} – ${to}. Use the arrow keys to move, ` +

@@ -53,8 +53,11 @@ body {
 
 /* Docs layout primitives ------------------------------------------------- */
 .docs-container {
+  /* border-box so the padding never pushes the page wider than the viewport
+     on phones; the max-width absorbs it to keep 960px of content on desktop. */
+  box-sizing: border-box;
   width: 100%;
-  max-width: 960px;
+  max-width: calc(960px + 2 * var(--mk-space-6));
   margin: 0 auto;
   padding: var(--mk-space-8) var(--mk-space-6) var(--mk-space-16);
 }

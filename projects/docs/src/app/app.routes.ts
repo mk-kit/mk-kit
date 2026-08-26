@@ -302,6 +302,11 @@ export const routes: Routes = [
       import('./pages/layout/layout-page').then((m) => m.LayoutPage),
   },
   {
+    path: 'components/chat',
+    title: 'Chat — mk-kit',
+    loadComponent: () => import('./pages/chat/chat-page').then((m) => m.ChatPage),
+  },
+  {
     path: 'components/drawer',
     title: 'Drawer — mk-kit',
     loadComponent: () =>

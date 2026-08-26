@@ -228,6 +228,9 @@ const INDEX: ReadonlyArray<IndexGroup> = [
   {
     group: 'Editors & interactions',
     items: [
+      { name: 'mk-chat', desc: 'Conversation log with streaming bubbles, tool cards, typing indicator and composer.', path: '/components/chat' },
+      { name: 'mk-prompt-box', desc: 'Auto-growing composer with attachments, suggestions and stop/send.', path: '/components/chat' },
+      { name: 'mk-chat-message', desc: 'One chat bubble: Markdown, attachments, tool calls, copy / retry.', path: '/components/chat' },
       { name: 'mk-block-editor', desc: 'Gutenberg-style block content editor, a CVA control.', path: '/components/content-editor' },
       { name: 'mk-block-renderer', desc: 'Read-only renderer for block documents.', path: '/components/content-editor' },
       { name: 'MK_BLOCK_DEFINITIONS', desc: 'Registry tokens for custom blocks, uploads and embed providers.', path: '/components/content-editor' },

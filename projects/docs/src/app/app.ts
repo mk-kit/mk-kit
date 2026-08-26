@@ -377,6 +377,11 @@ export class App {
           keywords: 'block-editor block-renderer blocks embed notion-style content',
         },
         {
+          label: 'Chat',
+          path: '/components/chat',
+          keywords: 'chat conversation messages assistant ai llm streaming prompt composer prompt-box',
+        },
+        {
           label: 'Rich text',
           path: '/components/rich-text',
           keywords: 'rich-text wysiwyg editor html formatting bold italic',
