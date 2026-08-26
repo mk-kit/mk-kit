@@ -1,10 +1,12 @@
 import { Injectable, inject } from '@angular/core';
 import { DomSanitizer, SafeHtml } from '@angular/platform-browser';
 import { MK_DEFAULT_ICONS } from './default-icons';
+import { MK_EXTENDED_ICONS } from './extended-icons';
 
 /**
  * IconRegistry — the name → SVG store behind `<mk-icon name="…">`. The built-in
- * {@link MK_DEFAULT_ICONS} set is registered on construction; add your own SVGs
+ * sets — the hand-made {@link MK_DEFAULT_ICONS} and the Lucide-derived
+ * {@link MK_EXTENDED_ICONS} — are registered on construction; add your own SVGs
  * (from a sprite, a design export, anything) with {@link register} /
  * {@link registerIcons}.
  *
@@ -24,6 +26,8 @@ export class MkIconRegistry {
   private readonly aliases = new Map<string, string>();
 
   constructor() {
+    // Extended first so a hand-made default always wins on a shared name.
+    this.registerIcons(MK_EXTENDED_ICONS);
     this.registerIcons(MK_DEFAULT_ICONS);
   }
 

@@ -22,6 +22,7 @@ import {
   MkPagination,
   MkTab,
   MkTabs,
+  MkIcon,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -46,8 +47,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkNavItem,
     MkFab,
     MkFabAction,
-    MkBackToTop,
-  ],
+    MkBackToTop, MkIcon],
   template: `
     <div class="docs-page docs-container">
       <h1>Navigation &amp; layout</h1>
@@ -153,7 +153,7 @@ import { DocsExample } from '../../shared/docs-example';
             Entirely through <code class="docs-inline">--mk-*</code> CSS variables.
           </mk-accordion-item>
           <mk-accordion-item>
-            <span mkAccordionHeader>🔒 Rich header markup</span>
+            <span mkAccordionHeader><mk-icon name="lock" size="sm" /> Rich header markup</span>
             Headers can be projected via
             <code class="docs-inline">mkAccordionHeader</code> for icons and badges.
           </mk-accordion-item>
@@ -268,16 +268,16 @@ import { DocsExample } from '../../shared/docs-example';
         </button>
         <mk-menu #menu="mkMenu">
           <mk-menu-item (action)="onMenuAction('Edit')">
-            <span mkMenuItemIcon>✏️</span> Edit
+            <mk-icon mkMenuItemIcon name="edit" /> Edit
           </mk-menu-item>
           <mk-menu-item (action)="onMenuAction('Duplicate')">
-            <span mkMenuItemIcon>⧉</span> Duplicate
+            <mk-icon mkMenuItemIcon name="copy" /> Duplicate
           </mk-menu-item>
           <mk-menu-item disabled>
-            <span mkMenuItemIcon>📦</span> Archive (disabled)
+            <mk-icon mkMenuItemIcon name="archive" /> Archive (disabled)
           </mk-menu-item>
           <mk-menu-item danger (action)="onMenuAction('Delete')">
-            <span mkMenuItemIcon>🗑️</span> Delete
+            <mk-icon mkMenuItemIcon name="trash" /> Delete
           </mk-menu-item>
         </mk-menu>
         <p style="margin: var(--mk-space-3) 0 0; color: var(--mk-text-muted)">
@@ -415,7 +415,7 @@ import { DocsExample } from '../../shared/docs-example';
             <mk-nav-item label="Invitations" (action)="onNav('Invitations')" />
           </mk-nav-item>
           <mk-nav-item label="Settings" disabled>
-            <span mkNavIcon>⚙</span>
+            <mk-icon mkNavIcon name="settings" />
           </mk-nav-item>
         </mk-nav-list>
         <p style="margin: var(--mk-space-3) 0 0; color: var(--mk-text-muted)">
@@ -452,8 +452,8 @@ import { DocsExample } from '../../shared/docs-example';
           <mk-fab position="static" label="Create" extended (action)="fabHits.set(fabHits() + 1)">＋</mk-fab>
           <mk-fab position="static" label="Actions">
             ⋯
-            <button mkFabAction>📄 Document</button>
-            <button mkFabAction>📁 Folder</button>
+            <button mkFabAction><mk-icon name="file-text" /> Document</button>
+            <button mkFabAction><mk-icon name="folder" /> Folder</button>
           </mk-fab>
         </div>
         <p class="echo">Extended FAB clicks: {{ fabHits() }}</p>
@@ -546,7 +546,7 @@ export class NavigationPage {
     '  </mk-accordion-item>',
     '  <mk-accordion-item header="How is it themed?">…</mk-accordion-item>',
     '  <mk-accordion-item>',
-    '    <span mkAccordionHeader>🔒 Rich header markup</span>',
+    '    <span mkAccordionHeader><mk-icon name="lock" size="sm" /> Rich header markup</span>',
     '    …body…',
     '  </mk-accordion-item>',
     '</mk-accordion>',
@@ -601,12 +601,12 @@ export class NavigationPage {
     '</button>',
     '<mk-menu #menu="mkMenu">',
     '  <mk-menu-item (action)="onMenuAction(\'Edit\')">',
-    '    <span mkMenuItemIcon>✏️</span> Edit',
+    '    <mk-icon mkMenuItemIcon name="edit" /> Edit',
     '  </mk-menu-item>',
     '  <mk-menu-item (action)="onMenuAction(\'Duplicate\')">…</mk-menu-item>',
     '  <mk-menu-item disabled>Archive (disabled)</mk-menu-item>',
     '  <mk-menu-item danger (action)="onMenuAction(\'Delete\')">',
-    '    <span mkMenuItemIcon>🗑️</span> Delete',
+    '    <mk-icon mkMenuItemIcon name="trash" /> Delete',
     '  </mk-menu-item>',
     '</mk-menu>',
   ].join('\n');
@@ -618,7 +618,7 @@ export class NavigationPage {
     '  [(sidebarCollapsed)]="collapsed"',
     '>',
     '  <div mkAppHeader>',
-    '    <button mkButton iconOnly (click)="shell.toggleSidebar()">☰</button>',
+    '    <button mkButton iconOnly (click)="shell.toggleSidebar()"><mk-icon name="menu" /></button>',
     '    <strong>Acme Admin</strong>',
     '  </div>',
     '',

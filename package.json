@@ -36,6 +36,7 @@
     "@playwright/test": "^1.62.1",
     "axe-core": "^4.12.1",
     "jsdom": "^28.0.0",
+    "lucide-static": "^1.34.0",
     "ng-packagr": "^22.0.0",
     "prettier": "^3.8.1",
     "sass": "^1.101.0",

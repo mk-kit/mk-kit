@@ -29,6 +29,7 @@ import {
   MkToastService,
   type MkSortChange,
   type MkTableColumn,
+  MkIcon,
 } from '@mk-kit/ui';
 import { DashChart } from './dash-chart';
 
@@ -85,8 +86,7 @@ interface Goal {
     MkMenu,
     MkMenuItem,
     MkMenuTrigger,
-    DashChart,
-  ],
+    DashChart, MkIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="dash">
@@ -98,7 +98,7 @@ interface Goal {
         </div>
         <div class="dash__actions">
           <button mkButton variant="outline" tone="neutral" [mkMenuTriggerFor]="rangeMenu">
-            <span aria-hidden="true">📅</span> Last 30 days ▾
+            <mk-icon name="calendar" /> Last 30 days <mk-icon name="chevron-down" size="sm" />
           </button>
           <mk-menu #rangeMenu="mkMenu">
             <mk-menu-item (action)="setRange('7 days')">Last 7 days</mk-menu-item>
@@ -107,7 +107,7 @@ interface Goal {
             <mk-menu-item (action)="setRange('year')">This year</mk-menu-item>
           </mk-menu>
           <button mkButton tone="primary" (click)="newReport()">
-            <span aria-hidden="true">＋</span> New report
+            <mk-icon name="plus" /> New report
           </button>
         </div>
       </header>
@@ -115,16 +115,16 @@ interface Goal {
       <!-- KPI row -->
       <section class="dash__kpis" aria-label="Key metrics">
         <mk-stat-card label="Revenue" value="$48,290" delta="+12.4%" deltaTrend="up" hint="vs. last period">
-          <span mkStatIcon aria-hidden="true">💰</span>
+          <mk-icon mkStatIcon name="banknote" />
         </mk-stat-card>
         <mk-stat-card label="Active users" value="8,642" delta="+3.1%" deltaTrend="up" hint="vs. last period">
-          <span mkStatIcon aria-hidden="true">👥</span>
+          <mk-icon mkStatIcon name="users" />
         </mk-stat-card>
         <mk-stat-card label="Orders" value="1,204" delta="-2.7%" deltaTrend="down" hint="vs. last period">
-          <span mkStatIcon aria-hidden="true">📦</span>
+          <mk-icon mkStatIcon name="package" />
         </mk-stat-card>
         <mk-stat-card label="Churn" value="1.9%" delta="0.0%" deltaTrend="neutral" hint="stable">
-          <span mkStatIcon aria-hidden="true">📉</span>
+          <mk-icon mkStatIcon name="trending-down" />
         </mk-stat-card>
       </section>
 
@@ -139,13 +139,13 @@ interface Goal {
                 aria-label="Chart options" [mkMenuTriggerFor]="chartMenu">⋯</button>
               <mk-menu #chartMenu="mkMenu">
                 <mk-menu-item (action)="toast.success('Export started')">
-                  <span mkMenuItemIcon aria-hidden="true">⬇</span> Export CSV
+                  <mk-icon mkMenuItemIcon name="download" /> Export CSV
                 </mk-menu-item>
                 <mk-menu-item (action)="toast.info('Data refreshed')">
-                  <span mkMenuItemIcon aria-hidden="true">↻</span> Refresh
+                  <mk-icon mkMenuItemIcon name="refresh" /> Refresh
                 </mk-menu-item>
                 <mk-menu-item danger (action)="removeWidget()">
-                  <span mkMenuItemIcon aria-hidden="true">🗑</span> Remove widget
+                  <mk-icon mkMenuItemIcon name="trash" /> Remove widget
                 </mk-menu-item>
               </mk-menu>
             </div>

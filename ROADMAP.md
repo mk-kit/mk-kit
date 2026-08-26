@@ -39,7 +39,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 | ✅ | **Nested submenus** in `mk-menu` (`[mkSubmenuFor]`, hover/keyboard, RTL) — shipped, Wave A | P K S M Z D | menu, anchored panel | M |
 | ✅ | **`mk-split-button`** — main action + menu trigger (shipped, Wave A) | P K S Z D | button, menu | S |
 | ✅ | **Tree table** — nested rows in `mk-table` (`childrenKey`, expand/collapse, indent, keyboard) — shipped, Wave A | P K S D | table expandable rows, tree key model | M |
-| P1 | **Icon set** — ship ~250 tree-shakeable SVG icons via `MkIconRegistry` (today: 35) + documented Lucide/Material adapters; stop using emoji in docs | all | icon registry | M |
+| ✅ | **Icon set** — ship ~250 tree-shakeable SVG icons via `MkIconRegistry` (today: 35) + documented Lucide/Material adapters; stop using emoji in docs | all | icon registry — shipped, Wave A (420+ icons) | M |
 | P1 | **`mk-chat`** + **`mk-prompt-box`** — message list, streaming text, tool/attachment cards, composer | K S D | virtual scroll, markdown, file-upload, autosize | M |
 | P1 | **`mk-query-builder`** — rule/group tree → JSON, pairs with `MkTableDataSource` filters | K S D | select, inputs, date pickers, repeater | M |
 | P1 | **CSV export + print stylesheet** — `mkExportCsv(rows, columns)`, `@media print` table styles | K S D | table columns | S |

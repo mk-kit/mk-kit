@@ -1,6 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { Router } from '@angular/router';
-import { MkBadge, MkButton, MkCard } from '@mk-kit/ui';
+import {
+  MkBadge,
+  MkButton,
+  MkCard,
+  MkIcon,
+} from '@mk-kit/ui';
 
 interface Feature {
   icon: string;
@@ -10,7 +15,7 @@ interface Feature {
 
 @Component({
   selector: 'docs-introduction-page',
-  imports: [MkButton, MkCard, MkBadge],
+  imports: [MkButton, MkCard, MkBadge, MkIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -38,7 +43,7 @@ interface Feature {
       <section class="intro-features">
         @for (f of features; track f.title) {
           <mk-card variant="outlined" class="intro-feature">
-            <div class="intro-feature__icon" aria-hidden="true">{{ f.icon }}</div>
+            <div class="intro-feature__icon" aria-hidden="true"><mk-icon [name]="f.icon" size="lg" /></div>
             <h3 class="intro-feature__title">{{ f.title }}</h3>
             <p class="intro-feature__body">{{ f.body }}</p>
           </mk-card>
@@ -186,32 +191,32 @@ export class IntroductionPage {
 
   protected readonly features: Feature[] = [
     {
-      icon: '🎨',
+      icon: 'palette',
       title: 'CSS-variable theming',
       body: 'Re-brand the entire library by overriding --mk-* tokens. No SCSS recompile, no build step.',
     },
     {
-      icon: '🌗',
+      icon: 'sun-moon',
       title: 'Light & dark built in',
       body: 'Follows the OS preference automatically, or switch explicitly with the signal-based MkThemeService.',
     },
     {
-      icon: '⚡',
+      icon: 'zap',
       title: 'Signals everywhere',
       body: 'input(), model() and output() with OnPush. Fast, reactive, zoneless-ready.',
     },
     {
-      icon: '♿',
+      icon: 'accessibility',
       title: 'Accessible by design',
       body: 'WCAG 2.1 AA: keyboard nav, focus management, aria wiring and live regions throughout.',
     },
     {
-      icon: '📦',
+      icon: 'package',
       title: 'Publishable package',
       body: 'Ships as a standard Angular package (FESM2022 + typings) — npm install @mk-kit/ui.',
     },
     {
-      icon: '🧭',
+      icon: 'compass',
       title: 'Admin-oriented',
       body: 'App shell, collapsible sidebar nav, sortable tables, stat cards, dialogs and toasts.',
     },
