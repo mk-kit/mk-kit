@@ -49,6 +49,7 @@ import { MkMonthPicker } from '@mk-kit/ui/datetime/month-picker';
 import { MkWeekPicker } from '@mk-kit/ui/datetime/week-picker';
 import { MkDateRangePicker } from '@mk-kit/ui/datetime/date-range-picker';
 import { MkTimePicker } from '@mk-kit/ui/datetime/time-picker';
+import { MkDateTimePicker } from '@mk-kit/ui/datetime/datetime-picker';
 import { MkCalendar } from '@mk-kit/ui/datetime/calendar';
 import { MkMiniDate } from '@mk-kit/ui/datetime/mini-date';
 
@@ -284,6 +285,14 @@ const VALIDATOR_CASES: readonly ValidatorCase[] = [
     bad: '07:30',
     key: 'mkMinTime',
     good: '10:30',
+  },
+  {
+    name: 'mk-datetime-picker [min]',
+    type: MkDateTimePicker,
+    template: '<mk-datetime-picker [min]="min" [formControl]="ctrl" />',
+    bad: new Date(2026, 4, 31, 23, 59),
+    key: 'mkMinDate',
+    good: new Date(2026, 5, 1, 0, 0),
   },
   {
     name: 'mk-file-upload [maxFiles]',

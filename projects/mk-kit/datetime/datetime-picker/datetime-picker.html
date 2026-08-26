@@ -1,0 +1,117 @@
+<div #field class="mk-datetime-picker__field">
+  <input
+    #textInput
+    type="text"
+    class="mk-datetime-picker__input"
+    [id]="inputId"
+    [value]="inputText()"
+    [placeholder]="placeholder()"
+    [disabled]="isDisabled()"
+    autocomplete="off"
+    role="combobox"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [attr.aria-invalid]="isInvalid() || null"
+    [attr.aria-required]="isRequired() || null"
+    [attr.aria-describedby]="describedBy()"
+    (input)="onInput($event)"
+    (keydown)="onInputKeydown($event)"
+  />
+
+  @if (showClear()) {
+    <button
+      type="button"
+      class="mk-datetime-picker__clear"
+      [attr.aria-label]="i18n.clear"
+      (click)="clear()"
+    >
+      <span class="mk-datetime-picker__clear-icon" aria-hidden="true"></span>
+    </button>
+  }
+
+  <button
+    type="button"
+    class="mk-datetime-picker__toggle"
+    [attr.aria-label]="i18n.openDateTimePicker"
+    aria-haspopup="dialog"
+    [attr.aria-expanded]="open()"
+    [attr.aria-controls]="panelId"
+    [disabled]="isDisabled()"
+    (click)="toggle()"
+  >
+    <svg
+      class="mk-datetime-picker__icon"
+      viewBox="0 0 24 24"
+      width="18"
+      height="18"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="2"
+      aria-hidden="true"
+    >
+      <path d="M3 9h18M8 2v4M16 2v4" />
+      <path d="M21 12V6a2 2 0 0 0-2-2H5a2 2 0 0 0-2 2v13a2 2 0 0 0 2 2h6" />
+      <circle cx="17.5" cy="17.5" r="4.5" />
+      <path d="M17.5 15.5v2l1.5 1" />
+    </svg>
+  </button>
+</div>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-datetime-picker__panel"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="field"
+    (dismiss)="close()"
+    [id]="panelId"
+    role="dialog"
+    [attr.aria-label]="i18n.chooseDateTime"
+    (keydown.escape)="onPanelEscape($event)"
+    (focusout)="onPanelFocusout($event)"
+  >
+    <mk-calendar
+      [value]="calendarValue()"
+      (valueChange)="onCalendarPick($event)"
+      [min]="calendarMin()"
+      [max]="calendarMax()"
+      [firstDayOfWeek]="firstDayOfWeek()"
+      [size]="effectiveSize()"
+      [disabledDate]="disabledDate()"
+    />
+
+    <ul
+      #times
+      class="mk-datetime-picker__times"
+      [id]="listId"
+      role="listbox"
+      tabindex="0"
+      [attr.aria-label]="i18n.chooseTime"
+      [attr.aria-activedescendant]="
+        activeIndex() >= 0 && options()[activeIndex()] ? options()[activeIndex()].id : null
+      "
+      (keydown)="onListKeydown($event)"
+    >
+      @for (opt of options(); track opt.minutes; let i = $index) {
+        <li
+          class="mk-datetime-picker__option"
+          [id]="opt.id"
+          role="option"
+          [attr.aria-selected]="i === selectedIndex()"
+          [class.mk-datetime-picker__option--active]="i === activeIndex()"
+          [class.mk-datetime-picker__option--selected]="i === selectedIndex()"
+          (mousedown)="$event.preventDefault()"
+          (mousemove)="activeIndex.set(i)"
+          (click)="selectTime(i)"
+        >
+          {{ opt.label }}
+        </li>
+      } @empty {
+        <li class="mk-datetime-picker__empty" role="presentation">
+          {{ i18n.noOptions }}
+        </li>
+      }
+    </ul>
+  </div>
+}

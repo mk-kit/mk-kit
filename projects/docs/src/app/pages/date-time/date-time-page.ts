@@ -3,6 +3,7 @@ import {
   MkCalendar,
   MkDatePicker,
   MkDateRangePicker,
+  MkDateTimePicker,
   MkEventCalendar,
   MkMiniDate,
   MkMonthPicker,
@@ -27,7 +28,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-date-time-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker, MkEventCalendar, MkMiniDate],
+  imports: [DocsExample, MkCalendar, MkDatePicker, MkTimePicker, MkDateTimePicker, MkDateRangePicker, MkMonthPicker, MkWeekPicker, MkEventCalendar, MkMiniDate],
   template: `
     <div class="docs-page docs-container">
       <h1>Date &amp; time</h1>
@@ -205,6 +206,67 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>placeholder</td><td>string</td><td>'Select time…'</td><td>Shown when empty.</td></tr>
           <tr><td>clearable</td><td>boolean</td><td>false</td><td>Show a clear button when a time is selected.</td></tr>
           <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling + aria-invalid.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <!-- DATETIME PICKER -->
+      <!-- ============================================================ -->
+      <h2>Date &amp; time picker</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-datetime-picker&gt;</code> is one field for a
+        date <em>and</em> a time of day. The panel pairs the calendar with a time
+        list generated from <code class="docs-inline">step</code>; the value is a
+        single <code class="docs-inline">Date</code> carrying both parts in local
+        time (seconds zeroed). Picking a day keeps the panel open — with an
+        existing value it moves that value to the new day and keeps its time —
+        and picking a time commits and closes. With no value yet the day is held
+        until a time is chosen, so a half-picked datetime is never emitted.
+        Typing works too: <code class="docs-inline">2026-08-26 14:30</code>,
+        <code class="docs-inline">2026-08-26T09:05</code>,
+        <code class="docs-inline">Aug 26, 2026 2:30 pm</code> or a bare ISO date
+        (midnight).
+      </p>
+
+      <docs-example [code]="dateTimePickerCode" [column]="true">
+        <mk-datetime-picker [(value)]="startsAt" [step]="15" clearable />
+        <p class="echo">Value: {{ startsAtLabel() }}</p>
+      </docs-example>
+
+      <p>
+        <code class="docs-inline">min</code> / <code class="docs-inline">max</code>
+        bound the whole instant at minute precision: days outside the range are
+        disabled in the calendar, and on the boundary days the time list only
+        offers times inside the bound. Typed values are clamped; reactive forms
+        get <code class="docs-inline">mkMinDate</code> /
+        <code class="docs-inline">mkMaxDate</code>. With
+        <code class="docs-inline">hour12</code> the field and the list render
+        12-hour times.
+      </p>
+
+      <docs-example [code]="dateTimePickerBoundsCode" [column]="true">
+        <mk-datetime-picker [(value)]="meetingAt" [min]="officeOpen" [max]="officeClose" [step]="30" hour12 clearable />
+        <p class="echo">Value: {{ meetingAtLabel() }}</p>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>value</td><td>model&lt;Date | null&gt;</td><td>null</td><td>Two-way date-time (local; seconds and ms are zero).</td></tr>
+          <tr><td>min</td><td>Date | null</td><td>null</td><td>Earliest selectable instant (inclusive, minute precision).</td></tr>
+          <tr><td>max</td><td>Date | null</td><td>null</td><td>Latest selectable instant (inclusive, minute precision).</td></tr>
+          <tr><td>disabledDate</td><td>(d: Date) =&gt; boolean | null</td><td>null</td><td>Predicate marking individual days as disabled.</td></tr>
+          <tr><td>step</td><td>number</td><td>30</td><td>Interval between generated time options, in minutes.</td></tr>
+          <tr><td>hour12</td><td>boolean</td><td>false</td><td>Display 12-hour times with AM/PM.</td></tr>
+          <tr><td>displayFormat</td><td>string | null</td><td>null</td><td>Field pattern; defaults to 'MMM d, yyyy HH:mm' (or 'h:mm a' with hour12). Tokens: yyyy MMMM MMM MM ddd dd d HH H hh h mm a.</td></tr>
+          <tr><td>placeholder</td><td>string</td><td>'Select date and time…'</td><td>Shown when empty.</td></tr>
+          <tr><td>clearable</td><td>boolean</td><td>false</td><td>Show a clear button when a value is selected.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable the control.</td></tr>
+          <tr><td>invalid</td><td>boolean</td><td>false</td><td>Force invalid styling + aria-invalid.</td></tr>
+          <tr><td>firstDayOfWeek</td><td>number</td><td>0</td><td>First column of the calendar week (0 = Sunday).</td></tr>
           <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Control size. Ignored inside an mk-form-field.</td></tr>
         </tbody>
       </table>
@@ -670,6 +732,35 @@ inThirtyDays = new Date(this.today.getTime() + 30 * 864e5);
 
 <!-- Displayed as 12-hour AM/PM; the model stays canonical 24h 'HH:mm'. -->
 <mk-time-picker [(value)]="time12" [step]="30" hour12 clearable />`;
+
+  protected readonly startsAt = signal<Date | null>(new Date(2026, 7, 26, 14, 30));
+  protected readonly startsAtLabel = computed(() => {
+    const v = this.startsAt();
+    return v ? formatDate(v, 'yyyy-MM-dd HH:mm') : '—';
+  });
+  protected readonly officeOpen = new Date(2026, 7, 24, 9, 0);
+  protected readonly officeClose = new Date(2026, 7, 28, 17, 0);
+  protected readonly meetingAt = signal<Date | null>(null);
+  protected readonly meetingAtLabel = computed(() => {
+    const v = this.meetingAt();
+    return v ? formatDate(v, 'yyyy-MM-dd h:mm a') : '—';
+  });
+
+  protected readonly dateTimePickerCode = `startsAt = signal<Date | null>(new Date(2026, 7, 26, 14, 30));
+
+<mk-datetime-picker [(value)]="startsAt" [step]="15" clearable />`;
+
+  protected readonly dateTimePickerBoundsCode = `officeOpen = new Date(2026, 7, 24, 9, 0);
+officeClose = new Date(2026, 7, 28, 17, 0);
+
+<mk-datetime-picker
+  [(value)]="meetingAt"
+  [min]="officeOpen"
+  [max]="officeClose"
+  [step]="30"
+  hour12
+  clearable
+/>`;
 
   protected readonly timePickerDateCode = `pickupAt = signal<Date | null>(new Date());
 

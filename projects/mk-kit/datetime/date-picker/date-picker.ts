@@ -223,11 +223,14 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
     if (parsed) {
       this.setValue(clampDate(parsed, this.min(), this.max()));
     } else {
-      // Invalid entry — revert to the current model's display.
+      // Invalid entry — revert to the current model's display. The signal may
+      // already hold that string (the model did not change), so the `[value]`
+      // binding would not re-apply it: write the DOM value directly as well.
       const v = this.value();
-      this.inputText.set(
-        v ? formatDate(v, this.displayFormat(), this.i18n.dateNames) : '',
-      );
+      const text = v ? formatDate(v, this.displayFormat(), this.i18n.dateNames) : '';
+      this.inputText.set(text);
+      const el = this.inputRef()?.nativeElement;
+      if (el) el.value = text;
     }
   }
 

@@ -185,7 +185,7 @@ export class App {
           label: 'Date & time',
           path: '/components/date-time',
           keywords:
-            'date-picker date-range-picker time-picker calendar event-calendar month-picker week-picker mini-date datetime scheduling',
+            'date-picker date-range-picker time-picker datetime-picker calendar event-calendar month-picker week-picker mini-date datetime scheduling',
         },
       ],
     },

@@ -52,6 +52,7 @@ import { MkNumericKeypad } from '@mk-kit/ui/forms/numeric-keypad';
 import { MkOnScreenKeyboard } from '@mk-kit/ui/forms/on-screen-keyboard';
 import { MkIbanInput } from '@mk-kit/ui/forms/iban-input';
 import { MkSubmitInput } from '@mk-kit/ui/forms/submit-input';
+import { MkDateTimePicker } from '@mk-kit/ui/datetime/datetime-picker';
 import { MkTaxIdInput } from '@mk-kit/ui/forms/tax-id-input';
 import { MkSignaturePad } from '@mk-kit/ui/forms/signature-pad';
 import { MkBlockEditor, mkHtmlToBlocks } from '@mk-kit/ui/block-editor';
@@ -103,6 +104,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
     MkIbanInput,
     MkTaxIdInput,
     MkSubmitInput,
+    MkDateTimePicker,
     MkSignaturePad,
     MkBlockEditor,
     MkJsonViewer,
@@ -182,6 +184,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
       </mk-form-field>
       <mk-form-field label="Discount code">
         <mk-submit-input buttonLabel="Apply" value="SUMMER10" clearable />
+        <mk-datetime-picker [value]="startsAt" clearable />
       </mk-form-field>
       <mk-form-field label="Signature">
         <mk-signature-pad />
@@ -246,6 +249,7 @@ class SsrSmokeRoot implements AfterViewInit {
   // must fall back to a sanitised paragraph, never throw.
   readonly parsedDoc = mkHtmlToBlocks('<h2>Title</h2><p>Body copy.</p>');
   private readonly pad = viewChild.required(MkSignaturePad);
+  readonly startsAt = new Date(2026, 7, 26, 14, 30);
 
   ngAfterViewInit(): void {
     // clear() → redraw() touches canvas/window APIs; must be a no-op on the

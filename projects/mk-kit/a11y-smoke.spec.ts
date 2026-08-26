@@ -43,6 +43,7 @@ import {
 } from '@mk-kit/ui/forms/on-screen-keyboard';
 import { MkIbanInput } from '@mk-kit/ui/forms/iban-input';
 import { MkTaxIdInput } from '@mk-kit/ui/forms/tax-id-input';
+import { MkDateTimePicker } from '@mk-kit/ui/datetime/datetime-picker';
 import { MkSignaturePad } from '@mk-kit/ui/forms/signature-pad';
 import { MkJsonViewer } from '@mk-kit/ui/data/json-viewer';
 import { MkImage } from '@mk-kit/ui/media/image';
@@ -111,6 +112,18 @@ class ButtonHost {}
   `,
 })
 class FormFieldInputHost {}
+
+@Component({
+  imports: [MkFormField, MkDateTimePicker],
+  template: `
+    <mk-form-field label="Starts at" hint="Local time">
+      <mk-datetime-picker [value]="startsAt" [step]="15" clearable />
+    </mk-form-field>
+  `,
+})
+class DateTimePickerHost {
+  readonly startsAt = new Date(2026, 7, 26, 14, 30);
+}
 
 @Component({
   imports: [MkInputGroup, MkInput],
@@ -469,6 +482,7 @@ class TreeHost {
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
+  { name: 'form-field + datetime-picker', host: DateTimePickerHost },
   { name: 'input group', host: InputGroupHost },
   { name: 'checkbox', host: CheckboxHost },
   { name: 'radio group', host: RadioGroupHost },

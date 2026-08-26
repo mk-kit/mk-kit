@@ -7,6 +7,7 @@ export * from './datetime/date-utils';
 export * from './calendar';
 export * from './date-picker';
 export * from './time-picker';
+export * from './datetime-picker';
 export * from './date-range-picker';
 export * from './month-picker';
 export * from './week-picker';

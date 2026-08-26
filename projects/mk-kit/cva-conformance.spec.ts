@@ -57,6 +57,7 @@ import { MkDateRangePicker } from '@mk-kit/ui/datetime/date-range-picker';
 import { MkMiniDate } from '@mk-kit/ui/datetime/mini-date';
 import { MkMonthPicker } from '@mk-kit/ui/datetime/month-picker';
 import { MkTimePicker } from '@mk-kit/ui/datetime/time-picker';
+import { MkDateTimePicker } from '@mk-kit/ui/datetime/datetime-picker';
 import { MkWeekPicker } from '@mk-kit/ui/datetime/week-picker';
 import { MkBlockEditor } from '@mk-kit/ui/block-editor';
 import { MkInlineEdit } from '@mk-kit/ui/data/inline-edit';
@@ -287,6 +288,14 @@ const CASES: readonly CvaCase[] = [
     tag: 'mk-time-picker',
     value: '13:45',
     read: readValue,
+  },
+  {
+    name: 'mk-datetime-picker',
+    type: MkDateTimePicker,
+    tag: 'mk-datetime-picker',
+    value: new Date(2026, 6, 1, 14, 30),
+    read: readValue,
+    expect: (v) => v instanceof Date && v.getHours() === 14 && v.getMinutes() === 30,
   },
   {
     name: 'mk-week-picker',

@@ -35,7 +35,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 
 | Pri | Component / feature | Suites with it | Reuses | Size |
 |-----|---------------------|----------------|--------|------|
-| P1 | **`mk-datetime-picker`** — combined date + time field | P K S Z T D | date-picker + time-picker + anchored panel | S |
+| ✅ | **`mk-datetime-picker`** — combined date + time field (shipped, Wave A) | P K S Z T D | date-picker + time-picker + anchored panel | S |
 | P1 | **Nested submenus** in `mk-menu` (`[mkSubmenuFor]`, hover/keyboard, RTL) | P K S M Z D | menu, anchored panel | M |
 | P1 | **`mk-split-button`** — main action + menu trigger | P K S Z D | button, menu | S |
 | P1 | **Tree table** — nested rows in `mk-table` (`childrenKey`, expand/collapse, indent, keyboard) | P K S D | table expandable rows, tree key model | M |
