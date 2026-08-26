@@ -1,5 +1,13 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { RouterLink, RouterLinkActive, RouterOutlet, Router } from '@angular/router';
+import {
+  NavigationEnd,
+  RouterLink,
+  RouterLinkActive,
+  RouterOutlet,
+  Router,
+} from '@angular/router';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { filter, map } from 'rxjs/operators';
 import {
   MkAppShell,
   MkButton,
@@ -35,10 +43,19 @@ interface NavSection {
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '[class.docs-home]': 'isHome()' },
 })
 export class App {
   protected readonly uiVersion = uiVersion;
   private readonly router = inject(Router);
+  /** True on the landing page, where the docs sidebar and TOC rail are hidden. */
+  protected readonly isHome = toSignal(
+    this.router.events.pipe(
+      filter((e): e is NavigationEnd => e instanceof NavigationEnd),
+      map((e) => e.urlAfterRedirects.split(/[?#]/)[0] === '/'),
+    ),
+    { initialValue: this.router.url.split(/[?#]/)[0] === '/' },
+  );
   protected readonly theme = inject(MkThemeService);
 
   protected readonly sections: NavSection[] = [

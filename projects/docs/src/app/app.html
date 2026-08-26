@@ -2,7 +2,7 @@
   <!-- Header -->
   <div mkAppHeader class="docs-header">
     <div class="docs-header__left">
-      @if (shell.isMobile()) {
+      @if (shell.isMobile() && !isHome()) {
         <button
           mkButton
           variant="ghost"
@@ -14,7 +14,7 @@
           ☰
         </button>
       }
-      <a class="docs-brand" routerLink="/introduction">
+      <a class="docs-brand" routerLink="/">
         <span class="docs-brand__mark">mk</span>
         <span class="docs-brand__name">mk-kit</span>
       </a>
@@ -67,6 +67,7 @@
         variant="ghost"
         tone="neutral"
         size="sm"
+        class="docs-github"
         href="https://github.com/mkornas/mk-kit"
         target="_blank"
         rel="noopener"
@@ -76,8 +77,8 @@
     </div>
   </div>
 
-  <!-- Sidebar: flat, text-only navigation -->
-  <nav mkAppSidebar class="docs-nav" aria-label="Documentation">
+  <!-- Sidebar: flat, text-only navigation (hidden on the landing page) -->
+  <nav mkAppSidebar class="docs-nav" aria-label="Documentation" [hidden]="isHome()">
     @for (section of sections; track section.title) {
       <div class="docs-nav__group">
         <p class="docs-nav__heading">{{ section.title }}</p>

@@ -117,7 +117,12 @@ export const routes: Routes = [
         (m) => m.ProportionChartsPage,
       ),
   },
-  { path: '', pathMatch: 'full', redirectTo: 'introduction' },
+  {
+    path: '',
+    pathMatch: 'full',
+    title: 'mk-kit — Angular admin component library',
+    loadComponent: () => import('./pages/home/home-page').then((m) => m.HomePage),
+  },
   {
     path: 'introduction',
     title: 'mk-kit — Introduction',
@@ -350,5 +355,5 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/changelog/changelog-page').then((m) => m.ChangelogPage),
   },
-  { path: '**', redirectTo: 'introduction' },
+  { path: '**', redirectTo: '' },
 ];

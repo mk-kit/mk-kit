@@ -22,6 +22,10 @@ body {
   background: var(--mk-bg);
   border-inline-end: var(--mk-border-width) solid var(--mk-border-subtle);
 }
+/* Landing page: no sidebar, the main column spans the full width. */
+.docs-home .mk-app-shell__sidebar {
+  display: none;
+}
 /* Frosted sticky header. */
 .mk-app-shell__header {
   background: color-mix(in srgb, var(--mk-surface) 82%, transparent);

@@ -40,6 +40,7 @@ const ROUTES: ReadonlyArray<{
    */
   viewportOnly?: boolean;
 }> = [
+  { path: '/', slug: 'home' },
   { path: '/getting-started', slug: 'getting-started' },
   { path: '/components/buttons', slug: 'buttons' },
   { path: '/components/forms', slug: 'forms' },
