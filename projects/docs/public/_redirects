@@ -1,0 +1,4 @@
+# Canonical host is mk-kit.dev; every other attached hostname redirects there.
+https://mk-kit.com/* https://mk-kit.dev/:splat 301
+https://www.mk-kit.com/* https://mk-kit.dev/:splat 301
+https://www.mk-kit.dev/* https://mk-kit.dev/:splat 301
