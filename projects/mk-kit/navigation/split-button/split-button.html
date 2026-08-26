@@ -1,0 +1,40 @@
+<button
+  mkButton
+  class="mk-split-button__main"
+  [type]="type()"
+  [variant]="variant()"
+  [tone]="tone()"
+  [size]="size()"
+  [disabled]="disabled()"
+  [loading]="loading()"
+  (click)="onMain()"
+>
+  <ng-content />
+</button>
+<button
+  mkButton
+  class="mk-split-button__toggle"
+  type="button"
+  iconOnly
+  [variant]="variant()"
+  [tone]="tone()"
+  [size]="size()"
+  [disabled]="menuDisabled()"
+  [mkMenuTriggerFor]="menu()"
+  [attr.aria-label]="menuLabel()"
+>
+  <svg
+    class="mk-split-button__chevron"
+    viewBox="0 0 16 16"
+    width="14"
+    height="14"
+    fill="none"
+    stroke="currentColor"
+    stroke-width="1.75"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+    aria-hidden="true"
+  >
+    <path d="M3.5 6 8 10.5 12.5 6" />
+  </svg>
+</button>

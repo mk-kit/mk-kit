@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkButton } from '@mk-kit/ui';
+import { MkButton, MkMenu, MkMenuItem, MkSplitButton } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({
   selector: 'docs-buttons-page',
-  imports: [MkButton, DocsExample],
+  imports: [MkButton, MkSplitButton, MkMenu, MkMenuItem, DocsExample],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -99,6 +99,58 @@ import { DocsExample } from '../../shared/docs-example';
         </div>
       </docs-example>
 
+      <h2>Split button</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-split-button&gt;</code> pairs a primary
+        action with a menu of alternatives. The main segment emits
+        <code class="docs-inline">action</code>; the chevron is a menu button for
+        the <code class="docs-inline">mk-menu</code> passed in
+        <code class="docs-inline">[menu]</code> (ArrowDown / Enter / Space open it
+        and focus the first item, Escape closes). Both segments share
+        <code class="docs-inline">variant</code>, <code class="docs-inline">tone</code>
+        and <code class="docs-inline">size</code>; <code class="docs-inline">loading</code>
+        spins the main segment and disables the chevron.
+      </p>
+      <docs-example [code]="splitCode">
+        <mk-split-button [menu]="saveMenu" tone="primary" [loading]="splitSaving()" (action)="splitSave()">
+          Save
+        </mk-split-button>
+        <mk-menu #saveMenu="mkMenu">
+          <mk-menu-item (action)="splitStatus.set('Saved as…')">Save as…</mk-menu-item>
+          <mk-menu-item (action)="splitStatus.set('Saved as template')">Save as template</mk-menu-item>
+          <mk-menu-item danger (action)="splitStatus.set('Discarded')">Discard changes</mk-menu-item>
+        </mk-menu>
+        <mk-split-button [menu]="exportMenu" variant="outline" tone="neutral" (action)="splitStatus.set('Exported CSV')">
+          Export CSV
+        </mk-split-button>
+        <mk-menu #exportMenu="mkMenu">
+          <mk-menu-item (action)="splitStatus.set('Exported JSON')">JSON</mk-menu-item>
+          <mk-menu-item (action)="splitStatus.set('Exported PDF')">PDF</mk-menu-item>
+        </mk-menu>
+        <mk-split-button [menu]="exportMenu" variant="soft" tone="success" size="sm" (action)="splitStatus.set('Published')">
+          Publish
+        </mk-split-button>
+      </docs-example>
+      <p class="echo" aria-live="polite">{{ splitStatus() }}</p>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>menu</td><td>MkMenu</td><td>required</td><td>The menu the chevron segment opens.</td></tr>
+          <tr><td>variant</td><td>'solid' | 'soft' | 'outline' | 'ghost' | 'link'</td><td>'solid'</td><td>Shared by both segments.</td></tr>
+          <tr><td>tone</td><td>MkTone</td><td>'primary'</td><td>Shared by both segments.</td></tr>
+          <tr><td>size</td><td>'sm' | 'md' | 'lg'</td><td>'md'</td><td>Shared by both segments.</td></tr>
+          <tr><td>disabled</td><td>boolean</td><td>false</td><td>Disable both segments.</td></tr>
+          <tr><td>loading</td><td>boolean</td><td>false</td><td>Spinner on the main segment; chevron disabled meanwhile.</td></tr>
+          <tr><td>fullWidth</td><td>boolean</td><td>false</td><td>Stretch to the container; the main segment grows.</td></tr>
+          <tr><td>type</td><td>'button' | 'submit'</td><td>'button'</td><td>Type of the main segment.</td></tr>
+          <tr><td>menuLabel</td><td>string</td><td>'More actions'</td><td>Accessible name of the chevron segment (i18n <code>moreActions</code>).</td></tr>
+          <tr><td>(action)</td><td>output&lt;void&gt;</td><td>—</td><td>Main segment activated (not while disabled or loading).</td></tr>
+        </tbody>
+      </table>
+
       <h2>API</h2>
       <table class="docs-props">
         <thead>
@@ -134,6 +186,26 @@ export class ButtonsPage {
     this.saving.set(true);
     setTimeout(() => this.saving.set(false), 1600);
   }
+
+  protected readonly splitStatus = signal('Nothing yet.');
+  protected readonly splitSaving = signal(false);
+  protected splitSave(): void {
+    this.splitSaving.set(true);
+    this.splitStatus.set('Saving…');
+    setTimeout(() => {
+      this.splitSaving.set(false);
+      this.splitStatus.set('Saved');
+    }, 900);
+  }
+
+  protected readonly splitCode = `<mk-split-button [menu]="saveMenu" tone="primary" [loading]="saving()" (action)="save()">
+  Save
+</mk-split-button>
+<mk-menu #saveMenu="mkMenu">
+  <mk-menu-item (action)="saveAs()">Save as…</mk-menu-item>
+  <mk-menu-item (action)="saveTemplate()">Save as template</mk-menu-item>
+  <mk-menu-item danger (action)="discard()">Discard changes</mk-menu-item>
+</mk-menu>`;
 
   protected readonly variantsCode = `<button mkButton variant="solid">Solid</button>
 <button mkButton variant="soft">Soft</button>

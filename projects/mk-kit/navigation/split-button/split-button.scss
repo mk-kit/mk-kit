@@ -1,0 +1,58 @@
+:host {
+  display: inline-flex;
+  align-items: stretch;
+  vertical-align: middle;
+  max-width: 100%;
+}
+
+:host(.mk-split-button--block) {
+  display: flex;
+  width: 100%;
+}
+
+/* The two segments read as one control: the shared edge loses its radius and
+   a hairline divider separates them. Selectors go through :host so they beat
+   the button's own :host rules under emulated encapsulation. */
+:host .mk-split-button__main {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+:host(.mk-split-button--block) .mk-split-button__main {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+:host .mk-split-button__toggle {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  /* Divider: currentColor at low alpha works on every tone/variant. */
+  box-shadow: inset 1px 0 0 color-mix(in srgb, currentColor 28%, transparent);
+}
+:host(:dir(rtl)) .mk-split-button__toggle {
+  box-shadow: inset -1px 0 0 color-mix(in srgb, currentColor 28%, transparent);
+}
+/* Outline: the borders overlap instead of doubling up. */
+:host(.mk-split-button--outline) .mk-split-button__toggle {
+  margin-inline-start: calc(-1 * var(--mk-border-width));
+  box-shadow: none;
+}
+
+/* Keep a focus ring on either segment on top of its neighbour. */
+:host .mk-split-button__main:focus-visible,
+:host .mk-split-button__toggle:focus-visible {
+  position: relative;
+  z-index: 1;
+}
+
+.mk-split-button__chevron {
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+:host .mk-split-button__toggle[aria-expanded='true'] .mk-split-button__chevron {
+  transform: rotate(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-split-button__chevron {
+    transition: none;
+  }
+}
