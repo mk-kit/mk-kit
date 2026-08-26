@@ -2,7 +2,7 @@
 
 Monorepo for **[@mk-kit/ui](./projects/mk-kit)** — a themable, accessible
 Angular 22 component library for admin dashboards & UIs — and its documentation
-site.
+site, live at **<https://mk-kit.dev>**.
 
 ```
 projects/
