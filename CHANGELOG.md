@@ -8,6 +8,12 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Draggable / resizable dialogs** — `draggable` and `resizable` inputs on
+  `<mk-dialog>`. The header becomes a move handle (pointer, touch, or arrow
+  keys on the grip beside the title; Shift for bigger steps), a corner grip
+  resizes the same way; double-click the header or press Home on a grip to
+  snap back. The panel is clamped to the viewport and to a usable minimum
+  size; RTL-aware. i18n keys `dialogMove`, `dialogResize`.
 - **Query builder** — new `@mk-kit/ui/query-builder` entry (Wave B):
   `mk-query-builder` assembles rules and nested and / or groups (optional
   *Not*, `maxDepth`) into a plain-JSON `MkQueryGroup` via `[(query)]`; a

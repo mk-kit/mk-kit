@@ -53,6 +53,34 @@ export class DemoDialogContent {
   }
 }
 
+/** Demo: a dialog the user can move and resize. */
+@Component({
+  imports: [MkDialog, MkDialogTitle, MkButton],
+  template: `
+    <mk-dialog draggable resizable>
+      <mk-dialog-title>Report preview</mk-dialog-title>
+      <p>
+        Drag the header (or use the arrow keys on the grip beside the title) to
+        move this dialog; drag the corner grip to resize it. Double-click the
+        header or press Home on either grip to snap it back.
+      </p>
+      <p>
+        The panel is clamped to the viewport, so it can never be pushed off
+        screen, and it keeps a usable minimum size.
+      </p>
+      <div mkDialogFooter>
+        <button mkButton (click)="close()">Done</button>
+      </div>
+    </mk-dialog>
+  `,
+})
+export class MovableDialogContent {
+  private readonly ref = inject(MkOverlayRef);
+  protected close(): void {
+    this.ref.close();
+  }
+}
+
 /**
  * Documentation page for `MkDialogService`: confirm, alert & prompt, and
  * custom component dialogs.
@@ -277,6 +305,24 @@ export class DemoDialogContent {
       </table>
 
       <!-- =================== FOCUS & ACCESSIBILITY ===================== -->
+      <h2>Draggable &amp; resizable</h2>
+      <p>
+        Add <code class="docs-inline">draggable</code> to
+        <code class="docs-inline">&lt;mk-dialog&gt;</code> and its header becomes
+        a handle — drag with a pointer or a finger, or focus the grip beside the
+        title and use the arrow keys (Shift for bigger steps).
+        <code class="docs-inline">resizable</code> adds a corner grip that works
+        the same way. Double-click the header or press Home on a grip to snap
+        back to the centred, preset size. Both stay inside the viewport. Handy
+        for reference panels the user wants to peek behind, and for dialogs
+        showing tables or previews that deserve more room on a big screen.
+      </p>
+      <docs-example [code]="movableCode">
+        <button mkButton variant="outline" (click)="openMovable()">
+          Open draggable dialog…
+        </button>
+      </docs-example>
+
       <h2>Focus &amp; accessibility</h2>
       <p>
         The panel gets <code class="docs-inline">role="dialog"</code> (or
@@ -350,6 +396,18 @@ export class DialogsPage {
     });
     this.confirmResult.set(confirmed);
   }
+
+  protected openMovable(): void {
+    this.dialog.open(MovableDialogContent, { size: 'md' });
+  }
+
+  protected readonly movableCode = `<mk-dialog draggable resizable>
+  <mk-dialog-title>Report preview</mk-dialog-title>
+  …
+</mk-dialog>
+
+// Header drag / arrow keys on the grip move it; corner grip resizes.
+// Double-click the header or press Home on a grip to reset.`;
 
   protected async openCustom(): Promise<void> {
     const ref = this.dialog.open<DemoDialogContent, string>(DemoDialogContent, {

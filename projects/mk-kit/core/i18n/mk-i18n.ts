@@ -547,6 +547,12 @@ export interface MkI18nStrings {
   queryOpEmpty: string;
   queryOpNotEmpty: string;
 
+  // --- Dialog drag / resize ---------------------------------------------------
+  /** Dialog: label of the move grip (arrow keys move, Home resets). */
+  dialogMove: string;
+  /** Dialog: label of the resize grip (arrow keys resize, Home resets). */
+  dialogResize: string;
+
   // --- Event calendar editing --------------------------------------------------
   /** Announced when an event is picked up in keyboard move mode. */
   eventCalendarGrabbed: (title: string, from: string, to: string) => string;
@@ -944,6 +950,9 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   queryOpAfter: 'after',
   queryOpEmpty: 'is empty',
   queryOpNotEmpty: 'is not empty',
+
+  dialogMove: 'Move dialog (arrow keys; Home to reset)',
+  dialogResize: 'Resize dialog (arrow keys; Home to reset)',
 
   eventCalendarGrabbed: (title, from, to) =>
     `${title} grabbed, ${from} – ${to}. Use the arrow keys to move, ` +

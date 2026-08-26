@@ -1,4 +1,28 @@
-<header class="mk-dialog__header">
+<header
+  class="mk-dialog__header"
+  [class.mk-dialog__header--draggable]="draggable()"
+  (pointerdown)="onHeaderPointerDown($event)"
+  (dblclick)="onHeaderDoubleClick($event)"
+>
+  @if (draggable()) {
+    <button
+      type="button"
+      class="mk-dialog__grip"
+      [attr.aria-label]="i18n.dialogMove"
+      [title]="i18n.dialogMove"
+      (pointerdown)="onGripPointerDown($event)"
+      (keydown)="onGripKeydown($event)"
+    >
+      <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+        <circle cx="5.5" cy="3.5" r="1.3" fill="currentColor" />
+        <circle cx="10.5" cy="3.5" r="1.3" fill="currentColor" />
+        <circle cx="5.5" cy="8" r="1.3" fill="currentColor" />
+        <circle cx="10.5" cy="8" r="1.3" fill="currentColor" />
+        <circle cx="5.5" cy="12.5" r="1.3" fill="currentColor" />
+        <circle cx="10.5" cy="12.5" r="1.3" fill="currentColor" />
+      </svg>
+    </button>
+  }
   <div class="mk-dialog__heading">
     <ng-content select="[mkDialogHeader], mk-dialog-title" />
     @if (dialogTitle(); as heading) {
@@ -32,3 +56,18 @@
 <footer class="mk-dialog__footer">
   <ng-content select="[mkDialogFooter]" />
 </footer>
+
+@if (resizable()) {
+  <button
+    type="button"
+    class="mk-dialog__resizer"
+    [attr.aria-label]="i18n.dialogResize"
+    [title]="i18n.dialogResize"
+    (pointerdown)="onResizerPointerDown($event)"
+    (keydown)="onResizerKeydown($event)"
+  >
+    <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+      <path d="M14 8L8 14M14 12l-2 2" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+    </svg>
+  </button>
+}
