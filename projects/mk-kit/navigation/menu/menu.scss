@@ -36,3 +36,18 @@
     animation: none;
   }
 }
+
+/* Submenus open beside their item; no entrance slide so the branch reads as
+   one surface with its parent. */
+.mk-menu__panel--submenu {
+  animation-name: mk-menu-fade;
+}
+
+@keyframes mk-menu-fade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
