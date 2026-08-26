@@ -23,4 +23,5 @@ export * from '@mk-kit/ui/feedback';
 export * from '@mk-kit/ui/rich-text';
 export * from '@mk-kit/ui/block-editor';
 export * from '@mk-kit/ui/context-menu';
+export * from '@mk-kit/ui/layout';
 export * from '@mk-kit/ui/media';

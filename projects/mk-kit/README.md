@@ -96,7 +96,7 @@ import { MkDatePicker } from '@mk-kit/ui/datetime';
 
 Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
 `feedback`, `directives`, `dnd`, `media`, `icon`, `button`, `checkbox`, `chip`,
-`context-menu`, `rich-text`, `block-editor`. `sideEffects: false` throughout.
+`context-menu`, `layout`, `rich-text`, `block-editor`. `sideEffects: false` throughout.
 
 ## Theming
 

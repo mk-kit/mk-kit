@@ -7,6 +7,7 @@ import {
 import { RouterLink } from '@angular/router';
 import {
   MkAlert,
+  MkBreakpointService,
   MkButton,
   MkChip,
   MkHistoryService,
@@ -220,6 +221,39 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
           <tr><td><code>isDark()</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>Convenience boolean for template bindings.</td></tr>
           <tr><td><code>setTheme(preference)</code></td><td><code>method</code></td><td>Set the preference explicitly.</td></tr>
           <tr><td><code>toggle()</code></td><td><code>method</code></td><td>Flip between light and dark (resolving <code>system</code> first).</td></tr>
+        </tbody>
+      </table>
+
+      <!-- ============================================================ -->
+      <h2 id="breakpoints">Breakpoints</h2>
+      <p>
+        <code class="docs-inline">MkBreakpointService</code> turns the viewport
+        into signals: one <code class="docs-inline">matchMedia</code> listener per
+        step of the scale (<code class="docs-inline">sm</code> 640,
+        <code class="docs-inline">md</code> 768,
+        <code class="docs-inline">lg</code> 1024,
+        <code class="docs-inline">xl</code> 1280,
+        <code class="docs-inline">2xl</code> 1536 px; anything narrower is
+        <code class="docs-inline">xs</code>). It is what the
+        <a routerLink="/components/layout">layout primitives</a> use to resolve
+        their per-breakpoint inputs, and <code class="docs-inline">resolve()</code>
+        gives your own code the same mobile-first lookup. Provide
+        <code class="docs-inline">MK_BREAKPOINTS</code> to change the scale; on
+        the server everything reports <code class="docs-inline">xs</code>.
+        Right now: <strong>{{ bp.current() }}</strong>.
+      </p>
+      <pre class="core-code"><code>{{ breakpointCode }}</code></pre>
+      <table class="docs-props">
+        <thead>
+          <tr><th>Member</th><th>Type</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>current()</code></td><td><code>Signal&lt;MkBreakpoint&gt;</code></td><td>The widest breakpoint the viewport satisfies.</td></tr>
+          <tr><td><code>up(bp)</code> / <code>down(bp)</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>At least <code>bp</code> wide / narrower than <code>bp</code>. Cached per name.</td></tr>
+          <tr><td><code>between(from, to)</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>At least <code>from</code> and narrower than <code>to</code>.</td></tr>
+          <tr><td><code>observe(query)</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>Any media query, e.g. <code>'(orientation: portrait)'</code>. Cached per query.</td></tr>
+          <tr><td><code>resolve(value)</code></td><td><code>T | undefined</code></td><td>Pick the entry of a <code>MkResponsive&lt;T&gt;</code> map for the current viewport, mobile-first; plain values pass through. Read inside <code>computed()</code>.</td></tr>
+          <tr><td><code>breakpoints</code></td><td><code>MkBreakpoints</code></td><td>The min-widths in effect.</td></tr>
         </tbody>
       </table>
 
@@ -585,6 +619,22 @@ this.theme.isDark();        // computed boolean
 
 this.theme.setTheme('dark');
 this.theme.toggle();        // flip light <-> dark`;
+
+  protected readonly bp = inject(MkBreakpointService);
+
+  protected readonly breakpointCode = `private readonly bp = inject(MkBreakpointService);
+
+this.bp.current();               // 'xs' | 'sm' | 'md' | 'lg' | 'xl' | '2xl'
+readonly compact = this.bp.down('md');      // Signal<boolean>
+readonly wide = this.bp.up('xl');
+readonly tablet = this.bp.between('md', 'lg');
+readonly portrait = this.bp.observe('(orientation: portrait)');
+
+// Mobile-first map -> value for the current viewport
+readonly columns = computed(() => this.bp.resolve({ xs: 1, md: 2, xl: 4 }));
+
+// Custom scale
+{ provide: MK_BREAKPOINTS, useValue: { sm: 600, md: 900, lg: 1200, xl: 1536, '2xl': 1920 } }`;
 
   protected readonly i18nCode = `bootstrapApplication(App, {
   providers: [

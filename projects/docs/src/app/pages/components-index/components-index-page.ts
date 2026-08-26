@@ -40,6 +40,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
     group: 'Overview',
     items: [
       { name: 'MkThemeService', desc: 'Signal-based light/dark/system theme and density switching.', path: '/core-services' },
+      { name: 'MkBreakpointService', desc: 'Viewport breakpoints as signals: current(), up(), down(), resolve() for responsive values.', path: '/core-services' },
       { name: 'MkLiveAnnouncer', desc: 'Polite/assertive screen-reader announcements via a shared live region.', path: '/core-services' },
       { name: 'MkFocusTrap', desc: 'Keeps Tab cycles inside overlays; used by dialogs, drawers and sheets.', path: '/core-services' },
       { name: 'MkOverlayService', desc: 'Imperative top-layer overlay creation with MkOverlayRef handles.', path: '/core-services' },
@@ -177,6 +178,9 @@ const INDEX: ReadonlyArray<IndexGroup> = [
     group: 'Navigation & layout',
     items: [
       { name: 'mk-app-shell', desc: 'Header + collapsible sidebar application frame.', path: '/components/navigation' },
+      { name: 'mk-stack', desc: 'Children in a row or column with a token gap; responsive direction.', path: '/components/layout' },
+      { name: 'mk-flex', desc: 'Flexbox container with align / justify / wrap inputs; mkFlexItem for children.', path: '/components/layout' },
+      { name: 'mk-grid', desc: 'CSS grid by column count, track list or minimum column width; mkGridItem spans.', path: '/components/layout' },
       { name: 'mk-tabs / mk-tab', desc: 'Tab set with lazy panels and keyboard nav.', path: '/components/navigation' },
       { name: 'mk-accordion / mk-accordion-item', desc: 'Expandable sections, single or multi open.', path: '/components/navigation' },
       { name: 'mk-breadcrumb / mk-breadcrumb-item', desc: 'Hierarchical location trail.', path: '/components/navigation' },

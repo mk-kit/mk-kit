@@ -50,6 +50,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/components/feedback', slug: 'feedback' },
   { path: '/components/navigation', slug: 'navigation' },
   { path: '/components/structure', slug: 'structure' },
+  { path: '/components/layout', slug: 'layout' },
   { path: '/theming', slug: 'theming' },
   { path: '/components/rich-text', slug: 'rich-text' },
   { path: '/components/markdown', slug: 'markdown' },
