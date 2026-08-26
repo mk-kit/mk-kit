@@ -8,6 +8,18 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **CSV export + print stylesheet.** `table.exportCsv()` downloads the table
+  as the user sees it — column order, sort, formatters, tree rows flattened —
+  with `selectedOnly`, `columns`, `filename`, `delimiter` and
+  `download: false` options. Standalone `mkToCsv()` / `mkExportCsv()` /
+  `mkDownloadText()` (`@mk-kit/ui/table`) work on any array: RFC 4180
+  quoting, UTF-8 BOM for Excel, formula-injection neutralised (`=`, `+`,
+  `-`, `@` text cells get a leading `'`; numbers untouched), `childrenKey`
+  flattening. `mk-table` gains `@media print` rules (no scroll box or sticky
+  offsets, controls hidden, header repeats per page, rows kept whole) and the
+  theme adds `.mk-print-hidden` / `.mk-print-only` helpers; `mk-app-shell`
+  prints only its main content (no header, sidebar or viewport-height bands).
+
 - **Icon set grown to 420+ glyphs.** The hand-made 114-icon core is joined
   by a curated, Lucide-derived set (`MK_EXTENDED_ICONS`, ISC — see
   `THIRD_PARTY_NOTICES.md`) covering layouts, files, charts, commerce,

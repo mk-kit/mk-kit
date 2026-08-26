@@ -42,7 +42,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 | ✅ | **Icon set** — ship ~250 tree-shakeable SVG icons via `MkIconRegistry` (today: 35) + documented Lucide/Material adapters; stop using emoji in docs | all | icon registry — shipped, Wave A (420+ icons) | M |
 | P1 | **`mk-chat`** + **`mk-prompt-box`** — message list, streaming text, tool/attachment cards, composer | K S D | virtual scroll, markdown, file-upload, autosize | M |
 | P1 | **`mk-query-builder`** — rule/group tree → JSON, pairs with `MkTableDataSource` filters | K S D | select, inputs, date pickers, repeater | M |
-| P1 | **CSV export + print stylesheet** — `mkExportCsv(rows, columns)`, `@media print` table styles | K S D | table columns | S |
+| ✅ | **CSV export + print stylesheet** — `table.exportCsv()`, `mkToCsv` / `mkExportCsv`, `@media print` table styles (shipped, Wave A) | K S D | table columns | S |
 | P1 | Layout primitives — `mk-stack`, `mk-grid`, `mk-flex` + `MkBreakpointService` | K M Z D S T | app-shell media query | S |
 | P2 | **Draggable / resizable dialog** (`draggable`, `resizable` on `mk-dialog`) | P K S D | dialog, dnd rect-snapshot | S |
 | P2 | `mk-cascader` — multi-level dependent select | P Z | select, anchored panel | M |
