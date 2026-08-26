@@ -91,7 +91,6 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-multi-select', desc: 'Multi-select with removable chips and async options.', path: '/components/selection' },
       { name: 'mk-tag-input', desc: 'Type-and-enter tag entry with suggestions.', path: '/components/selection' },
       { name: 'mk-transfer-list', desc: 'Two-pane picker moving items between lists.', path: '/components/selection' },
-      { name: 'mkBlockUi / MkBlockUiService', desc: 'Overlay a region or the page with a spinner while busy; inert contents, aria-busy.', path: '/components/loading' },
       { name: 'mk-cascader', desc: 'Hierarchical select shown as side-by-side columns; path or leaf value.', path: '/components/selection' },
       { name: 'mk-listbox', desc: 'Always-visible single / multi selection list with groups, filter and full keyboard support.', path: '/components/selection' },
       { name: 'mk-tree-select', desc: 'Hierarchical dropdown selecting tree nodes.', path: '/components/selection' },
@@ -207,6 +206,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
   {
     group: 'Feedback & overlays',
     items: [
+      { name: 'mkBlockUi / MkBlockUiService', desc: 'Overlay a region or the page with a spinner while busy; inert contents, aria-busy.', path: '/components/loading' },
       { name: 'mk-alert', desc: 'Inline callout with tones and dismissal.', path: '/components/feedback' },
       { name: 'mk-banner', desc: 'Full-width page-level announcement.', path: '/components/feedback' },
       { name: 'mk-loading-bar / MkLoadingBarService', desc: 'Top-of-page progress bar driven by a service.', path: '/components/feedback' },
