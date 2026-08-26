@@ -4,7 +4,7 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.36.0] — 2026-08-26
 
 ### Added
 

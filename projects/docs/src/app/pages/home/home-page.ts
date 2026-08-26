@@ -1347,7 +1347,7 @@ export class HomePage {
   private readonly teamForm = viewChild<ElementRef<HTMLElement>>('teamForm');
 
   protected readonly uiVersion = uiVersion;
-  protected readonly total = 167;
+  protected readonly total = 170;
   protected readonly copied = signal(false);
 
   /* Brand-swap: rewrites the primary token family on the host ------------ */
@@ -1447,9 +1447,9 @@ export class HomePage {
     { title: 'Data display', count: 25, blurb: 'Cards, lists, stat cards, badges, tags, chips, avatars, timeline, description lists, tree, empty states, QR, diff, JSON viewer.' },
     { title: 'Editors & interactions', count: 22, blurb: 'Block editor, rich text, markdown, log viewer, drag & drop, sortable list, mentions, hotkeys, masks, permissions.' },
     { title: 'Feedback & overlays', count: 20, blurb: 'Dialogs, sheets, drawers, toasts, snackbars, banners, tooltips, popovers, hovercards, tours, progress, skeletons.' },
-    { title: 'Navigation & layout', count: 18, blurb: 'App shell, nav lists, tabs, stepper, breadcrumbs, pagination, menus with nested submenus, context menu, command palette, splitter.' },
+    { title: 'Navigation & layout', count: 21, blurb: 'App shell, stack / flex / grid layout primitives with breakpoints, nav lists, tabs, stepper, breadcrumbs, pagination, menus with nested submenus, context menu, command palette, splitter.' },
     { title: 'Charts', count: 12, blurb: 'Line, bar, donut, gauge, scatter, radar, funnel, treemap, heatmaps, sparklines — SVG, themed, accessible.' },
-    { title: 'Tables & grids', count: 6, blurb: 'Sortable, selectable, expandable, groupable, resizable, editable data table with a server-side data source.' },
+    { title: 'Tables & grids', count: 6, blurb: 'Sortable, selectable, expandable, groupable, tree-row, resizable, editable data table with CSV export, print styles and a server-side data source.' },
     { title: 'Media', count: 6, blurb: 'Images, galleries, lightbox, carousel, cropper, media manager.' },
   ];
 
@@ -1555,6 +1555,6 @@ export class HomePage {
     { q: 'Which Angular versions are supported?', a: 'mk-kit targets the current Angular major (22). Each new Angular major gets a matching mk-kit release within weeks; the previous major keeps receiving fixes for six months.' },
     { q: 'How does it compare to Angular Material or PrimeNG?', a: 'Material is a design language with a smaller admin surface. PrimeNG is a huge general-purpose suite that is now commercial for most companies. mk-kit is narrower on purpose: built for admin panels and internal tools, themed with plain CSS variables, and written for signals and standalone components from day one.' },
     { q: 'Does it work with SSR and zoneless?', a: 'Yes. Every component is guarded against non-browser platforms (there is an SSR smoke suite), and nothing depends on Zone.js.' },
-    { q: 'Can I use my own icons, fonts and design tokens?', a: 'Icons are projected content, so use any icon set. Fonts, radii, spacing, shadows and colours are all --mk-* custom properties you can override globally or per subtree — the swatches at the top of this page do exactly that.' },
+    { q: 'Can I use my own icons, fonts and design tokens?', a: '426 stroke icons ship built in, and <mk-icon> also renders any projected SVG, so bring your own set if you prefer. Fonts, radii, spacing, shadows and colours are all --mk-* custom properties you can override globally or per subtree — the swatches at the top of this page do exactly that.' },
   ];
 }
