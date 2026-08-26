@@ -5,6 +5,8 @@ import {
   type MkAutocompleteOption,
   MkButtonToggle,
   MkButtonToggleGroup,
+  MkCascader,
+  type MkCascaderOption,
   MkFormField,
   MkInput,
   MkListbox,
@@ -47,6 +49,7 @@ interface Framework {
     MkTagInput,
     MkTransferList,
     MkListbox,
+    MkCascader,
     MkTreeSelect,
   ],
   styles: `
@@ -377,6 +380,55 @@ interface Framework {
       <!-- ============================================================ -->
       <!-- BUTTON TOGGLE -->
       <!-- ============================================================ -->
+      <h2>Cascader</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-cascader&gt;</code> is a select for a
+        hierarchy — region → country → city, category → subcategory — shown as
+        side-by-side columns instead of a deep tree. Each pick opens the next
+        column and a leaf commits the whole path, which is what the model holds
+        (<code class="docs-inline">['eu', 'pl', 'krk']</code>);
+        <code class="docs-inline">valueMode="leaf"</code> binds only the last
+        value. <code class="docs-inline">selectParents</code> lets a parent be
+        chosen on its own and <code class="docs-inline">expandTrigger="hover"</code>
+        opens columns as the pointer moves. On narrow screens the columns stack.
+      </p>
+      <docs-example [code]="cascaderCode" column>
+        <div style="max-width: 24rem; width: 100%;">
+          <mk-cascader [options]="regions" [(value)]="location" clearable placeholder="Choose a location…" />
+          <p class="echo">Location: <code class="docs-inline">{{ locationText() }}</code></p>
+        </div>
+      </docs-example>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Input / Output</th><th>Type</th><th>Default</th><th>Description</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>options</code></td><td><code>MkCascaderOption[]</code></td><td><code>[]</code></td><td>Hierarchy: <code>label</code>, <code>value</code>, optional <code>children</code>, <code>disabled</code>.</td></tr>
+          <tr><td><code>value</code></td><td><code>model&lt;unknown&gt;</code></td><td><code>null</code></td><td>Two-way: the path of values, or the leaf value in <code>leaf</code> mode.</td></tr>
+          <tr><td><code>valueMode</code></td><td><code>'path' | 'leaf'</code></td><td><code>'path'</code></td><td>What the model holds.</td></tr>
+          <tr><td><code>selectParents</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Allow committing a parent (its children stay reachable).</td></tr>
+          <tr><td><code>expandTrigger</code></td><td><code>'click' | 'hover'</code></td><td><code>'click'</code></td><td>Also open the next column on pointer hover.</td></tr>
+          <tr><td><code>separator</code></td><td><code>string</code></td><td><code>' / '</code></td><td>Between path labels in the trigger.</td></tr>
+          <tr><td><code>placeholder</code> / <code>clearable</code></td><td><code>string</code> / <code>boolean</code></td><td>—</td><td>Empty text; reset button when a value is set.</td></tr>
+          <tr><td><code>size</code></td><td><code>'sm' | 'md' | 'lg'</code></td><td><code>'md'</code></td><td>Control size (ignored inside <code>mk-form-field</code>).</td></tr>
+          <tr><td><code>disabled</code> / <code>invalid</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable the control / force invalid styling standalone.</td></tr>
+          <tr><td><code>(change)</code></td><td><code>unknown</code></td><td>—</td><td>The new value after the user commits or clears.</td></tr>
+        </tbody>
+      </table>
+
+      <h3>Keyboard</h3>
+      <table class="docs-props">
+        <thead><tr><th>Key</th><th>Action</th></tr></thead>
+        <tbody>
+          <tr><td><kbd>↓</kbd> / <kbd>↑</kbd></td><td>On the trigger: open. In the panel: move within the column (wrapping, skipping disabled).</td></tr>
+          <tr><td><kbd>→</kbd> / <kbd>←</kbd></td><td>Open the highlighted option's children / go back a column.</td></tr>
+          <tr><td><kbd>Enter</kbd> / <kbd>Space</kbd></td><td>Commit a leaf (or a parent with <code>selectParents</code>); on a parent otherwise, open its children.</td></tr>
+          <tr><td><kbd>Home</kbd> / <kbd>End</kbd>, typing</td><td>Jump within the column; typeahead by label.</td></tr>
+          <tr><td><kbd>Esc</kbd></td><td>Close and return focus to the trigger.</td></tr>
+        </tbody>
+      </table>
+
       <h2>Listbox</h2>
       <p>
         <code class="docs-inline">&lt;mk-listbox&gt;</code> is a selection list
@@ -799,6 +851,46 @@ assigned = signal<unknown[]>(['editor', 'reviewer']);
   [(value)]="category"
   clearable
   placeholder="Choose a category…" />`;
+
+  protected readonly regions: MkCascaderOption[] = [
+    {
+      label: 'Europe',
+      value: 'eu',
+      children: [
+        { label: 'Poland', value: 'pl', children: [{ label: 'Kraków', value: 'krk' }, { label: 'Warsaw', value: 'waw' }, { label: 'Gdańsk', value: 'gdn' }] },
+        { label: 'Germany', value: 'de', children: [{ label: 'Berlin', value: 'ber' }, { label: 'Munich', value: 'muc' }] },
+        { label: 'Spain', value: 'es', children: [{ label: 'Madrid', value: 'mad' }, { label: 'Barcelona', value: 'bcn' }] },
+      ],
+    },
+    {
+      label: 'North America',
+      value: 'na',
+      children: [
+        { label: 'United States', value: 'us', children: [{ label: 'New York', value: 'nyc' }, { label: 'San Francisco', value: 'sfo' }] },
+        { label: 'Canada', value: 'ca', children: [{ label: 'Toronto', value: 'yyz' }] },
+      ],
+    },
+    { label: 'Asia', value: 'asia', disabled: true },
+    { label: 'Remote', value: 'remote' },
+  ];
+  protected readonly location = signal<unknown>(['eu', 'pl', 'krk']);
+  protected readonly locationText = computed(() => {
+    const v = this.location();
+    return Array.isArray(v) ? v.join(' → ') : v == null ? '—' : String(v);
+  });
+
+  protected readonly cascaderCode = `<mk-cascader [options]="regions" [(value)]="location" clearable placeholder="Choose a location…" />
+
+regions: MkCascaderOption[] = [
+  { label: 'Europe', value: 'eu', children: [
+    { label: 'Poland', value: 'pl', children: [{ label: 'Kraków', value: 'krk' }, { label: 'Warsaw', value: 'waw' }] },
+    { label: 'Germany', value: 'de', children: [{ label: 'Berlin', value: 'ber' }] },
+  ] },
+  { label: 'Remote', value: 'remote' },
+];
+location = signal<unknown>(['eu', 'pl', 'krk']);   // the path — or the leaf with valueMode="leaf"
+
+<mk-cascader [options]="categories" [(ngModel)]="category" valueMode="leaf" selectParents expandTrigger="hover" />`;
 
   protected readonly plans: MkListboxOption[] = [
     { label: 'Starter', value: 'starter', description: 'Up to 3 seats', group: 'Free' },

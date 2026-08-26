@@ -10,6 +10,7 @@ export * from './submit-input';
 export * from './i18n-input';
 export * from './select';
 export * from './listbox';
+export * from './cascader';
 export * from './autocomplete';
 export * from './mention';
 export * from './multi-select';
