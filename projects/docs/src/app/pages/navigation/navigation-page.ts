@@ -22,7 +22,7 @@ import {
   MkPagination,
   MkTab,
   MkTabs,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({

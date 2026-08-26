@@ -4,7 +4,7 @@
  * default to English but accept an optional {@link MkDateNames} table (from
  * `MK_I18N`) for localisation. Dates are treated in the local time zone.
  */
-import type { MkDateNames } from '@mkornas/ui/core';
+import type { MkDateNames } from '@mk-kit/ui/core';
 
 /** English full month names, January (index 0) → December (index 11). */
 const MONTH_NAMES = [

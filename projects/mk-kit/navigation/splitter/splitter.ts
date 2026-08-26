@@ -9,7 +9,7 @@ import {
   model,
   numberAttribute,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Split direction for {@link MkSplitter}. */
 export type MkSplitterOrientation = 'horizontal' | 'vertical';

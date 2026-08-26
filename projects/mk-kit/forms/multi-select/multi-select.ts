@@ -23,13 +23,13 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
-import { MkAnchoredPanel } from '@mkornas/ui/core';
-import { MkChip } from '@mkornas/ui/chip';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { MkChip } from '@mk-kit/ui/chip';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single selectable option for {@link MkMultiSelect}. */

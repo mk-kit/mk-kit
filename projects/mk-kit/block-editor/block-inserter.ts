@@ -14,8 +14,8 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import type { MkBlockDefinition } from './block-registry';
 
 /** A definition annotated with its index in the flat filtered list. */

@@ -6,9 +6,9 @@ import {
   output,
   viewChild,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import type { MkPlacement, MkTone } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
+import { MK_I18N } from '@mk-kit/ui/core';
+import type { MkPlacement, MkTone } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
 import { MkPopover } from './popover';
 
 /**

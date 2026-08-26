@@ -12,9 +12,9 @@ import {
   numberAttribute,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkDrag, MkDropList, mkMoveItemInArray } from '@mkornas/ui/dnd';
-import type { MkDropEvent } from '@mkornas/ui/dnd';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkDrag, MkDropList, mkMoveItemInArray } from '@mk-kit/ui/dnd';
+import type { MkDropEvent } from '@mk-kit/ui/dnd';
 
 /** A single asset displayed as a tile in {@link MkMediaGallery}. */
 export interface MkMediaItem {

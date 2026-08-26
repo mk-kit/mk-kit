@@ -2,8 +2,8 @@ import { Injectable, Type, inject } from '@angular/core';
 import {
   MkOverlayConfig,
   MkOverlayService,
-} from '@mkornas/ui/core';
-import { MkOverlayRef } from '@mkornas/ui/core';
+} from '@mk-kit/ui/core';
+import { MkOverlayRef } from '@mk-kit/ui/core';
 
 /** Configuration for `MkBottomSheetService.open`. Extends the overlay config. */
 export interface MkBottomSheetConfig<TData = unknown>

@@ -8,7 +8,7 @@ import {
   numberAttribute,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import { MkImage, type MkImageRounded } from '../image/image';
 import {
   MkLightboxService,

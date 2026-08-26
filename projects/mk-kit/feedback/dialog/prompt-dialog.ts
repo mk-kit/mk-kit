@@ -8,11 +8,11 @@ import {
   viewChild,
   ElementRef,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MK_OVERLAY_DATA, MkOverlayRef } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
-import { MkInput } from '@mkornas/ui/forms';
-import { MkFormField } from '@mkornas/ui/forms';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MK_OVERLAY_DATA, MkOverlayRef } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
+import { MkInput } from '@mk-kit/ui/forms';
+import { MkFormField } from '@mk-kit/ui/forms';
 import { MkDialog } from './dialog';
 
 /** Data contract for {@link MkPromptDialog} / `MkDialogService.prompt`. */

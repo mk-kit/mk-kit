@@ -7,7 +7,7 @@ import {
   output,
   inject,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Semantic tones supported by {@link MkAlert}. */
 export type MkAlertTone = 'info' | 'success' | 'warning' | 'danger' | 'neutral';

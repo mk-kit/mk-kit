@@ -1,6 +1,6 @@
 import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkAutocomplete, type MkAutocompleteOption } from './autocomplete';
 
 const OPTIONS: MkAutocompleteOption[] = [

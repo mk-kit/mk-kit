@@ -18,9 +18,9 @@ import {
   ValidatorFn,
   type Validator,
 } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { MK_I18N, mkUniqueId, mkValidatorChange } from '@mkornas/ui/core';
-import { mkApplyMask, mkMaskCaret } from '@mkornas/ui/directives';
+import type { MkSize } from '@mk-kit/ui/core';
+import { MK_I18N, mkUniqueId, mkValidatorChange } from '@mk-kit/ui/core';
+import { mkApplyMask, mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 
 /**

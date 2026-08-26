@@ -1,6 +1,6 @@
-# Migrating from Angular Material to @mkornas/ui
+# Migrating from Angular Material to @mk-kit/ui
 
-A practical guide for moving an Angular Material (M3) app onto `@mkornas/ui`
+A practical guide for moving an Angular Material (M3) app onto `@mk-kit/ui`
 (mk-kit). It is written against a real migration target — an admin app using
 ~30 Material modules — so every mapping below is one you will actually hit.
 
@@ -15,13 +15,13 @@ dialogs, tables, form fields and theming.
 ## 1. Coexistence: migrate incrementally
 
 - Selectors never clash (`mat-*`/`mdc-*` vs `mk-*`/`mkButton`), and theming
-  is separate (`--mat-sys-*` vs `--mk-*`). Install `@mkornas/ui` next to
+  is separate (`--mat-sys-*` vs `--mk-*`). Install `@mk-kit/ui` next to
   Material and convert one route/feature at a time.
 - mk-kit is signals-first (`input()`/`model()`/`output()`), zoneless-ready and
   NgModule-free. Every form control implements `ControlValueAccessor`, so
   your `formControlName`/`[(ngModel)]` bindings carry over unchanged.
-- Import from the group entry points (`@mkornas/ui/forms`, `/feedback`,
-  `/table`, …) or the root `@mkornas/ui` barrel.
+- Import from the group entry points (`@mk-kit/ui/forms`, `/feedback`,
+  `/table`, …) or the root `@mk-kit/ui` barrel.
 
 ## 2. Theming: `--mat-sys-*` → `--mk-*`
 
@@ -29,7 +29,7 @@ mk-kit is themed by plain CSS custom properties — no Sass API, no
 `mat.theme()`. Import the stylesheet and override tokens:
 
 ```scss
-@import '@mkornas/ui/styles.css';
+@import '@mk-kit/ui/styles.css';
 
 :root {
   --mk-primary: #f4511e;          /* your mat.$orange-palette seed */
@@ -82,9 +82,9 @@ cases the token you were fighting for is a first-class `--mk-*` token
 | `MatStepper` | `MkStepper` + `MkStep` | |
 | `MatChips` | `MkChip` (display) / `MkTagInput` (editable set) | |
 | CDK `Overlay` | `MkOverlayService` / `MkAnchoredPanel` | |
-| CDK `DragDrop` | `@mkornas/ui/dnd` (`MkDropList`/`MkDrag`, `mkMoveItemInArray`) | keyboard drag built in |
+| CDK `DragDrop` | `@mk-kit/ui/dnd` (`MkDropList`/`MkDrag`, `mkMoveItemInArray`) | keyboard drag built in |
 | CDK `Clipboard` | `mkCopyToClipboard` directive | |
-| CDK `A11y` (FocusTrap, LiveAnnouncer) | `MkFocusTrap`, `MkLiveAnnouncer` (`@mkornas/ui/core`) | |
+| CDK `A11y` (FocusTrap, LiveAnnouncer) | `MkFocusTrap`, `MkLiveAnnouncer` (`@mk-kit/ui/core`) | |
 | CDK `ScrollingModule` (virtual) | `MkVirtualScroll` | |
 
 Beyond parity, mk-kit adds things Material doesn't have — command palette,
@@ -132,8 +132,8 @@ ref.afterClosed().subscribe(result => …);
 // inside: data = inject(MAT_DIALOG_DATA); ref = inject(MatDialogRef);
 
 // after
-import { MkDialogService } from '@mkornas/ui';
-import { MK_OVERLAY_DATA, MkOverlayRef } from '@mkornas/ui/core';
+import { MkDialogService } from '@mk-kit/ui';
+import { MK_OVERLAY_DATA, MkOverlayRef } from '@mk-kit/ui/core';
 const ref = this.dialog.open(EditUserDialog, { data: user });
 const result = await ref.afterClosed;  // Promise, not Observable
 // inside: data = inject(MK_OVERLAY_DATA); ref = inject(MkOverlayRef); ref.close(result);

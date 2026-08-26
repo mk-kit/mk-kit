@@ -21,10 +21,10 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** A `[low, high]` value pair. */
 export type MkRange = [number, number];

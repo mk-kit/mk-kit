@@ -5,11 +5,11 @@ import {
   MkNumericKeypad,
   MkOnScreenKeyboard,
   MkOnScreenKeyboardTrigger,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the touch key surfaces of `@mkornas/ui`:
+ * Documentation + live demo page for the touch key surfaces of `@mk-kit/ui`:
  * the numeric keypad and the on-screen keyboard (kiosk / POS screens).
  */
 @Component({

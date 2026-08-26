@@ -1,7 +1,7 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MkCodeEditor, MkCodeValidity } from './code-editor';
-import { mkHighlightJson } from '@mkornas/ui/core';
+import { mkHighlightJson } from '@mk-kit/ui/core';
 // Not exported from the core barrel (name collides with the block-editor's).
 import { mkEscapeHtml } from '../../core/highlight/code-highlight';
 

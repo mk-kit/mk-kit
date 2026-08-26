@@ -1,6 +1,6 @@
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkTagInput } from './tag-input';
 
 describe('MkTagInput', () => {

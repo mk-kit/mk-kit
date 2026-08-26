@@ -1,5 +1,5 @@
 /**
- * RICH TEXT entry for @mkornas/ui.
+ * RICH TEXT entry for @mk-kit/ui.
  *
  * A small WYSIWYG form control (`<mk-rich-text>`) over a sanitised HTML
  * string, plus the low-level contenteditable engine and the allow-list

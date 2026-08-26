@@ -16,11 +16,11 @@ import {
   viewChildren,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkButton } from '@mkornas/ui/button';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single transferable item for {@link MkTransferList}. */

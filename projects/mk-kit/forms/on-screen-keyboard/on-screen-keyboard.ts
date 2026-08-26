@@ -9,9 +9,9 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import type { MkPlacement } from '@mkornas/ui/core';
-import { MK_I18N, MkAnchoredPanel, mkUniqueId } from '@mkornas/ui/core';
-import { MkIcon } from '@mkornas/ui/icon';
+import type { MkPlacement } from '@mk-kit/ui/core';
+import { MK_I18N, MkAnchoredPanel, mkUniqueId } from '@mk-kit/ui/core';
+import { MkIcon } from '@mk-kit/ui/icon';
 import {
   MK_KEYBOARD_LAYOUT_QWERTY_PL,
   type MkKeyboardActionKey,

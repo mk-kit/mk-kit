@@ -6,7 +6,7 @@ import {
   input,
   model,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkAccordion } from './accordion';
 
 /**

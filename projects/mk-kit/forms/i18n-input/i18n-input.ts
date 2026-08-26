@@ -15,7 +15,7 @@ import {
 } from '@angular/forms';
 import { MkButtonToggle, MkButtonToggleGroup } from '../button-toggle';
 import { MkInput } from '../input';
-import { MkSize } from '@mkornas/ui/core';
+import { MkSize } from '@mk-kit/ui/core';
 
 /** One translatable locale offered by {@link MkI18nInput}. */
 export interface MkI18nLocale {

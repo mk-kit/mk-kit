@@ -7,7 +7,7 @@ import {
   inject,
   input,
 } from '@angular/core';
-import type { MkSize, MkTone, MkVariant } from '@mkornas/ui/core';
+import type { MkSize, MkTone, MkVariant } from '@mk-kit/ui/core';
 
 /**
  * Button — enhances a native `<button>` or `<a>` so semantics and keyboard

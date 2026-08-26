@@ -5,7 +5,7 @@ import {
   signal,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MkInput } from '@mkornas/ui';
+import { MkInput } from '@mk-kit/ui';
 
 interface IndexItem {
   /** Selector / class name as consumers know it (mk-xxx, mkXxx, MkXxxService). */
@@ -24,7 +24,7 @@ interface IndexGroup {
 }
 
 /**
- * Every public component, directive and service of `@mkornas/ui`, grouped the
+ * Every public component, directive and service of `@mk-kit/ui`, grouped the
  * same way as the sidebar nav, each card linking to the docs page where it is
  * demonstrated. Built from the library's entry-point barrels
  * (`projects/mk-kit/<entry>/index.ts`) cross-referenced with the docs pages.
@@ -263,7 +263,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       <h1>Component index</h1>
       <p class="docs-lead">
         Every component, directive and service in
-        <strong>&#64;mkornas/ui</strong> — {{ total }} entries — and the docs
+        <strong>&#64;mk-kit/ui</strong> — {{ total }} entries — and the docs
         page where each one lives. Type to filter.
       </p>
 

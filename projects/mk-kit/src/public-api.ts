@@ -1,26 +1,26 @@
 /*
- * Public API Surface of @mkornas/ui.
+ * Public API Surface of @mk-kit/ui.
  *
  * The library ships Material-style secondary entry points — import from the
- * group entries (`@mkornas/ui/forms`, `@mkornas/ui/table`, …) so a code-split
+ * group entries (`@mk-kit/ui/forms`, `@mk-kit/ui/table`, …) so a code-split
  * app only carries the groups each chunk uses. This root entry re-exports
  * everything for convenience; importing it eagerly pulls all groups into the
  * importing chunk.
  */
-export * from '@mkornas/ui/core';
-export * from '@mkornas/ui/icon';
-export * from '@mkornas/ui/chip';
-export * from '@mkornas/ui/checkbox';
-export * from '@mkornas/ui/button';
-export * from '@mkornas/ui/directives';
-export * from '@mkornas/ui/dnd';
-export * from '@mkornas/ui/navigation';
-export * from '@mkornas/ui/forms';
-export * from '@mkornas/ui/datetime';
-export * from '@mkornas/ui/table';
-export * from '@mkornas/ui/data';
-export * from '@mkornas/ui/feedback';
-export * from '@mkornas/ui/rich-text';
-export * from '@mkornas/ui/block-editor';
-export * from '@mkornas/ui/context-menu';
-export * from '@mkornas/ui/media';
+export * from '@mk-kit/ui/core';
+export * from '@mk-kit/ui/icon';
+export * from '@mk-kit/ui/chip';
+export * from '@mk-kit/ui/checkbox';
+export * from '@mk-kit/ui/button';
+export * from '@mk-kit/ui/directives';
+export * from '@mk-kit/ui/dnd';
+export * from '@mk-kit/ui/navigation';
+export * from '@mk-kit/ui/forms';
+export * from '@mk-kit/ui/datetime';
+export * from '@mk-kit/ui/table';
+export * from '@mk-kit/ui/data';
+export * from '@mk-kit/ui/feedback';
+export * from '@mk-kit/ui/rich-text';
+export * from '@mk-kit/ui/block-editor';
+export * from '@mk-kit/ui/context-menu';
+export * from '@mk-kit/ui/media';

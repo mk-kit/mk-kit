@@ -2,7 +2,7 @@
   "$schema": "../../../node_modules/@angular-devkit/schematics/collection-schema.json",
   "schematics": {
     "ng-add": {
-      "description": "Adds @mkornas/ui to an application: wires the theme stylesheet into angular.json and optionally scaffolds a provideMkI18n override block.",
+      "description": "Adds @mk-kit/ui to an application: wires the theme stylesheet into angular.json and optionally scaffolds a provideMkI18n override block.",
       "factory": "./ng-add/index#ngAdd",
       "schema": "./ng-add/schema.json"
     }

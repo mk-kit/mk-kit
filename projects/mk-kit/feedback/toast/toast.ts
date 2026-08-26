@@ -5,8 +5,8 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { MkButton } from '@mkornas/ui/button';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MkButton } from '@mk-kit/ui/button';
+import { MK_I18N } from '@mk-kit/ui/core';
 import { MkToastItem, MkToastService } from './toast.service';
 
 /**

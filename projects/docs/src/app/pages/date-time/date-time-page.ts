@@ -15,11 +15,11 @@ import {
   formatDate,
   getISOWeek,
   startOfWeek,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the DATE & TIME components of `@mkornas/ui`:
+ * Documentation + live demo page for the DATE & TIME components of `@mk-kit/ui`:
  * Calendar, DatePicker, TimePicker and DateRangePicker. Every control is
  * signal-driven and implements a two-way `value` model (the pickers are also
  * `ControlValueAccessor`s, so they work with `[(ngModel)]` and reactive forms).
@@ -683,7 +683,7 @@ inThirtyDays = new Date(this.today.getTime() + 30 * 864e5);
     'ddd, MMM d',
   );
 
-  protected readonly dateHelpersCode = `import { formatDate, startOfWeek, getISOWeek } from '@mkornas/ui';
+  protected readonly dateHelpersCode = `import { formatDate, startOfWeek, getISOWeek } from '@mk-kit/ui';
 
 const monday = startOfWeek(new Date(), 1);          // week starts Monday
 const label = formatDate(monday, 'ddd, MMM d');     // e.g. 'Mon, Aug 3'

@@ -1,5 +1,5 @@
 import { ElementRef, Injectable, type Signal, computed, inject, signal } from '@angular/core';
-import { MK_I18N, MkLiveAnnouncer } from '@mkornas/ui/core';
+import { MK_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
 import type { MkBlockDefinition, MkBlockUploadHandler, MkEmbedProvider } from './block-registry';
 
 /**

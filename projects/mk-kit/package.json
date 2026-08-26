@@ -1,8 +1,8 @@
 {
-  "name": "@mkornas/ui",
-  "version": "0.33.0",
+  "name": "@mk-kit/ui",
+  "version": "0.34.0",
   "publishConfig": {
-    "registry": "https://npm.pkg.github.com"
+    "access": "public"
   },
   "description": "Themable, accessible Angular 22 component library for admin dashboards and UIs. Signals-based, WCAG 2.1 AA, controlled entirely through CSS variables with light/dark out of the box.",
   "keywords": [
@@ -21,15 +21,15 @@
     "css-variables",
     "themable"
   ],
-  "author": "Mateusz Korna\u015b",
+  "author": "Mateusz Kornaś",
   "license": "MIT",
-  "homepage": "https://github.com/mkornas/mk-kit#readme",
+  "homepage": "https://github.com/mk-kit/mk-kit#readme",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/mkornas/mk-kit.git"
+    "url": "git+https://github.com/mk-kit/mk-kit.git"
   },
   "bugs": {
-    "url": "https://github.com/mkornas/mk-kit/issues"
+    "url": "https://github.com/mk-kit/mk-kit/issues"
   },
   "peerDependencies": {
     "@angular/common": "^22.0.0",

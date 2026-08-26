@@ -16,7 +16,7 @@ import {
   viewChildren,
 } from '@angular/core';
 import { MkStep } from './step';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** Orientation of the step header rail. */
 export type MkStepperOrientation = 'horizontal' | 'vertical';

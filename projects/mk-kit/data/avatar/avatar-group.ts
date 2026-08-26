@@ -8,7 +8,7 @@ import {
   input,
   numberAttribute,
 } from '@angular/core';
-import type { MkSize } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
 import { MkAvatar } from './avatar';
 
 /**

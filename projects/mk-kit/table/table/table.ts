@@ -20,10 +20,10 @@ import {
   viewChild,
 } from '@angular/core';
 import { DOCUMENT, NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
-import { MkLiveAnnouncer } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MkCheckbox } from '@mkornas/ui/checkbox';
+import { MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MkCheckbox } from '@mk-kit/ui/checkbox';
 import { MkTableRowDetail } from './table-row-detail';
 import { MkTableCell } from './table-cell';
 

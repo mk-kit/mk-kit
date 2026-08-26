@@ -1,5 +1,5 @@
 import { Injectable, inject } from '@angular/core';
-import { MK_I18N, MkOverlayService } from '@mkornas/ui/core';
+import { MK_I18N, MkOverlayService } from '@mk-kit/ui/core';
 import { MkLightbox } from './lightbox';
 
 /** A single image shown by {@link MkLightboxService}. */

@@ -1,5 +1,5 @@
 /**
- * `ng add @mkornas/ui`
+ * `ng add @mk-kit/ui`
  *
  * - Adds the packaged theme stylesheet to the target application's `styles`
  *   in angular.json (physical path — exports maps don't apply there).
@@ -23,13 +23,13 @@ import type { Schema } from './schema';
 
 /**
  * Physical path of the compiled theme inside the published package. The
- * package.json exports map aliases it as `@mkornas/ui/styles.css`, but
+ * package.json exports map aliases it as `@mk-kit/ui/styles.css`, but
  * angular.json `styles` entries resolve plain file paths, not export
  * conditions, so the real location is used here.
  */
-const THEME_STYLE_PATH = 'node_modules/@mkornas/ui/styles/mk-kit.css';
+const THEME_STYLE_PATH = 'node_modules/@mk-kit/ui/styles/mk-kit.css';
 
-const DOCS_URL = 'https://github.com/mkornas/mk-kit#readme';
+const DOCS_URL = 'https://github.com/mk-kit/mk-kit#readme';
 
 /** Entry point referenced from collection.json (`./ng-add/index#ngAdd`). */
 export function ngAdd(options: Schema): Rule {
@@ -69,7 +69,7 @@ async function resolveProjectName(tree: Tree, requested: string | undefined): Pr
 
   throw new SchematicsException(
     'No application project found in the workspace. ' +
-      'Pass one explicitly: ng add @mkornas/ui --project <name>.',
+      'Pass one explicitly: ng add @mk-kit/ui --project <name>.',
   );
 }
 
@@ -88,7 +88,7 @@ function addThemeStyles(projectName: string): Rule {
     const buildTarget = project.targets.get('build');
     if (!buildTarget) {
       throw new SchematicsException(
-        `Project "${projectName}" has no "build" target; cannot add the @mkornas/ui theme ` +
+        `Project "${projectName}" has no "build" target; cannot add the @mk-kit/ui theme ` +
           `stylesheet. Add "${THEME_STYLE_PATH}" to your styles manually.`,
       );
     }
@@ -117,7 +117,7 @@ function addI18nProvider(projectName: string): Rule {
   return async (tree: Tree, context: SchematicContext) => {
     const rule = addRootProvider(
       projectName,
-      ({ code, external }) => code`${external('provideMkI18n', '@mkornas/ui/core')}({})`,
+      ({ code, external }) => code`${external('provideMkI18n', '@mk-kit/ui/core')}({})`,
     );
 
     try {
@@ -127,7 +127,7 @@ function addI18nProvider(projectName: string): Rule {
         'Could not set up provideMkI18n automatically (the application config does not match ' +
           'the standard standalone shape). To localise the built-in strings, add it manually:',
       );
-      context.logger.warn(`  import { provideMkI18n } from '@mkornas/ui/core';`);
+      context.logger.warn(`  import { provideMkI18n } from '@mk-kit/ui/core';`);
       context.logger.warn('  providers: [provideMkI18n({})]');
       return tree;
     }
@@ -138,10 +138,10 @@ function addI18nProvider(projectName: string): Rule {
 function logGettingStarted(): Rule {
   return (_tree: Tree, context: SchematicContext) => {
     context.logger.info('');
-    context.logger.info('@mkornas/ui has been set up.');
+    context.logger.info('@mk-kit/ui has been set up.');
     context.logger.info(`  - Theme stylesheet wired into angular.json (${THEME_STYLE_PATH}).`);
     context.logger.info(
-      "  - Scaffold a dashboard layout with MkAppShell: import { MkAppShell } from '@mkornas/ui/navigation';",
+      "  - Scaffold a dashboard layout with MkAppShell: import { MkAppShell } from '@mk-kit/ui/navigation';",
     );
     context.logger.info(`  - Docs and examples: ${DOCS_URL}`);
   };

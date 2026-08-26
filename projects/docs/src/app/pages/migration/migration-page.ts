@@ -37,7 +37,7 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td>MatDatepicker / MatTimepicker</td><td>mk-date-picker / mk-time-picker</td><td>native Date, no adapters; locale via provideMkI18n</td></tr>
           <tr><td>MatMenu / Tabs / Stepper / Chips</td><td>mk-menu / mk-tabs / mk-stepper / mk-chip · mk-tag-input</td><td></td></tr>
           <tr><td>MatCard / Divider / List / ProgressBar / Spinner / Tooltip / Badge / ButtonToggle / BottomSheet</td><td>mk-card / mk-divider / mk-list / mk-progress-bar / mk-spinner / [mkTooltip] / mk-badge / mk-button-toggle-group / MkBottomSheetService</td><td>matBadge attribute → mk-badge element</td></tr>
-          <tr><td>CDK Overlay / DragDrop / Clipboard / A11y / VirtualScroll</td><td>MkOverlayService · MkAnchoredPanel / &#64;mkornas/ui/dnd / mkCopyToClipboard / MkFocusTrap · MkLiveAnnouncer / mk-virtual-scroll</td><td>keyboard drag built in</td></tr>
+          <tr><td>CDK Overlay / DragDrop / Clipboard / A11y / VirtualScroll</td><td>MkOverlayService · MkAnchoredPanel / &#64;mk-kit/ui/dnd / mkCopyToClipboard / MkFocusTrap · MkLiveAnnouncer / mk-virtual-scroll</td><td>keyboard drag built in</td></tr>
         </tbody>
       </table>
 

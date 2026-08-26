@@ -2,9 +2,9 @@ import { Injectable, Type, inject } from '@angular/core';
 import {
   MkOverlayConfig,
   MkOverlayService,
-} from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkOverlayRef } from '@mkornas/ui/core';
+} from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkOverlayRef } from '@mk-kit/ui/core';
 import { MkConfirmDialog, MkConfirmDialogData } from './confirm-dialog';
 import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
 

@@ -1,10 +1,10 @@
 import { ChangeDetectionStrategy, Component, computed, signal } from '@angular/core';
-import { MkFormField, MkRichText } from '@mkornas/ui';
+import { MkFormField, MkRichText } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for `<mk-rich-text>` — the single-field
- * WYSIWYG form control of `@mkornas/ui/rich-text`.
+ * WYSIWYG form control of `@mk-kit/ui/rich-text`.
  */
 @Component({
   selector: 'docs-rich-text-page',
@@ -115,7 +115,7 @@ import { DocsExample } from '../../shared/docs-example';
         single-field control: one sanitised HTML string, ideal for
         descriptions, bios and comment boxes.
         <code class="docs-inline">&lt;mk-block-editor&gt;</code>
-        (<code class="docs-inline">@mkornas/ui/block-editor</code>) is for
+        (<code class="docs-inline">@mk-kit/ui/block-editor</code>) is for
         whole documents — a structured block model with paragraphs, headings,
         quotes and lists. Both are built on the same contenteditable engine
         (<code class="docs-inline">MkRichTextEngine</code>) and the same

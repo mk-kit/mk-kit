@@ -21,8 +21,8 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import { MK_I18N, MkLiveAnnouncer, mkUniqueId, mkValidatorChange } from '@mkornas/ui/core';
-import { MkIcon } from '@mkornas/ui/icon';
+import { MK_I18N, MkLiveAnnouncer, mkUniqueId, mkValidatorChange } from '@mk-kit/ui/core';
+import { MkIcon } from '@mk-kit/ui/icon';
 
 export type MkNumericKeypadMode = 'pin' | 'quantity' | 'amount';
 

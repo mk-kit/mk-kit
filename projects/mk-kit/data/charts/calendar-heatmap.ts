@@ -8,7 +8,7 @@ import {
   numberAttribute,
   output,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import { mkFormatCompact } from './chart-utils';
 
 /** One day's datum for `mk-calendar-heatmap`. */

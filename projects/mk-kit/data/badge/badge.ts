@@ -4,7 +4,7 @@ import {
   booleanAttribute,
   input,
 } from '@angular/core';
-import type { MkSize, MkTone } from '@mkornas/ui/core';
+import type { MkSize, MkTone } from '@mk-kit/ui/core';
 
 /** Visual treatment for a {@link MkBadge}. */
 export type MkBadgeVariant = 'solid' | 'soft' | 'outline';

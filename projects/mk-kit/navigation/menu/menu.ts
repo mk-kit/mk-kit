@@ -11,8 +11,8 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MkAnchoredPanel } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MkAnchoredPanel } from '@mk-kit/ui/core';
 import { MkMenuItem } from './menu-item';
 
 /**

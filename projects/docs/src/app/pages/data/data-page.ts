@@ -1,6 +1,6 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { MkCountdown, MkInput, MkQrCode, MkVirtualScroll } from '@mkornas/ui';
+import { MkCountdown, MkInput, MkQrCode, MkVirtualScroll } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
@@ -193,6 +193,6 @@ export class DataPage {
 </mk-virtual-scroll>`;
 
   // ----- QR code -------------------------------------------------------
-  protected readonly qrValue = signal('https://github.com/mkornas/mk-kit');
+  protected readonly qrValue = signal('https://github.com/mk-kit/mk-kit');
   protected readonly qrCode = `<mk-qr-code value="https://example.com" ecc="M" [size]="160" />`;
 }

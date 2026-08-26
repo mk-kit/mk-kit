@@ -1,2 +1,2 @@
 export * from './tree-select';
-export type { MkTreeNode } from '@mkornas/ui/navigation';
+export type { MkTreeNode } from '@mk-kit/ui/navigation';

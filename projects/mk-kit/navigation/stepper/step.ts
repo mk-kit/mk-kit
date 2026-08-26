@@ -8,7 +8,7 @@ import {
   signal,
   viewChild,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 
 /**
  * A single step + its content panel. Declared inside `<mk-stepper>`; the

@@ -14,7 +14,7 @@ import {
   MkCommandPalette,
   type MkCommand,
   MkThemeService,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsToc } from './shared/docs-toc';
 import { version as uiVersion } from '../../../mk-kit/package.json';
 

@@ -17,7 +17,7 @@ import {
   type MkTransferItem,
   MkTreeSelect,
   type MkTreeNode,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 interface Framework {
@@ -26,7 +26,7 @@ interface Framework {
 }
 
 /**
- * Documentation + live demo page for the selection controls of `@mkornas/ui`:
+ * Documentation + live demo page for the selection controls of `@mk-kit/ui`:
  * the filtering Autocomplete combobox and the segmented ButtonToggle group.
  */
 @Component({

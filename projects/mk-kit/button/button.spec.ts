@@ -2,7 +2,7 @@ import { Component, signal } from '@angular/core';
 import { provideZonelessChangeDetection } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { MkButton } from './button';
-import type { MkTone } from '@mkornas/ui/core';
+import type { MkTone } from '@mk-kit/ui/core';
 
 @Component({
   imports: [MkButton],

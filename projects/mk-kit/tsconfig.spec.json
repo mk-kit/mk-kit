@@ -6,8 +6,8 @@
     "outDir": "../../out-tsc/spec",
     "types": ["vitest/globals"],
     "paths": {
-      "@mkornas/ui": ["./src/public-api.ts"],
-      "@mkornas/ui/*": ["./*"]
+      "@mk-kit/ui": ["./src/public-api.ts"],
+      "@mk-kit/ui/*": ["./*"]
     }
   },
   "include": ["**/*.d.ts", "**/*.spec.ts"]

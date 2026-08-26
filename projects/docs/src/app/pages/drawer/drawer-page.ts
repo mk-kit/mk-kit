@@ -7,12 +7,12 @@ import {
   MkInput,
   MkNavItem,
   MkNavList,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for `MkDrawer` — the declarative slide-out
- * panel from `@mkornas/ui`.
+ * panel from `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-drawer-page',

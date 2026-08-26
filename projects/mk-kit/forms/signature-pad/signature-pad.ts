@@ -18,8 +18,8 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { MK_I18N, mkUniqueId } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
+import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /** One drawn stroke: pointer positions in CSS pixels. */

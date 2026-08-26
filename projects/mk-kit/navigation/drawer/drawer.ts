@@ -12,9 +12,9 @@ import {
   viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkFocusTrap } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkFocusTrap } from '@mk-kit/ui/core';
 
 /** Edge the drawer slides in from. */
 export type MkDrawerSide = 'start' | 'end' | 'top' | 'bottom';

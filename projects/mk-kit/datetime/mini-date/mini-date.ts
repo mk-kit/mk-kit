@@ -20,11 +20,11 @@ import {
   type ValidationErrors,
   type Validator,
 } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { mkValidatorChange } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkFormField } from '@mkornas/ui/forms';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { mkValidatorChange } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkFormField } from '@mk-kit/ui/forms';
 import { clampDate, isAfter, isBefore, isSameDay, startOfDay } from '../datetime/date-utils';
 
 /** Which segment a part represents. */

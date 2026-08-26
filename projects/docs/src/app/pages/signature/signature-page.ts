@@ -1,9 +1,9 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkFormField, MkSignaturePad } from '@mkornas/ui';
+import { MkFormField, MkSignaturePad } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the Signature pad of `@mkornas/ui`.
+ * Documentation + live demo page for the Signature pad of `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-signature-page',

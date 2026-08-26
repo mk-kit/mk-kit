@@ -3,8 +3,8 @@ import {
   Component,
   input,
 } from '@angular/core';
-import type { MkSize } from '@mkornas/ui/core';
-import { MkIcon } from '@mkornas/ui/icon';
+import type { MkSize } from '@mk-kit/ui/core';
+import { MkIcon } from '@mk-kit/ui/icon';
 
 /**
  * EmptyState — a centered placeholder for "nothing here yet" situations: empty

@@ -5,11 +5,11 @@ import {
   type MkRange,
   MkRating,
   MkSlider,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
- * Documentation + live demo page for the SLIDER-style components of `@mkornas/ui`:
+ * Documentation + live demo page for the SLIDER-style components of `@mk-kit/ui`:
  * Slider, Range slider, Rating and Color picker.
  */
 @Component({

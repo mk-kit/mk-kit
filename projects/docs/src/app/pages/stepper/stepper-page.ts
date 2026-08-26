@@ -7,12 +7,12 @@ import {
   MkInput,
   MkStep,
   MkStepper,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the `<mk-stepper>` / `<mk-step>`
- * navigation components of `@mkornas/ui`.
+ * navigation components of `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-stepper-page',

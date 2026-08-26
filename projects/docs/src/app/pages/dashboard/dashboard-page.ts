@@ -29,7 +29,7 @@ import {
   MkToastService,
   type MkSortChange,
   type MkTableColumn,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DashChart } from './dash-chart';
 
 interface Order {

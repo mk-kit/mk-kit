@@ -18,13 +18,13 @@ import {
   Validators,
 } from '@angular/forms';
 import type { Subscription } from 'rxjs';
-import type { MkErrorMessages, MkSize } from '@mkornas/ui/core';
+import type { MkErrorMessages, MkSize } from '@mk-kit/ui/core';
 import {
   MK_I18N,
   MkFieldContext,
   mkFirstErrorMessage,
   mkUniqueId,
-} from '@mkornas/ui/core';
+} from '@mk-kit/ui/core';
 
 /**
  * FormField — an accessible wrapper that provides a real `<label>`, optional

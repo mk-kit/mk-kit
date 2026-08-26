@@ -18,7 +18,7 @@ import {
   MkJsonViewer,
   MkLogViewer,
   MkMarkdown,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 const LOG_SERVICES = ['api', 'worker', 'scheduler', 'mailer'] as const;
@@ -26,7 +26,7 @@ const LOG_PATHS = ['/orders', '/users/42', '/health', '/invoices', '/search?q=mk
 
 /**
  * Documentation + live demo page for the code & content components of
- * `@mkornas/ui`: authoring with `<mk-code-editor>` and rendering with
+ * `@mk-kit/ui`: authoring with `<mk-code-editor>` and rendering with
  * `<mk-markdown>`, `<mk-code>`, `<mk-diff>`, `<mk-json-viewer>` and
  * `<mk-log-viewer>`.
  */
@@ -572,7 +572,7 @@ published: true`;
       '- Zero-dependency CommonMark subset',
       '- Safe by construction',
       '  - Nested lists via 2-space indent',
-      '- [Repository](https://github.com/mkornas/mk-kit#readme)',
+      '- [Repository](https://github.com/mk-kit/mk-kit#readme)',
       '',
       '| Component | Entry point | Since |',
       '| --- | :---: | ---: |',

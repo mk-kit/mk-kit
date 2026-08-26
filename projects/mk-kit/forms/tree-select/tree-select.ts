@@ -14,12 +14,12 @@ import {
   viewChild,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkAnchoredPanel } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkAnchoredPanel } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
-import { MkTree, type MkTreeNode } from '@mkornas/ui/navigation';
+import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation';
 
 /**
  * TreeSelect — a form field whose popover contains a hierarchical

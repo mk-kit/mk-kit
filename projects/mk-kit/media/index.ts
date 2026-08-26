@@ -1,5 +1,5 @@
 /**
- * MEDIA components group barrel for @mkornas/ui.
+ * MEDIA components group barrel for @mk-kit/ui.
  * Images, galleries, lightbox, cropping and media management.
  */
 export * from './image';

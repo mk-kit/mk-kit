@@ -14,7 +14,7 @@ import {
   untracked,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** A duration split into whole day/hour/minute/second parts. */
 export interface MkDurationParts {

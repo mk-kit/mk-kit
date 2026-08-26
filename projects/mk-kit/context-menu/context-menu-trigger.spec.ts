@@ -1,7 +1,7 @@
 import { Component, provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { By } from '@angular/platform-browser';
-import { MkMenu, MkMenuItem } from '@mkornas/ui/navigation';
+import { MkMenu, MkMenuItem } from '@mk-kit/ui/navigation';
 import { MkContextMenuTrigger } from './context-menu-trigger';
 
 @Component({

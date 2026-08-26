@@ -12,7 +12,7 @@ import {
   viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 
 /** Which axes get a custom scrollbar for {@link MkScrollArea}. */
 export type MkScrollAreaOrientation = 'vertical' | 'horizontal' | 'both';

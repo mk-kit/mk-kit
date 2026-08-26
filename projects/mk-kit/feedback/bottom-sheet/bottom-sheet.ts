@@ -8,9 +8,9 @@ import {
   inject,
   input,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import { MK_I18N } from '@mkornas/ui/core';
-import { MkOverlayRef } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
+import { MkOverlayRef } from '@mk-kit/ui/core';
 
 /** Distance in px the sheet must be dragged down before it dismisses. */
 const DISMISS_THRESHOLD = 120;

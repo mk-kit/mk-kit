@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkButton } from '@mkornas/ui';
+import { MkButton } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({

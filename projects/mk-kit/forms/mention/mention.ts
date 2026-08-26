@@ -14,7 +14,7 @@ import {
   signal,
   untracked,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkMentionPanel } from './mention-panel';
 
 /** How mention suggestions are narrowed against the typed query. */

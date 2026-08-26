@@ -7,7 +7,7 @@ import {
   numberAttribute,
   inject,
 } from '@angular/core';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 /** A rendered pagination cell: a real page number or a gap marker. */
 export type MkPageItem = number | 'ellipsis';

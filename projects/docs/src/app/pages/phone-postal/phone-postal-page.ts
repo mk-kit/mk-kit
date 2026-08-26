@@ -7,12 +7,12 @@ import {
   MkPostalCodeInput,
   MkSelect,
   type MkSelectOption,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the masked location/contact inputs of
- * `@mkornas/ui`: Phone input (country prefix + national mask) and Postal code
+ * `@mk-kit/ui`: Phone input (country prefix + national mask) and Postal code
  * input (country-aware mask + validation).
  */
 @Component({

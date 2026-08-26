@@ -1,12 +1,12 @@
 # mk-kit
 
-Monorepo for **[@mkornas/ui](./projects/mk-kit)** — a themable, accessible
+Monorepo for **[@mk-kit/ui](./projects/mk-kit)** — a themable, accessible
 Angular 22 component library for admin dashboards & UIs — and its documentation
 site.
 
 ```
 projects/
-  mk-kit/   → the publishable library (@mkornas/ui)
+  mk-kit/   → the publishable library (@mk-kit/ui)
   docs/     → the documentation & live-demo site
 ```
 
@@ -21,7 +21,7 @@ projects/
 npm install
 
 # Build the library (required before running the docs — the docs consume the
-# built package via the @mkornas/ui path mapping).
+# built package via the @mk-kit/ui path mapping).
 npm run build:lib
 
 # Run the documentation site
@@ -33,21 +33,18 @@ npm run watch:lib
 
 ## Build & publish the library
 
-Published **privately to GitHub Packages** as `@mkornas/ui`. Pushing a `v*` tag
-runs the Release workflow, which builds, tests, and publishes with the built-in
-`GITHUB_TOKEN`:
+Published to the public npm registry as `@mk-kit/ui`, with a provenance
+attestation, by the Release workflow. Bump the version in
+`projects/mk-kit/package.json`, write its `CHANGELOG.md` section, and merge
+to `main` — the workflow verifies the build, publishes, creates the `v*` tag
+and the GitHub Release. Pushing a matching `v*` tag by hand works too.
 
-```bash
-# bump projects/mk-kit/package.json version, then:
-git tag v0.1.0 && git push origin v0.1.0
-```
-
-To publish by hand: export a PAT with `write:packages` as `NODE_AUTH_TOKEN`,
-then `npm run build:lib && cd dist/mk-kit && npm publish`.
+Auth is npm trusted publishing (OIDC), so no token is stored in the repo.
+To publish by hand: `npm run build:lib && cd dist/mk-kit && npm publish --access public`.
 
 The build produces a standards-compliant Angular package (FESM2022 + typings)
-with a `@mkornas/ui` entry point and a `@mkornas/ui/styles.css` subpath export for
-the theme.
+with a `@mk-kit/ui` entry point per group and a `@mk-kit/ui/styles.css` subpath
+export for the theme.
 
 ## Highlights
 

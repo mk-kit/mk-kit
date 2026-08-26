@@ -18,7 +18,7 @@ import {
   type OnDestroy,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { MK_I18N } from '@mkornas/ui/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 
 // --- Pure crop geometry -----------------------------------------------------
 // jsdom has no canvas and never loads images, so everything numeric lives in

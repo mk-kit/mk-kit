@@ -4,8 +4,8 @@ import {
   computed,
   input,
 } from '@angular/core';
-import { mkUniqueId } from '@mkornas/ui/core';
-import type { MkSize } from '@mkornas/ui/core';
+import { mkUniqueId } from '@mk-kit/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
 import { MkAvatar } from '../avatar/avatar';
 
 /** Layout direction of a {@link MkProfileCard}. */

@@ -6,12 +6,12 @@ import {
   MkNavGroup,
   MkNavItem,
   MkNavList,
-} from '@mkornas/ui';
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
  * Documentation + live demo page for the `mk-command-palette` and
- * `mk-nav-group` navigation components of `@mkornas/ui`.
+ * `mk-nav-group` navigation components of `@mk-kit/ui`.
  */
 @Component({
   selector: 'docs-command-nav-page',

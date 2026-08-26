@@ -58,7 +58,7 @@ export default defineConfig({
   ],
 
   webServer: {
-    /* The docs import `@mkornas/ui` from dist/mk-kit (tsconfig paths), so the
+    /* The docs import `@mk-kit/ui` from dist/mk-kit (tsconfig paths), so the
      * library must be built first — same order as verify.yml. Schematics are
      * not needed for rendering, so only theme + ng build mk-kit run here. */
     command:

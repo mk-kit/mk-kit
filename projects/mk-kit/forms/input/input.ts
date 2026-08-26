@@ -9,7 +9,7 @@ import {
   input,
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
-import type { MkSize } from '@mkornas/ui/core';
+import type { MkSize } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkInputGroup } from '../input-group/input-group';
 
