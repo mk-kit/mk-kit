@@ -335,6 +335,8 @@ export interface MkI18nStrings {
   chooseWeek: string;
   openCalendar: string;
   openTimeList: string;
+  /** Accessible name of the chevron segment of `mk-split-button`. */
+  moreActions: string;
   /** Placeholder of `mk-datetime-picker`. */
   selectDateTime: string;
   /** Dialog label of the `mk-datetime-picker` panel. */
@@ -722,6 +724,7 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chooseWeek: 'Choose week',
   openCalendar: 'Open calendar',
   openTimeList: 'Open time list',
+  moreActions: 'More actions',
   selectDateTime: 'Select date and time…',
   chooseDateTime: 'Choose date and time',
   chooseTime: 'Choose time',

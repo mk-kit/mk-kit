@@ -52,6 +52,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
     group: 'Forms & inputs',
     items: [
       { name: 'mkButton', desc: 'Button/anchor directive: tones, variants, sizes, loading state.', path: '/components/buttons' },
+      { name: 'mk-split-button', desc: 'Primary action plus a chevron that opens an mk-menu of alternatives.', path: '/components/buttons' },
       { name: 'mk-form-field', desc: 'Label, hint, error and prefix/suffix wrapper for any control.', path: '/components/forms' },
       { name: 'mk-select', desc: 'Single-select dropdown with keyboard type-ahead.', path: '/components/forms' },
       { name: 'mk-file-upload', desc: 'Dropzone with validation, previews and upload progress.', path: '/components/forms' },

@@ -131,7 +131,7 @@ export class App {
         {
           label: 'Buttons',
           path: '/components/buttons',
-          keywords: 'button icon-button variants tones sizes loading mkButton',
+          keywords: 'button icon-button split-button dropdown-button variants tones sizes loading mkButton',
         },
         {
           label: 'Form fields',

@@ -24,6 +24,11 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   chevron; RTL opens on the left and swaps the arrow keys. Any depth.
   `MkAnchoredPanel` gains `keepOpenWhen` so a parent panel ignores
   pointerdowns inside its nested panels.
+- **`mk-split-button`** — a primary action with an attached menu: the main
+  segment emits `action`, the chevron segment is a full menu button for the
+  `mk-menu` given in `[menu]`. Shared `variant`/`tone`/`size`, `disabled`,
+  `loading` (spinner + chevron disabled), `fullWidth`, `type="submit"`,
+  i18n `moreActions` label.
 - `formatDate` understands time tokens: `HH`, `H`, `hh`, `h`, `mm`, `a`.
 - i18n keys `selectDateTime`, `chooseDateTime`, `chooseTime`,
   `openDateTimePicker`.

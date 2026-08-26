@@ -10,6 +10,7 @@ export * from './accordion';
 export * from './breadcrumb';
 export * from './pagination';
 export * from './menu';
+export * from './split-button';
 export * from './app-shell';
 export * from './nav-list';
 export * from './stepper';
