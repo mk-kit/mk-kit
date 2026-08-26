@@ -1,12 +1,17 @@
 # @mk-kit/ui
 
-**Themable, accessible Angular 22 component library for admin dashboards & UIs.**
+**Themable, accessible Angular component library for admin dashboards, back-offices and internal tools.**
 
-Signals-first. WCAG 2.1 AA. Every pixel controlled by CSS variables. Light &
-dark mode out of the box. Zero runtime dependencies beyond Angular.
+165+ standalone components, directives and services — data tables, charts,
+date & time pickers, editors, kanban, overlays, an app shell — written for
+Angular 22 with signals and `OnPush` from day one. Every visual value is a
+`--mk-*` CSS custom property; light and dark ship out of the box; WCAG 2.1 AA
+is the target, not the marketing. MIT licensed. Zero runtime dependencies
+beyond Angular.
 
-> Like Angular Material — but leaner, admin-oriented, and re-themable by editing
-> a handful of CSS custom properties.
+- **Docs & live demos:** <https://github.com/mk-kit/mk-kit> (site: mk-kit.dev — coming soon)
+- **Changelog:** [CHANGELOG.md](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
+- **Issues:** <https://github.com/mk-kit/mk-kit/issues>
 
 ## Install
 
@@ -14,32 +19,33 @@ dark mode out of the box. Zero runtime dependencies beyond Angular.
 ng add @mk-kit/ui
 ```
 
-`ng add` installs the package from npm and wires the theme stylesheet into
-your `angular.json`. To do it by hand instead:
+`ng add` installs the package and wires the theme stylesheet into
+`angular.json`. By hand instead:
 
 ```bash
 npm install @mk-kit/ui
 ```
 
-Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms` (v22+).
+Peer dependencies: `@angular/core`, `@angular/common`, `@angular/forms`,
+`@angular/platform-browser` (^22) and `rxjs` (^7.8).
 
 ## Setup
 
-**1. Import the theme stylesheet** once (e.g. in `angular.json` `styles` or your
-global `styles.css`):
+**1. Import the theme stylesheet** once (in `angular.json` `styles` or your
+global stylesheet):
 
 ```css
 @import '@mk-kit/ui/styles.css';
 ```
 
-**2. Add the `mk-app` class** to your `<body>` (or a top-level wrapper) so the
-background, text color, fonts and themed scrollbars apply:
+**2. Add the `mk-app` class** to `<body>` (or a top-level wrapper) so
+background, text colour, fonts and themed scrollbars apply:
 
 ```html
 <body class="mk-app">
 ```
 
-**3. Use components** — everything is standalone, just import what you need:
+**3. Use components** — everything is standalone; import what you need:
 
 ```ts
 import { Component, inject } from '@angular/core';
@@ -61,25 +67,64 @@ export class AppRoot {
 }
 ```
 
+## What's inside
+
+| Group | Highlights |
+|---|---|
+| **Forms & inputs** (49) | text, number, password (strength meter), OTP, phone (country prefix), postal code, currency, card number, IBAN, tax id, masked input, tag input, select, autocomplete, multi-select, tree-select, transfer list, checkbox, radio, switch, slider, range slider, rating, colour picker, file upload (dropzone), signature pad, numeric keypad & on-screen keyboard, repeater (`FormArray`), form field with automatic validation messages, form error summary |
+| **Date & time** | calendar, date picker, date-range picker, time picker, month/year picker, week picker, inline mini date, event calendar with editable week/day grid (drag to move / resize) |
+| **Tables & grids** (6) | data table — sort, multi-select, expandable rows, grouping, sticky header, column resize / reorder / pin, inline cell edit, responsive stacking — plus `MkTableDataSource` for server-side sort/page/filter |
+| **Charts** (12) | line/area, bar (stacked, horizontal, label fitting), donut, gauge, progress ring, scatter/bubble, radar, funnel, treemap, heatmap, calendar heatmap, sparkline — SVG, themed, accessible |
+| **Data display** (25) | cards, lists, stat cards, badges, tags, chips, avatars & groups, timeline, description list, tree, empty state, countdown, QR code, diff view, JSON viewer, code block, virtual scroll, carousel, kanban |
+| **Navigation & layout** (18) | app shell (responsive sidebar), nav list & groups, tabs, stepper, breadcrumb, pagination, menu, context menu, command palette (⌘K), page header, toolbar, splitter, drawer, scroll area, FAB, back-to-top |
+| **Feedback & overlays** (20) | dialogs (+ `confirm()` / `alert()` / `prompt()`), bottom sheet, drawer, popover, popconfirm, hovercard, tooltip, toast, snackbar, alert, banner, result page, notification center, product tour, progress bar, loading bar, spinner, skeletons |
+| **Editors & interactions** (22) | block editor (Notion-style, HTML round-trip), rich text, markdown renderer, code editor, log viewer, drag & drop, sortable list, @mentions, hotkeys, undo/redo history, permissions (`*mkCan`), clipboard, intersect, infinite scroll, ripple, scrollspy |
+| **Media** (6) | image with states, gallery, lightbox, cropper, media manager |
+| **Core services** | theme (light/dark/system + density), overlay & anchored panels, focus trap, live announcer, icon registry, i18n |
+
+The full, searchable index lives in the docs (`/components-index`).
+
+## Entry points
+
+Import from the umbrella `@mk-kit/ui`, or from a group to keep bundles lean:
+
+```ts
+import { MkTable } from '@mk-kit/ui/table';
+import { MkLineChart } from '@mk-kit/ui/data';
+import { MkDatePicker } from '@mk-kit/ui/datetime';
+```
+
+Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
+`feedback`, `directives`, `dnd`, `media`, `icon`, `button`, `checkbox`, `chip`,
+`context-menu`, `rich-text`, `block-editor`. `sideEffects: false` throughout.
+
 ## Theming
 
-The entire look is driven by `--mk-*` custom properties defined on `:root`.
-Override any of them — globally or scoped to a subtree — to re-brand instantly:
+The entire look is driven by `--mk-*` custom properties on `:root`. Override
+any of them — globally, or scoped to a subtree — to re-brand at runtime, no
+rebuild:
 
 ```css
 :root {
-  --mk-primary: #7c3aed;
-  --mk-primary-hover: #6d28d9;
+  --mk-primary: #0f766e;
+  --mk-primary-contrast: #ffffff;
   --mk-radius-md: 4px;
   --mk-font-sans: 'Inter', system-ui, sans-serif;
 }
+
+[data-mk-theme='dark'] {
+  --mk-primary: #2dd4bf;
+  --mk-primary-contrast: #042f2e;
+}
 ```
+
+The docs include a theme builder that exports a ready-to-paste `:root` block.
 
 ### Dark mode
 
-Dark mode works with no JavaScript — it follows the OS `prefers-color-scheme`.
-To let users choose explicitly, set `data-mk-theme` on `<html>` (`"light"` |
-`"dark"`), or use the built-in `MkThemeService`:
+Dark mode follows the OS `prefers-color-scheme` with no JavaScript. To let
+users choose, set `data-mk-theme` on `<html>` (`"light"` | `"dark"`) or use
+`MkThemeService`:
 
 ```ts
 const theme = inject(MkThemeService);
@@ -89,26 +134,65 @@ theme.toggle();              // flip light/dark
 theme.resolvedTheme();       // signal: 'light' | 'dark'
 ```
 
-The service persists the choice to `localStorage` and is fully SSR-safe.
+The choice is persisted to `localStorage`; the service is SSR-safe.
 
-## What's inside
+### Density & touch
 
-- **Forms** — Button, FormField, Input, Select, Checkbox, Radio, Switch, Slider
-- **Data** — Table (sortable/sticky), Card, Badge, Tag, Chip, Avatar, List,
-  StatCard, ProgressBar, Spinner, Skeleton, Divider
-- **Feedback** — Alert, Toast, Dialog (+confirm), Tooltip
-- **Navigation & layout** — Tabs, Accordion, Breadcrumb, Pagination, Menu,
-  AppShell, NavList
+Three densities — `comfortable`, `compact`, `touch` — via `data-mk-density`
+or `MkThemeService.setDensity()`. Touch density enlarges every hit target;
+inputs use 16px text on coarse pointers, drag starts on long-press, overlays
+respect safe-area insets.
 
-All components: `OnPush`, signal inputs/outputs, keyboard-operable, screen-reader
-labelled, `:focus-visible` rings, and `prefers-reduced-motion` aware.
+## Internationalisation
+
+Every string the library renders comes from one provider:
+
+```ts
+import { provideMkI18n } from '@mk-kit/ui/core';
+
+bootstrapApplication(AppRoot, {
+  providers: [provideMkI18n({ close: 'Zamknij', noData: 'Brak danych' })],
+});
+```
+
+Overrides can be scoped to a component subtree for mixed-locale screens.
+Layout and arrow keys flip under `dir="rtl"`.
 
 ## Accessibility
 
-mk-kit targets **WCAG 2.1 AA**: semantic roles, complete `aria-*` wiring, focus
-trapping for overlays, roving tabindex for composite widgets, live-region status
-announcements, and color contrast that holds in both themes. Information is never
-conveyed by color alone.
+Target: **WCAG 2.1 AA**. Semantic roles and complete `aria-*` wiring, roving
+tabindex for composite widgets, focus trapping and background `inert` for
+modals, an Escape that closes only the topmost overlay, live-region
+announcements for async state, contrast-checked tokens in both themes,
+`prefers-reduced-motion` and `forced-colors` support. Axe runs over rendered
+fixtures in the test suite; information is never conveyed by colour alone.
+
+## SSR & zoneless
+
+Every component guards non-browser platforms (an SSR smoke suite renders the
+whole library on the server), and nothing depends on Zone.js.
+
+## Coming from PrimeNG?
+
+The admin surface maps closely — `p-table` → `mk-table`, `p-select` →
+`mk-select`, `p-datePicker` → `mk-date-picker`, `DialogService` →
+`MkDialogService`, `MessageService` → `MkToastService` — and the parts
+PrimeUI sells separately (charts, text editor, scheduler, task board) are
+here under MIT. The docs landing page carries a mapping table.
+
+## Versioning & support
+
+mk-kit tracks the current Angular major. A matching release follows each new
+Angular major within weeks; the previous major keeps receiving fixes for six
+months. Releases are published from CI with npm provenance
+(`npm audit signatures`).
+
+## Contributing
+
+See [CONTRIBUTING.md](https://github.com/mk-kit/mk-kit/blob/main/CONTRIBUTING.md)
+(DCO sign-off), [SECURITY.md](https://github.com/mk-kit/mk-kit/blob/main/SECURITY.md)
+for vulnerability reports, and [TRADEMARK.md](https://github.com/mk-kit/mk-kit/blob/main/TRADEMARK.md)
+for use of the name and logo.
 
 ## License
 
