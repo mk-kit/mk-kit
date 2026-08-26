@@ -7,6 +7,24 @@
    Published apps instead use: @import '@mk-kit/ui/styles.css'; */
 @import '../../mk-kit/src/styles/mk-kit.css';
 
+/* AZ Widgets (contact form, consent banner) pick these up through their
+   Shadow DOM, so they follow the docs theme incl. dark mode. */
+:root {
+  --az-accent: var(--mk-primary);
+  --az-on-accent: var(--mk-primary-contrast);
+  --az-link: var(--mk-primary);
+  --az-surface: var(--mk-surface);
+  --az-ink: var(--mk-text);
+  --az-muted: var(--mk-text-muted);
+  --az-field: var(--mk-bg);
+  --az-border: var(--mk-border);
+  --az-radius: var(--mk-radius-md);
+  --az-font: var(--mk-font-sans);
+  --az-font-mono: var(--mk-font-mono);
+  --az-control-height: var(--mk-control-height-md);
+  --az-contact-width: 400px;
+}
+
 html,
 body {
   height: 100%;

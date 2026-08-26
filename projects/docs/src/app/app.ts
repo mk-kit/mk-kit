@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
+import { CUSTOM_ELEMENTS_SCHEMA, ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   NavigationEnd,
   RouterLink,
@@ -17,6 +17,7 @@ import {
 } from '@mk-kit/ui';
 import { DocsToc } from './shared/docs-toc';
 import { version as uiVersion } from '../../../mk-kit/package.json';
+import { SITE } from './site.config';
 
 interface NavLink {
   label: string;
@@ -43,10 +44,13 @@ interface NavSection {
   templateUrl: './app.html',
   styleUrl: './app.scss',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // <az-consent> is an AZ Widgets custom element.
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: { '[class.docs-home]': 'isHome()' },
 })
 export class App {
   protected readonly uiVersion = uiVersion;
+  protected readonly site = SITE;
   private readonly router = inject(Router);
   /** True on the landing page, where the docs sidebar and TOC rail are hidden. */
   protected readonly isHome = toSignal(

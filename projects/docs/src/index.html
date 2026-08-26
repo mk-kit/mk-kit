@@ -20,6 +20,32 @@
     <meta property="og:url" content="https://mk-kit.dev/" />
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#4f46e5" />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@graph": [
+          {
+            "@type": "SoftwareSourceCode",
+            "@id": "https://mk-kit.dev/#software",
+            "name": "mk-kit",
+            "description": "Themable, accessible Angular component library for admin dashboards and internal tools.",
+            "url": "https://mk-kit.dev/",
+            "codeRepository": "https://github.com/mk-kit/mk-kit",
+            "programmingLanguage": "TypeScript",
+            "runtimePlatform": "Angular",
+            "license": "https://opensource.org/licenses/MIT",
+            "author": { "@id": "https://mateuszkornas.com/#person" }
+          },
+          {
+            "@type": "Person",
+            "@id": "https://mateuszkornas.com/#person",
+            "name": "Mateusz Kornaś",
+            "url": "https://mateuszkornas.com",
+            "sameAs": ["https://github.com/mkornas", "https://azwidgets.pl", "https://rozpedzeni.pl"]
+          }
+        ]
+      }
+    </script>
     <link rel="icon" href="favicon.ico" sizes="16x16 32x32 48x48" />
     <link rel="icon" type="image/svg+xml" href="favicon.svg" />
     <link rel="apple-touch-icon" href="apple-touch-icon.png" />
@@ -37,5 +63,7 @@
   </head>
   <body class="mk-app">
     <app-root></app-root>
+    <!-- AZ Widgets: contact forms (Pro waitlist / Team), consent banner, analytics. -->
+    <script src="https://cdn.azwidgets.pl/loader.js" data-tenant="mk-kit" defer></script>
   </body>
 </html>
