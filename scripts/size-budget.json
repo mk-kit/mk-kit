@@ -12,9 +12,10 @@
     "mk-kit-ui-table.mjs": 135,
     "mk-kit-ui-rich-text.mjs": 80,
     "mk-kit-ui-directives.mjs": 100,
-    "mk-kit-ui-core.mjs": 85,
+    "mk-kit-ui-core.mjs": 100,
     "mk-kit-ui-layout.mjs": 32,
     "mk-kit-ui-chat.mjs": 96,
+    "mk-kit-ui-query-builder.mjs": 64,
     "mk-kit-ui-checkbox.mjs": 40
   }
 }

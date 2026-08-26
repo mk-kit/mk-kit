@@ -149,6 +149,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
   {
     group: 'Tables & grids',
     items: [
+      { name: 'mk-query-builder', desc: 'Rule / group filter tree as JSON; predicate, text and data-source helpers.', path: '/components/query-builder' },
       { name: 'mk-table', desc: 'Data table: sticky headers, selection, row detail, stacked mobile layout, tree rows (childrenKey).', path: '/components/table' },
       { name: 'mkTableCell', desc: 'Custom cell template per column.', path: '/components/table' },
       { name: 'mkTableRowDetail', desc: 'Expandable per-row detail template.', path: '/components/table' },

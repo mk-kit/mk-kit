@@ -18,3 +18,5 @@ export {
 } from './highlight/code-highlight';
 export * from './forms/validator-change';
 export * from './forms/validation-messages';
+export * from './query/query.types';
+export * from './query/query';

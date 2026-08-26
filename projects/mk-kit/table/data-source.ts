@@ -1,5 +1,6 @@
 import { DestroyRef, Signal, computed, inject, signal } from '@angular/core';
 import type { Observable, Unsubscribable } from 'rxjs';
+import { mkQueryCompact, type MkQueryGroup } from '@mk-kit/ui/core';
 import type { MkSortChange } from './table/table';
 import type { MkSort, MkSortState } from './sort/sort';
 
@@ -13,6 +14,8 @@ export interface MkDataRequest {
   sort: MkSortState | null;
   /** Free-text filter query (`''` = none). */
   filter: string;
+  /** Structured filter from `mk-query-builder` (`null` = none). Compacted: no empty groups or unfinished rules. */
+  query: MkQueryGroup | null;
 }
 
 /** One page of server data returned by a {@link MkDataFetcher}. */
@@ -161,6 +164,7 @@ export class MkTableDataSource<T> {
   private readonly _pageSize = signal(DEFAULT_PAGE_SIZE);
   private readonly _sort = signal<MkSortState | null>(null);
   private readonly _filter = signal('');
+  private readonly _query = signal<MkQueryGroup | null>(null);
 
   /** Rows of the current page (`[]` until the first load lands). */
   readonly rows = this._rows.asReadonly();
@@ -178,6 +182,8 @@ export class MkTableDataSource<T> {
   readonly sort = this._sort.asReadonly();
   /** Current filter query (updates immediately, even while debouncing). */
   readonly filter = this._filter.asReadonly();
+  /** Current structured query, or `null`. */
+  readonly query = this._query.asReadonly();
   /** True when a settled load reported no rows at all. */
   readonly empty: Signal<boolean> = computed(
     () => !this._loading() && this._total() === 0,
@@ -259,6 +265,20 @@ export class MkTableDataSource<T> {
   }
 
   /**
+   * Set (or clear with `null`) the structured query from `mk-query-builder`.
+   * Empty groups and unfinished rules are dropped before the request; a query
+   * with nothing left is sent as `null`. Resets to page 1 and loads at once.
+   */
+  setQuery(query: MkQueryGroup | null): void {
+    const compact = query ? mkQueryCompact(query) : null;
+    const next = compact && compact.rules.length ? compact : null;
+    if (JSON.stringify(next) === JSON.stringify(this._query())) return;
+    this._query.set(next);
+    this._page.set(1);
+    this.load();
+  }
+
+  /**
    * Re-run the current request immediately (e.g. after a mutation). Flushes a
    * pending debounced filter, since the request reads the live filter value.
    */
@@ -306,6 +326,7 @@ export class MkTableDataSource<T> {
       pageSize: this._pageSize(),
       sort: this._sort(),
       filter: this._filter(),
+      query: this._query(),
     };
     let result: Promise<MkDataPage<T>> | Observable<MkDataPage<T>>;
     try {

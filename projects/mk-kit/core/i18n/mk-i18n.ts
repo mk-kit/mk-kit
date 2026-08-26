@@ -510,6 +510,43 @@ export interface MkI18nStrings {
   /** Chat: tool call failed. */
   chatToolError: string;
 
+  // --- Query builder ----------------------------------------------------------
+  /** Query builder: accessible name of the whole builder. */
+  queryBuilderLabel: string;
+  queryAddRule: string;
+  queryAddGroup: string;
+  queryRemoveRule: string;
+  queryRemoveGroup: string;
+  /** Combinator labels — also used by `mkQueryToText`. */
+  queryAnd: string;
+  queryOr: string;
+  queryNot: string;
+  queryField: string;
+  queryOperator: string;
+  queryValue: string;
+  queryValueFrom: string;
+  queryValueTo: string;
+  queryEmptyGroup: string;
+  queryTrue: string;
+  queryFalse: string;
+  queryOpEq: string;
+  queryOpNeq: string;
+  queryOpContains: string;
+  queryOpNotContains: string;
+  queryOpStartsWith: string;
+  queryOpEndsWith: string;
+  queryOpGt: string;
+  queryOpGte: string;
+  queryOpLt: string;
+  queryOpLte: string;
+  queryOpBetween: string;
+  queryOpIn: string;
+  queryOpNotIn: string;
+  queryOpBefore: string;
+  queryOpAfter: string;
+  queryOpEmpty: string;
+  queryOpNotEmpty: string;
+
   // --- Event calendar editing --------------------------------------------------
   /** Announced when an event is picked up in keyboard move mode. */
   eventCalendarGrabbed: (title: string, from: string, to: string) => string;
@@ -873,6 +910,40 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chatToolRunning: 'Running',
   chatToolDone: 'Done',
   chatToolError: 'Failed',
+
+  queryBuilderLabel: 'Filter conditions',
+  queryAddRule: 'Add rule',
+  queryAddGroup: 'Add group',
+  queryRemoveRule: 'Remove rule',
+  queryRemoveGroup: 'Remove group',
+  queryAnd: 'And',
+  queryOr: 'Or',
+  queryNot: 'Not',
+  queryField: 'Field',
+  queryOperator: 'Operator',
+  queryValue: 'Value',
+  queryValueFrom: 'From',
+  queryValueTo: 'To',
+  queryEmptyGroup: 'No conditions yet',
+  queryTrue: 'True',
+  queryFalse: 'False',
+  queryOpEq: 'equals',
+  queryOpNeq: 'does not equal',
+  queryOpContains: 'contains',
+  queryOpNotContains: 'does not contain',
+  queryOpStartsWith: 'starts with',
+  queryOpEndsWith: 'ends with',
+  queryOpGt: 'greater than',
+  queryOpGte: 'at least',
+  queryOpLt: 'less than',
+  queryOpLte: 'at most',
+  queryOpBetween: 'between',
+  queryOpIn: 'is any of',
+  queryOpNotIn: 'is none of',
+  queryOpBefore: 'before',
+  queryOpAfter: 'after',
+  queryOpEmpty: 'is empty',
+  queryOpNotEmpty: 'is not empty',
 
   eventCalendarGrabbed: (title, from, to) =>
     `${title} grabbed, ${from} – ${to}. Use the arrow keys to move, ` +
