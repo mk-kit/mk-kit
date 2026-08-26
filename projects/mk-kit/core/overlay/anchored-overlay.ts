@@ -53,7 +53,7 @@ const MIN_SIZE_CAP = 120;
 function sideOf(placement: MkPlacement): 'top' | 'bottom' | 'left' | 'right' {
   if (placement.startsWith('top')) return 'top';
   if (placement.startsWith('bottom')) return 'bottom';
-  return placement as 'left' | 'right';
+  return placement.startsWith('left') ? 'left' : 'right';
 }
 
 function alignOf(placement: MkPlacement): 'start' | 'center' | 'end' {
@@ -112,8 +112,11 @@ export function mkComputeAnchoredPosition(
     else if (align === 'end') left = endLeft;
     else left = anchor.left + anchor.width / 2 - w / 2;
   } else {
-    // Left/right: centre on the cross (vertical) axis.
-    top = anchor.top + anchor.height / 2 - h / 2;
+    // Left/right: the cross axis is vertical. `-start` tops the panel with the
+    // anchor (a submenu beside its item), `-end` bottoms it, else centre.
+    if (align === 'start') top = anchor.top;
+    else if (align === 'end') top = anchor.bottom - h;
+    else top = anchor.top + anchor.height / 2 - h / 2;
   }
 
   if (clamp) {
@@ -171,6 +174,12 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   /** Clamp the panel inside the viewport. */
   readonly clamp = input(true);
 
+  /**
+   * Predicate consulted before an outside pointerdown dismisses the panel.
+   * Return `true` for targets that must keep it open — e.g. a nested panel
+   * (a submenu) that lives in the top layer outside this element.
+   */
+  readonly keepOpenWhen = input<((target: Node) => boolean) | null>(null);
   /** Emitted on an outside pointerdown or when the window loses focus. */
   readonly dismiss = output<void>();
 
@@ -205,6 +214,7 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     if (this.host.nativeElement.contains(target)) return;
     const anchorEl = this.resolveAnchorEl();
     if (anchorEl?.contains(target)) return;
+    if (this.keepOpenWhen()?.(target)) return;
     this.dismiss.emit();
   };
   private readonly onWindowBlur = () => this.dismiss.emit();

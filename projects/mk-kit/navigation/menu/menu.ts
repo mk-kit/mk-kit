@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   DOCUMENT,
+  ElementRef,
   Injector,
   type OnDestroy,
   PLATFORM_ID,
@@ -9,8 +10,10 @@ import {
   contentChildren,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import type { MkPlacement } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
 import { MkMenuItem } from './menu-item';
@@ -31,6 +34,24 @@ import { MkMenuItem } from './menu-item';
  *   <mk-menu-item danger (action)="del()">Delete</mk-menu-item>
  * </mk-menu>
  * ```
+ *
+ * **Submenus.** Point an item at a nested menu with `[mkSubmenuFor]`; declare
+ * the nested `<mk-menu>` anywhere inside the parent menu. The submenu opens
+ * beside its item on hover (after a short delay), on ArrowRight / Enter /
+ * Space / click, and closes with ArrowLeft or Escape (returning focus to the
+ * item) — only that level, per the APG menu pattern. Activating any leaf item
+ * closes the whole chain. In RTL the submenu opens on the left and the arrow
+ * keys swap.
+ *
+ * ```html
+ * <mk-menu #menu>
+ *   <mk-menu-item [mkSubmenuFor]="exportMenu">Export</mk-menu-item>
+ *   <mk-menu #exportMenu>
+ *     <mk-menu-item (action)="csv()">CSV</mk-menu-item>
+ *     <mk-menu-item (action)="pdf()">PDF</mk-menu-item>
+ *   </mk-menu>
+ * </mk-menu>
+ * ```
  */
 @Component({
   selector: 'mk-menu',
@@ -47,8 +68,11 @@ export class MkMenu implements OnDestroy {
   private readonly document = inject(DOCUMENT);
   private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
+  /** The enclosing menu when this one is a submenu. */
+  private readonly parent = inject(MkMenu, { optional: true, skipSelf: true });
 
   private readonly items = contentChildren(MkMenuItem);
+  private readonly panelRef = viewChild<ElementRef<HTMLElement>>('panel');
 
   /** Stable id for `aria-controls` on the trigger. */
   readonly panelId = mkUniqueId('mk-menu');
@@ -66,23 +90,43 @@ export class MkMenu implements OnDestroy {
   protected readonly anchorPoint = signal<{ x: number; y: number } | undefined>(
     undefined,
   );
+  /** Where the panel sits relative to its anchor (submenus open sideways). */
+  protected readonly placement = signal<MkPlacement>('bottom-start');
 
   private triggerEl: HTMLElement | null = null;
   private typeahead = '';
   private typeaheadTimer?: ReturnType<typeof setTimeout>;
+  /** Submenus that are currently open under this menu. */
+  private readonly openChildren = new Set<MkMenu>();
+
+  /**
+   * Whether this menu is a submenu of another `mk-menu`. Submenus open
+   * sideways, close a single level on Escape, and swap ArrowLeft/ArrowRight.
+   */
+  get isSubmenu(): boolean {
+    return this.parent !== null;
+  }
 
   /**
    * Open the menu anchored to `trigger`. `focus` picks the item that receives
    * focus once the panel is painted: `true`/`'first'` for the first enabled
    * item, `'last'` for the last (ArrowUp on a menu button, per the APG
    * menu-button pattern), `false` to leave focus where it is (mouse open).
+   * `placement` overrides the default `bottom-start` (submenus pass
+   * `right-start` / `left-start`).
    */
-  open(trigger: HTMLElement, focus: boolean | 'first' | 'last' = true): void {
+  open(
+    trigger: HTMLElement,
+    focus: boolean | 'first' | 'last' = true,
+    placement: MkPlacement = 'bottom-start',
+  ): void {
     if (!this.isBrowser || this._open()) return;
     this.triggerEl = trigger;
     this.anchorEl.set(trigger);
     this.anchorPoint.set(undefined);
+    this.placement.set(placement);
     this._open.set(true);
+    this.parent?.childOpened(this);
     if (focus) this.focusAfterOpen(focus === 'last' ? 'last' : 'first');
   }
 
@@ -97,19 +141,41 @@ export class MkMenu implements OnDestroy {
     this.triggerEl = restoreFocusEl ?? null;
     this.anchorEl.set(undefined);
     this.anchorPoint.set({ x, y });
+    this.placement.set('bottom-start');
     this._open.set(true);
     this.focusAfterOpen('first');
   }
 
-  /** Close the menu; optionally restore focus to the trigger. */
+  /**
+   * Close this menu (and any submenu open under it); optionally restore focus
+   * to the trigger — for a submenu that is the item it hangs off.
+   */
   close(restoreFocus = true): void {
     if (!this._open()) return;
+    this.closeChildren();
     this._open.set(false);
     this.anchorEl.set(undefined);
     this.anchorPoint.set(undefined);
     const trigger = this.triggerEl;
     this.triggerEl = null;
+    this.parent?.childClosed(this);
     if (restoreFocus) trigger?.focus();
+  }
+
+  /**
+   * Close the whole menu chain from the root down — what activating a leaf
+   * item does, wherever in the tree it sits. Focus returns to the root
+   * trigger when `restoreFocus` is set.
+   */
+  closeAll(restoreFocus = true): void {
+    this.root().close(restoreFocus);
+  }
+
+  /** Close every submenu open under this menu, except `keep`. */
+  closeChildren(keep?: MkMenu): void {
+    for (const child of [...this.openChildren]) {
+      if (child !== keep) child.close(false);
+    }
   }
 
   /** Toggle open/closed from a trigger. */
@@ -135,6 +201,49 @@ export class MkMenu implements OnDestroy {
     this.focusLast();
   }
 
+  /**
+   * Whether `node` lives inside this menu's panel or any submenu open under
+   * it. Submenu panels are separate top-layer elements, so a plain
+   * `contains` on the parent panel would treat clicks in them as outside.
+   */
+  containsTarget(node: Node | null): boolean {
+    if (!node) return false;
+    if (this.panelRef()?.nativeElement.contains(node)) return true;
+    for (const child of this.openChildren) {
+      if (child.containsTarget(node)) return true;
+    }
+    return false;
+  }
+
+  /** Bound for the anchored panel's `keepOpenWhen` (stable identity). */
+  protected readonly keepOpenWhen = (target: Node): boolean =>
+    [...this.openChildren].some((c) => c.containsTarget(target));
+
+  /**
+   * An item was hovered: close sibling submenus so only the hovered branch
+   * stays open (the item opens its own submenu after a delay).
+   */
+  itemHovered(item: MkMenuItem): void {
+    this.closeChildren(item.submenu());
+  }
+
+  /** @internal */
+  childOpened(child: MkMenu): void {
+    this.closeChildren(child);
+    this.openChildren.add(child);
+  }
+
+  /** @internal */
+  childClosed(child: MkMenu): void {
+    this.openChildren.delete(child);
+  }
+
+  private root(): MkMenu {
+    let m: MkMenu = this;
+    while (m.parent) m = m.parent;
+    return m;
+  }
+
   /** Focus an item once the panel is in the top layer and painted. */
   private focusAfterOpen(which: 'first' | 'last'): void {
     afterNextRender(
@@ -148,7 +257,26 @@ export class MkMenu implements OnDestroy {
     );
   }
 
+  /**
+   * Whether the menu is laid out right-to-left (submenu side + arrow keys).
+   * Read from the trigger's nearest `dir` attribute — the panel itself lives
+   * in the top layer, outside any `dir` container — then from computed style.
+   */
+  private isRtl(): boolean {
+    // A submenu's trigger is an item inside a teleported panel, so climb to
+    // the root menu, whose trigger sits in the consumer's DOM.
+    const el = this.root().triggerEl ?? this.panelRef()?.nativeElement;
+    if (!el) return this.document.dir === 'rtl';
+    const dir = el.closest('[dir]')?.getAttribute('dir');
+    if (dir) return dir.toLowerCase() === 'rtl';
+    const view = this.document.defaultView;
+    return (view?.getComputedStyle(el).direction ?? 'ltr') === 'rtl';
+  }
+
   protected onPanelKeydown(event: KeyboardEvent): void {
+    const rtl = this.isRtl();
+    const openKey = rtl ? 'ArrowLeft' : 'ArrowRight';
+    const closeKey = rtl ? 'ArrowRight' : 'ArrowLeft';
     switch (event.key) {
       case 'ArrowDown':
         event.preventDefault();
@@ -171,19 +299,38 @@ export class MkMenu implements OnDestroy {
         event.preventDefault();
         this.activeItem()?.activate();
         break;
+      case openKey: {
+        const item = this.activeItem();
+        if (item?.submenu()) {
+          event.preventDefault();
+          item.openSubmenu(true);
+        }
+        break;
+      }
+      case closeKey:
+        if (this.isSubmenu) {
+          event.preventDefault();
+          this.close(true);
+        }
+        break;
       case 'Escape':
         event.preventDefault();
         this.close(true);
         break;
       case 'Tab':
         event.preventDefault();
-        this.close(true);
+        this.closeAll(true);
         break;
       default:
         if (event.key.length === 1 && !event.ctrlKey && !event.metaKey) {
           this.onTypeahead(event.key);
         }
     }
+  }
+
+  /** Placement for a submenu hanging off `item`, honouring text direction. */
+  submenuPlacement(): MkPlacement {
+    return this.isRtl() ? 'left-start' : 'right-start';
   }
 
   private enabled(): MkMenuItem[] {
@@ -240,5 +387,6 @@ export class MkMenu implements OnDestroy {
 
   ngOnDestroy(): void {
     if (this.typeaheadTimer) clearTimeout(this.typeaheadTimer);
+    if (this._open()) this.close(false);
   }
 }

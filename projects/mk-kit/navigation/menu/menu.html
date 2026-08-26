@@ -1,12 +1,15 @@
 @if (opened()) {
   <div
+    #panel
     class="mk-menu__panel"
+    [class.mk-menu__panel--submenu]="isSubmenu"
     role="menu"
     [id]="panelId"
     mkAnchoredPanel
     [mkAnchoredPanelFor]="anchorEl()"
     [anchorRect]="anchorPoint()"
-    placement="bottom-start"
+    [placement]="placement()"
+    [keepOpenWhen]="keepOpenWhen"
     (dismiss)="close(false)"
     [attr.aria-label]="ariaLabel()"
     (keydown)="onPanelKeydown($event)"

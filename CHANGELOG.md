@@ -16,6 +16,14 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   `clearable`, `mk-form-field` integration. Picking a day keeps the panel
   open and hands focus to the time list; picking a time commits and closes.
   Wave A of the Round-5 roadmap.
+- **Nested submenus in `mk-menu`** — `<mk-menu-item [mkSubmenuFor]="sub">`
+  opens a nested `<mk-menu>` beside the item on hover (150 ms dwell),
+  ArrowRight, Enter, Space or click; ArrowLeft / Escape close one level and
+  return focus to the item; activating any leaf closes the whole chain
+  (`MkMenu.closeAll()`). Items expose `aria-haspopup` / `aria-expanded` and a
+  chevron; RTL opens on the left and swaps the arrow keys. Any depth.
+  `MkAnchoredPanel` gains `keepOpenWhen` so a parent panel ignores
+  pointerdowns inside its nested panels.
 - `formatDate` understands time tokens: `HH`, `H`, `hh`, `h`, `mm`, `a`.
 - i18n keys `selectDateTime`, `chooseDateTime`, `chooseTime`,
   `openDateTimePicker`.

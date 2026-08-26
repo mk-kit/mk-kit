@@ -59,3 +59,17 @@
   overflow: hidden;
   text-overflow: ellipsis;
 }
+
+/* Submenu trigger: trailing chevron, mirrored in RTL; stays highlighted while
+   its submenu is open so the active branch is visible. */
+.mk-menu-item__chevron {
+  flex: none;
+  margin-inline-start: auto;
+  color: var(--mk-text-muted);
+}
+:host(:dir(rtl)) .mk-menu-item__chevron {
+  transform: scaleX(-1);
+}
+:host(.mk-menu-item--expanded) {
+  background: var(--mk-hover-overlay);
+}

@@ -285,6 +285,42 @@ import { DocsExample } from '../../shared/docs-example';
         </p>
       </docs-example>
 
+      <h3>Submenus</h3>
+      <p>
+        Point an item at a nested <code class="docs-inline">mk-menu</code> with
+        <code class="docs-inline">[mkSubmenuFor]</code>; declare the nested menu
+        anywhere inside the parent. The submenu opens beside its item on hover
+        (after a short dwell), ArrowRight, Enter, Space or click, and closes one
+        level with ArrowLeft or Escape — focus returns to the item. Activating
+        any leaf closes the whole chain. In RTL the submenu opens on the left
+        and the arrow keys swap. Nest as deep as you need.
+      </p>
+      <docs-example [code]="submenuCode" [column]="true">
+        <button mkButton variant="outline" tone="neutral" [mkMenuTriggerFor]="submenuDemo">
+          File ▾
+        </button>
+        <mk-menu #submenuDemo="mkMenu">
+          <mk-menu-item (action)="onMenuAction('New')">New</mk-menu-item>
+          <mk-menu-item (action)="onMenuAction('Open')">Open…</mk-menu-item>
+          <mk-menu-item [mkSubmenuFor]="exportMenu">Export</mk-menu-item>
+          <mk-menu #exportMenu="mkMenu">
+            <mk-menu-item (action)="onMenuAction('Export CSV')">CSV</mk-menu-item>
+            <mk-menu-item (action)="onMenuAction('Export JSON')">JSON</mk-menu-item>
+            <mk-menu-item [mkSubmenuFor]="pdfMenu">PDF</mk-menu-item>
+            <mk-menu #pdfMenu="mkMenu">
+              <mk-menu-item (action)="onMenuAction('Export PDF A4')">A4</mk-menu-item>
+              <mk-menu-item (action)="onMenuAction('Export PDF Letter')">Letter</mk-menu-item>
+            </mk-menu>
+          </mk-menu>
+          <mk-menu-item [mkSubmenuFor]="shareMenu">Share</mk-menu-item>
+          <mk-menu #shareMenu="mkMenu">
+            <mk-menu-item (action)="onMenuAction('Copy link')">Copy link</mk-menu-item>
+            <mk-menu-item (action)="onMenuAction('Email')">Email…</mk-menu-item>
+          </mk-menu>
+          <mk-menu-item danger (action)="onMenuAction('Move to trash')">Move to trash</mk-menu-item>
+        </mk-menu>
+      </docs-example>
+
       <table class="docs-props">
         <thead>
           <tr><th>Symbol</th><th>Member</th><th>Type</th><th>Notes</th></tr>
@@ -294,6 +330,8 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>mk-menu</code></td><td><code>exportAs</code></td><td><code>'mkMenu'</code></td><td>Reference as <code>#menu="mkMenu"</code>.</td></tr>
           <tr><td><code>mk-menu</code></td><td><code>opened</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>Read-only open state.</td></tr>
           <tr><td><code>mk-menu-item</code></td><td><code>action</code></td><td><code>output&lt;void&gt;</code></td><td>Emitted on activation (not when disabled).</td></tr>
+          <tr><td><code>mk-menu-item</code></td><td><code>mkSubmenuFor</code></td><td><code>MkMenu</code></td><td>Turns the item into a submenu trigger: chevron, <code>aria-haspopup</code>/<code>aria-expanded</code>, opens beside the item on hover / ArrowRight / Enter / Space / click. Never emits <code>action</code>.</td></tr>
+          <tr><td><code>mk-menu</code></td><td><code>closeAll()</code></td><td><code>method</code></td><td>Close the whole chain from the root (what a leaf item does on activation).</td></tr>
           <tr><td><code>mk-menu-item</code></td><td><code>danger</code></td><td><code>boolean</code></td><td>Destructive styling.</td></tr>
           <tr><td><code>mk-menu-item</code></td><td><code>disabled</code></td><td><code>boolean</code></td><td>Prevents selection &amp; focus.</td></tr>
           <tr><td><code>mk-menu-item</code></td><td><code>href</code></td><td><code>string?</code></td><td>Navigates on activation instead of emitting only.</td></tr>
@@ -541,6 +579,20 @@ export class NavigationPage {
     '',
     '// page = signal(1);',
     '// pageCount = computed(() => Math.ceil(95 / 10)); // → 10',
+  ].join('\n');
+
+  protected readonly submenuCode = [
+    '<mk-menu #menu="mkMenu">',
+    '  <mk-menu-item (action)="create()">New</mk-menu-item>',
+    '  <mk-menu-item [mkSubmenuFor]="exportMenu">Export</mk-menu-item>',
+    '  <mk-menu #exportMenu="mkMenu">',
+    '    <mk-menu-item (action)="exportCsv()">CSV</mk-menu-item>',
+    '    <mk-menu-item [mkSubmenuFor]="pdfMenu">PDF</mk-menu-item>',
+    '    <mk-menu #pdfMenu="mkMenu">',
+    '      <mk-menu-item (action)="exportPdf(\'a4\')">A4</mk-menu-item>',
+    '    </mk-menu>',
+    '  </mk-menu>',
+    '</mk-menu>',
   ].join('\n');
 
   protected readonly menuCode = [

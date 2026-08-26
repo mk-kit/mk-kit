@@ -30,4 +30,8 @@ export type MkPlacement =
   | 'bottom-start'
   | 'bottom-end'
   | 'left'
-  | 'right';
+  | 'left-start'
+  | 'left-end'
+  | 'right'
+  | 'right-start'
+  | 'right-end';
