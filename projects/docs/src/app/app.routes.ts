@@ -307,6 +307,12 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/chat/chat-page').then((m) => m.ChatPage),
   },
   {
+    path: 'components/query-builder',
+    title: 'Query builder — mk-kit',
+    loadComponent: () =>
+      import('./pages/query-builder/query-builder-page').then((m) => m.QueryBuilderPage),
+  },
+  {
     path: 'components/drawer',
     title: 'Drawer — mk-kit',
     loadComponent: () =>

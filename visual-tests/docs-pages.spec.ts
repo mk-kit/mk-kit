@@ -52,6 +52,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/components/structure', slug: 'structure' },
   { path: '/components/layout', slug: 'layout' },
   { path: '/components/chat', slug: 'chat' },
+  { path: '/components/query-builder', slug: 'query-builder' },
   { path: '/theming', slug: 'theming' },
   { path: '/components/rich-text', slug: 'rich-text' },
   { path: '/components/markdown', slug: 'markdown' },

@@ -1,0 +1,122 @@
+@use '../src/styles/mixins' as mk;
+
+:host {
+  display: block;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-lg);
+  background: var(--mk-surface);
+  color: var(--mk-text);
+}
+
+:host(:not(.mk-query-group--root)) {
+  background: var(--mk-surface-2);
+  border-inline-start: 3px solid var(--mk-primary);
+}
+
+:host(.mk-query-group--not) {
+  border-inline-start-color: var(--mk-danger);
+}
+
+.mk-query-group__bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-2) var(--mk-space-3);
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+}
+
+.mk-query-group__spacer {
+  flex: 1 1 auto;
+}
+
+.mk-query-group__combinator {
+  display: inline-flex;
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  overflow: hidden;
+}
+
+.mk-query-group__toggle {
+  padding: var(--mk-space-1) var(--mk-space-3);
+  border: 0;
+  background: transparent;
+  color: var(--mk-text-muted);
+  font: inherit;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-semibold);
+  cursor: pointer;
+
+  &--active {
+    background: var(--mk-primary);
+    color: var(--mk-primary-contrast, #fff);
+  }
+  &--not {
+    border: var(--mk-border-width) solid var(--mk-border);
+    border-radius: var(--mk-radius-md);
+  }
+  &--not.mk-query-group__toggle--active {
+    background: var(--mk-danger);
+    border-color: var(--mk-danger);
+  }
+  &:disabled {
+    cursor: default;
+    opacity: 0.6;
+  }
+  &:focus-visible {
+    @include mk.focus-ring(calc(-1 * var(--mk-focus-ring-width)));
+  }
+}
+
+.mk-query-group__rules {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-2);
+  padding: var(--mk-space-3);
+}
+
+.mk-query-group__empty {
+  margin: 0;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+}
+
+.mk-query-group__rule {
+  display: grid;
+  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 1fr) minmax(10rem, 2fr) auto;
+  align-items: center;
+  gap: var(--mk-space-2);
+}
+
+.mk-query-group__value {
+  grid-column: 3;
+  min-width: 0;
+}
+
+/* Two half-width editors (between) share the value column. */
+.mk-query-group__value--half {
+  grid-column: auto;
+}
+.mk-query-group__rule:has(.mk-query-group__value--half) {
+  grid-template-columns: minmax(8rem, 1fr) minmax(8rem, 1fr) minmax(5rem, 1fr) minmax(5rem, 1fr) auto;
+}
+
+/* No value editor: keep the remove button in its column. */
+.mk-query-group__rule > .mk-query-group__remove {
+  grid-column: -2;
+}
+
+@media (max-width: 640px) {
+  .mk-query-group__rule,
+  .mk-query-group__rule:has(.mk-query-group__value--half) {
+    grid-template-columns: 1fr auto;
+  }
+  .mk-query-group__value,
+  .mk-query-group__value--half {
+    grid-column: 1;
+  }
+  .mk-query-group__rule > .mk-query-group__remove {
+    grid-column: 2;
+    grid-row: 1;
+  }
+}

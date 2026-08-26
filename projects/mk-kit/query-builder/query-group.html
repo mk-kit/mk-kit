@@ -1,0 +1,123 @@
+@let g = group();
+<div class="mk-query-group__bar">
+  <div class="mk-query-group__combinator" role="group" [attr.aria-label]="i18n.queryOperator">
+    <button
+      type="button"
+      class="mk-query-group__toggle"
+      [class.mk-query-group__toggle--active]="g.combinator === 'and'"
+      [attr.aria-pressed]="g.combinator === 'and'"
+      [disabled]="disabled()"
+      (click)="setCombinator('and')"
+    >{{ i18n.queryAnd }}</button>
+    <button
+      type="button"
+      class="mk-query-group__toggle"
+      [class.mk-query-group__toggle--active]="g.combinator === 'or'"
+      [attr.aria-pressed]="g.combinator === 'or'"
+      [disabled]="disabled()"
+      (click)="setCombinator('or')"
+    >{{ i18n.queryOr }}</button>
+  </div>
+  @if (allowNot()) {
+    <button
+      type="button"
+      class="mk-query-group__toggle mk-query-group__toggle--not"
+      [class.mk-query-group__toggle--active]="!!g.not"
+      [attr.aria-pressed]="!!g.not"
+      [disabled]="disabled()"
+      (click)="toggleNot()"
+    >{{ i18n.queryNot }}</button>
+  }
+  <span class="mk-query-group__spacer"></span>
+  <button mkButton type="button" variant="ghost" tone="neutral" [size]="size()" [disabled]="disabled() || !fields().length" (click)="addRule()">
+    <mk-icon name="plus" size="sm" /> {{ i18n.queryAddRule }}
+  </button>
+  @if (canNest()) {
+    <button mkButton type="button" variant="ghost" tone="neutral" [size]="size()" [disabled]="disabled()" (click)="addGroup()">
+      <mk-icon name="layers" size="sm" /> {{ i18n.queryAddGroup }}
+    </button>
+  }
+  @if (!root()) {
+    <button mkButton type="button" variant="ghost" tone="neutral" [size]="size()" class="mk-query-group__remove" [disabled]="disabled()" [attr.aria-label]="i18n.queryRemoveGroup" (click)="remove.emit()">
+      <mk-icon name="trash" size="sm" />
+    </button>
+  }
+</div>
+
+<div class="mk-query-group__rules">
+  @if (!g.rules.length) {
+    <p class="mk-query-group__empty">{{ i18n.queryEmptyGroup }}</p>
+  }
+  @for (node of g.rules; track node.id; let i = $index) {
+    @if (isGroup(node)) {
+      <mk-query-group
+        [group]="node"
+        [fields]="fields()"
+        [depth]="depth() + 1"
+        [maxDepth]="maxDepth()"
+        [allowNot]="allowNot()"
+        [disabled]="disabled()"
+        [size]="size()"
+        (groupChange)="replaceAt(i, $event)"
+        (remove)="removeAt(i)"
+      />
+    } @else {
+      <div class="mk-query-group__rule" role="group">
+        <mk-select
+          class="mk-query-group__field"
+          [options]="fieldOptions()"
+          [value]="node.field"
+          [size]="size()"
+          [disabled]="disabled()"
+          [attr.aria-label]="i18n.queryField"
+          (valueChange)="setField(i, node, $event)"
+        />
+        <mk-select
+          class="mk-query-group__operator"
+          [options]="operatorOptions(node)"
+          [value]="node.operator"
+          [size]="size()"
+          [disabled]="disabled()"
+          [attr.aria-label]="i18n.queryOperator"
+          (valueChange)="setOperator(i, node, $event)"
+        />
+        @if (needsValue(node)) {
+          @switch (typeOf(node)) {
+            @case ('boolean') {
+              <mk-select class="mk-query-group__value" [options]="booleanOptions()" [value]="node.value ?? null" [size]="size()" [disabled]="disabled()" [attr.aria-label]="i18n.queryValue" (valueChange)="setValue(i, node, $event)" />
+            }
+            @case ('select') {
+              @if (isList(node)) {
+                <mk-multi-select class="mk-query-group__value" [options]="selectOptions(node)" [value]="asArray(node.value)" [size]="size()" [disabled]="disabled()" [attr.aria-label]="i18n.queryValue" (valueChange)="setValue(i, node, $event)" />
+              } @else {
+                <mk-select class="mk-query-group__value" [options]="selectOptions(node)" [value]="node.value ?? null" [size]="size()" [disabled]="disabled()" [attr.aria-label]="i18n.queryValue" (valueChange)="setValue(i, node, $event)" />
+              }
+            }
+            @case ('number') {
+              @if (isRange(node)) {
+                <mk-number-input class="mk-query-group__value mk-query-group__value--half" [value]="numberValue(rangePart(node, 0))" [size]="size()" [disabled]="disabled()" [placeholder]="i18n.queryValueFrom" [attr.aria-label]="i18n.queryValueFrom" (valueChange)="setRangePart(i, node, 0, $event)" />
+                <mk-number-input class="mk-query-group__value mk-query-group__value--half" [value]="numberValue(rangePart(node, 1))" [size]="size()" [disabled]="disabled()" [placeholder]="i18n.queryValueTo" [attr.aria-label]="i18n.queryValueTo" (valueChange)="setRangePart(i, node, 1, $event)" />
+              } @else {
+                <mk-number-input class="mk-query-group__value" [value]="numberValue(node.value)" [size]="size()" [disabled]="disabled()" [placeholder]="fieldOf(node)?.placeholder ?? ''" [attr.aria-label]="i18n.queryValue" (valueChange)="setValue(i, node, $event)" />
+              }
+            }
+            @case ('date') {
+              @if (isRange(node)) {
+                <mk-date-picker class="mk-query-group__value mk-query-group__value--half" [value]="dateValue(rangePart(node, 0))" [size]="size()" [disabled]="disabled()" [placeholder]="i18n.queryValueFrom" (valueChange)="setDateRange(i, node, 0, $event)" />
+                <mk-date-picker class="mk-query-group__value mk-query-group__value--half" [value]="dateValue(rangePart(node, 1))" [size]="size()" [disabled]="disabled()" [placeholder]="i18n.queryValueTo" (valueChange)="setDateRange(i, node, 1, $event)" />
+              } @else {
+                <mk-date-picker class="mk-query-group__value" [value]="dateValue(node.value)" [size]="size()" [disabled]="disabled()" (valueChange)="setDate(i, node, $event)" />
+              }
+            }
+            @default {
+              <input mkInput class="mk-query-group__value" type="text" [value]="textValue(node.value)" [size]="size()" [disabled]="disabled()" [placeholder]="fieldOf(node)?.placeholder ?? ''" [attr.aria-label]="i18n.queryValue" (input)="onTextInput(i, node, $event)" />
+            }
+          }
+        }
+        <button mkButton type="button" variant="ghost" tone="neutral" [size]="size()" class="mk-query-group__remove" [disabled]="disabled()" [attr.aria-label]="i18n.queryRemoveRule" (click)="removeAt(i)">
+          <mk-icon name="close" size="sm" />
+        </button>
+      </div>
+    }
+  }
+</div>

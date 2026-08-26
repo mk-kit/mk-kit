@@ -47,7 +47,7 @@ describe('MkTableDataSource', () => {
     expect(ds.loading()).toBe(true);
     expect(ds.rows()).toEqual([]);
     expect(requests).toEqual([
-      { page: 1, pageSize: 10, sort: null, filter: '' },
+      { page: 1, pageSize: 10, sort: null, filter: '', query: null },
     ]);
 
     await drain();
@@ -121,6 +121,7 @@ describe('MkTableDataSource', () => {
         pageSize: 50,
         sort: null,
         filter: '',
+        query: null,
       });
     });
 
@@ -179,7 +180,7 @@ describe('MkTableDataSource', () => {
       expect(requests).toEqual([]);
       vi.advanceTimersByTime(1);
       expect(requests).toEqual([
-        { page: 1, pageSize: 10, sort: null, filter: 'an' },
+        { page: 1, pageSize: 10, sort: null, filter: 'an', query: null },
       ]);
       ds.destroy();
     });
@@ -252,7 +253,7 @@ describe('MkTableDataSource', () => {
       ds.setFilter('q');
       ds.setPage(2);
       expect(requests).toEqual([
-        { page: 2, pageSize: 10, sort: null, filter: 'q' },
+        { page: 2, pageSize: 10, sort: null, filter: 'q', query: null },
       ]);
       vi.advanceTimersByTime(1000);
       expect(requests).toHaveLength(1); // debounce timer was cancelled
@@ -446,7 +447,7 @@ describe('MkTableDataSource', () => {
       ) as HTMLButtonElement;
       button.click();
       expect(requests).toEqual([
-        { page: 1, pageSize: 10, sort: { active: 'name', direction: 'asc' }, filter: '' },
+        { page: 1, pageSize: 10, sort: { active: 'name', direction: 'asc' }, filter: '', query: null },
       ]);
 
       button.click();
@@ -461,6 +462,44 @@ describe('MkTableDataSource', () => {
 
       ds.destroy();
       fixture.destroy();
+    });
+  });
+
+  describe('setQuery', () => {
+    it('compacts the tree, resets to page 1, loads at once, and clears with null', async () => {
+      const reqs: MkDataRequest[] = [];
+      const ds = new MkTableDataSource<Row>(async (req) => {
+        reqs.push(req);
+        return pageOf([]);
+      });
+      await drain();
+      ds.setPage(3);
+      await drain();
+      ds.setQuery({
+        id: 'g',
+        combinator: 'and',
+        rules: [
+          { id: 'r', field: 'name', operator: 'contains', value: 'a' },
+          { id: 'u', field: 'name', operator: 'contains', value: '' }, // unfinished → dropped
+          { id: 'e', combinator: 'or', rules: [] }, // empty → dropped
+        ],
+      });
+      await drain();
+      const last = reqs[reqs.length - 1];
+      expect(last.page).toBe(1);
+      expect(last.query).toEqual({
+        id: 'g',
+        combinator: 'and',
+        rules: [{ id: 'r', field: 'name', operator: 'contains', value: 'a' }],
+      });
+      const count = reqs.length;
+      ds.setQuery({ id: 'g', combinator: 'and', rules: [{ id: 'r', field: 'name', operator: 'contains', value: 'a' }] });
+      await drain();
+      expect(reqs.length).toBe(count); // unchanged → no reload
+      ds.setQuery({ id: 'x', combinator: 'or', rules: [] });
+      await drain();
+      expect(reqs[reqs.length - 1].query).toBeNull();
+      ds.destroy();
     });
   });
 

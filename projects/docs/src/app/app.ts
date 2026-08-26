@@ -264,6 +264,11 @@ export class App {
             'table data-grid pagination inline-edit row-detail grouping data-source fetcher sticky columns cells',
         },
         {
+          label: 'Query builder',
+          path: '/components/query-builder',
+          keywords: 'query-builder filter conditions rules groups and or predicate where',
+        },
+        {
           label: 'Sort',
           path: '/components/sort',
           keywords: 'sort sort-header sorting order ascending descending',

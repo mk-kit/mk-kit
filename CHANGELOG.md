@@ -8,6 +8,18 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Query builder** — new `@mk-kit/ui/query-builder` entry (Wave B):
+  `mk-query-builder` assembles rules and nested and / or groups (optional
+  *Not*, `maxDepth`) into a plain-JSON `MkQueryGroup` via `[(query)]`; a
+  field's `type` (`string`, `number`, `boolean`, `date`, `select`) picks the
+  editor and the operators, `operators` restricts them. In `core`:
+  `MkQueryField` / `MkQueryGroup` / `MkQueryRule` types, `mkQueryToPredicate()`
+  for client-side filtering (unfinished rules are ignored), `mkQueryToText()`
+  for a readable summary, `mkQueryCompact()`, `mkCreateQueryGroup()` /
+  `mkCreateQueryRule()`, `MK_QUERY_OPERATORS`. `MkTableDataSource.setQuery()`
+  puts the compacted tree on every request as `req.query`. i18n `query*` keys
+  (operator labels included). Budgets: core 85 → 100 KiB, new query-builder
+  64 KiB.
 - **Chat** — new `@mk-kit/ui/chat` entry point (Wave B): `mk-chat` (a
   `role="log"` conversation that stays pinned to the newest message while
   text streams in, *jump to latest* with an unseen count, typing indicator,
