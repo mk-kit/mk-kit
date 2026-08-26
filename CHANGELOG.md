@@ -4,6 +4,16 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.34.1] — 2026-08-26
+
+### Changed
+
+- **Package README rewritten** for the public release: the full component
+  inventory by group, entry points, density & touch, i18n, SSR & zoneless,
+  the PrimeNG mapping and the versioning/support policy. No code changes.
+- First release published from CI through npm trusted publishing (OIDC) with
+  a provenance attestation.
+
 ## [0.34.0] — 2026-08-26
 
 ### Changed
