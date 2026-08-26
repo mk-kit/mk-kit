@@ -2,7 +2,7 @@
 
 **Themable, accessible Angular component library for admin dashboards, back-offices and internal tools.**
 
-170+ standalone components, directives and services — data tables, charts,
+175+ standalone components, directives and services — data tables, charts,
 date & time pickers, editors, kanban, overlays, an app shell — written for
 Angular 22 with signals and `OnPush` from day one. Every visual value is a
 `--mk-*` CSS custom property; light and dark ship out of the box; WCAG 2.1 AA
@@ -71,14 +71,14 @@ export class AppRoot {
 
 | Group | Highlights |
 |---|---|
-| **Forms & inputs** (49) | text, number, password (strength meter), OTP, phone (country prefix), postal code, currency, card number, IBAN, tax id, masked input, tag input, select, autocomplete, multi-select, tree-select, transfer list, checkbox, radio, switch, slider, range slider, rating, colour picker, file upload (dropzone), signature pad, numeric keypad & on-screen keyboard, repeater (`FormArray`), form field with automatic validation messages, form error summary |
+| **Forms & inputs** (53)** | text, number, password (strength meter), OTP, phone (country prefix), postal code, currency, card number, IBAN, tax id, masked input, tag input, select, autocomplete, multi-select, tree-select, transfer list, checkbox, radio, switch, slider, range slider, rating, colour picker, file upload (dropzone), signature pad, numeric keypad & on-screen keyboard, repeater (`FormArray`), form field with automatic validation messages, form error summary, listbox, cascader (multi-column select), floating labels |
 | **Date & time** | calendar, date picker, date-range picker, time picker, month/year picker, week picker, inline mini date, event calendar with editable week/day grid (drag to move / resize) |
-| **Tables & grids** (6) | data table — sort, multi-select, expandable rows, tree rows, grouping, sticky header, column resize / reorder / pin, inline cell edit, responsive stacking, CSV export, print styles — plus `MkTableDataSource` for server-side sort/page/filter |
+| **Tables & grids** (7)** | data table — sort, multi-select, expandable rows, tree rows, grouping, sticky header, column resize / reorder / pin, inline cell edit, responsive stacking, CSV export, print styles — plus `MkTableDataSource` for server-side sort/page/filter, query builder (`mk-query-builder` → predicate / readable text / `MkTableDataSource.setQuery()`) |
 | **Charts** (12) | line/area, bar (stacked, horizontal, label fitting), donut, gauge, progress ring, scatter/bubble, radar, funnel, treemap, heatmap, calendar heatmap, sparkline — SVG, themed, accessible |
 | **Data display** (25) | cards, lists, stat cards, badges, tags, chips, avatars & groups, timeline, description list, tree, empty state, countdown, QR code, diff view, JSON viewer, code block, virtual scroll, carousel, kanban |
 | **Navigation & layout** (21) | app shell (responsive sidebar), stack / flex / grid layout primitives, nav list & groups, tabs, stepper, breadcrumb, pagination, menu, context menu, command palette (⌘K), page header, toolbar, splitter, drawer, scroll area, FAB, back-to-top |
-| **Feedback & overlays** (20) | dialogs (+ `confirm()` / `alert()` / `prompt()`), bottom sheet, drawer, popover, popconfirm, hovercard, tooltip, toast, snackbar, alert, banner, result page, notification center, product tour, progress bar, loading bar, spinner, skeletons |
-| **Editors & interactions** (22) | block editor (Notion-style, HTML round-trip), rich text, markdown renderer, code editor, log viewer, drag & drop, sortable list, @mentions, hotkeys, undo/redo history, permissions (`*mkCan`), clipboard, intersect, infinite scroll, ripple, scrollspy |
+| **Feedback & overlays** (21)** | dialogs (+ `confirm()` / `alert()` / `prompt()`), bottom sheet, drawer, popover, popconfirm, hovercard, tooltip, toast, snackbar, alert, banner, result page, notification center, product tour, progress bar, loading bar, spinner, skeletons, block UI (region / page overlay), draggable & resizable dialogs |
+| **Editors & interactions** (25)** | block editor (Notion-style, HTML round-trip), rich text, markdown renderer, code editor, log viewer, drag & drop, sortable list, @mentions, hotkeys, undo/redo history, permissions (`*mkCan`), clipboard, intersect, infinite scroll, ripple, scrollspy, chat (streaming message log, tool cards, prompt box) |
 | **Media** (6) | image with states, gallery, lightbox, cropper, media manager |
 | **Core services** | theme (light/dark/system + density), breakpoints, overlay & anchored panels, focus trap, live announcer, icon registry (426 built-in icons), i18n |
 
