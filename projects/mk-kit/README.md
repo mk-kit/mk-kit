@@ -9,7 +9,7 @@ Angular 22 with signals and `OnPush` from day one. Every visual value is a
 is the target, not the marketing. MIT licensed. Zero runtime dependencies
 beyond Angular.
 
-- **Docs & live demos:** <https://github.com/mk-kit/mk-kit> (site: mk-kit.dev — coming soon)
+- **Docs & live demos:** <https://mk-kit.dev>
 - **Changelog:** [CHANGELOG.md](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
 - **Issues:** <https://github.com/mk-kit/mk-kit/issues>
 
