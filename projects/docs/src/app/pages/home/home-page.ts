@@ -47,6 +47,7 @@ import {
 } from '@mk-kit/ui';
 import { version as uiVersion } from '../../../../../mk-kit/package.json';
 import { SITE } from '../../site.config';
+import { openInStackBlitz, starterApp } from '../../shared/stackblitz';
 
 interface Feature {
   tag: string;
@@ -170,6 +171,9 @@ interface Mapping {
               <a mkButton variant="outline" tone="neutral" size="lg" routerLink="/examples/dashboard">
                 Open the demo dashboard
               </a>
+              <button mkButton variant="ghost" tone="neutral" size="lg" type="button" (click)="openStarter()">
+                Try it in StackBlitz ↗
+              </button>
             </div>
             <div class="install">
               <code class="install__cmd" aria-label="Install command">
@@ -1338,6 +1342,10 @@ interface Mapping {
   ],
 })
 export class HomePage {
+  protected openStarter(): void {
+    openInStackBlitz(starterApp());
+  }
+
   protected readonly theme = inject(MkThemeService);
   private readonly toast = inject(MkToastService);
 
