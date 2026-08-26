@@ -16,8 +16,18 @@ import {
   type MkSortChange,
   type MkTableColumn,
   type MkTone,
+  MkButton,
+  type MkTreeToggle,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
+
+interface TreeNode {
+  id: string;
+  name: string;
+  role: string;
+  headcount: number;
+  children?: TreeNode[];
+}
 
 interface DemoUser {
   name: string;
@@ -69,6 +79,7 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
     MkTableCell,
     MkTableRowDetail,
     MkTag,
+    MkButton,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -222,6 +233,19 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td><code class="docs-inline">output&lt;T[]&gt;</code></td>
             <td>—</td>
             <td>The currently expanded rows whenever they change.</td>
+          </tr>
+          <tr><td colspan="4"><strong>Tree rows</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">childrenKey</code></td>
+            <td><code class="docs-inline">string | null</code></td>
+            <td><code class="docs-inline">null</code></td>
+            <td>Property holding each row's child rows. Renders a treegrid with indent, toggle, per-sibling sorting and Arrow keys.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">(treeToggle)</code></td>
+            <td><code class="docs-inline">MkTreeToggle&lt;T&gt;</code></td>
+            <td>—</td>
+            <td>A parent row was expanded or collapsed: <code class="docs-inline">{{ '{' }} row, expanded {{ '}' }}</code>.</td>
           </tr>
           <tr><td colspan="4"><strong>Grouping</strong></td></tr>
           <tr>
@@ -449,6 +473,40 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
           style="width: 100%"
         />
         <p class="echo">Last toggle: {{ groupStatus() }}</p>
+      </docs-example>
+
+      <h2>Tree rows</h2>
+      <p>
+        Set <code class="docs-inline">childrenKey</code> to the property that holds
+        each row's child rows and the table becomes a tree grid: children are
+        indented under their parent behind a toggle in the first column,
+        sorting applies within each sibling group, ArrowRight / ArrowLeft on a
+        row open / close it, and select-all covers every row. Rows carry
+        <code class="docs-inline">aria-level</code> and
+        <code class="docs-inline">aria-expanded</code>; the table announces as
+        a <code class="docs-inline">treegrid</code>. Listen to
+        <code class="docs-inline">(treeToggle)</code> or call
+        <code class="docs-inline">expandAllRows()</code> /
+        <code class="docs-inline">collapseAllRows()</code>. Works together with
+        expandable detail rows, selection, grouping and stacked cards.
+      </p>
+      <docs-example [code]="treeCode" column>
+        <div style="display: flex; gap: var(--mk-space-2); margin-bottom: var(--mk-space-3)">
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="treeTable.expandAllRows()">Expand all</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="treeTable.collapseAllRows()">Collapse all</button>
+        </div>
+        <mk-table
+          #treeTable
+          [columns]="treeColumns"
+          [data]="treeRows"
+          childrenKey="children"
+          trackKey="id"
+          clickableRows
+          hover
+          (treeToggle)="onTreeToggle($event)"
+          style="width: 100%"
+        />
+        <p class="echo">Last toggle: {{ treeStatus() }}</p>
       </docs-example>
 
       <h2>Inline edit</h2>
@@ -935,6 +993,44 @@ export class TablePage {
   protected onGroupToggle(e: { key: unknown; collapsed: boolean }): void {
     this.groupStatus.set(`${e.key} ${e.collapsed ? 'collapsed' : 'expanded'}`);
   }
+
+  // --- Tree rows -------------------------------------------------------------
+  protected readonly treeStatus = signal('—');
+  protected onTreeToggle(e: MkTreeToggle<TreeNode>): void {
+    this.treeStatus.set((e.expanded ? 'Expanded ' : 'Collapsed ') + e.row.name);
+  }
+  protected readonly treeColumns: MkTableColumn<TreeNode>[] = [
+    { key: 'name', header: 'Team / member', sortable: true },
+    { key: 'role', header: 'Role' },
+    { key: 'headcount', header: 'Headcount', sortable: true, align: 'end' },
+  ];
+  protected readonly treeRows: TreeNode[] = [
+    {
+      id: 'eng', name: 'Engineering', role: 'Department', headcount: 42,
+      children: [
+        { id: 'web', name: 'Web platform', role: 'Team', headcount: 14, children: [
+          { id: 'ada', name: 'Ada Lovelace', role: 'Staff engineer', headcount: 1 },
+          { id: 'linus', name: 'Linus Torvalds', role: 'Engineer', headcount: 1 },
+        ] },
+        { id: 'api', name: 'API', role: 'Team', headcount: 18 },
+        { id: 'sre', name: 'SRE', role: 'Team', headcount: 10 },
+      ],
+    },
+    { id: 'design', name: 'Design', role: 'Department', headcount: 7, children: [
+      { id: 'grace', name: 'Grace Hopper', role: 'Design lead', headcount: 1 },
+    ] },
+    { id: 'ops', name: 'Operations', role: 'Department', headcount: 9 },
+  ];
+  protected readonly treeCode = `<mk-table
+  [columns]="columns"
+  [data]="departments"
+  childrenKey="children"
+  trackKey="id"
+  clickableRows
+  (treeToggle)="onTreeToggle($event)"
+/>
+
+// departments: { id, name, headcount, children?: Department[] }[]`;
 
   protected readonly groupedCode = `<mk-table
   [columns]="columns"

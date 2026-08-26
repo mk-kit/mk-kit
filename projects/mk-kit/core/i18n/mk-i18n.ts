@@ -371,6 +371,9 @@ export interface MkI18nStrings {
   /** Row expander toggle labels. */
   expandRow: string;
   collapseRow: string;
+  /** Tree-row toggle labels (`childrenKey`). */
+  expandTreeRow: string;
+  collapseTreeRow: string;
   /** aria-label of a group header's toggle when the group is collapsed. */
   expandGroup: string;
   /** aria-label of a group header's toggle when the group is expanded. */
@@ -746,6 +749,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   expandHeader: 'Expand',
   expandRow: 'Expand row',
   collapseRow: 'Collapse row',
+  expandTreeRow: 'Show child rows',
+  collapseTreeRow: 'Hide child rows',
   expandGroup: 'Expand group',
   collapseGroup: 'Collapse group',
   groupCount: (count) => `${count} item${count === 1 ? '' : 's'}`,

@@ -38,7 +38,7 @@ hooks — see the "Coming from PrimeNG" section on the homepage.
 | ✅ | **`mk-datetime-picker`** — combined date + time field (shipped, Wave A) | P K S Z T D | date-picker + time-picker + anchored panel | S |
 | ✅ | **Nested submenus** in `mk-menu` (`[mkSubmenuFor]`, hover/keyboard, RTL) — shipped, Wave A | P K S M Z D | menu, anchored panel | M |
 | ✅ | **`mk-split-button`** — main action + menu trigger (shipped, Wave A) | P K S Z D | button, menu | S |
-| P1 | **Tree table** — nested rows in `mk-table` (`childrenKey`, expand/collapse, indent, keyboard) | P K S D | table expandable rows, tree key model | M |
+| ✅ | **Tree table** — nested rows in `mk-table` (`childrenKey`, expand/collapse, indent, keyboard) — shipped, Wave A | P K S D | table expandable rows, tree key model | M |
 | P1 | **Icon set** — ship ~250 tree-shakeable SVG icons via `MkIconRegistry` (today: 35) + documented Lucide/Material adapters; stop using emoji in docs | all | icon registry | M |
 | P1 | **`mk-chat`** + **`mk-prompt-box`** — message list, streaming text, tool/attachment cards, composer | K S D | virtual scroll, markdown, file-upload, autosize | M |
 | P1 | **`mk-query-builder`** — rule/group tree → JSON, pairs with `MkTableDataSource` filters | K S D | select, inputs, date pickers, repeater | M |
