@@ -4,6 +4,119 @@ A curated gap analysis for `@mkornas/ui`, measured against Angular Material and
 common admin-dashboard needs. Priorities: **P1** high value / frequently needed,
 **P2** useful, **P3** nice-to-have. This is a planning doc, not a commitment.
 
+## Round 5 (2026-08-26) — competitor gap analysis & Free / Pro tiering
+
+Measured against the full component inventories of PrimeNG 21 (last MIT)
++ PrimeUI PRO, Kendo UI for Angular, Syncfusion EJ2, Angular Material/CDK,
+ng-zorro-antd, Taiga UI and DevExtreme (sidebar-level, 2026-08-26). Only
+feature areas that appear in **two or more** suites count as gaps; suite-
+exclusive novelties (Terminal, Watermark, Ribbon, Smith chart…) are ignored.
+
+### Tiering principle
+
+- **Everything that ships today stays MIT** — all 165 components, directives
+  and services, the theme builder, i18n, the schematic and the docs. Nothing
+  is carved out of the free core; the free core is the marketing.
+- **Pro = things that do not exist yet** and that every paid Angular vendor
+  also charges for: multi-week "vendor-class" widgets, finished screens, the
+  Figma kit and support. Each Pro widget must be a genuinely separate entry
+  point that the free library never depends on.
+- Free gaps below are prioritised by (a) how many suites ship it, (b) how often
+  an admin panel actually needs it, (c) reuse of existing primitives.
+
+### What we already cover that PrimeUI now charges for
+
+Charts (12 types), rich-text + block editor, event calendar with editable
+week/day grid, kanban, data table with resize/reorder/pin/inline-edit +
+server-side data source, Figma-free theme builder. These are the migration
+hooks — see the "Coming from PrimeNG" section on the homepage.
+
+### Free-tier gaps (stay MIT) — ordered by priority
+
+| Pri | Component / feature | Suites with it | Reuses | Size |
+|-----|---------------------|----------------|--------|------|
+| P1 | **`mk-datetime-picker`** — combined date + time field | P K S Z T D | date-picker + time-picker + anchored panel | S |
+| P1 | **Nested submenus** in `mk-menu` (`[mkSubmenuFor]`, hover/keyboard, RTL) | P K S M Z D | menu, anchored panel | M |
+| P1 | **`mk-split-button`** — main action + menu trigger | P K S Z D | button, menu | S |
+| P1 | **Tree table** — nested rows in `mk-table` (`childrenKey`, expand/collapse, indent, keyboard) | P K S D | table expandable rows, tree key model | M |
+| P1 | **Icon set** — ship ~250 tree-shakeable SVG icons via `MkIconRegistry` (today: 35) + documented Lucide/Material adapters; stop using emoji in docs | all | icon registry | M |
+| P1 | **`mk-chat`** + **`mk-prompt-box`** — message list, streaming text, tool/attachment cards, composer | K S D | virtual scroll, markdown, file-upload, autosize | M |
+| P1 | **`mk-query-builder`** — rule/group tree → JSON, pairs with `MkTableDataSource` filters | K S D | select, inputs, date pickers, repeater | M |
+| P1 | **CSV export + print stylesheet** — `mkExportCsv(rows, columns)`, `@media print` table styles | K S D | table columns | S |
+| P1 | Layout primitives — `mk-stack`, `mk-grid`, `mk-flex` + `MkBreakpointService` | K M Z D S T | app-shell media query | S |
+| P2 | **Draggable / resizable dialog** (`draggable`, `resizable` on `mk-dialog`) | P K S D | dialog, dnd rect-snapshot | S |
+| P2 | `mk-cascader` — multi-level dependent select | P Z | select, anchored panel | M |
+| P2 | `mk-listbox` — standalone single/multi selection list (keyboard, typeahead) | P K S M D | list, roving tabindex | S |
+| P2 | `mk-form-field` float-label variant (`labelPosition="float"`) | P K S M T | form-field | S |
+| P2 | `mkBlockUi` / `mk-load-panel` — overlay loading state on any region | P Z T D | overlay, spinner | S |
+| P2 | `mk-dynamic-form` — schema → form renderer (fields, groups, validators, conditions) | K D (+ Formly) | every form control, repeater | L |
+| P2 | Bullet chart, meter group, sankey | K S D / P / K S D | chart-utils | S/S/M |
+| P2 | `mk-cron-editor` — human cron expression builder (admin schedulers) | Z | select, inputs | S |
+| P2 | `mk-tab-bar` / bottom navigation (mobile) | K T | nav-list | S |
+| P2 | `mk-image-compare` slider | P | image, slider | S |
+| P2 | Pipes: `mkCurrency`, `mkRelativeTime`, `mkFileSize`, `mkInitials`, `mkTruncate` | Z T | date-utils, payment helpers | S |
+| P2 | Overlay badge (`[mkBadgeOverlay]` anchored to icon/avatar) | P K S M | badge | S |
+| P3 | Multi-date selection in `mk-calendar` | P K S T | calendar range model | S |
+| P3 | `mk-barcode` (Code 128 / EAN) | K S | qr-code encoder pattern | S |
+| P3 | `mkAffix` sticky directive, `mkLineClamp` | Z T | intersect | S |
+| P3 | Candlestick / stock chart | K S D | line/bar chart | M |
+| P3 | Color palette / gradient picker variants | K | color-picker | S |
+| P3 | Comment thread (`mk-comment`) | Z T | avatar, timeline | S |
+| P3 | Swipe-to-reveal list actions (mobile) | T | dnd pointer handling | S |
+| P3 | Test harnesses (`@mkornas/ui/testing`) | M | — | M |
+| — | Spreadsheet, geo maps, PDF viewer, image editor, word processor | K S / K S D / P K S T / S / S | out of scope — huge, and not admin-panel core |
+
+Size: S ≤ 2 days, M ≤ 1 week, L ≤ 2 weeks (single dev, with tests + docs).
+
+### Pro candidates (paid, separate `@mk-kit/pro/*` entry points)
+
+Ranked by how many paid suites charge for it × admin-panel demand × distance
+from what the free core can already fake.
+
+| # | Widget | Charged for by | Effort | Notes |
+|---|--------|----------------|--------|-------|
+| 1 | **Admin Starter** — auth/2FA, dashboard, CRUD list + detail + form, settings, users & roles, billing, notifications, audit log (12 screens, mock API, tests) | PrimeBlocks, Kendo templates, every ThemeForest admin | 3–4 wk | Lift and generalise the mk-cms admin. The product; ships first. |
+| 2 | **`mk-dashboard-grid`** — draggable/resizable widget layout with breakpoints + persisted layout JSON | Syncfusion Dashboard Layout, Kendo TileLayout | 2 wk | Highest demand-to-effort ratio; every "build your own dashboard" admin. |
+| 3 | **Resource scheduler / timeline view** on `mk-event-calendar` (resources as rows, day/week timeline, drag across resources) | PrimeUI Scheduler, Kendo, Syncfusion, DevExtreme | 2–3 wk | Free calendar stays; Pro adds the resource axis. |
+| 4 | **`mk-gantt`** — tasks, dependencies, drag/resize, baseline, critical path, zoom | PrimeUI (soon), Kendo, Syncfusion, DevExtreme | 3–4 wk | |
+| 5 | **Export pack** — XLSX with styles/multiple sheets, PDF (table + charts), scheduled/large exports via web worker | Kendo, Syncfusion, DevExtreme | 2 wk | CSV + print stay free. |
+| 6 | **`mk-pivot-grid`** + field chooser | Kendo, Syncfusion, DevExtreme | 3–4 wk | |
+| 7 | **`mk-form-builder`** — drag-drop form designer emitting the free `mk-dynamic-form` schema | (no Angular vendor has a good one) | 3 wk | Differentiator; needs free `mk-dynamic-form` first. |
+| 8 | **`mk-org-chart`** | PrimeNG, Syncfusion, DevExtreme | 1 wk | Small enough to be free if Pro needs a "taster"; decide at launch. |
+| 9 | **`mk-diagram`** — flow/whiteboard editor with nodes, ports, auto-layout | PrimeUI (soon), Kendo, Syncfusion, ng-zorro (Graph), DevExtreme | 4–6 wk | Last; only if Pro is validated. |
+| 10 | **Figma kit** mirroring every `--mk-*` token, plus the Admin Starter screens | Kendo, PrimeUI, Untitled UI | 2–3 wk | Design work, not code. |
+
+### Pro packaging
+
+- Private repo `mk-kit-pro`; package `@mk-kit/pro` with one secondary entry
+  per widget (`@mk-kit/pro/gantt`…); peer-depends on the public package.
+- Offline licence key à la MUI X / AG Grid (`provideMkProLicense(key)`,
+  console warning + watermark without a valid key; no network calls).
+- Delivery: private GitHub repo access + tarball download first; private npm
+  (Verdaccio on the VPS or Cloudsmith) once `npm install` friction shows up.
+- Same quality bar as the core: specs, a11y smoke, SSR smoke, visual sweep,
+  i18n keys through `provideMkI18n`.
+
+### Implementation waves
+
+1. **Wave A — free P1 (2 weeks) → public launch.** datetime-picker, submenus,
+   split-button, tree table, icon set, CSV export + print, layout primitives.
+   These close every "2+ suites" gap a PrimeNG migrator hits in week one.
+2. **Wave B — free P1 differentiators + DX (3 weeks).** `mk-chat` +
+   prompt box, `mk-query-builder`, draggable dialog, listbox, cascader,
+   float label, block UI; StackBlitz starters, `llms.txt` + MCP server,
+   generated API reference, test harnesses.
+3. **Gate (month 3 after launch):** ≥ 1k stars or ≥ 2k weekly downloads or
+   ≥ 150 Pro waitlist sign-ups → start Pro. Otherwise continue Wave C only.
+4. **Wave C — free P2 (rolling).** dynamic-form renderer, cron editor,
+   charts (bullet/meter/sankey), pipes, tab bar, image compare, overlay badge.
+5. **Pro 1 (4 weeks):** Admin Starter + `mk-dashboard-grid` + licence
+   plumbing + checkout (Paddle/Polar) → Pro launch to the waitlist.
+6. **Pro 2 (6 weeks):** resource scheduler, gantt, export pack.
+7. **Pro 3 (as validated):** pivot grid, form builder, Figma kit, diagram.
+
+---
+
 ## ⭑ mk-cms admin blockers
 
 Driven by the **mk-cms** admin panel (schema-driven CRUD). The original blockers
