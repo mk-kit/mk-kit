@@ -59,6 +59,28 @@ describe('mkComputeAnchoredPosition', () => {
     expect(pos).toEqual({ top: 110, left: 332, placement: 'left' });
   });
 
+  it('tops a right-start panel with the anchor (submenu beside its item)', () => {
+    const pos = mkComputeAnchoredPosition(
+      rect(100, 400, 100, 40),
+      { width: 60, height: 200 },
+      VIEWPORT,
+      { ...OPTS, placement: 'right-start' },
+    );
+    // left = 400 + 100 + 4 = 504; top = anchor top.
+    expect(pos).toEqual({ top: 100, left: 504, placement: 'right-start' });
+  });
+
+  it('flips a right-start panel to left-start when it would overflow the right edge', () => {
+    const pos = mkComputeAnchoredPosition(
+      rect(100, 900, 80, 40),
+      { width: 60, height: 200 },
+      VIEWPORT,
+      { ...OPTS, placement: 'right-start' },
+    );
+    // 900 + 80 + 4 + 60 > 1000 → left side: 900 - 60 - 4 = 836, still top-aligned.
+    expect(pos).toEqual({ top: 100, left: 836, placement: 'left-start' });
+  });
+
   it('does not flip when flip is disabled, only clamps (tooltip behaviour)', () => {
     const pos = mkComputeAnchoredPosition(
       rect(10, 50, 100, 30),
