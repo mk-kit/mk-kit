@@ -8,8 +8,8 @@ contributions are made under.
 
 - **Bugs and small fixes:** open a pull request directly.
 - **New components or behaviour changes:** open an issue first so we can agree
-  on the API and where it fits before you invest time. `ROADMAP.md` lists what
-  is planned.
+  on the API and where it fits before you invest time. Open issues labelled
+  `planned` show what is already on the way.
 - **Security issues:** do not open a public issue — see `SECURITY.md`.
 - Be kind and specific in reviews; assume good intent.
 
