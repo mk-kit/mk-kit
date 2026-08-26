@@ -1,10 +1,16 @@
 import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
-import { MkButton, MkMenu, MkMenuItem, MkSplitButton } from '@mk-kit/ui';
+import {
+  MkButton,
+  MkMenu,
+  MkMenuItem,
+  MkSplitButton,
+  MkIcon,
+} from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({
   selector: 'docs-buttons-page',
-  imports: [MkButton, MkSplitButton, MkMenu, MkMenuItem, DocsExample],
+  imports: [MkButton, MkSplitButton, MkMenu, MkMenuItem, DocsExample, MkIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -83,10 +89,10 @@ import { DocsExample } from '../../shared/docs-example';
         an <code class="docs-inline">aria-label</code> so it's announced.
       </p>
       <docs-example [code]="iconCode">
-        <button mkButton iconOnly aria-label="Add item">＋</button>
-        <button mkButton iconOnly variant="soft" tone="neutral" aria-label="Settings">⚙</button>
-        <button mkButton iconOnly variant="ghost" tone="danger" aria-label="Delete">🗑</button>
-        <button mkButton iconOnly size="lg" tone="success" aria-label="Confirm">✓</button>
+        <button mkButton iconOnly aria-label="Add item"><mk-icon name="plus" /></button>
+        <button mkButton iconOnly variant="soft" tone="neutral" aria-label="Settings"><mk-icon name="settings" /></button>
+        <button mkButton iconOnly variant="ghost" tone="danger" aria-label="Delete"><mk-icon name="trash" /></button>
+        <button mkButton iconOnly size="lg" tone="success" aria-label="Confirm"><mk-icon name="check" /></button>
       </docs-example>
 
       <h2>Full width & disabled</h2>
@@ -228,9 +234,9 @@ export class ButtonsPage {
   {{ saving() ? 'Saving…' : 'Save changes' }}
 </button>`;
 
-  protected readonly iconCode = `<button mkButton iconOnly aria-label="Add item">＋</button>
-<button mkButton iconOnly variant="soft" tone="neutral" aria-label="Settings">⚙</button>
-<button mkButton iconOnly variant="ghost" tone="danger" aria-label="Delete">🗑</button>`;
+  protected readonly iconCode = `<button mkButton iconOnly aria-label="Add item"><mk-icon name="plus" /></button>
+<button mkButton iconOnly variant="soft" tone="neutral" aria-label="Settings"><mk-icon name="settings" /></button>
+<button mkButton iconOnly variant="ghost" tone="danger" aria-label="Delete"><mk-icon name="trash" /></button>`;
 
   protected readonly stateCode = `<button mkButton fullWidth tone="primary">Full width</button>
 <button mkButton disabled>Disabled</button>

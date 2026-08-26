@@ -2,6 +2,7 @@ import { provideZonelessChangeDetection } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { MkIconRegistry } from './icon-registry';
 import { MK_DEFAULT_ICONS } from './default-icons';
+import { MK_EXTENDED_ICONS } from './extended-icons';
 import { MK_MATERIAL_ICON_ALIASES } from './material-aliases';
 
 describe('MkIconRegistry', () => {
@@ -49,5 +50,22 @@ describe('MkIconRegistry', () => {
     expect(registry.get('visibility_off')).not.toBeNull();
     expect(registry.get('qr_code_scanner')).not.toBeNull();
     expect(registry.get('restaurant')).not.toBeNull();
+  });
+
+  it('registers the Lucide-derived extended set alongside the defaults', () => {
+    const reg = TestBed.inject(MkIconRegistry);
+    const names = reg.names();
+    expect(names.length).toBeGreaterThanOrEqual(400);
+    for (const n of ['ellipsis', 'layout-dashboard', 'file-spreadsheet', 'receipt', 'circle-help']) {
+      expect(reg.has(n)).toBe(true);
+    }
+    // A hand-made default wins over an extended glyph of the same name.
+    expect(reg.get('trash')).toBe(reg.get('trash'));
+    // Every built-in glyph is a self-contained 24×24 stroke SVG.
+    for (const [name, svg] of Object.entries({ ...MK_EXTENDED_ICONS, ...MK_DEFAULT_ICONS })) {
+      expect(svg, name).toMatch(/^<svg viewBox="0 0 24 24"[^>]*stroke="currentColor"/);
+      expect(svg, name).toMatch(/<\/svg>$/);
+    }
+    expect(new Set(names).size).toBe(names.length);
   });
 });

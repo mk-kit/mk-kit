@@ -138,7 +138,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-qr-code', desc: 'Dependency-free QR code renderer.', path: '/components/data' },
       { name: 'mk-code', desc: 'Highlighted code block with copy button.', path: '/components/data' },
       { name: 'mk-virtual-scroll', desc: 'Windowed rendering for very long lists.', path: '/components/data' },
-      { name: 'mk-icon', desc: 'Inline SVG icon component.', path: '/components/icon' },
+      { name: 'mk-icon', desc: '420+ built-in stroke icons (hand-made core + Lucide-derived set), sizes, labels, custom SVG.', path: '/components/icon' },
       { name: 'MkIconRegistry', desc: 'Register custom SVG icon sets by name.', path: '/components/icon' },
       { name: 'mk-tree', desc: 'Expandable tree view with selection and keyboard nav.', path: '/components/tree' },
       { name: 'mk-empty-state', desc: 'Friendly empty/none-yet placeholder with action slot.', path: '/components/empty-timeline' },

@@ -1,5 +1,5 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { MkButton, MkIcon, MkIconRegistry } from '@mk-kit/ui';
+import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { MkButton, MkIcon, MkIconRegistry, MkInput, MkToastService } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
@@ -9,7 +9,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-icon-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkIcon, MkButton],
+  imports: [DocsExample, MkIcon, MkButton, MkInput],
   template: `
     <div class="docs-page docs-container">
       <h1>Icon</h1>
@@ -19,25 +19,55 @@ import { DocsExample } from '../../shared/docs-example';
         <code class="docs-inline">&lt;svg&gt;</code>. Glyphs inherit the current
         text colour (<code class="docs-inline">currentColor</code>) and scale to
         the <code class="docs-inline">size</code> box, so they drop cleanly into
-        buttons, inputs and menus. A default Feather-style set ships built in;
-        extend it via <code class="docs-inline">MkIconRegistry</code>.
+        buttons, inputs and menus. {{ names.length }} stroke icons ship built
+        in — a hand-made core plus a curated set derived from
+        <a href="https://lucide.dev" target="_blank" rel="noopener">Lucide</a>
+        (ISC) — and you can extend or override any of them via
+        <code class="docs-inline">MkIconRegistry</code>.
       </p>
 
       <!-- ============================================================ -->
       <h2>Built-in set</h2>
       <p>
-        {{ names.length }} icons are registered out of the box. Reference any by
-        name.
+        {{ names.length }} icons are registered out of the box. Search by name;
+        click an icon to copy its <code class="docs-inline">&lt;mk-icon&gt;</code>
+        tag.
       </p>
-      <docs-example [code]="basicCode" column>
-        <div class="icon-grid">
-          @for (n of names; track n) {
-            <div class="icon-cell">
-              <mk-icon [name]="n" size="lg" />
-              <span class="icon-cell__name">{{ n }}</span>
-            </div>
-          }
-        </div>
+      <div class="icon-search">
+        <input
+          mkInput
+          type="search"
+          placeholder="Search icons… (e.g. chart, file, arrow)"
+          aria-label="Search icons"
+          [value]="query()"
+          (input)="query.set($any($event.target).value)"
+        />
+        <span class="icon-search__count" aria-live="polite">
+          {{ filtered().length }} of {{ names.length }}
+        </span>
+      </div>
+      <div class="icon-grid" role="list">
+        @for (n of filtered(); track n) {
+          <button
+            type="button"
+            class="icon-cell"
+            role="listitem"
+            [attr.aria-label]="'Copy ' + n"
+            (click)="copy(n)"
+          >
+            <mk-icon [name]="n" size="lg" />
+            <span class="icon-cell__name">{{ n }}</span>
+          </button>
+        } @empty {
+          <p class="icon-grid__empty">No icon matches “{{ query() }}”.</p>
+        }
+      </div>
+      <docs-example [code]="basicCode">
+        <mk-icon name="search" size="lg" />
+        <mk-icon name="layout-dashboard" size="lg" />
+        <mk-icon name="file-spreadsheet" size="lg" />
+        <mk-icon name="circle-help" size="lg" />
+        <mk-icon name="receipt" size="lg" />
       </docs-example>
 
       <!-- ============================================================ -->
@@ -149,6 +179,39 @@ import { DocsExample } from '../../shared/docs-example';
   `,
   styles: [
     `
+      .icon-search {
+        display: flex;
+        align-items: center;
+        gap: var(--mk-space-3);
+        margin-bottom: var(--mk-space-4);
+      }
+      .icon-search input {
+        flex: 1 1 auto;
+      }
+      .icon-search__count {
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+        white-space: nowrap;
+      }
+      button.icon-cell {
+        font: inherit;
+        color: inherit;
+        background: var(--mk-surface);
+        border: 1px solid var(--mk-border);
+        cursor: pointer;
+      }
+      button.icon-cell:hover {
+        border-color: var(--mk-primary);
+      }
+      button.icon-cell:focus-visible {
+        outline: 2px solid var(--mk-focus-ring, var(--mk-primary));
+        outline-offset: 2px;
+      }
+      .icon-grid__empty {
+        grid-column: 1 / -1;
+        color: var(--mk-text-muted);
+      }
+
       .icon-grid {
         display: grid;
         grid-template-columns: repeat(auto-fill, minmax(6rem, 1fr));
@@ -174,6 +237,21 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class IconPage {
+  private readonly toast = inject(MkToastService);
+  protected readonly query = signal('');
+  protected readonly filtered = computed(() => {
+    const q = this.query().trim().toLowerCase();
+    return q ? this.names.filter((n) => n.includes(q)) : this.names;
+  });
+  protected async copy(name: string): Promise<void> {
+    const tag = `<mk-icon name="${name}" />`;
+    try {
+      await navigator.clipboard.writeText(tag);
+      this.toast.success(`Copied ${tag}`);
+    } catch {
+      this.toast.info(tag);
+    }
+  }
   private readonly registry = inject(MkIconRegistry);
   protected readonly names = this.registry.names();
 
@@ -185,8 +263,11 @@ export class IconPage {
     );
   }
 
-  protected readonly basicCode = `<mk-icon name="search" />
-<mk-icon name="trash" size="lg" />`;
+  protected readonly basicCode = `<mk-icon name="search" size="lg" />
+<mk-icon name="layout-dashboard" size="lg" />
+<mk-icon name="file-spreadsheet" size="lg" />
+<mk-icon name="circle-help" size="lg" />
+<mk-icon name="receipt" size="lg" />`;
 
   protected readonly sizeCode = `<mk-icon name="star" size="sm" />
 <mk-icon name="star" size="lg" />

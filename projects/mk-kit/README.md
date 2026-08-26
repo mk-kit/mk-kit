@@ -196,4 +196,5 @@ for use of the name and logo.
 
 ## License
 
-MIT © Mateusz Kornaś
+MIT © Mateusz Kornaś. Part of the built-in icon set is derived from
+[Lucide](https://lucide.dev) (ISC) — see `THIRD_PARTY_NOTICES.md`.

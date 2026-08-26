@@ -4,12 +4,13 @@ import {
   MkMenu,
   MkMenuItem,
   MkToastService,
+  MkIcon,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
 @Component({
   selector: 'docs-context-menu-page',
-  imports: [MkContextMenuTrigger, MkMenu, MkMenuItem, DocsExample],
+  imports: [MkContextMenuTrigger, MkMenu, MkMenuItem, DocsExample, MkIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -29,24 +30,24 @@ import { DocsExample } from '../../shared/docs-example';
       </p>
       <docs-example [column]="true" [code]="basicCode">
         <div class="ctx-surface" tabindex="0" [mkContextMenuTriggerFor]="fileMenu">
-          <span aria-hidden="true">🖱️</span>
+          <mk-icon name="mouse-pointer-click" />
           Right-click anywhere in this box
         </div>
         <mk-menu #fileMenu="mkMenu">
           <mk-menu-item (action)="run('Open')">
-            <span mkMenuItemIcon aria-hidden="true">📂</span> Open
+            <mk-icon mkMenuItemIcon name="folder-open" /> Open
           </mk-menu-item>
           <mk-menu-item (action)="run('Rename')">
-            <span mkMenuItemIcon aria-hidden="true">✏️</span> Rename
+            <mk-icon mkMenuItemIcon name="edit" /> Rename
           </mk-menu-item>
           <mk-menu-item (action)="run('Duplicate')">
             <span mkMenuItemIcon aria-hidden="true">⧉</span> Duplicate
           </mk-menu-item>
           <mk-menu-item disabled>
-            <span mkMenuItemIcon aria-hidden="true">🔒</span> Locked
+            <mk-icon mkMenuItemIcon name="lock" /> Locked
           </mk-menu-item>
           <mk-menu-item danger (action)="run('Delete')">
-            <span mkMenuItemIcon aria-hidden="true">🗑</span> Delete
+            <mk-icon mkMenuItemIcon name="trash" /> Delete
           </mk-menu-item>
         </mk-menu>
       </docs-example>
@@ -157,7 +158,7 @@ export class ContextMenuPage {
 
 <mk-menu #fileMenu="mkMenu">
   <mk-menu-item (action)="open()">
-    <span mkMenuItemIcon>📂</span> Open
+    <mk-icon mkMenuItemIcon name="folder-open" /> Open
   </mk-menu-item>
   <mk-menu-item (action)="rename()">Rename</mk-menu-item>
   <mk-menu-item disabled>Locked</mk-menu-item>
