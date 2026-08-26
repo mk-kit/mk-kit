@@ -117,6 +117,33 @@ interface OrderLine {
       <!-- ============================================================ -->
       <!-- REACTIVE FORMS -->
       <!-- ============================================================ -->
+      <h2>Floating label</h2>
+      <p>
+        <code class="docs-inline">labelPosition="float"</code> moves the label
+        inside the control; it slides up once the field is focused or holds a
+        value, and the placeholder stays hidden until then so the two never
+        overlap. It works with <code class="docs-inline">mkInput</code> and
+        textareas out of the box, and with any control bound through
+        <code class="docs-inline">ngModel</code> or a
+        <code class="docs-inline">formControl</code>. Hints, errors and
+        <code class="docs-inline">required</code> behave exactly as with a top
+        label — keep the top position for dense admin forms, float for
+        sign-up and checkout flows where the label doubles as the prompt.
+      </p>
+      <docs-example [code]="floatCode" column>
+        <div style="display: grid; gap: var(--mk-space-4); max-width: 24rem;">
+          <mk-form-field label="Email" labelPosition="float" required hint="We never share it.">
+            <input mkInput type="email" placeholder="you@example.com" [(ngModel)]="floatEmail" />
+          </mk-form-field>
+          <mk-form-field label="Full name" labelPosition="float">
+            <input mkInput [(ngModel)]="floatName" />
+          </mk-form-field>
+          <mk-form-field label="Notes" labelPosition="float">
+            <textarea mkInput rows="3"></textarea>
+          </mk-form-field>
+        </div>
+      </docs-example>
+
       <h2>Reactive forms</h2>
       <p>
         Every mk-kit control implements
@@ -596,6 +623,17 @@ export class FormsPage {
   }
 
   // --- Code snippets (plain strings shown in the code blocks) ---------------
+  protected floatEmail = '';
+  protected floatName = 'Ada Lovelace';
+
+  protected readonly floatCode = `<mk-form-field label="Email" labelPosition="float" required hint="We never share it.">
+  <input mkInput type="email" placeholder="you@example.com" [(ngModel)]="email" />
+</mk-form-field>
+
+<mk-form-field label="Notes" labelPosition="float">
+  <textarea mkInput rows="3"></textarea>
+</mk-form-field>`;
+
   protected readonly formFieldCode = `<mk-form-field
   label="Email"
   hint="We never share it."

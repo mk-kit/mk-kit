@@ -1,10 +1,13 @@
-import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import {
   MkChip,
   MkProgressBar,
   MkSkeleton,
   MkSkeletonPreset,
   MkSpinner,
+  MkBlockUi,
+  MkBlockUiService,
+  MkButton,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -15,7 +18,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-loading-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkChip, MkProgressBar, MkSkeleton, MkSkeletonPreset, MkSpinner],
+  imports: [DocsExample, MkChip, MkProgressBar, MkSkeleton, MkSkeletonPreset, MkSpinner, MkBlockUi, MkButton],
   template: `
     <div class="docs-page docs-container">
       <h1>Loading & progress</h1>
@@ -131,6 +134,30 @@ import { DocsExample } from '../../shared/docs-example';
       </table>
 
       <!-- ========================== SKELETON ========================= -->
+      <h2>Block UI</h2>
+      <p>
+        <code class="docs-inline">[mkBlockUi]</code> covers any element with a
+        translucent panel and a spinner while something is in flight: the
+        contents become <code class="docs-inline">inert</code> (no clicks, no
+        Tab stops), the host gets <code class="docs-inline">aria-busy</code>,
+        and an optional <code class="docs-inline">mkBlockUiMessage</code>
+        explains what is happening. <code class="docs-inline">mkBlockUiDelay</code>
+        holds it back for fast operations so nothing flashes. For the whole
+        page, <code class="docs-inline">MkBlockUiService.block()</code>
+        returns a release function and is reference-counted.
+      </p>
+      <docs-example [code]="blockCode" column>
+        <div class="block-demo" [mkBlockUi]="blocking()" mkBlockUiMessage="Refreshing orders…" [mkBlockUiDelay]="150">
+          <h3>Orders</h3>
+          <p>1,204 open · 86 shipping today · 12 refund requests</p>
+          <button mkButton size="sm" variant="outline" tone="neutral">Export</button>
+        </div>
+        <div style="display: flex; gap: var(--mk-space-2); margin-top: var(--mk-space-3)">
+          <button mkButton size="sm" (click)="blockRegion()">Block this card for 2.5 s</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="blockPage()">Block the page for 2 s</button>
+        </div>
+      </docs-example>
+
       <h2>Skeleton</h2>
       <p>
         A shimmering placeholder shown while content loads. It is
@@ -196,6 +223,7 @@ import { DocsExample } from '../../shared/docs-example';
     </div>
   `,
   styles: [
+    `.block-demo { padding: var(--mk-space-4); border: var(--mk-border-width) solid var(--mk-border); border-radius: var(--mk-radius-lg); } .block-demo h3 { margin: 0 0 var(--mk-space-2); }`,
     `
       :host {
         display: block;
@@ -207,6 +235,26 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class LoadingPage {
+  private readonly blockUi = inject(MkBlockUiService);
+  protected readonly blocking = signal(false);
+
+  protected blockRegion(): void {
+    this.blocking.set(true);
+    setTimeout(() => this.blocking.set(false), 2500);
+  }
+
+  protected blockPage(): void {
+    const release = this.blockUi.block('Exporting report…');
+    setTimeout(release, 2000);
+  }
+
+  protected readonly blockCode = `<mk-card [mkBlockUi]="saving()" mkBlockUiMessage="Saving…">…</mk-card>
+<form [mkBlockUi]="submitting()" [mkBlockUiDelay]="300">…</form>
+
+// Whole page, reference-counted
+const release = this.blockUi.block('Exporting…');
+try { await this.api.export(); } finally { release(); }`;
+
   // ----- Progress ------------------------------------------------------
   protected readonly progress = signal(40);
 
