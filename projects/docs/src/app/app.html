@@ -104,3 +104,6 @@
 
 <!-- ⌘K docs search -->
 <mk-command-palette [(open)]="searchOpen" [commands]="searchCommands" />
+
+<!-- Cookie consent (AZ Widgets) — themed via --az-* in styles.scss -->
+<az-consent [attr.tenant]="site.azTenant" position="bar" locale="en" [attr.theme]="theme.resolvedTheme()"></az-consent>

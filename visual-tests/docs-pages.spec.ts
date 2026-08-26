@@ -114,6 +114,9 @@ for (const theme of ['light', 'dark'] as const) {
     for (const { path, slug, waitFor, viewportOnly } of ROUTES) {
       test(`${slug} (${theme})`, async ({ page }) => {
         await preparePage(page, theme);
+        // Third-party widgets (consent bar, contact forms) would make the
+        // sweep network-dependent and non-deterministic — keep them out.
+        await page.route(/azwidgets\.pl/, (route) => route.abort());
         await page.goto(path, { waitUntil: 'networkidle' });
         if (waitFor) await page.waitForSelector(waitFor);
         await settle(page, viewportOnly);

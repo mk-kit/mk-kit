@@ -1,9 +1,13 @@
 import {
+  CUSTOM_ELEMENTS_SCHEMA,
   ChangeDetectionStrategy,
   Component,
+  DOCUMENT,
+  ElementRef,
   computed,
   inject,
   signal,
+  viewChild,
 } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import {
@@ -42,6 +46,7 @@ import {
   type MkTableColumn,
 } from '@mk-kit/ui';
 import { version as uiVersion } from '../../../../../mk-kit/package.json';
+import { SITE } from '../../site.config';
 
 interface Feature {
   tag: string;
@@ -70,7 +75,10 @@ interface Tier {
   blurb: string;
   features: string[];
   cta: string;
-  link: string;
+  /** Route for a plain link CTA. */
+  link?: string;
+  /** Opens the AZ Widgets contact form tagged with this topic instead. */
+  form?: 'waitlist' | 'team';
   highlight?: boolean;
 }
 interface Faq {
@@ -126,6 +134,8 @@ interface Mapping {
     MkTooltip,
   ],
   changeDetection: ChangeDetectionStrategy.OnPush,
+  // <az-form> hosts are AZ Widgets custom elements.
+  schemas: [CUSTOM_ELEMENTS_SCHEMA],
   host: {
     '[style.--mk-primary]': 'brand().color',
     '[style.--mk-primary-hover]': 'derived().hover',
@@ -499,16 +509,84 @@ interface Mapping {
                     <li>{{ f }}</li>
                   }
                 </ul>
-                <a mkButton [tone]="t.highlight ? 'primary' : 'neutral'"
-                   [variant]="t.highlight ? 'solid' : 'outline'" fullWidth
-                   [routerLink]="t.link">
-                  {{ t.cta }}
-                </a>
+                @if (t.form) {
+                  <button mkButton type="button" [tone]="t.highlight ? 'primary' : 'neutral'"
+                          [variant]="t.highlight ? 'solid' : 'outline'" fullWidth
+                          (click)="openForm(t.form)">
+                    {{ t.cta }}
+                  </button>
+                } @else {
+                  <a mkButton [tone]="t.highlight ? 'primary' : 'neutral'"
+                     [variant]="t.highlight ? 'solid' : 'outline'" fullWidth
+                     [routerLink]="t.link">
+                    {{ t.cta }}
+                  </a>
+                }
               </mk-card>
             }
           </div>
+
+          <!-- AZ Widgets contact forms, opened from the tier buttons above. The
+               hosts are kept out of flow; the modal itself is position: fixed
+               inside the widget's shadow root, so it still renders. -->
+          <div class="az-hosts" aria-hidden="true">
+            <az-form #waitlistForm [attr.tenant]="site.azTenant" mode="modal" locale="en"
+                     topic="Pro waitlist" headline="Join the Pro waitlist"
+                     subheadline="Launch price for the first 100 seats. One email when it opens, nothing else."
+                     [attr.theme]="theme.resolvedTheme()"></az-form>
+            <az-form #teamForm [attr.tenant]="site.azTenant" mode="modal" locale="en"
+                     topic="Team licence" headline="Talk to us about a Team licence"
+                     subheadline="Tell us about your team and how you'd like to be invoiced."
+                     [attr.theme]="theme.resolvedTheme()"></az-form>
+          </div>
         </section>
       }
+
+      <!-- ───────────────────────── Creator ───────────────────────── -->
+      <section class="wrap section" aria-labelledby="creator-title">
+        <div class="creator">
+          <div class="creator__photo">
+            <img
+              src="founder.webp"
+              alt="Mateusz Kornaś, creator of mk-kit"
+              width="592"
+              height="432"
+              loading="lazy"
+              decoding="async"
+            />
+          </div>
+          <div class="creator__body">
+            <p class="eyebrow">From the creator</p>
+            <h2 class="section__title" id="creator-title">Hi, I'm Mateusz.</h2>
+            <p class="creator__text">
+              I build admin panels and internal tools for a living, and every
+              project used to start the same way: a week of wiring up the same
+              tables, pickers and dialogs before the real work could begin.
+              mk-kit is that week, done once and properly — accessible,
+              themeable, tested — so the next project starts on day one.
+            </p>
+            <p class="creator__text">
+              The library is MIT and stays that way. Pro adds the finished
+              screens and premium widgets I would otherwise rebuild for every
+              client; the open core is what you would get from me anyway.
+            </p>
+            <ul class="creator__points">
+              <li>I build and maintain mk-kit myself — issues and feature requests land in my inbox.</li>
+              <li>Every component ships with tests, an accessibility pass and docs before it is released.</li>
+              <li>I use it in my own products every day — the Gastronaut admin runs on it.</li>
+            </ul>
+            <div class="creator__footer">
+              <div class="creator__sign">
+                <strong>Mateusz Kornaś</strong>
+                <span>Creator of mk-kit</span>
+              </div>
+              <a mkButton variant="outline" tone="neutral" href="https://mateuszkornas.com" target="_blank" rel="noopener">
+                See what else I make ↗
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
 
       <!-- ───────────────────────── FAQ ───────────────────────── -->
       <section class="band" aria-labelledby="faq-title">
@@ -1035,6 +1113,81 @@ interface Mapping {
         font-weight: var(--mk-font-weight-bold);
       }
 
+      /* Out-of-flow hosts for the AZ contact forms (fixed modals escape). */
+      .az-hosts {
+        position: absolute;
+        width: 0;
+        height: 0;
+        overflow: hidden;
+      }
+
+      /* Creator ---------------------------------------------------------- */
+      .creator {
+        display: grid;
+        grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+        overflow: hidden;
+        border: 1px solid var(--mk-border);
+        border-radius: var(--mk-radius-lg);
+        background: var(--mk-surface);
+        box-shadow: var(--mk-shadow-sm, none);
+      }
+      .creator__photo {
+        position: relative;
+        min-height: 100%;
+        background: var(--mk-surface-2);
+      }
+      .creator__photo img {
+        display: block;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+      }
+      .creator__body {
+        padding: var(--mk-space-10) var(--mk-space-10);
+      }
+      .creator__body .section__title {
+        margin-bottom: var(--mk-space-4);
+      }
+      .creator__text {
+        margin: 0 0 var(--mk-space-4);
+        color: var(--mk-text-muted);
+        line-height: 1.65;
+      }
+      .creator__points {
+        list-style: none;
+        margin: var(--mk-space-5) 0 var(--mk-space-6);
+        padding: 0;
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-2);
+        font-size: var(--mk-font-size-sm);
+        line-height: 1.55;
+      }
+      .creator__points li::before {
+        content: '✓';
+        color: var(--mk-success);
+        font-weight: var(--mk-font-weight-bold);
+        margin-right: 0.5em;
+      }
+      .creator__footer {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: space-between;
+        gap: var(--mk-space-4);
+        padding-top: var(--mk-space-5);
+        border-top: 1px solid var(--mk-border-subtle);
+      }
+      .creator__sign {
+        display: flex;
+        flex-direction: column;
+        line-height: 1.3;
+      }
+      .creator__sign span {
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+
       /* FAQ -------------------------------------------------------------- */
       .faqwrap .section__head {
         margin-bottom: var(--mk-space-6);
@@ -1130,6 +1283,20 @@ interface Mapping {
         .index__row {
           grid-template-columns: 3rem minmax(0, 1fr);
         }
+        .creator {
+          grid-template-columns: minmax(0, 1fr);
+        }
+        .creator__photo {
+          aspect-ratio: 16 / 10;
+          min-height: 0;
+        }
+        .creator__photo img {
+          position: absolute;
+          inset: 0;
+        }
+        .creator__body {
+          padding: var(--mk-space-6) var(--mk-space-5);
+        }
         .index__blurb {
           grid-column: 2;
         }
@@ -1174,6 +1341,11 @@ export class HomePage {
   protected readonly theme = inject(MkThemeService);
   private readonly toast = inject(MkToastService);
 
+  private readonly document = inject(DOCUMENT);
+  protected readonly site = SITE;
+  private readonly waitlistForm = viewChild<ElementRef<HTMLElement>>('waitlistForm');
+  private readonly teamForm = viewChild<ElementRef<HTMLElement>>('teamForm');
+
   protected readonly uiVersion = uiVersion;
   protected readonly total = 167;
   protected readonly copied = signal(false);
@@ -1201,6 +1373,25 @@ export class HomePage {
 
   protected setDark(dark: boolean): void {
     this.theme.setTheme(dark ? 'dark' : 'light');
+  }
+
+  /**
+   * Open the AZ Widgets contact form for a tier. The widget renders its own
+   * trigger inside an open shadow root; we click it so our mk-kit button is
+   * the visible control. If the widget is not loaded (blocked, offline,
+   * module disabled) fall back to a pre-filled email.
+   */
+  protected openForm(which: 'waitlist' | 'team'): void {
+    const host = (which === 'waitlist' ? this.waitlistForm() : this.teamForm())?.nativeElement;
+    const trigger = host?.shadowRoot?.querySelector<HTMLButtonElement>('.trigger');
+    if (trigger) {
+      trigger.click();
+      return;
+    }
+    const subject = which === 'waitlist' ? 'mk-kit Pro waitlist' : 'mk-kit Team licence';
+    this.document.defaultView?.location.assign(
+      `mailto:${SITE.contactEmail}?subject=${encodeURIComponent(subject)}`,
+    );
   }
 
   protected async copyInstall(): Promise<void> {
@@ -1340,7 +1531,7 @@ export class HomePage {
         'Priority issues, 2-business-day response',
       ],
       cta: 'Join the waitlist',
-      link: '/introduction',
+      form: 'waitlist',
       highlight: true,
     },
     {
@@ -1355,7 +1546,7 @@ export class HomePage {
         'Early access to new premium widgets',
       ],
       cta: 'Talk to us',
-      link: '/introduction',
+      form: 'team',
     },
   ];
 
