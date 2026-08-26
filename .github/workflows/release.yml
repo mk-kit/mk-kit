@@ -112,12 +112,14 @@ jobs:
         with:
           fetch-depth: 0
 
+      # No `registry-url` here on purpose: with it, setup-node writes an .npmrc
+      # carrying a placeholder NODE_AUTH_TOKEN, and npm then sends that bogus
+      # token instead of authenticating through the OIDC trusted publisher.
       - name: Set up Node
         uses: actions/setup-node@v5
         with:
           node-version: 24.18.0
           cache: npm
-          registry-url: https://registry.npmjs.org
 
       # Trusted publishing needs npm ≥ 11.5.1; Node 24 bundles 11.x but pin
       # the floor explicitly so a runner image change cannot silently break it.
