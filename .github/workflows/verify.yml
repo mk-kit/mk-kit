@@ -37,8 +37,12 @@ jobs:
       - name: Build docs
         run: npm run build
 
-      - name: Verify package (publish dry-run)
-        run: npm publish --dry-run
+      # `npm pack --dry-run` validates the tarball (files, package.json, exports)
+      # without the registry check that `npm publish --dry-run` performs — the
+      # latter fails on every PR that does not bump the version, because the
+      # current version is already published.
+      - name: Verify package (pack dry-run)
+        run: npm pack --dry-run
         working-directory: dist/mk-kit
 
       - name: Upload built package
