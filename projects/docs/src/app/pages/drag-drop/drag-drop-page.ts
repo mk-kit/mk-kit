@@ -26,6 +26,17 @@ interface BoardColumn {
   readonly title: string;
 }
 
+interface NestedItem {
+  readonly id: string;
+  readonly title: string;
+}
+
+interface NestedSection {
+  readonly id: string;
+  readonly title: string;
+  readonly items: NestedItem[];
+}
+
 /**
  * Drag & drop components demo page — the low-level `[mkDropList]` + `[mkDrag]`
  * primitives, the `[mkDragHandle]` grip, the `mk-sortable-list` convenience
@@ -369,6 +380,56 @@ interface BoardColumn {
           </tr>
         </tbody>
       </table>
+
+      <h2 id="nested">Nested lists</h2>
+      <p>
+        Drop lists nest: a draggable section can own its own list of draggable
+        items. The pointer always targets the <em>innermost</em> connected list
+        under it, a section can never be dropped into its own items, and
+        dragging an item never picks up the section around it. Give the outer
+        items a <code class="docs-inline">mkDragHandle</code> so their whole
+        body stays free for the inner drags. Move items within and across the
+        sections below, or reorder the sections by their grip:
+      </p>
+      <docs-example [code]="nestedCode" column>
+        <ul
+          mkDropList
+          class="dnd-list dnd-sections"
+          mkDropListId="sections"
+          mkDropListLabel="Sections"
+          [mkDropListData]="sections()"
+          (mkDropListDropped)="onNestedDrop($event)"
+        >
+          @for (s of sections(); track s.id) {
+            <li mkDrag [mkDragData]="s" class="dnd-section">
+              <div class="dnd-section__head">
+                <span class="dnd-grip" mkDragHandle aria-hidden="true">⠿</span>
+                <span class="dnd-section__title">{{ s.title }}</span>
+                <span class="dnd-col__count">{{ s.items.length }}</span>
+              </div>
+              <ul
+                mkDropList
+                class="dnd-list dnd-sublist"
+                [mkDropListId]="'sec-' + s.id"
+                [mkDropListLabel]="s.title"
+                [mkDropListData]="s.items"
+                [mkDropListConnectedTo]="sectionListIds()"
+                (mkDropListDropped)="onNestedDrop($event)"
+              >
+                @for (it of s.items; track it.id) {
+                  <li mkDrag [mkDragData]="it" class="dnd-item dnd-subitem">
+                    <span class="dnd-grip" aria-hidden="true">⠿</span>
+                    {{ it.title }}
+                  </li>
+                }
+                @if (s.items.length === 0) {
+                  <li class="dnd-col__empty" aria-hidden="true">Drop here</li>
+                }
+              </ul>
+            </li>
+          }
+        </ul>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -378,6 +439,40 @@ interface BoardColumn {
       }
       h2 {
         margin-top: var(--mk-space-9, 3rem);
+      }
+      /* ---- Nested lists ---- */
+      .dnd-sections {
+        gap: var(--mk-space-3);
+      }
+      .dnd-section {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-2);
+        padding: var(--mk-space-3);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-lg);
+        background: var(--mk-surface);
+      }
+      .dnd-section__head {
+        display: flex;
+        align-items: center;
+        gap: var(--mk-space-2);
+        font-weight: var(--mk-font-weight-semibold);
+      }
+      .dnd-section__head .dnd-grip {
+        cursor: grab;
+      }
+      .dnd-section__title {
+        flex: 1;
+      }
+      .dnd-sublist {
+        min-height: 2.5rem;
+        padding: var(--mk-space-2);
+        border-radius: var(--mk-radius-md);
+        background: var(--mk-bg);
+      }
+      .dnd-subitem {
+        font-size: var(--mk-font-size-sm);
       }
       .dnd-kbd-note {
         padding: var(--mk-space-3) var(--mk-space-4);
@@ -631,7 +726,76 @@ export class DragDropPage {
     this.board.set(next);
   }
 
+  // ----- Nested lists ----------------------------------------------------
+  protected readonly sections = signal<NestedSection[]>([
+    {
+      id: 'start',
+      title: 'Getting started',
+      items: [
+        { id: 'n1', title: 'Install the package' },
+        { id: 'n2', title: 'Import the theme' },
+      ],
+    },
+    {
+      id: 'build',
+      title: 'Build the screen',
+      items: [
+        { id: 'n3', title: 'Add the app shell' },
+        { id: 'n4', title: 'Wire the table' },
+        { id: 'n5', title: 'Add the form' },
+      ],
+    },
+    { id: 'ship', title: 'Ship it', items: [{ id: 'n6', title: 'Run the visual sweep' }] },
+  ]);
+
+  /** Every section's list id — items may travel between any of them. */
+  protected readonly sectionListIds = computed(() => this.sections().map((s) => `sec-${s.id}`));
+
+  // Two list types share one handler (sections + items) — `any` keeps the
+  // generic invariance of MkDropEvent<T> out of the way.
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  protected onNestedDrop(event: MkDropEvent<any>): void {
+    const from = event.previousContainer.id();
+    const to = event.container.id();
+    if (to === 'sections' && from === 'sections') {
+      const next = [...this.sections()];
+      mkMoveItemInArray(next, event.previousIndex, event.currentIndex);
+      this.sections.set(next);
+      return;
+    }
+    if (from === 'sections' || to === 'sections') return; // sections stay sections
+    const next = this.sections().map((s) => ({ ...s, items: [...s.items] }));
+    const src = next.find((s) => `sec-${s.id}` === from)!;
+    const dst = next.find((s) => `sec-${s.id}` === to)!;
+    if (src === dst) mkMoveItemInArray(src.items, event.previousIndex, event.currentIndex);
+    else mkTransferArrayItem(src.items, dst.items, event.previousIndex, event.currentIndex);
+    this.sections.set(next);
+  }
+
   // ----- Code snippets -------------------------------------------------
+  protected readonly nestedCode = `<ul mkDropList mkDropListId="sections" [mkDropListData]="sections()"
+    (mkDropListDropped)="onNestedDrop($event)">
+  @for (s of sections(); track s.id) {
+    <li mkDrag [mkDragData]="s">
+      <span mkDragHandle>⠿</span> {{ s.title }}
+      <ul mkDropList [mkDropListId]="'sec-' + s.id" [mkDropListData]="s.items"
+          [mkDropListConnectedTo]="sectionListIds()"
+          (mkDropListDropped)="onNestedDrop($event)">
+        @for (it of s.items; track it.id) {
+          <li mkDrag [mkDragData]="it">{{ it.title }}</li>
+        }
+      </ul>
+    </li>
+  }
+</ul>
+
+onNestedDrop(e: MkDropEvent) {
+  const from = e.previousContainer.id(), to = e.container.id();
+  if (from === 'sections' && to === 'sections') { /* reorder sections */ }
+  else if (from === to) { /* mkMoveItemInArray within a section */ }
+  else { /* mkTransferArrayItem between sections */ }
+}`;
+
   protected readonly sortableCode = `<ul mkDropList
     [mkDropListData]="tasks()"
     (mkDropListDropped)="onReorder($event)">

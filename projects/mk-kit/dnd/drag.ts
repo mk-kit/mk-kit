@@ -217,6 +217,10 @@ export class MkDrag<T = unknown> {
     const e = event as PointerEvent;
     if (this.disabled() || !this.home || this.lifted()) return;
     if (e.button !== undefined && e.button !== 0) return;
+    // Nested drags: a press inside a nested `[mkDrag]` belongs to that item.
+    // Without this the event bubbles to the outer item, which would start a
+    // second drag and steal the pointer capture from the inner one.
+    if (!this.isOwnTarget(e.target)) return;
     if (this.ownHandles().length && !this.isHandleTarget(e.target)) return;
 
     this.pointerId = e.pointerId;
@@ -485,6 +489,9 @@ export class MkDrag<T = unknown> {
   protected onKeyDown(event: Event): void {
     const e = event as KeyboardEvent;
     const key = e.key;
+    // Keys act on the focused item only — a nested item's keydown bubbles up
+    // through outer items, which must not pick themselves up.
+    if (e.target !== this.element) return;
 
     if (!this.lifted()) {
       if ((key === ' ' || key === 'Enter') && !this.disabled() && this.home && !this.dragging()) {
@@ -679,11 +686,21 @@ export class MkDrag<T = unknown> {
    * only — reads the rects snapshotted at lift, not live layout.
    */
   private listUnderPoint(x: number, y: number): MkDropList<any> | null {
+    // Every candidate whose bounds contain the point. Lists nested inside the
+    // dragged item itself are never targets (an item cannot be dropped into
+    // its own descendants).
+    const hits: MkDropList<any>[] = [];
     for (const list of this.cachedGroup) {
+      if (list.element !== this.element && this.element.contains(list.element)) continue;
       const r = this.listRects.get(list) ?? list.element.getBoundingClientRect();
-      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) return list;
+      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) hits.push(list);
     }
-    return null;
+    if (hits.length <= 1) return hits[0] ?? null;
+    // Nested lists: the innermost hit wins — the one that contains no other hit.
+    return (
+      hits.find((list) => !hits.some((other) => other !== list && list.element.contains(other.element))) ??
+      hits[0]
+    );
   }
 
   /**
@@ -823,6 +840,12 @@ export class MkDrag<T = unknown> {
   private isHandleTarget(target: EventTarget | null): boolean {
     if (!(target instanceof Node)) return false;
     return this.ownHandles().some((h) => h.element.contains(target));
+  }
+
+  /** Whether `target` belongs to this item rather than to a nested `[mkDrag]`. */
+  private isOwnTarget(target: EventTarget | null): boolean {
+    if (!(target instanceof Element)) return target === this.element;
+    return target.closest('[mkDrag]') === this.element;
   }
 
   private prefersReducedMotion(): boolean {
