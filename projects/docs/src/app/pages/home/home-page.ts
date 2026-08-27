@@ -492,6 +492,7 @@ interface Mapping {
             <p class="section__lead">
               The library is MIT and always will be. Pro adds finished screens,
               premium widgets and a human on the other end of your issues.
+              <a routerLink="/pro">See what's in Pro →</a>
             </p>
           </div>
           <div class="tiers">

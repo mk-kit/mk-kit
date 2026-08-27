@@ -92,6 +92,11 @@ export class App {
           keywords: 'testing harness harnesses testbed spec unit test vitest jest loader MkHarnessLoader',
         },
         {
+          label: 'Pro',
+          path: '/pro',
+          keywords: 'pro commercial licence license dashboard grid scheduler gantt admin starter pricing buy',
+        },
+        {
           label: 'Theming',
           path: '/theming',
           keywords: 'theme css variables tokens dark light mode colors density theme-service',
