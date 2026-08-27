@@ -32,6 +32,10 @@ describe('MkDescriptionList', () => {
     expect(el.querySelectorAll('dt').length).toBe(2);
     expect(el.querySelectorAll('dd').length).toBe(2);
     expect(el.querySelector('dt')?.textContent?.trim()).toBe('Status');
+    // dt/dd must be direct children of the dl (axe `dlitem` / `definition-list`).
+    const dl = el.querySelector('dl')!;
+    expect(Array.from(dl.children).map((c) => c.tagName)).toEqual(['DT', 'DD', 'DT', 'DD']);
+    expect(el.querySelector('dd')?.textContent?.trim()).toBe('Active');
   });
 
   it('reflects the layout on the dl', async () => {

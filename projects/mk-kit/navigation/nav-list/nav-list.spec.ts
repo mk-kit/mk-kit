@@ -63,10 +63,13 @@ describe('MkNavList', () => {
     expect(items.every((i) => i.getAttribute('role') === 'listitem')).toBe(true);
   });
 
-  it('labels the group region', () => {
+  it('is a list item holding a nested, labelled list', () => {
     const { group } = mount();
-    expect(group.getAttribute('role')).toBe('group');
-    expect(group.getAttribute('aria-label')).toBe('Main');
+    expect(group.getAttribute('role')).toBe('listitem');
+    const items = group.querySelector('.mk-nav-group__items')!;
+    expect(items.getAttribute('role')).toBe('list');
+    const labelledBy = items.getAttribute('aria-labelledby')!;
+    expect(group.querySelector(`#${labelledBy}`)?.textContent).toContain('Main');
   });
 
   it('renders a plain header for a non-collapsible group', () => {

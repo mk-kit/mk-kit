@@ -29,3 +29,9 @@
   box-sizing: border-box;
   overflow: hidden;
 }
+
+/* The viewport is keyboard-scrollable (tabindex=0); show where focus is. */
+.mk-virtual-scroll__viewport:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring-color);
+  outline-offset: calc(-1 * var(--mk-focus-ring-width));
+}

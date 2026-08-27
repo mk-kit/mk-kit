@@ -77,7 +77,7 @@ import { DocsExample } from '../../shared/docs-example';
         <div style="display: flex; gap: var(--mk-space-6); flex-wrap: wrap; align-items: flex-start;">
           <mk-qr-code [value]="qrValue()" [size]="160" />
           <div style="display: grid; gap: var(--mk-space-2); max-width: 22rem; width: 100%;">
-            <input mkInput [value]="qrValue()" (input)="qrValue.set($any($event.target).value)" />
+            <input mkInput aria-label="QR code content" [value]="qrValue()" (input)="qrValue.set($any($event.target).value)" />
             <p class="echo">Encodes the text above — try editing it.</p>
           </div>
         </div>

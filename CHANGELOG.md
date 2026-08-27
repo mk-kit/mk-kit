@@ -8,6 +8,8 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Fixed
 
+- **`mk-nav-group`** is now a `listitem` of its `mk-nav-list` that wraps its items in a nested, labelled `list`, and **`mk-desc-item`** rows render their `<dt>`/`<dd>` as direct children of the `<dl>` — both fix axe `aria-required-children` / `definition-list` / `dlitem` violations (found by the Admin Starter's a11y smoke). No API change; the description list now renders only projected `mk-desc-item`s.
+- **`mk-list-item`** marks the selected interactive row with `aria-current` instead of `aria-selected` (not permitted on `listitem`); **`mk-virtual-scroll`**'s viewport is keyboard-focusable (`tabindex="0"`, focus ring) so the scrollable region is reachable. Docs: inline links are underlined (WCAG 1.4.1).
 - **Nested drop lists** (`@mk-kit/ui/dnd`) — a `[mkDropList]` inside a
   draggable item (sections with items, swimlanes, form designers) now works:
   the pointer hit-test picks the innermost connected list under the pointer

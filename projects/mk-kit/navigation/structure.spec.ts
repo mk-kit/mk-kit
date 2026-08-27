@@ -79,17 +79,17 @@ describe('MkList', () => {
   it('leaves a plain row out of the tab order and unselectable', () => {
     const { items } = list();
     expect(items[0].getAttribute('tabindex')).toBeNull();
-    expect(items[0].getAttribute('aria-selected')).toBeNull();
+    expect(items[0].getAttribute('aria-current')).toBeNull();
   });
 
   it('makes an interactive row focusable and selectable', () => {
     const { fixture, items, host } = list();
     expect(items[1].getAttribute('tabindex')).toBe('0');
-    expect(items[1].getAttribute('aria-selected')).toBe('false');
+    expect(items[1].getAttribute('aria-current')).toBeNull();
 
     host.selected.set(true);
     fixture.detectChanges();
-    expect(items[1].getAttribute('aria-selected')).toBe('true');
+    expect(items[1].getAttribute('aria-current')).toBe('true');
   });
 
   it('activates an interactive row on click and Enter/Space', () => {

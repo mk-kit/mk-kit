@@ -57,6 +57,8 @@ import { MkBreadcrumb, MkBreadcrumbItem } from '@mk-kit/ui/navigation/breadcrumb
 import { MkPagination } from '@mk-kit/ui/navigation/pagination';
 import { MkStep, MkStepper } from '@mk-kit/ui/navigation/stepper';
 import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation/tree';
+import { MkNavGroup, MkNavItem, MkNavList } from '@mk-kit/ui/navigation/nav-list';
+import { MkDescItem, MkDescriptionList } from '@mk-kit/ui/data/description-list';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkBadge } from '@mk-kit/ui/data/badge';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
@@ -479,6 +481,39 @@ class TreeHost {
 
 // --- Test loop --------------------------------------------------------------
 
+@Component({
+  imports: [MkNavList, MkNavGroup, MkNavItem],
+  template: `
+    <nav aria-label="Main">
+      <mk-nav-list>
+        <mk-nav-group label="Overview">
+          <mk-nav-item label="Dashboard" href="/" [active]="true" />
+          <mk-nav-item label="Reports" href="/reports" />
+        </mk-nav-group>
+        <mk-nav-group label="Settings" collapsible>
+          <mk-nav-item label="Team" href="/team" />
+          <mk-nav-item label="Billing" href="/billing" [badge]="3" />
+        </mk-nav-group>
+      </mk-nav-list>
+    </nav>
+  `,
+})
+class NavListHost {}
+
+@Component({
+  imports: [MkDescriptionList, MkDescItem],
+  template: `
+    <mk-description-list divided>
+      <mk-desc-item term="Status"><strong>Active</strong></mk-desc-item>
+      <mk-desc-item term="Owner">Ada Lovelace</mk-desc-item>
+    </mk-description-list>
+    <mk-description-list layout="stacked">
+      <mk-desc-item term="Plan">Pro</mk-desc-item>
+    </mk-description-list>
+  `,
+})
+class DescriptionListHost {}
+
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
@@ -515,6 +550,8 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'chip', host: ChipHost },
   { name: 'stepper', host: StepperHost },
   { name: 'tree', host: TreeHost },
+  { name: 'nav list with groups', host: NavListHost },
+  { name: 'description list', host: DescriptionListHost },
 ];
 
 describe('a11y smoke (axe-core)', () => {

@@ -95,10 +95,15 @@ body {
 
 .docs-page a {
   color: var(--mk-primary);
-  text-decoration: none;
+  /* Underlined by default: links inside running text must be distinguishable
+     without colour (axe link-in-text-block, WCAG 1.4.1). Card/chip-style links
+     opt out with their own `text-decoration: none`. */
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 0.15em;
 }
 .docs-page a:hover {
-  text-decoration: underline;
+  text-decoration-thickness: 2px;
 }
 
 /* Live example canvas + code block -------------------------------------- */
