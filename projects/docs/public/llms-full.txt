@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.38.0 — full API reference
+# @mk-kit/ui 0.39.0 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
