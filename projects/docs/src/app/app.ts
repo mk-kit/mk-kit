@@ -82,6 +82,11 @@ export class App {
           keywords: 'index catalog directory list every component browse a-z',
         },
         {
+          label: 'API reference',
+          path: '/api',
+          keywords: 'api reference inputs outputs methods types signatures llms.txt json generated',
+        },
+        {
           label: 'Theming',
           path: '/theming',
           keywords: 'theme css variables tokens dark light mode colors density theme-service',

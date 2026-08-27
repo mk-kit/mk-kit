@@ -4,6 +4,20 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Generated API reference + `llms.txt`** (Wave B) — `scripts/gen-api.mjs`
+  runs the TypeScript compiler over every entry-point barrel and emits
+  `api.json` (each export with inputs, outputs, methods, properties, types and
+  JSDoc), `llms.txt` (an [llms.txt](https://llmstxt.org) index of the docs)
+  and `llms-full.txt` (the whole API as one Markdown file for LLM context).
+  All three ship with the docs (`mk-kit.dev/api.json`, `/llms.txt`,
+  `/llms-full.txt`) and are checked for staleness in CI. New docs page
+  `/api`: searchable, one entry point at a time, deep links like
+  `/api?entry=forms#MkSelect`.
+
 ## [0.37.0] — 2026-08-26
 
 ### Added
@@ -1780,7 +1794,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.7.0...HEAD
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.37.0...HEAD
 [0.7.0]: https://github.com/mk-kit/mk-kit/compare/v0.6.0...v0.7.0
 [0.2.0]: https://github.com/mk-kit/mk-kit/compare/v0.1.9...v0.2.0
 [0.1.9]: https://github.com/mk-kit/mk-kit/compare/v0.1.8...v0.1.9

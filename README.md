@@ -31,6 +31,12 @@ npm start           # → http://localhost:4200
 npm run watch:lib
 ```
 
+Generated artefacts checked in CI (`--check`): `npm run gen:selectors`
+(selector → class map for the StackBlitz button) and `npm run gen:api`
+(`projects/docs/public/api.json`, `llms.txt`, `llms-full.txt` — the API
+reference, extracted from the library sources). Re-run them after changing
+any public export.
+
 ## Build & publish the library
 
 Published to the public npm registry as `@mk-kit/ui`, with a provenance

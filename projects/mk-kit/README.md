@@ -10,6 +10,7 @@ is the target, not the marketing. MIT licensed. Zero runtime dependencies
 beyond Angular.
 
 - **Docs & live demos:** <https://mk-kit.dev>
+- **API reference:** <https://mk-kit.dev/api> — also as [api.json](https://mk-kit.dev/api.json), [llms.txt](https://mk-kit.dev/llms.txt) and [llms-full.txt](https://mk-kit.dev/llms-full.txt) for tools and AI assistants
 - **Changelog:** [CHANGELOG.md](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
 - **Issues:** <https://github.com/mk-kit/mk-kit/issues>
 
