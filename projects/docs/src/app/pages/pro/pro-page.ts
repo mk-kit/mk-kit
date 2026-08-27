@@ -31,7 +31,7 @@ const WIDGETS: ProWidget[] = [
   { name: 'Gantt', status: 'available', entry: '@mk-kit/pro/gantt', blurb: 'Phases and tasks as a tree, milestones, four dependency types with lag, critical path, auto-schedule cascade, drag / resize / progress, day / week / month zoom, keyboard editing.' },
   { name: 'Export pack', status: 'available', entry: '@mk-kit/pro/export', blurb: 'Zero-dependency XLSX (typed cells, styles, multiple sheets, frozen header, auto-filter) and PDF (tables with repeated headers, wrapped text, charts as images, embedded TrueType fonts) writers, one-call table export, big exports in a worker, and a ready-made export button. CSV and print stay free.' },
   { name: 'Form builder', status: 'available', entry: '@mk-kit/pro/form-builder', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, nested groups and lists, properties and validators, a visual editor for show/hide conditions, undo/redo, JSON tab, live preview, issue checks.' },
-  { name: 'Pivot grid', status: 'planned', blurb: 'Rows / columns / values with a field chooser, totals and drill-down.' },
+  { name: 'Pivot grid', status: 'available', entry: '@mk-kit/pro/pivot-grid', blurb: 'Pivot any dataset by rows × columns with sum / count / avg / min / max / distinct and show-as %, subtotals and grand totals, collapse, sort, drill-down to the source rows, and a drag-and-drop field chooser. 50k rows in about 130 ms.' },
 ];
 
 const STATUS_LABEL: Record<ProWidget['status'], string> = {
@@ -181,6 +181,28 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         <figcaption>Design tab: palette, canvas with live field previews, properties for the selected field.</figcaption>
       </figure>
       <pre class="pro-code"><code>{{ formBuilderCode }}</code></pre>
+
+      <h2 id="pivot">Pivot grid <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        <code class="docs-inline">&lt;mk-pivot-grid&gt;</code> turns raw rows into a
+        report: choose row and column fields (dates bucket by year / quarter /
+        month / week / day), pick aggregates and "show as % of row / column /
+        total", get subtotals, grand totals, collapsible groups, sortable value
+        columns and drill-down to the underlying rows on click. The field
+        chooser lets users rearrange the pivot themselves. The engine is pure
+        TypeScript and pivots 50 000 rows in about 130 ms; the result exports
+        straight into the export pack.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-pivot-grid-dark.png' : '/pro-pivot-grid.png'"
+          [attr.width]="1200"
+          alt="The mk-kit Pro pivot grid: sales by region and country in rows, years and quarters in columns, revenue and margin values with subtotals and grand totals."
+          loading="lazy"
+        />
+        <figcaption>Regions › countries by years › quarters, two value columns, subtotals and grand totals.</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ pivotCode }}</code></pre>
 
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
@@ -432,6 +454,20 @@ schema = signal<MkDynamicSchema>({ columns: 2, fields: [] });
 
 <!-- …users fill in -->
 <mk-dynamic-form [schema]="schema()" [(value)]="answers" (formSubmit)="submit($event)" />`;
+
+  protected readonly pivotCode = `import { MkPivotGrid, MkPivotFieldChooser, MkPivotConfig } from '@mk-kit/pro/pivot-grid';
+
+config = signal<MkPivotConfig>({
+  rows: [{ key: 'region' }, { key: 'country' }],
+  columns: [{ key: 'date', bucket: 'year' }, { key: 'date', bucket: 'quarter' }],
+  values: [
+    { key: 'revenue', aggregate: 'sum', format: (n) => n.toLocaleString('en', { style: 'currency', currency: 'EUR' }) },
+    { key: 'margin', aggregate: 'avg', showAs: 'percentOfRow' },
+  ],
+});
+
+<mk-pivot-field-chooser [fields]="fields" [data]="sales" [(config)]="config" />
+<mk-pivot-grid [data]="sales" [(config)]="config" showTotals="all" expandable stickyHeaders [height]="480" (cellClick)="drill($event)" />`;
 
   protected readonly licenseCode = `// main.ts — once per app
 import { provideMkProLicense } from '@mk-kit/pro/license';
