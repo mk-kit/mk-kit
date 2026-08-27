@@ -154,6 +154,11 @@ export class App {
             'form-field input select number-input file-upload repeater code-editor form-error-summary validation errors submit-input',
         },
         {
+          label: 'Dynamic form',
+          path: '/components/dynamic-form',
+          keywords: 'dynamic form schema json renderer formly generated fields conditions validators',
+        },
+        {
           label: 'Text inputs',
           path: '/components/text-inputs',
           keywords:

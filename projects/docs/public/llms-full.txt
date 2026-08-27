@@ -938,6 +938,8 @@ Members:
 | `chatToolRunning` | `string` | Chat: tool call in progress. |
 | `chatToolDone` | `string` | Chat: tool call finished. |
 | `chatToolError` | `string` | Chat: tool call failed. |
+| `dynamicFormAdd` | `string` | Dynamic form: add an item to an array field. |
+| `dynamicFormRemove` | `(index: number) => string` | Dynamic form: remove one item of an array field (index is 1-based). |
 | `queryBuilderLabel` | `string` | Query builder: accessible name of the whole builder. |
 | `queryAddRule` | `string` |  |
 | `queryAddGroup` | `string` |  |
@@ -12799,6 +12801,443 @@ Outputs:
 | --- | --- | --- |
 | `groupChange` | `MkQueryGroup` | A new version of this group after an edit. |
 | `remove` | `void` | The user removed this (non-root) group. |
+
+## @mk-kit/ui/dynamic-form
+
+28 exports. `import { … } from '@mk-kit/ui/dynamic-form';`
+
+### MkDynamicFields (component)
+
+Selector: `mk-dynamic-fields`
+
+Import: `import { MkDynamicFields } from '@mk-kit/ui/dynamic-form';`
+
+Renders one field list (the root, a group, or one array item) as a grid.
+Internal — projected by `MkDynamicForm`; recursive for groups/arrays.
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `fields` (required) | `readonly MkDynamicField[]` |  |  |
+| `group` (required) | `FormGroup<any>` |  |  |
+| `columns` | `number` | `1` |  |
+| `scope` (required) | `Record<string, unknown>` |  | Value the conditions of this level are evaluated against. |
+
+### MkDynamicForm (component)
+
+Selector: `mk-dynamic-form`
+
+Docs: https://mk-kit.dev/components/dynamic-form
+
+Import: `import { MkDynamicForm } from '@mk-kit/ui/dynamic-form';`
+
+Dynamic form — renders a form from a JSON schema and manages one reactive
+`FormGroup` for it. Every value field renders inside `mk-form-field`, so
+labels, hints, required marks and localised validation messages come from
+the schema alone.
+
+```html
+<mk-dynamic-form [schema]="schema" [(value)]="user" (formSubmit)="save($event)">
+  <button mkButton type="submit">Save</button>
+</mk-dynamic-form>
+```
+
+```ts
+schema: MkDynamicSchema = {
+  columns: 2,
+  fields: [
+    { key: 'name', type: 'text', label: 'Name', required: true },
+    { key: 'role', type: 'select', label: 'Role', options: roles },
+    { key: 'company', type: 'text', label: 'Company', showWhen: { field: 'role', eq: 'b2b' } },
+  ],
+};
+```
+
+- Hidden fields (`showWhen` false) are disabled, so `value` only carries
+  what the user can see; `form.getRawValue()` has everything.
+- `form` is the live `FormGroup` for anything the schema does not cover.
+- Custom field types: project an `ng-template[mkDynamicField]`.
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `schema` (required) | `MkDynamicSchema` |  | The schema. Changing it rebuilds the form (values of surviving keys are kept). |
+| `value` (two-way) | `Record<string, unknown>` | `{}` | Two-way form value (visible, enabled fields only). |
+| `disabled` | `boolean` | `false` | Disable every control. |
+| `labelPosition` | `"top" \| "float"` | `'top'` | Label placement forwarded to every `mk-form-field`. |
+| `size` | `"sm" \| "md" \| "lg"` | `'md'` | Control size forwarded to the fields. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `valueChange` | `Record<string, unknown>` | Emits when `value` changes (two-way binding). |
+| `formSubmit` | `Record<string, unknown>` | Emits the value when the form is submitted and valid. |
+| `invalidSubmit` | `FormGroup<any>` | Emits when a submit is attempted while invalid (every control is marked touched). |
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `patch(value: Record<string, unknown>): void` | Patch part of the value. |
+| `reset(value?: Record<string, unknown>): void` | Reset to the schema defaults (or the given value). |
+| `touchAll(): void` | Mark every control touched so validation messages show. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `form` | `FormGroup<any>` | The live reactive form. |
+| `valid` | `Signal<boolean>` | `true` while every control passes validation. |
+
+### MkDynamicFieldDef (directive)
+
+Selector: `ng-template[mkDynamicField]`
+
+Import: `import { MkDynamicFieldDef } from '@mk-kit/ui/dynamic-form';`
+
+Registers a renderer for a custom field type:
+
+```html
+<mk-dynamic-form [schema]="schema">
+  <ng-template mkDynamicField="signature" let-field let-control="control">
+    <mk-signature-pad [formControl]="control" />
+  </ng-template>
+</mk-dynamic-form>
+```
+
+A field `{ type: 'custom', key: 'sig', props: { renderer: 'signature' } }`
+(or any built-in `type` you want to override) then renders this template
+inside the usual `mk-form-field`.
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mkDynamicField` (required) | `string` |  | The type (or `props.renderer` name) this template renders. |
+
+### mkDynamicCondition (function)
+
+Import: `import { mkDynamicCondition } from '@mk-kit/ui/dynamic-form';`
+
+Evaluate a condition against a form value. `value` is normally the whole
+form value; inside an array item the item's own value is used, with the
+root available under `$root`.
+
+```ts
+function mkDynamicCondition(cond: MkDynamicCondition | undefined, value: Record<string, unknown>): boolean
+```
+
+### mkDynamicControl (function)
+
+Import: `import { mkDynamicControl } from '@mk-kit/ui/dynamic-form';`
+
+Build the `FormControl` / `FormGroup` / `FormArray` for one field.
+
+```ts
+function mkDynamicControl(field: MkDynamicField, value?: unknown): AbstractControl
+```
+
+### mkDynamicDefaults (function)
+
+Import: `import { mkDynamicDefaults } from '@mk-kit/ui/dynamic-form';`
+
+Default value object of a field list (groups nested, arrays as item lists).
+
+```ts
+function mkDynamicDefaults(fields: readonly MkDynamicField[]): Record<string, unknown>
+```
+
+### mkDynamicEmptyValue (function)
+
+Import: `import { mkDynamicEmptyValue } from '@mk-kit/ui/dynamic-form';`
+
+The empty value a field type starts with when no `default` is given.
+
+```ts
+function mkDynamicEmptyValue(field: MkDynamicFieldBase): unknown
+```
+
+### mkDynamicFlatten (function)
+
+Import: `import { mkDynamicFlatten } from '@mk-kit/ui/dynamic-form';`
+
+Depth-first list of every value field with its dotted path.
+
+```ts
+function mkDynamicFlatten(fields: readonly MkDynamicField[], prefix?: string): Array<{ path: string; field: MkDynamicFieldBase | MkDynamicGroup | MkDynamicArray; }>
+```
+
+### mkDynamicForm (function)
+
+Import: `import { mkDynamicForm } from '@mk-kit/ui/dynamic-form';`
+
+Build the reactive form of a whole schema.
+
+```ts
+function mkDynamicForm(schema: MkDynamicSchema, value?: Record<string, unknown>): FormGroup
+```
+
+### mkDynamicGroup (function)
+
+Import: `import { mkDynamicGroup } from '@mk-kit/ui/dynamic-form';`
+
+A `FormGroup` for a field list; `value` (partial) overrides the defaults.
+
+```ts
+function mkDynamicGroup(fields: readonly MkDynamicField[], value?: Record<string, unknown>): FormGroup
+```
+
+### mkDynamicSpan (function)
+
+Import: `import { mkDynamicSpan } from '@mk-kit/ui/dynamic-form';`
+
+Column span a field takes in a grid of `columns`.
+
+```ts
+function mkDynamicSpan(field: MkDynamicField, columns: number): number
+```
+
+### mkDynamicValidators (function)
+
+Import: `import { mkDynamicValidators } from '@mk-kit/ui/dynamic-form';`
+
+Angular validators for one value field, from its declarative `validators` + `required`.
+
+```ts
+function mkDynamicValidators(field: MkDynamicFieldBase): ValidatorFn[]
+```
+
+### mkIsArray (function)
+
+Import: `import { mkIsArray } from '@mk-kit/ui/dynamic-form';`
+
+```ts
+function mkIsArray(f: MkDynamicField): f is MkDynamicArray
+```
+
+### mkIsGroup (function)
+
+Import: `import { mkIsGroup } from '@mk-kit/ui/dynamic-form';`
+
+```ts
+function mkIsGroup(f: MkDynamicField): f is MkDynamicGroup
+```
+
+### mkIsSection (function)
+
+Import: `import { mkIsSection } from '@mk-kit/ui/dynamic-form';`
+
+```ts
+function mkIsSection(f: MkDynamicField): f is MkDynamicSection
+```
+
+### mkIsValueField (function)
+
+Import: `import { mkIsValueField } from '@mk-kit/ui/dynamic-form';`
+
+```ts
+function mkIsValueField(f: MkDynamicField): f is MkDynamicFieldBase
+```
+
+### MkDynamicArray (interface)
+
+Import: `import { MkDynamicArray } from '@mk-kit/ui/dynamic-form';`
+
+A list of objects: a `FormArray` of groups with add / remove controls.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | `"array"` |  |
+| `key` | `string` |  |
+| `label`? | `string \| undefined` |  |
+| `hint`? | `string \| undefined` |  |
+| `fields` | `MkDynamicField[]` | Fields of one item. |
+| `min`? | `number \| undefined` |  |
+| `max`? | `number \| undefined` |  |
+| `addLabel`? | `string \| undefined` |  |
+| `default`? | `Record<string, unknown>[] \| undefined` | Initial items (each is patched over the item defaults). |
+| `span`? | `number \| undefined` |  |
+| `columns`? | `number \| undefined` |  |
+| `showWhen`? | `MkDynamicCondition \| undefined` |  |
+| `disabledWhen`? | `MkDynamicCondition \| undefined` |  |
+
+### MkDynamicFieldBase (interface)
+
+Import: `import { MkDynamicFieldBase } from '@mk-kit/ui/dynamic-form';`
+
+Properties shared by every field that holds a value.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `key` | `string` | Key in the form value. |
+| `type` | `MkDynamicFieldType` |  |
+| `label`? | `string \| undefined` |  |
+| `hint`? | `string \| undefined` |  |
+| `placeholder`? | `string \| undefined` |  |
+| `required`? | `boolean \| undefined` |  |
+| `disabled`? | `boolean \| undefined` |  |
+| `default`? | `unknown` | Initial value when the form (or a new array item) is created. |
+| `validators`? | `MkDynamicValidators \| undefined` |  |
+| `options`? | `readonly MkDynamicOption[] \| undefined` | Options for select / multi-select / radio / toggle / autocomplete. |
+| `props`? | `Record<string, unknown> \| undefined` | Extra inputs forwarded to the underlying control — the subset each type understands (`rows`, `min`, `max`, `step`, `currency`, `accept`, `multiple`, `swatches`, `language`, …). See the docs table. |
+| `span`? | `number \| undefined` | Grid columns (1–12) the field spans. Default: the form's `columns` split. |
+| `showWhen`? | `MkDynamicCondition \| undefined` | Render (and enable) only when the condition holds. Hidden fields are excluded from the value. |
+| `disabledWhen`? | `MkDynamicCondition \| undefined` | Disable while the condition holds. |
+
+### MkDynamicFieldContext (interface)
+
+Import: `import { MkDynamicFieldContext } from '@mk-kit/ui/dynamic-form';`
+
+Context handed to a custom field template.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$implicit` | `MkDynamicFieldBase` |  |
+| `field` | `MkDynamicFieldBase` |  |
+| `control` | `FormControl<any>` | The field's `FormControl` — bind it with `[formControl]`. |
+| `value` | `Record<string, unknown>` | The current value of the whole form (or array item). |
+
+### MkDynamicGroup (interface)
+
+Import: `import { MkDynamicGroup } from '@mk-kit/ui/dynamic-form';`
+
+A nested object: its fields become a child `FormGroup` under `key`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | `"group"` |  |
+| `key` | `string` |  |
+| `label`? | `string \| undefined` |  |
+| `hint`? | `string \| undefined` |  |
+| `fields` | `MkDynamicField[]` |  |
+| `span`? | `number \| undefined` |  |
+| `columns`? | `number \| undefined` | Columns for the group's own grid (default: inherits the form's). |
+| `showWhen`? | `MkDynamicCondition \| undefined` |  |
+| `disabledWhen`? | `MkDynamicCondition \| undefined` |  |
+
+### MkDynamicGroupField (interface)
+
+Import: `import { MkDynamicGroupField } from '@mk-kit/ui/dynamic-form';`
+
+A nested object: its fields become a child `FormGroup` under `key`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | `"group"` |  |
+| `key` | `string` |  |
+| `label`? | `string \| undefined` |  |
+| `hint`? | `string \| undefined` |  |
+| `fields` | `MkDynamicField[]` |  |
+| `span`? | `number \| undefined` |  |
+| `columns`? | `number \| undefined` | Columns for the group's own grid (default: inherits the form's). |
+| `showWhen`? | `MkDynamicCondition \| undefined` |  |
+| `disabledWhen`? | `MkDynamicCondition \| undefined` |  |
+
+### MkDynamicOption (interface)
+
+Import: `import { MkDynamicOption } from '@mk-kit/ui/dynamic-form';`
+
+One option of a select / radio / toggle / autocomplete field.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `label` | `string` |  |
+| `value` | `unknown` |  |
+| `disabled`? | `boolean \| undefined` |  |
+
+### MkDynamicSchema (interface)
+
+Import: `import { MkDynamicSchema } from '@mk-kit/ui/dynamic-form';`
+
+The whole form.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `fields` | `MkDynamicField[]` |  |
+| `columns`? | `number \| undefined` | Default number of columns fields are laid out in (1–12). Default 1. |
+
+### MkDynamicSection (interface)
+
+Import: `import { MkDynamicSection } from '@mk-kit/ui/dynamic-form';`
+
+A heading + description with no value of its own.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `type` | `"section"` |  |
+| `label` | `string` |  |
+| `hint`? | `string \| undefined` |  |
+| `span`? | `number \| undefined` |  |
+| `showWhen`? | `MkDynamicCondition \| undefined` |  |
+
+### MkDynamicValidators (interface)
+
+Import: `import { MkDynamicValidators } from '@mk-kit/ui/dynamic-form';`
+
+Declarative validators — plain data so a schema can be stored as JSON.
+`custom` takes Angular validator functions for anything else.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `min`? | `number \| undefined` |  |
+| `max`? | `number \| undefined` |  |
+| `minLength`? | `number \| undefined` |  |
+| `maxLength`? | `number \| undefined` |  |
+| `pattern`? | `string \| RegExp \| undefined` | A RegExp or its source string. |
+| `email`? | `boolean \| undefined` |  |
+| `custom`? | `ValidatorFn[] \| undefined` | Angular validator functions appended after the declarative ones. |
+
+### MkDynamicCondition (type)
+
+Import: `import { MkDynamicCondition } from '@mk-kit/ui/dynamic-form';`
+
+A serialisable condition over the form value (dotted paths reach into
+groups: `address.country`). Combine with `and` / `or`; a function is the
+escape hatch for TypeScript-only schemas.
+
+```ts
+type MkDynamicCondition = | { field: string; eq?: unknown; neq?: unknown; in?: unknown[]; notIn?: unknown[]; truthy?: boolean; empty?: boolean } | { and: MkDynamicCondition[] } | { or: MkDynamicCondition[] } | { not: MkDynamicCondition } | ((value: Record<string, unknown>) => boolean);
+```
+
+### MkDynamicField (type)
+
+Import: `import { MkDynamicField } from '@mk-kit/ui/dynamic-form';`
+
+```ts
+type MkDynamicField = MkDynamicFieldBase | MkDynamicGroup | MkDynamicArray | MkDynamicSection;
+```
+
+### MkDynamicFieldType (type)
+
+Import: `import { MkDynamicFieldType } from '@mk-kit/ui/dynamic-form';`
+
+Field kinds `mk-dynamic-form` renders out of the box. Each maps to one
+mk-kit control; `custom` renders a projected `mkDynamicField` template.
+
+```ts
+type MkDynamicFieldType = | 'text' | 'email' | 'password' | 'url' | 'tel' | 'search' | 'textarea' | 'number' | 'currency' | 'date' | 'time' | 'datetime' | 'select' | 'multi-select' | 'autocomplete' | 'radio' | 'toggle' | 'checkbox' | 'switch' | 'slider' | 'rating' | 'color' | 'tags' | 'phone' | 'file' | 'code' | 'custom';
+```
 
 ## @mk-kit/ui/media
 

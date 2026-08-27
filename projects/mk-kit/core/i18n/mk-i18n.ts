@@ -510,6 +510,12 @@ export interface MkI18nStrings {
   /** Chat: tool call failed. */
   chatToolError: string;
 
+  // --- Dynamic form -----------------------------------------------------------
+  /** Dynamic form: add an item to an array field. */
+  dynamicFormAdd: string;
+  /** Dynamic form: remove one item of an array field (index is 1-based). */
+  dynamicFormRemove: (index: number) => string;
+
   // --- Query builder ----------------------------------------------------------
   /** Query builder: accessible name of the whole builder. */
   queryBuilderLabel: string;
@@ -922,6 +928,9 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chatToolRunning: 'Running',
   chatToolDone: 'Done',
   chatToolError: 'Failed',
+
+  dynamicFormAdd: 'Add',
+  dynamicFormRemove: (index) => `Remove item ${index}`,
 
   queryBuilderLabel: 'Filter conditions',
   queryAddRule: 'Add rule',

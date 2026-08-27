@@ -1,0 +1,101 @@
+:host {
+  display: block;
+}
+
+.mk-dynamic-form__form {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-4);
+}
+
+.mk-dynamic-form__actions:empty {
+  display: none;
+}
+
+.mk-dynamic-form__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-space-2);
+}
+
+/* mk-dynamic-fields is unstyled by its own component (recursive, styleless);
+   its grid lives here so the whole tree shares one stylesheet. */
+:host ::ng-deep .mk-dynamic-fields {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: var(--mk-space-4) var(--mk-space-4);
+  min-width: 0;
+
+  > .mk-dynamic-fields__field,
+  > .mk-dynamic-fields__section,
+  > .mk-dynamic-fields__group,
+  > .mk-dynamic-fields__array {
+    grid-column: span var(--mk-dyn-span, 12);
+    min-width: 0;
+  }
+
+  @media (max-width: 640px) {
+    > .mk-dynamic-fields__field,
+    > .mk-dynamic-fields__section,
+    > .mk-dynamic-fields__group,
+    > .mk-dynamic-fields__array {
+      grid-column: span 12;
+    }
+  }
+}
+
+:host ::ng-deep {
+  .mk-dynamic-fields__section {
+    padding-top: var(--mk-space-2);
+  }
+  .mk-dynamic-fields__section-title {
+    margin: 0;
+    font-size: var(--mk-font-size-md);
+    font-weight: var(--mk-font-weight-semibold);
+    color: var(--mk-text);
+  }
+  .mk-dynamic-fields__section-hint {
+    margin: var(--mk-space-1) 0 0;
+    font-size: var(--mk-font-size-sm);
+    color: var(--mk-text-muted);
+  }
+  .mk-dynamic-fields__group,
+  .mk-dynamic-fields__array {
+    margin: 0;
+    padding: var(--mk-space-4);
+    border: 1px solid var(--mk-border);
+    border-radius: var(--mk-radius-lg);
+    min-width: 0;
+  }
+  .mk-dynamic-fields__legend {
+    padding: 0 var(--mk-space-2);
+    font-size: var(--mk-font-size-sm);
+    font-weight: var(--mk-font-weight-semibold);
+    color: var(--mk-text);
+  }
+  .mk-dynamic-fields__group > .mk-dynamic-fields__section-hint,
+  .mk-dynamic-fields__array > .mk-dynamic-fields__section-hint {
+    margin: 0 0 var(--mk-space-3);
+  }
+  .mk-dynamic-fields__item {
+    display: flex;
+    align-items: flex-start;
+    gap: var(--mk-space-2);
+    padding: var(--mk-space-3) 0;
+    border-bottom: 1px dashed var(--mk-border);
+  }
+  .mk-dynamic-fields__item:first-of-type {
+    padding-top: 0;
+  }
+  .mk-dynamic-fields__item-fields {
+    flex: 1;
+    min-width: 0;
+  }
+  .mk-dynamic-fields__remove {
+    flex: none;
+    margin-top: var(--mk-space-6);
+  }
+  .mk-dynamic-fields__array-actions {
+    padding-top: var(--mk-space-3);
+  }
+}

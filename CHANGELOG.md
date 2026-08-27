@@ -8,6 +8,22 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`mk-dynamic-form`** (new entry point `@mk-kit/ui/dynamic-form`) — render a
+  whole form from a JSON schema: 26 field types mapped to mk-kit controls
+  (text/email/…/textarea, number, currency, date/time/datetime, select,
+  multi-select, autocomplete, radio, toggle, checkbox, switch, slider,
+  rating, color, tags, phone, file, code), `group` (nested object), `array`
+  (list of groups with add/remove, min/max), `section` headings, and
+  `custom` via a projected `ng-template[mkDynamicField]`. Declarative
+  validators (`min`, `maxLength`, `pattern`, `email`, `custom`), a
+  serialisable condition DSL (`showWhen` / `disabledWhen` with `eq`, `in`,
+  `truthy`, `empty`, `and`/`or`/`not` or a function), a 12-column grid
+  (`columns`, per-field `span`), `[(value)]`, `(formSubmit)`,
+  `(invalidSubmit)`, `form` (the live `FormGroup`), `patch()`, `reset()`,
+  `touchAll()`. Hidden fields are disabled so `value` only carries what the
+  user sees. Pure helpers exported: `mkDynamicForm()`, `mkDynamicGroup()`,
+  `mkDynamicDefaults()`, `mkDynamicValidators()`, `mkDynamicCondition()`.
+  i18n: `dynamicFormAdd`, `dynamicFormRemove`.
 - **Test harnesses — `@mk-kit/ui/testing`** (Wave B) — `MkHarnessLoader.fromFixture(fixture)`
   finds harnesses by type + `{ selector, text }` filters and settles change
   detection after every interaction (zoneless or zone-based TestBed).

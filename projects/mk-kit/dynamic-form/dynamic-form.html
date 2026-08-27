@@ -1,0 +1,6 @@
+<form class="mk-dynamic-form__form" [formGroup]="formRef()" (submit)="onSubmit($event)" novalidate>
+  <mk-dynamic-fields [fields]="fields()" [group]="formRef()" [columns]="columns()" [scope]="scope()" />
+  <div class="mk-dynamic-form__actions">
+    <ng-content />
+  </div>
+</form>
