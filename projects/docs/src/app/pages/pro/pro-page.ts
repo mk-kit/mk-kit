@@ -21,7 +21,7 @@ const WIDGETS: ProWidget[] = [
     name: 'Resource scheduler',
     status: 'available',
     entry: '@mk-kit/pro/scheduler',
-    blurb: 'Resources as rows — rooms, people, machines. Day / week / month timeline, drag bookings in time and across resources, resize, working hours with optional enforcement, conflict rules, keyboard editing with announcements, RTL.',
+    blurb: 'Resources as rows — rooms, people, machines. Day / week / month timeline, drag bookings in time and across resources, resize, recurring events (RFC 5545 rules, exceptions, .ics import/export), working hours with optional enforcement, conflict rules, keyboard editing with announcements, RTL.',
   },
   {
     name: 'Admin Starter',
@@ -31,6 +31,7 @@ const WIDGETS: ProWidget[] = [
   { name: 'Gantt', status: 'available', entry: '@mk-kit/pro/gantt', blurb: 'Phases and tasks as a tree, milestones, four dependency types with lag, critical path, auto-schedule cascade, drag / resize / progress, day / week / month zoom, keyboard editing.' },
   { name: 'Export pack', status: 'available', entry: '@mk-kit/pro/export', blurb: 'Zero-dependency XLSX (typed cells, styles, multiple sheets, frozen header, auto-filter) and PDF (tables with repeated headers, wrapped text, charts as images, embedded TrueType fonts) writers, one-call table export, big exports in a worker, and a ready-made export button. CSV and print stay free.' },
   { name: 'Form builder', status: 'available', entry: '@mk-kit/pro/form-builder', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, nested groups and lists, properties and validators, a visual editor for show/hide conditions, undo/redo, JSON tab, live preview, issue checks.' },
+  { name: 'Data grid Pro', status: 'available', entry: '@mk-kit/pro/data-grid', blurb: 'Excel-like editing on top of mk-table: drag-select ranges with live stats, copy / paste as TSV, fill handle with series detection, aggregation footer and group subtotals, master-detail rows, column virtualisation for wide grids, full keyboard model.' },
   { name: 'Pivot grid', status: 'available', entry: '@mk-kit/pro/pivot-grid', blurb: 'Pivot any dataset by rows × columns with sum / count / avg / min / max / distinct and show-as %, subtotals and grand totals, collapse, sort, drill-down to the source rows, and a drag-and-drop field chooser. 50k rows in about 130 ms.' },
 ];
 
@@ -204,6 +205,29 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
       </figure>
       <pre class="pro-code"><code>{{ pivotCode }}</code></pre>
 
+      <h2 id="data-grid">Data grid Pro <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        <code class="docs-inline">&lt;mk-data-grid&gt;</code> wraps the free
+        <code class="docs-inline">mk-table</code> — same columns, templates, sorting,
+        selection and inline editing — and adds what finance and ops teams expect from
+        a spreadsheet: drag or Shift-select a range and read its count / sum / average
+        in the footer, copy it as TSV, paste a block from Excel (parsed per column,
+        multi-row paste extends down), drag the fill handle to continue a series,
+        aggregate any column, group rows with subtotals, expand a row into a detail
+        template, and scroll 60+ columns smoothly thanks to column virtualisation.
+        Every change arrives as a change set — the grid never mutates your rows.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-data-grid-dark.png' : '/pro-data-grid.png'"
+          [attr.width]="1200"
+          alt="The mk-kit Pro data grid: a wide finance table with a selected range highlighted, a fill handle, and a footer showing count, sum and average of the selection."
+          loading="lazy"
+        />
+        <figcaption>A selected range with its quick stats, aggregation footer and group subtotals.</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ dataGridCode }}</code></pre>
+
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
         @for (w of widgets; track w.name) {
@@ -222,7 +246,7 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         }
       </div>
       <p>
-        Six widgets are shipping; the Admin Starter follows once
+        Seven widgets are shipping — plus recurrence, an i18n token and test harnesses — and the Admin Starter is feature-complete; it ships to buyers once
         the free library has enough users to justify four weeks of work. Tell us
         what you need through the
         <a href="/#pricing">waitlist</a> — that list decides the order.
@@ -469,6 +493,21 @@ config = signal<MkPivotConfig>({
 
 <mk-pivot-field-chooser [fields]="fields" [data]="sales" [(config)]="config" />
 <mk-pivot-grid [data]="sales" [(config)]="config" showTotals="all" expandable stickyHeaders [height]="480" (cellClick)="drill($event)" />`;
+
+  protected readonly dataGridCode = `import { MkDataGrid, MkGridChangeSet } from '@mk-kit/pro/data-grid';
+
+<mk-data-grid
+  [columns]="columns"        // MkTableColumn + aggregate: 'sum' | 'avg' | … , parse for pasted text
+  [data]="rows()"
+  [groupBy]="'region'" subtotals aggregates
+  virtualizeColumns
+  (rangeChange)="stats.set($event.summary)"
+  (pasteChange)="apply($event)" (fillChange)="apply($event)" (clearChange)="apply($event)"
+/>
+
+apply(change: MkGridChangeSet) {
+  // change.changes: [{ row, key, before, after }] — apply, validate, or reject
+}`;
 
   protected readonly licenseCode = `// main.ts — once per app
 import { provideMkProLicense } from '@mk-kit/pro/license';
