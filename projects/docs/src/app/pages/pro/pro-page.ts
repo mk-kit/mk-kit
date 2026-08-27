@@ -30,7 +30,7 @@ const WIDGETS: ProWidget[] = [
   },
   { name: 'Gantt', status: 'available', entry: '@mk-kit/pro/gantt', blurb: 'Phases and tasks as a tree, milestones, four dependency types with lag, critical path, auto-schedule cascade, drag / resize / progress, day / week / month zoom, keyboard editing.' },
   { name: 'Export pack', status: 'available', entry: '@mk-kit/pro/export', blurb: 'Zero-dependency XLSX (typed cells, styles, multiple sheets, frozen header, auto-filter) and PDF (tables with repeated headers, wrapped text, charts as images, embedded TrueType fonts) writers, one-call table export, big exports in a worker, and a ready-made export button. CSV and print stay free.' },
-  { name: 'Form builder', status: 'planned', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, properties, conditions editor, live preview.' },
+  { name: 'Form builder', status: 'available', entry: '@mk-kit/pro/form-builder', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, nested groups and lists, properties and validators, a visual editor for show/hide conditions, undo/redo, JSON tab, live preview, issue checks.' },
   { name: 'Pivot grid', status: 'planned', blurb: 'Rows / columns / values with a field chooser, totals and drill-down.' },
 ];
 
@@ -157,6 +157,31 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
       </figure>
       <pre class="pro-code"><code>{{ exportCode }}</code></pre>
 
+      <h2 id="form-builder">Form builder <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        <code class="docs-inline">&lt;mk-form-builder&gt;</code> is the design
+        surface for the free
+        <a routerLink="/components/dynamic-form">dynamic form</a>: pick fields
+        from the palette, arrange them (including groups and repeatable lists),
+        set labels, defaults, validators and show/hide conditions in a
+        properties panel, undo anything, edit the JSON directly, and preview
+        the real form. What it emits is a plain
+        <code class="docs-inline">MkDynamicSchema</code> — store it, ship it
+        from your API, render it with <code class="docs-inline">mk-dynamic-form</code>.
+        Let admins build their own intake forms without a deploy.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-form-builder-dark.png' : '/pro-form-builder.png'"
+          width="1232"
+          height="721"
+          alt="The mk-kit Pro form builder: a field palette on the left, the customer form on the canvas with a selected “Full name” field, and its properties and validation on the right."
+          loading="lazy"
+        />
+        <figcaption>Design tab: palette, canvas with live field previews, properties for the selected field.</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ formBuilderCode }}</code></pre>
+
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
         @for (w of widgets; track w.name) {
@@ -175,7 +200,7 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         }
       </div>
       <p>
-        Order is by demand: the Admin Starter follows once
+        Six widgets are shipping; the Admin Starter follows once
         the free library has enough users to justify four weeks of work. Tell us
         what you need through the
         <a href="/#pricing">waitlist</a> — that list decides the order.
@@ -396,6 +421,17 @@ mkExportXlsx({ sheets: [{ name: 'Orders', columns: [
 
 mkExportPdf({ title: 'Monthly report', page: { size: 'A4', orientation: 'landscape' }, pageNumbers: true,
   sections: [{ type: 'table', columns, rows }, { type: 'image', element: chartSvg }] }, 'report.pdf');`;
+
+  protected readonly formBuilderCode = `import { MkFormBuilder } from '@mk-kit/pro/form-builder';
+import { MkDynamicForm, MkDynamicSchema } from '@mk-kit/ui/dynamic-form';
+
+schema = signal<MkDynamicSchema>({ columns: 2, fields: [] });
+
+<!-- admins design… -->
+<mk-form-builder [(schema)]="schema" (schemaChange)="save($event)" />
+
+<!-- …users fill in -->
+<mk-dynamic-form [schema]="schema()" [(value)]="answers" (formSubmit)="submit($event)" />`;
 
   protected readonly licenseCode = `// main.ts — once per app
 import { provideMkProLicense } from '@mk-kit/pro/license';
