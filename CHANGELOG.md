@@ -4,6 +4,23 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **PrimeNG migration schematic** — `ng g @mk-kit/ui:migrate-primeng`
+  rewrites `primeng/*` imports and class names to `@mk-kit/ui`, renames the
+  selectors that map 1:1 (`pButton` → `mkButton`, `pInputText` → `mkInput`,
+  `p-select` → `mk-select`, `p-checkbox`, `p-toggleswitch`, `p-table`,
+  `p-tabview`, `p-accordion`, `p-tag`, `p-chip`, `p-avatar`, `p-skeleton`,
+  `pTooltip` → `mkTooltip`, …) plus a few mechanical inputs (`[value]` →
+  `[data]` on tables, `severity` → `tone`, `[(activeIndex)]` →
+  `[(selectedIndex)]`, …), leaves a `<!-- mk-kit: … -->` note wherever the
+  shape differs (dialogs, toasts, menus with `[model]`, `p-chart`), cleans
+  the PrimeNG entries out of `angular.json` styles and `package.json`, and
+  writes `primeng-migration.md` with counts, manual steps and docs links.
+  `--dry-run` prints the report only; `--path` scopes the run.
+
 ## [0.38.0] — 2026-08-27
 
 ### Added
@@ -1828,6 +1845,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.38.0...HEAD
 [0.38.0]: https://github.com/mk-kit/mk-kit/compare/v0.37.0...v0.38.0
 [0.7.0]: https://github.com/mk-kit/mk-kit/compare/v0.6.0...v0.7.0
 [0.2.0]: https://github.com/mk-kit/mk-kit/compare/v0.1.9...v0.2.0

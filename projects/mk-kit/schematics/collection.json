@@ -5,6 +5,11 @@
       "description": "Adds @mk-kit/ui to an application: wires the theme stylesheet into angular.json and optionally scaffolds a provideMkI18n override block.",
       "factory": "./ng-add/index#ngAdd",
       "schema": "./ng-add/schema.json"
+    },
+    "migrate-primeng": {
+      "description": "Migrates a PrimeNG app to @mk-kit/ui: rewrites imports, class names and 1:1 selectors, annotates what needs a manual touch, cleans angular.json / package.json and writes a report.",
+      "factory": "./migrate-primeng/index#migratePrimeng",
+      "schema": "./migrate-primeng/schema.json"
     }
   }
 }

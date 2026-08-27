@@ -1,0 +1,25 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "MkKitMigratePrimeng",
+  "title": "@mk-kit/ui migrate-primeng schematic",
+  "type": "object",
+  "properties": {
+    "path": {
+      "type": "string",
+      "default": "src",
+      "description": "Directory to migrate (TypeScript and HTML files are visited recursively)."
+    },
+    "dryRun": {
+      "type": "boolean",
+      "default": false,
+      "description": "Compute and print the report without writing any file.",
+      "alias": "d"
+    },
+    "report": {
+      "type": "string",
+      "default": "primeng-migration.md",
+      "description": "Path of the Markdown report to write (relative to the workspace root)."
+    }
+  },
+  "required": []
+}
