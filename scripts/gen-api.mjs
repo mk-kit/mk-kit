@@ -434,6 +434,10 @@ ${componentPages.map(([p, t]) => `- [${t}](${SITE}${p})`).join('\n')}
 - [api.json](${SITE}/api.json): every export with inputs, outputs, methods and types, machine-readable
 - [llms-full.txt](${SITE}/llms-full.txt): the complete API reference as Markdown in one file
 
+## For AI assistants
+
+- MCP server: \`npx -y @mk-kit/mcp\` (tools: search_mk_kit, get_mk_kit_export, list_mk_kit_exports, get_mk_kit_overview) — https://www.npmjs.com/package/@mk-kit/mcp
+
 ## Source
 
 - [GitHub](https://github.com/mk-kit/mk-kit)

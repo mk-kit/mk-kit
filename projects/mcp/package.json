@@ -1,0 +1,42 @@
+{
+  "name": "@mk-kit/mcp",
+  "version": "0.0.0-set-by-build",
+  "description": "MCP server for @mk-kit/ui — lets AI coding assistants look up every component, directive, service and helper of the mk-kit Angular library (inputs, outputs, methods, import paths, docs links).",
+  "license": "MIT",
+  "type": "module",
+  "bin": {
+    "mk-kit-mcp": "bin.js"
+  },
+  "main": "index.js",
+  "files": [
+    "*.js",
+    "data/",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=20"
+  },
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "angular",
+    "components",
+    "mk-kit",
+    "ai",
+    "claude",
+    "cursor",
+    "copilot"
+  ],
+  "homepage": "https://mk-kit.dev/api",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/mk-kit/mk-kit.git",
+    "directory": "projects/mcp"
+  },
+  "bugs": "https://github.com/mk-kit/mk-kit/issues",
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.30.0",
+    "zod": "^4.0.0"
+  }
+}

@@ -38,6 +38,9 @@ jobs:
       - name: Test docs
         run: npm run test:docs
 
+      - name: Build + test MCP server
+        run: npm run build:mcp && npm run test:mcp
+
       - name: Build docs
         run: npm run build
 
@@ -48,6 +51,10 @@ jobs:
       - name: Verify package (pack dry-run)
         run: npm pack --dry-run
         working-directory: dist/mk-kit
+
+      - name: Verify MCP package (pack dry-run)
+        run: npm pack --dry-run
+        working-directory: dist/mcp
 
       - name: Upload built package
         uses: actions/upload-artifact@v7

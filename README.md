@@ -37,6 +37,10 @@ Generated artefacts checked in CI (`--check`): `npm run gen:selectors`
 reference, extracted from the library sources). Re-run them after changing
 any public export.
 
+`projects/mcp/` is the `@mk-kit/mcp` MCP server (same version as the
+library, bundles those artefacts): `npm run build:mcp` → `dist/mcp`,
+`npm run test:mcp`.
+
 ## Build & publish the library
 
 Published to the public npm registry as `@mk-kit/ui`, with a provenance

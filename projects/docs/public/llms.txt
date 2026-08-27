@@ -71,6 +71,10 @@ Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/sty
 - [api.json](https://mk-kit.dev/api.json): every export with inputs, outputs, methods and types, machine-readable
 - [llms-full.txt](https://mk-kit.dev/llms-full.txt): the complete API reference as Markdown in one file
 
+## For AI assistants
+
+- MCP server: `npx -y @mk-kit/mcp` (tools: search_mk_kit, get_mk_kit_export, list_mk_kit_exports, get_mk_kit_overview) — https://www.npmjs.com/package/@mk-kit/mcp
+
 ## Source
 
 - [GitHub](https://github.com/mk-kit/mk-kit)

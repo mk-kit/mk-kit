@@ -17,6 +17,15 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   `/llms-full.txt`) and are checked for staleness in CI. New docs page
   `/api`: searchable, one entry point at a time, deep links like
   `/api?entry=forms#MkSelect`.
+- **`@mk-kit/mcp`** (Wave B) — an MCP server (stdio, `npx -y @mk-kit/mcp`)
+  that gives Claude Code, Cursor, Copilot and other MCP clients the same
+  reference: `search_mk_kit` (name / selector / free text, kind + entry
+  filters), `get_mk_kit_export` (full Markdown API of one export),
+  `list_mk_kit_exports`, `get_mk_kit_overview`, plus `mk-kit://llms.txt`,
+  `llms-full.txt` and `api.json` resources. Bundles the release's snapshot
+  and fetches a newer one from mk-kit.dev on start (`MK_KIT_MCP_OFFLINE=1`
+  to disable). Versioned in lock-step with `@mk-kit/ui`; published by the
+  release workflow. Source in `projects/mcp/`.
 
 ## [0.37.0] — 2026-08-26
 

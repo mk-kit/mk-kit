@@ -11,6 +11,7 @@ beyond Angular.
 
 - **Docs & live demos:** <https://mk-kit.dev>
 - **API reference:** <https://mk-kit.dev/api> — also as [api.json](https://mk-kit.dev/api.json), [llms.txt](https://mk-kit.dev/llms.txt) and [llms-full.txt](https://mk-kit.dev/llms-full.txt) for tools and AI assistants
+- **MCP server:** `npx -y @mk-kit/mcp` — exact component/input/output lookup for Claude Code, Cursor & co. ([@mk-kit/mcp](https://www.npmjs.com/package/@mk-kit/mcp))
 - **Changelog:** [CHANGELOG.md](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
 - **Issues:** <https://github.com/mk-kit/mk-kit/issues>
 

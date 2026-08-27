@@ -172,7 +172,9 @@ const KIND_LABEL: Record<ApiKind, string> = {
         library sources. Machine-readable copies for tools and LLMs:
         <a href="/api.json" target="_blank" rel="noopener">api.json</a>,
         <a href="/llms.txt" target="_blank" rel="noopener">llms.txt</a>,
-        <a href="/llms-full.txt" target="_blank" rel="noopener">llms-full.txt</a>.
+        <a href="/llms-full.txt" target="_blank" rel="noopener">llms-full.txt</a>
+        — or give your coding assistant the MCP server:
+        <code class="docs-inline">npx -y &#64;mk-kit/mcp</code>.
       </p>
 
       @switch (state()) {
