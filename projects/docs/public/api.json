@@ -20261,6 +20261,928 @@
      "definition": "'loading' | 'loaded' | 'error'"
     }
    ]
+  },
+  {
+   "name": "testing",
+   "import": "@mk-kit/ui/testing",
+   "exports": [
+    {
+     "name": "MkButtonHarness",
+     "description": "`button[mkButton]` / `a[mkButton]`.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "text",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "click",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isLoading",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "tone",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "variant",
+       "signature": "(): string | null",
+       "description": "`solid` | `soft` | `outline` | `ghost` | `link`."
+      },
+      {
+       "name": "size",
+       "signature": "(): string | null",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkCheckboxHarness",
+     "description": "`mk-checkbox`.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "label",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "isChecked",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isIndeterminate",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isRequired",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "toggle",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "check",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "uncheck",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "blur",
+       "signature": "(): Promise<void>",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkDialogHarness",
+     "description": "A dialog opened by `MkDialogService` (`open()`, `confirm()`, `alert()`,\n`prompt()`). Dialogs live in `document.body`, so look them up through\n`loader.document()`.",
+     "file": "projects/mk-kit/testing/harnesses/overlays.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "title",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "bodyText",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "buttons",
+       "signature": "(): string[]",
+       "description": "Texts of every button in the dialog (header close excluded)."
+      },
+      {
+       "name": "clickButton",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Click a button by index, exact text or RegExp."
+      },
+      {
+       "name": "close",
+       "signature": "(): Promise<void>",
+       "description": "The header × button."
+      },
+      {
+       "name": "pressEscape",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "input",
+       "signature": "(): MkTestElement | null",
+       "description": "The prompt dialog's text field, if any."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkFormFieldHarness",
+     "description": "`mk-form-field` — label / hint / error around any control.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "label",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "hint",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "error",
+       "signature": "(): string | null",
+       "description": "The visible validation message, or `null` when the field is valid/untouched."
+      },
+      {
+       "name": "hasError",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isRequired",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "control",
+       "signature": "<T extends MkHarness>(type: Parameters<typeof this.loader.get<T>>[0]): Promise<T>",
+       "description": "The control inside the field, as a harness of the given type."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkHarness",
+     "description": "Base class of every mk-kit harness. Subclasses declare `hostSelector`\nand expose user-level actions (`click()`, `selectOption()`, …) and reads\n(`isChecked()`, `text()`), so specs never depend on the component's DOM.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "class",
+     "methods": [],
+     "properties": []
+    },
+    {
+     "name": "MkHarnessLoader",
+     "description": "Finds harnesses under a root element. Create one with\n`MkHarnessLoader.fromFixture(fixture)`; use `.document()` for content that\nmk-kit teleports into `document.body` (dialogs, toasts, menus, select\npanels) and `.within(el)` to scope lookups.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "document",
+       "signature": "(): MkHarnessLoader",
+       "description": "Same settle function, rooted at `document.body` — for overlays."
+      },
+      {
+       "name": "within",
+       "signature": "(root: Element | MkTestElement): MkHarnessLoader",
+       "description": ""
+      },
+      {
+       "name": "rootElement",
+       "signature": "(): MkTestElement",
+       "description": "Wrap the root element itself."
+      },
+      {
+       "name": "element",
+       "signature": "(selector: string): MkTestElement",
+       "description": ""
+      },
+      {
+       "name": "elements",
+       "signature": "(selector: string): MkTestElement[]",
+       "description": ""
+      },
+      {
+       "name": "get",
+       "signature": "<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T>",
+       "description": "First matching harness; throws when there is none."
+      },
+      {
+       "name": "getOrNull",
+       "signature": "<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T | null>",
+       "description": ""
+      },
+      {
+       "name": "has",
+       "signature": "<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<boolean>",
+       "description": ""
+      },
+      {
+       "name": "getAll",
+       "signature": "<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T[]>",
+       "description": ""
+      }
+     ],
+     "properties": [],
+     "docs": "/testing"
+    },
+    {
+     "name": "MkInputHarness",
+     "description": "Native `input[mkInput]` / `textarea[mkInput]`.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "value",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "setValue",
+       "signature": "(value: string): Promise<void>",
+       "description": "Replace the value (fires `input` + `change`)."
+      },
+      {
+       "name": "type",
+       "signature": "(text: string): Promise<void>",
+       "description": "Append text one character at a time (keydown / input / keyup)."
+      },
+      {
+       "name": "clear",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "blur",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "placeholder",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "type_",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isInvalid",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isRequired",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isFocused",
+       "signature": "(): boolean",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkMenuHarness",
+     "description": "A `[mkMenuTriggerFor]` trigger and the `mk-menu` panel it opens. The host\nis matched by the trigger's `aria-haspopup=\"menu\"` (the directive's\nattribute is an input binding, so it is not in the DOM).",
+     "file": "projects/mk-kit/testing/harnesses/navigation.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "isOpen",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "open",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "close",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "panel",
+       "signature": "(): MkTestElement | null",
+       "description": "The teleported panel (`[role=\"menu\"]`), or `null` while closed."
+      },
+      {
+       "name": "items",
+       "signature": "(): Promise<string[]>",
+       "description": "Item texts of the open menu (opens it if needed). Submenu panels excluded."
+      },
+      {
+       "name": "clickItem",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Click an item by index, exact text or RegExp (opens the menu first)."
+      },
+      {
+       "name": "isItemDisabled",
+       "signature": "(which: number | string | RegExp): Promise<boolean>",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkRadioGroupHarness",
+     "description": "`mk-radio-group`.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "radios",
+       "signature": "(): Promise<MkRadioHarness[]>",
+       "description": ""
+      },
+      {
+       "name": "labels",
+       "signature": "(): Promise<string[]>",
+       "description": ""
+      },
+      {
+       "name": "checkedLabel",
+       "signature": "(): Promise<string | null>",
+       "description": "Label of the checked radio, or `null`."
+      },
+      {
+       "name": "checkedIndex",
+       "signature": "(): Promise<number>",
+       "description": ""
+      },
+      {
+       "name": "select",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Select by index, exact label or RegExp."
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkRadioHarness",
+     "description": "One `mk-radio` inside a group.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "label",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "isChecked",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "select",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkSelectHarness",
+     "description": "`mk-select` — opens the teleported listbox and picks options like a user.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "valueText",
+       "signature": "(): string",
+       "description": "Label of the selected option, or `''` when only the placeholder shows."
+      },
+      {
+       "name": "placeholder",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "isOpen",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isInvalid",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "open",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "close",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "options",
+       "signature": "(): Promise<MkSelectOptionState[]>",
+       "description": "Options of the (opened) listbox. Opens it if needed."
+      },
+      {
+       "name": "selectOption",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Pick an option by index, exact label or RegExp (opens the list first)."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkSwitchHarness",
+     "description": "`mk-switch`.",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "label",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "isChecked",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "toggle",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "check",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "uncheck",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkTableHarness",
+     "description": "`mk-table`.",
+     "file": "projects/mk-kit/testing/harnesses/table.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "headers",
+       "signature": "(): string[]",
+       "description": "Header labels of the data columns, in display order."
+      },
+      {
+       "name": "rows",
+       "signature": "(): Promise<MkTableRowHarness[]>",
+       "description": ""
+      },
+      {
+       "name": "rowCount",
+       "signature": "(): Promise<number>",
+       "description": ""
+      },
+      {
+       "name": "cellTexts",
+       "signature": "(): Promise<string[][]>",
+       "description": "Every data cell as text: `rows()[r].cells()`."
+      },
+      {
+       "name": "sortBy",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Click a sortable header (by index, exact label or RegExp)."
+      },
+      {
+       "name": "sortDirection",
+       "signature": "(which: number | string | RegExp): string | null",
+       "description": "`'ascending' | 'descending' | 'none' | null` (null = not sortable)."
+      },
+      {
+       "name": "selectedRowCount",
+       "signature": "(): Promise<number>",
+       "description": ""
+      },
+      {
+       "name": "toggleAll",
+       "signature": "(): Promise<void>",
+       "description": "Toggle the header \"select all\" checkbox."
+      },
+      {
+       "name": "isEmpty",
+       "signature": "(): boolean",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkTableRowHarness",
+     "description": "One data row of `mk-table`.",
+     "file": "projects/mk-kit/testing/harnesses/table.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "cells",
+       "signature": "(): string[]",
+       "description": "Cell texts of the data columns (expand / select cells excluded)."
+      },
+      {
+       "name": "cell",
+       "signature": "(index: number): string",
+       "description": ""
+      },
+      {
+       "name": "isSelected",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isExpanded",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "click",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "toggleSelected",
+       "signature": "(): Promise<void>",
+       "description": "Toggle the selection checkbox (throws when the table is not `selectable`)."
+      },
+      {
+       "name": "toggleExpanded",
+       "signature": "(): Promise<void>",
+       "description": "Toggle the expand / tree control of the row."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkTabsHarness",
+     "description": "`mk-tabs`.",
+     "file": "projects/mk-kit/testing/harnesses/navigation.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "labels",
+       "signature": "(): string[]",
+       "description": ""
+      },
+      {
+       "name": "selectedIndex",
+       "signature": "(): number",
+       "description": ""
+      },
+      {
+       "name": "selectedLabel",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "select",
+       "signature": "(which: number | string | RegExp): Promise<void>",
+       "description": "Select by index, exact label or RegExp."
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(which: number | string | RegExp): boolean",
+       "description": ""
+      },
+      {
+       "name": "selectedPanel",
+       "signature": "(): MkTestElement | null",
+       "description": "The visible tab panel (`mk-tab` host)."
+      },
+      {
+       "name": "selectedPanelText",
+       "signature": "(): string",
+       "description": "Text of the visible panel."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkTestElement",
+     "description": "A DOM element wrapped for tests: reads are synchronous, every interaction\ndispatches the same events a user would and then settles change detection\n(`fixture.detectChanges()` + `whenStable()`), so the next read sees the\nupdated view.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "text",
+       "signature": "(): string",
+       "description": "Trimmed text content with whitespace collapsed."
+      },
+      {
+       "name": "attr",
+       "signature": "(name: string): string | null",
+       "description": ""
+      },
+      {
+       "name": "hasClass",
+       "signature": "(name: string): boolean",
+       "description": ""
+      },
+      {
+       "name": "prop",
+       "signature": "<T = unknown>(name: string): T",
+       "description": "Read a DOM property (`value`, `checked`, `open`, …)."
+      },
+      {
+       "name": "matches",
+       "signature": "(selector: string): boolean",
+       "description": ""
+      },
+      {
+       "name": "isFocused",
+       "signature": "(): boolean",
+       "description": ""
+      },
+      {
+       "name": "isDisabled",
+       "signature": "(): boolean",
+       "description": "Native `disabled`, `aria-disabled=\"true\"` or a `--disabled` host class."
+      },
+      {
+       "name": "query",
+       "signature": "(selector: string): MkTestElement | null",
+       "description": ""
+      },
+      {
+       "name": "queryAll",
+       "signature": "(selector: string): MkTestElement[]",
+       "description": ""
+      },
+      {
+       "name": "child",
+       "signature": "(selector: string): MkTestElement",
+       "description": "Like `query`, but throws a readable error when nothing matches."
+      },
+      {
+       "name": "click",
+       "signature": "(): Promise<void>",
+       "description": "pointerdown → mousedown → focus → pointerup → mouseup → click, like a user."
+      },
+      {
+       "name": "hover",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "leave",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "focus",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "blur",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "type",
+       "signature": "(text: string): Promise<void>",
+       "description": "Type into an input/textarea/contenteditable character by character —\nkeydown, `value` append, `input`, keyup — then settle. Use `setValue`\nto replace the value in one go."
+      },
+      {
+       "name": "setValue",
+       "signature": "(value: string): Promise<void>",
+       "description": "Set the value of an input/textarea/select and fire `input` + `change`."
+      },
+      {
+       "name": "clear",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "sendKeys",
+       "signature": "(...keys: Array<MkTestKey | (string & {})>): Promise<void>",
+       "description": "Dispatch keydown/keyup for each key. Printable single characters are also typed."
+      },
+      {
+       "name": "dispatch",
+       "signature": "(event: Event): Promise<void>",
+       "description": "Dispatch any event on the element and settle."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "MkToastHarness",
+     "description": "One toast shown by `MkToastService` (lives in `document.body` — use `loader.document()`).",
+     "file": "projects/mk-kit/testing/harnesses/overlays.harness.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "title",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "message",
+       "signature": "(): string",
+       "description": ""
+      },
+      {
+       "name": "tone",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "actionLabel",
+       "signature": "(): string | null",
+       "description": ""
+      },
+      {
+       "name": "clickAction",
+       "signature": "(): Promise<void>",
+       "description": ""
+      },
+      {
+       "name": "dismiss",
+       "signature": "(): Promise<void>",
+       "description": ""
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "matchText",
+     "description": "",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "function",
+     "signatures": [
+      "(actual: string, expected: string | RegExp): boolean"
+     ]
+    },
+    {
+     "name": "pickBy",
+     "description": "Resolve \"by index or by label\" arguments shared by option-style harnesses.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "function",
+     "signatures": [
+      "<T>(items: T[], which: number | string | RegExp, label: (item: T) => string, what: string): T"
+     ]
+    },
+    {
+     "name": "MkHarnessFilters",
+     "description": "Filters every harness lookup accepts. `selector` narrows the host elements\nconsidered (e.g. a class or attribute your template sets); `text` matches\nthe host's trimmed text content — a string must match exactly, a RegExp\nis tested.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "selector",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "text",
+       "type": "string | RegExp | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkHarnessType",
+     "description": "Constructor shape of every harness class: a static `hostSelector`.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "interface",
+     "typeParams": "<T extends MkHarness>",
+     "members": [
+      {
+       "name": "hostSelector",
+       "type": "string",
+       "description": "",
+       "readonly": true
+      }
+     ]
+    },
+    {
+     "name": "MkSelectOptionState",
+     "description": "",
+     "file": "projects/mk-kit/testing/harnesses/form-controls.harness.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "label",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "selected",
+       "type": "boolean",
+       "description": ""
+      },
+      {
+       "name": "disabled",
+       "type": "boolean",
+       "description": ""
+      }
+     ]
+    },
+    {
+     "name": "MkTestKey",
+     "description": "Keys accepted by `MkTestElement.sendKeys` besides printable characters.",
+     "file": "projects/mk-kit/testing/harness.ts",
+     "kind": "type",
+     "definition": "| 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown'"
+    }
+   ]
   }
  ]
 }

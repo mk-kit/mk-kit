@@ -13271,3 +13271,407 @@ Load lifecycle of an `MkImage`.
 ```ts
 type MkImageState = 'loading' | 'loaded' | 'error';
 ```
+
+## @mk-kit/ui/testing
+
+23 exports. `import { … } from '@mk-kit/ui/testing';`
+
+### MkButtonHarness (class)
+
+Import: `import { MkButtonHarness } from '@mk-kit/ui/testing';`
+
+`button[mkButton]` / `a[mkButton]`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `text(): string` |  |
+| `click(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+| `isDisabled(): boolean` |  |
+| `isLoading(): boolean` |  |
+| `tone(): string \| null` |  |
+| `variant(): string \| null` | `solid` \| `soft` \| `outline` \| `ghost` \| `link`. |
+| `size(): string \| null` |  |
+
+### MkCheckboxHarness (class)
+
+Import: `import { MkCheckboxHarness } from '@mk-kit/ui/testing';`
+
+`mk-checkbox`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `label(): string` |  |
+| `isChecked(): boolean` |  |
+| `isIndeterminate(): boolean` |  |
+| `isDisabled(): boolean` |  |
+| `isRequired(): boolean` |  |
+| `toggle(): Promise<void>` |  |
+| `check(): Promise<void>` |  |
+| `uncheck(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+| `blur(): Promise<void>` |  |
+
+### MkDialogHarness (class)
+
+Import: `import { MkDialogHarness } from '@mk-kit/ui/testing';`
+
+A dialog opened by `MkDialogService` (`open()`, `confirm()`, `alert()`,
+`prompt()`). Dialogs live in `document.body`, so look them up through
+`loader.document()`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `title(): string` |  |
+| `bodyText(): string` |  |
+| `buttons(): string[]` | Texts of every button in the dialog (header close excluded). |
+| `clickButton(which: number \| string \| RegExp): Promise<void>` | Click a button by index, exact text or RegExp. |
+| `close(): Promise<void>` | The header × button. |
+| `pressEscape(): Promise<void>` |  |
+| `input(): MkTestElement \| null` | The prompt dialog's text field, if any. |
+
+### MkFormFieldHarness (class)
+
+Import: `import { MkFormFieldHarness } from '@mk-kit/ui/testing';`
+
+`mk-form-field` — label / hint / error around any control.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `label(): string` |  |
+| `hint(): string \| null` |  |
+| `error(): string \| null` | The visible validation message, or `null` when the field is valid/untouched. |
+| `hasError(): boolean` |  |
+| `isRequired(): boolean` |  |
+| `control<T extends MkHarness>(type: Parameters<typeof this.loader.get<T>>[0]): Promise<T>` | The control inside the field, as a harness of the given type. |
+
+### MkHarness (class)
+
+Import: `import { MkHarness } from '@mk-kit/ui/testing';`
+
+Base class of every mk-kit harness. Subclasses declare `hostSelector`
+and expose user-level actions (`click()`, `selectOption()`, …) and reads
+(`isChecked()`, `text()`), so specs never depend on the component's DOM.
+
+### MkHarnessLoader (class)
+
+Docs: https://mk-kit.dev/testing
+
+Import: `import { MkHarnessLoader } from '@mk-kit/ui/testing';`
+
+Finds harnesses under a root element. Create one with
+`MkHarnessLoader.fromFixture(fixture)`; use `.document()` for content that
+mk-kit teleports into `document.body` (dialogs, toasts, menus, select
+panels) and `.within(el)` to scope lookups.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `document(): MkHarnessLoader` | Same settle function, rooted at `document.body` — for overlays. |
+| `within(root: Element \| MkTestElement): MkHarnessLoader` |  |
+| `rootElement(): MkTestElement` | Wrap the root element itself. |
+| `element(selector: string): MkTestElement` |  |
+| `elements(selector: string): MkTestElement[]` |  |
+| `get<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T>` | First matching harness; throws when there is none. |
+| `getOrNull<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T \| null>` |  |
+| `has<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<boolean>` |  |
+| `getAll<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T[]>` |  |
+
+### MkInputHarness (class)
+
+Import: `import { MkInputHarness } from '@mk-kit/ui/testing';`
+
+Native `input[mkInput]` / `textarea[mkInput]`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `value(): string` |  |
+| `setValue(value: string): Promise<void>` | Replace the value (fires `input` + `change`). |
+| `type(text: string): Promise<void>` | Append text one character at a time (keydown / input / keyup). |
+| `clear(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+| `blur(): Promise<void>` |  |
+| `placeholder(): string` |  |
+| `type_(): string` |  |
+| `isDisabled(): boolean` |  |
+| `isInvalid(): boolean` |  |
+| `isRequired(): boolean` |  |
+| `isFocused(): boolean` |  |
+
+### MkMenuHarness (class)
+
+Import: `import { MkMenuHarness } from '@mk-kit/ui/testing';`
+
+A `[mkMenuTriggerFor]` trigger and the `mk-menu` panel it opens. The host
+is matched by the trigger's `aria-haspopup="menu"` (the directive's
+attribute is an input binding, so it is not in the DOM).
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `isOpen(): boolean` |  |
+| `open(): Promise<void>` |  |
+| `close(): Promise<void>` |  |
+| `panel(): MkTestElement \| null` | The teleported panel (`[role="menu"]`), or `null` while closed. |
+| `items(): Promise<string[]>` | Item texts of the open menu (opens it if needed). Submenu panels excluded. |
+| `clickItem(which: number \| string \| RegExp): Promise<void>` | Click an item by index, exact text or RegExp (opens the menu first). |
+| `isItemDisabled(which: number \| string \| RegExp): Promise<boolean>` |  |
+
+### MkRadioGroupHarness (class)
+
+Import: `import { MkRadioGroupHarness } from '@mk-kit/ui/testing';`
+
+`mk-radio-group`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `radios(): Promise<MkRadioHarness[]>` |  |
+| `labels(): Promise<string[]>` |  |
+| `checkedLabel(): Promise<string \| null>` | Label of the checked radio, or `null`. |
+| `checkedIndex(): Promise<number>` |  |
+| `select(which: number \| string \| RegExp): Promise<void>` | Select by index, exact label or RegExp. |
+| `isDisabled(): boolean` |  |
+
+### MkRadioHarness (class)
+
+Import: `import { MkRadioHarness } from '@mk-kit/ui/testing';`
+
+One `mk-radio` inside a group.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `label(): string` |  |
+| `isChecked(): boolean` |  |
+| `isDisabled(): boolean` |  |
+| `select(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+
+### MkSelectHarness (class)
+
+Import: `import { MkSelectHarness } from '@mk-kit/ui/testing';`
+
+`mk-select` — opens the teleported listbox and picks options like a user.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `valueText(): string` | Label of the selected option, or `''` when only the placeholder shows. |
+| `placeholder(): string` |  |
+| `isOpen(): boolean` |  |
+| `isDisabled(): boolean` |  |
+| `isInvalid(): boolean` |  |
+| `open(): Promise<void>` |  |
+| `close(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+| `options(): Promise<MkSelectOptionState[]>` | Options of the (opened) listbox. Opens it if needed. |
+| `selectOption(which: number \| string \| RegExp): Promise<void>` | Pick an option by index, exact label or RegExp (opens the list first). |
+
+### MkSwitchHarness (class)
+
+Import: `import { MkSwitchHarness } from '@mk-kit/ui/testing';`
+
+`mk-switch`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `label(): string` |  |
+| `isChecked(): boolean` |  |
+| `isDisabled(): boolean` |  |
+| `toggle(): Promise<void>` |  |
+| `check(): Promise<void>` |  |
+| `uncheck(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+
+### MkTableHarness (class)
+
+Import: `import { MkTableHarness } from '@mk-kit/ui/testing';`
+
+`mk-table`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `headers(): string[]` | Header labels of the data columns, in display order. |
+| `rows(): Promise<MkTableRowHarness[]>` |  |
+| `rowCount(): Promise<number>` |  |
+| `cellTexts(): Promise<string[][]>` | Every data cell as text: `rows()[r].cells()`. |
+| `sortBy(which: number \| string \| RegExp): Promise<void>` | Click a sortable header (by index, exact label or RegExp). |
+| `sortDirection(which: number \| string \| RegExp): string \| null` | `'ascending' \| 'descending' \| 'none' \| null` (null = not sortable). |
+| `selectedRowCount(): Promise<number>` |  |
+| `toggleAll(): Promise<void>` | Toggle the header "select all" checkbox. |
+| `isEmpty(): boolean` |  |
+
+### MkTableRowHarness (class)
+
+Import: `import { MkTableRowHarness } from '@mk-kit/ui/testing';`
+
+One data row of `mk-table`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `cells(): string[]` | Cell texts of the data columns (expand / select cells excluded). |
+| `cell(index: number): string` |  |
+| `isSelected(): boolean` |  |
+| `isExpanded(): boolean` |  |
+| `click(): Promise<void>` |  |
+| `toggleSelected(): Promise<void>` | Toggle the selection checkbox (throws when the table is not `selectable`). |
+| `toggleExpanded(): Promise<void>` | Toggle the expand / tree control of the row. |
+
+### MkTabsHarness (class)
+
+Import: `import { MkTabsHarness } from '@mk-kit/ui/testing';`
+
+`mk-tabs`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `labels(): string[]` |  |
+| `selectedIndex(): number` |  |
+| `selectedLabel(): string \| null` |  |
+| `select(which: number \| string \| RegExp): Promise<void>` | Select by index, exact label or RegExp. |
+| `isDisabled(which: number \| string \| RegExp): boolean` |  |
+| `selectedPanel(): MkTestElement \| null` | The visible tab panel (`mk-tab` host). |
+| `selectedPanelText(): string` | Text of the visible panel. |
+
+### MkTestElement (class)
+
+Import: `import { MkTestElement } from '@mk-kit/ui/testing';`
+
+A DOM element wrapped for tests: reads are synchronous, every interaction
+dispatches the same events a user would and then settles change detection
+(`fixture.detectChanges()` + `whenStable()`), so the next read sees the
+updated view.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `text(): string` | Trimmed text content with whitespace collapsed. |
+| `attr(name: string): string \| null` |  |
+| `hasClass(name: string): boolean` |  |
+| `prop<T = unknown>(name: string): T` | Read a DOM property (`value`, `checked`, `open`, …). |
+| `matches(selector: string): boolean` |  |
+| `isFocused(): boolean` |  |
+| `isDisabled(): boolean` | Native `disabled`, `aria-disabled="true"` or a `--disabled` host class. |
+| `query(selector: string): MkTestElement \| null` |  |
+| `queryAll(selector: string): MkTestElement[]` |  |
+| `child(selector: string): MkTestElement` | Like `query`, but throws a readable error when nothing matches. |
+| `click(): Promise<void>` | pointerdown → mousedown → focus → pointerup → mouseup → click, like a user. |
+| `hover(): Promise<void>` |  |
+| `leave(): Promise<void>` |  |
+| `focus(): Promise<void>` |  |
+| `blur(): Promise<void>` |  |
+| `type(text: string): Promise<void>` | Type into an input/textarea/contenteditable character by character — keydown, `value` append, `input`, keyup — then settle. Use `setValue` to replace the value in one go. |
+| `setValue(value: string): Promise<void>` | Set the value of an input/textarea/select and fire `input` + `change`. |
+| `clear(): Promise<void>` |  |
+| `sendKeys(...keys: Array<MkTestKey \| (string & {})>): Promise<void>` | Dispatch keydown/keyup for each key. Printable single characters are also typed. |
+| `dispatch(event: Event): Promise<void>` | Dispatch any event on the element and settle. |
+
+### MkToastHarness (class)
+
+Import: `import { MkToastHarness } from '@mk-kit/ui/testing';`
+
+One toast shown by `MkToastService` (lives in `document.body` — use `loader.document()`).
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `title(): string \| null` |  |
+| `message(): string` |  |
+| `tone(): string \| null` |  |
+| `actionLabel(): string \| null` |  |
+| `clickAction(): Promise<void>` |  |
+| `dismiss(): Promise<void>` |  |
+
+### matchText (function)
+
+Import: `import { matchText } from '@mk-kit/ui/testing';`
+
+```ts
+function matchText(actual: string, expected: string | RegExp): boolean
+```
+
+### pickBy (function)
+
+Import: `import { pickBy } from '@mk-kit/ui/testing';`
+
+Resolve "by index or by label" arguments shared by option-style harnesses.
+
+```ts
+function pickBy<T>(items: T[], which: number | string | RegExp, label: (item: T) => string, what: string): T
+```
+
+### MkHarnessFilters (interface)
+
+Import: `import { MkHarnessFilters } from '@mk-kit/ui/testing';`
+
+Filters every harness lookup accepts. `selector` narrows the host elements
+considered (e.g. a class or attribute your template sets); `text` matches
+the host's trimmed text content — a string must match exactly, a RegExp
+is tested.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `selector`? | `string \| undefined` |  |
+| `text`? | `string \| RegExp \| undefined` |  |
+
+### MkHarnessType (interface)
+
+Import: `import { MkHarnessType } from '@mk-kit/ui/testing';`
+
+Constructor shape of every harness class: a static `hostSelector`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `hostSelector` | `string` |  |
+
+### MkSelectOptionState (interface)
+
+Import: `import { MkSelectOptionState } from '@mk-kit/ui/testing';`
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `label` | `string` |  |
+| `selected` | `boolean` |  |
+| `disabled` | `boolean` |  |
+
+### MkTestKey (type)
+
+Import: `import { MkTestKey } from '@mk-kit/ui/testing';`
+
+Keys accepted by `MkTestElement.sendKeys` besides printable characters.
+
+```ts
+type MkTestKey = | 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown';
+```

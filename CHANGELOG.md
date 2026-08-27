@@ -8,6 +8,15 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **Test harnesses — `@mk-kit/ui/testing`** (Wave B) — `MkHarnessLoader.fromFixture(fixture)`
+  finds harnesses by type + `{ selector, text }` filters and settles change
+  detection after every interaction (zoneless or zone-based TestBed).
+  Harnesses for button, input, checkbox, switch, radio group, select (opens
+  the teleported listbox), form field (`control(Type)`), tabs, menu, table +
+  rows (sort, select, expand), dialog and toast (`loader.document()` for
+  overlays). `MkTestElement` wraps any element with `click()`, `type()`,
+  `setValue()`, `sendKeys()`, `hover()`; extend `MkHarness` for your own.
+  New entry point (never re-exported from the root); docs page `/testing`.
 - **Generated API reference + `llms.txt`** (Wave B) — `scripts/gen-api.mjs`
   runs the TypeScript compiler over every entry-point barrel and emits
   `api.json` (each export with inputs, outputs, methods, properties, types and

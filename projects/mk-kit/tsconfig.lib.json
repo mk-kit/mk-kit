@@ -8,6 +8,6 @@
     "declarationMap": true,
     "types": []
   },
-  "include": ["src/**/*.ts", "core/**/*.ts", "icon/**/*.ts", "chip/**/*.ts", "button/**/*.ts", "directives/**/*.ts", "dnd/**/*.ts", "navigation/**/*.ts", "forms/**/*.ts", "datetime/**/*.ts", "table/**/*.ts", "data/**/*.ts", "feedback/**/*.ts", "block-editor/**/*.ts", "context-menu/**/*.ts", "layout/**/*.ts", "chat/**/*.ts", "query-builder/**/*.ts"],
+  "include": ["src/**/*.ts", "core/**/*.ts", "icon/**/*.ts", "chip/**/*.ts", "button/**/*.ts", "directives/**/*.ts", "dnd/**/*.ts", "navigation/**/*.ts", "forms/**/*.ts", "datetime/**/*.ts", "table/**/*.ts", "data/**/*.ts", "feedback/**/*.ts", "block-editor/**/*.ts", "context-menu/**/*.ts", "layout/**/*.ts", "chat/**/*.ts", "query-builder/**/*.ts", "testing/**/*.ts"],
   "exclude": ["**/*.spec.ts"]
 }
