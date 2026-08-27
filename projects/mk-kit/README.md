@@ -11,6 +11,7 @@ beyond Angular.
 
 - **Docs & live demos:** <https://mk-kit.dev>
 - **API reference:** <https://mk-kit.dev/api> — also as [api.json](https://mk-kit.dev/api.json), [llms.txt](https://mk-kit.dev/llms.txt) and [llms-full.txt](https://mk-kit.dev/llms-full.txt) for tools and AI assistants
+- **Testing:** `@mk-kit/ui/testing` — component harnesses for TestBed specs (<https://mk-kit.dev/testing>)
 - **MCP server:** `npx -y @mk-kit/mcp` — exact component/input/output lookup for Claude Code, Cursor & co. ([@mk-kit/mcp](https://www.npmjs.com/package/@mk-kit/mcp))
 - **Changelog:** [CHANGELOG.md](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
 - **Issues:** <https://github.com/mk-kit/mk-kit/issues>
@@ -98,7 +99,9 @@ import { MkDatePicker } from '@mk-kit/ui/datetime';
 
 Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
 `feedback`, `directives`, `dnd`, `media`, `icon`, `button`, `checkbox`, `chip`,
-`context-menu`, `layout`, `chat`, `query-builder`, `rich-text`, `block-editor`. `sideEffects: false` throughout.
+`context-menu`, `layout`, `chat`, `query-builder`, `rich-text`, `block-editor`,
+plus `testing` (component harnesses for specs — never re-exported from the
+umbrella). `sideEffects: false` throughout.
 
 ## Theming
 

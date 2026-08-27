@@ -47,6 +47,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'MkAnchoredPanel', desc: 'Clip-proof anchored panel in the native top layer — the base of every dropdown.', path: '/core-services' },
       { name: 'MkHistoryService', desc: 'Generic undo/redo command stack with batching, scopes and hotkey wiring.', path: '/core-services' },
       { name: 'provideMkI18n', desc: 'Translate every built-in string of the library from one provider.', path: '/core-services' },
+      { name: 'MkHarnessLoader', desc: 'Component test harnesses (@mk-kit/ui/testing): drive selects, tables, dialogs… like a user in TestBed specs.', path: '/testing' },
     ],
   },
   {

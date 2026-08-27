@@ -60,6 +60,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/components/touch-keys', slug: 'touch-keys' },
   { path: '/components/kanban', slug: 'kanban' },
   { path: '/components-index', slug: 'components-index' },
+  { path: '/testing', slug: 'testing' },
   {
     path: '/api?entry=button#MkButton',
     slug: 'api',
