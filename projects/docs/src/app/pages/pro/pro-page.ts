@@ -29,7 +29,7 @@ const WIDGETS: ProWidget[] = [
     blurb: 'A finished admin: auth & 2FA, dashboard, CRUD list / detail / form on mk-dynamic-form, users & roles, settings, billing, notifications, audit log. Source code, mock API and tests.',
   },
   { name: 'Gantt', status: 'available', entry: '@mk-kit/pro/gantt', blurb: 'Phases and tasks as a tree, milestones, four dependency types with lag, critical path, auto-schedule cascade, drag / resize / progress, day / week / month zoom, keyboard editing.' },
-  { name: 'Export pack', status: 'planned', blurb: 'XLSX with styles and multiple sheets, PDF for tables and charts, large exports off the main thread. CSV and print stay free.' },
+  { name: 'Export pack', status: 'available', entry: '@mk-kit/pro/export', blurb: 'Zero-dependency XLSX (typed cells, styles, multiple sheets, frozen header, auto-filter) and PDF (tables with repeated headers, wrapped text, charts as images, embedded TrueType fonts) writers, one-call table export, big exports in a worker, and a ready-made export button. CSV and print stay free.' },
   { name: 'Form builder', status: 'planned', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, properties, conditions editor, live preview.' },
   { name: 'Pivot grid', status: 'planned', blurb: 'Rows / columns / values with a field chooser, totals and drill-down.' },
 ];
@@ -132,6 +132,30 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         <figcaption>Day zoom with the critical path highlighted; a milestone (diamond) and phase summaries (brackets).</figcaption>
       </figure>
       <pre class="pro-code"><code>{{ ganttCode }}</code></pre>
+
+      <h2 id="export">Export pack <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        Real <strong>.xlsx</strong> and <strong>.pdf</strong> files without a
+        single dependency: the ZIP, the OOXML and the PDF objects are written by
+        the package itself. Give it your <code class="docs-inline">mk-table</code>
+        columns and rows and get typed cells, currency and date formats, a bold
+        frozen header, auto-filter and multiple sheets — or a paginated PDF
+        with repeated table headers, wrapped text, page numbers and your charts
+        rasterised in. Embed a TrueType font and Polish, Czech or Greek text
+        renders correctly. Exports above a few thousand rows run in a Web
+        Worker so the UI never freezes.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-export-dark.png' : '/pro-export.png'"
+          width="1200"
+          height="600"
+          alt="The mk-kit Pro export demo: an orders table with an export split button offering CSV, XLSX and PDF, and a bar chart that ends up in the PDF report."
+          loading="lazy"
+        />
+        <figcaption>The export button on a table; the same data goes to CSV (free), XLSX or a PDF report with the chart.</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ exportCode }}</code></pre>
 
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
@@ -355,6 +379,23 @@ dependencies = [{ from: 'wire', to: 'visual' }, { from: 'visual', to: 'beta', ty
 apply(c: MkGanttChange) {
   // c.task / c.start / c.end / c.progress — and c.cascade[] for successors auto-schedule pushed
 }`;
+
+  protected readonly exportCode = `import { MkExportButton, mkExportTable, mkExportXlsx, mkExportPdf } from '@mk-kit/pro/export';
+
+<!-- one button, three formats, wired to the table -->
+<mk-table #orders [columns]="columns" [data]="rows()" selectable />
+<mk-export-button [table]="orders" filename="orders" [formats]="['csv', 'xlsx', 'pdf']" />
+
+// or build the files yourself
+mkExportXlsx({ sheets: [{ name: 'Orders', columns: [
+  { key: 'id', header: '#', format: 'integer' },
+  { key: 'customer', header: 'Customer', width: 28 },
+  { key: 'total', header: 'Total', format: 'currency', currency: 'EUR' },
+  { key: 'placed', header: 'Placed', format: 'date' },
+], rows, freezeHeader: true, autoFilter: true }] }, 'orders.xlsx');
+
+mkExportPdf({ title: 'Monthly report', page: { size: 'A4', orientation: 'landscape' }, pageNumbers: true,
+  sections: [{ type: 'table', columns, rows }, { type: 'image', element: chartSvg }] }, 'report.pdf');`;
 
   protected readonly licenseCode = `// main.ts — once per app
 import { provideMkProLicense } from '@mk-kit/pro/license';
