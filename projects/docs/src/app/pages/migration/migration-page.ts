@@ -1,4 +1,5 @@
 import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { RouterLink } from '@angular/router';
 import { DocsExample } from '../../shared/docs-example';
 
 /**
@@ -7,7 +8,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-migration-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample],
+  imports: [DocsExample, RouterLink],
   template: `
     <div class="docs-page docs-container">
       <h1>Migrating from Angular Material</h1>
@@ -120,12 +121,50 @@ import { DocsExample } from '../../shared/docs-example';
         including per-surface before/after snippets, in
         <code class="docs-inline">MIGRATION.md</code>.
       </p>
+
+      <h2 id="primeng">Coming from PrimeNG? Migrate automatically</h2>
+      <p>
+        PrimeNG 22+ is commercial for most companies; mk-kit covers the same
+        admin surface under MIT. A schematic does the mechanical part:
+      </p>
+      <pre class="mig-code"><code>ng g &#64;mk-kit/ui:migrate-primeng --dry-run   # report only
+ng g &#64;mk-kit/ui:migrate-primeng             # apply + write primeng-migration.md</code></pre>
+      <p><strong>It rewrites</strong></p>
+      <ul>
+        <li><code class="docs-inline">primeng/*</code> imports and class names → <code class="docs-inline">&#64;mk-kit/ui</code> (<code class="docs-inline">ButtonModule</code> → <code class="docs-inline">MkButton</code>, <code class="docs-inline">MessageService</code> → <code class="docs-inline">MkToastService</code>, …), deduping <code class="docs-inline">imports: []</code>.</li>
+        <li>Selectors that map 1:1, in inline templates and <code class="docs-inline">.html</code>: <code class="docs-inline">pButton</code> → <code class="docs-inline">mkButton</code>, <code class="docs-inline">pInputText</code> → <code class="docs-inline">mkInput</code>, <code class="docs-inline">p-select</code> / <code class="docs-inline">p-dropdown</code> → <code class="docs-inline">mk-select</code>, <code class="docs-inline">p-checkbox</code>, <code class="docs-inline">p-toggleswitch</code>, <code class="docs-inline">p-table</code>, <code class="docs-inline">p-tabView</code>, <code class="docs-inline">p-accordion</code>, <code class="docs-inline">p-tag</code>, <code class="docs-inline">p-chip</code>, <code class="docs-inline">p-avatar</code>, <code class="docs-inline">p-skeleton</code>, <code class="docs-inline">p-drawer</code>, <code class="docs-inline">pTooltip</code> → <code class="docs-inline">mkTooltip</code> and ~80 more.</li>
+        <li>Mechanical inputs: <code class="docs-inline">[value]</code> → <code class="docs-inline">[data]</code> on tables, <code class="docs-inline">severity</code> → <code class="docs-inline">tone</code>, <code class="docs-inline">[(activeIndex)]</code> → <code class="docs-inline">[(selectedIndex)]</code>, <code class="docs-inline">[(visible)]</code> → <code class="docs-inline">[(open)]</code> on drawers, <code class="docs-inline">tooltipPosition</code> → <code class="docs-inline">mkTooltipPlacement</code>.</li>
+        <li><code class="docs-inline">angular.json</code> styles (PrimeNG theme / primeicons out, mk-kit theme in) and <code class="docs-inline">package.json</code> (PrimeNG packages removed once nothing unmapped remains).</li>
+      </ul>
+      <p><strong>It leaves a note</strong> (<code class="docs-inline">&lt;!-- mk-kit: … --&gt;</code>) where the shape differs, and lists each in the report with a docs link:</p>
+      <ul>
+        <li><code class="docs-inline">p-dialog [(visible)]</code> → <code class="docs-inline">MkDialogService.open(Component)</code>; <code class="docs-inline">p-confirmDialog</code> → <code class="docs-inline">await dialog.confirm(…)</code>.</li>
+        <li><code class="docs-inline">p-toast</code> host + <code class="docs-inline">MessageService.add(&#123; severity, summary, detail &#125;)</code> → <code class="docs-inline">toast.success(detail, &#123; title &#125;)</code>.</li>
+        <li>Menus, breadcrumbs, steppers driven by <code class="docs-inline">[model]</code> → child elements; select-style <code class="docs-inline">[options]</code> → <code class="docs-inline">&#123; label, value &#125;</code> objects; <code class="docs-inline">p-chart</code> → the matching SVG chart; PrimeNG templates (<code class="docs-inline">pTemplate</code>) → content slots.</li>
+      </ul>
+      <p>
+        Expect a green build after the notes are handled — the schematic never
+        rewrites something it cannot make compile. Icons:
+        <code class="docs-inline">pi pi-*</code> → <code class="docs-inline">&lt;mk-icon name&gt;</code>
+        (<a routerLink="/components/icon">icon set</a>); theming moves to
+        <code class="docs-inline">--mk-*</code> tokens.
+      </p>
     </div>
   `,
   styles: [
     `
       :host {
         display: block;
+      }
+      .mig-code {
+        margin: var(--mk-space-3) 0 var(--mk-space-4);
+        padding: var(--mk-space-3) var(--mk-space-4);
+        background: var(--mk-code-bg);
+        border: 1px solid var(--mk-border);
+        border-radius: var(--mk-radius-lg);
+        font-family: var(--mk-font-mono);
+        font-size: var(--mk-font-size-sm);
+        overflow-x: auto;
       }
       .echo {
         margin: 0;

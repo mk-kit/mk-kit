@@ -23,7 +23,12 @@ ng add @mk-kit/ui
 ```
 
 `ng add` installs the package and wires the theme stylesheet into
-`angular.json`. By hand instead:
+`angular.json`.
+
+**Coming from PrimeNG?** `ng g @mk-kit/ui:migrate-primeng --dry-run` shows
+what the codemod would rewrite (imports, class names, 1:1 selectors, a few
+input names) and what needs a manual touch; without `--dry-run` it applies
+the changes and writes `primeng-migration.md`. Details: <https://mk-kit.dev/migration>. By hand instead:
 
 ```bash
 npm install @mk-kit/ui
