@@ -1355,7 +1355,7 @@ export class HomePage {
   private readonly teamForm = viewChild<ElementRef<HTMLElement>>('teamForm');
 
   protected readonly uiVersion = uiVersion;
-  protected readonly total = 178;
+  protected readonly total = 180;
   protected readonly copied = signal(false);
 
   /* Brand-swap: rewrites the primary token family on the host ------------ */
@@ -1451,7 +1451,7 @@ export class HomePage {
 
   /* Copy --------------------------------------------------------------- */
   protected readonly groups: Group[] = [
-    { title: 'Forms & inputs', count: 53, blurb: 'Text, number, phone, IBAN, tax id, OTP, date, time & date-time pickers, selects, multi-select, listbox, cascader, floating labels, sliders, file upload, colour, rating, signature, keypad, split button.' },
+    { title: 'Forms & inputs', count: 54, blurb: 'Dynamic form (JSON schema → form), text, number, phone, IBAN, tax id, OTP, date, time & date-time pickers, selects, multi-select, listbox, cascader, floating labels, sliders, file upload, colour, rating, signature, keypad, split button.' },
     { title: 'Data display', count: 25, blurb: 'Cards, lists, stat cards, badges, tags, chips, avatars, timeline, description lists, tree, empty states, QR, diff, JSON viewer.' },
     { title: 'Editors & interactions', count: 25, blurb: 'Chat with streaming replies and a prompt box, block editor, rich text, markdown, log viewer, drag & drop, sortable list, mentions, hotkeys, masks, permissions.' },
     { title: 'Feedback & overlays', count: 21, blurb: 'Dialogs (draggable & resizable), sheets, drawers, toasts, snackbars, banners, tooltips, popovers, hovercards, tours, block UI, progress, skeletons.' },
