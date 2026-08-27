@@ -148,8 +148,8 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
       <figure class="pro-figure">
         <img
           [src]="theme.isDark() ? '/pro-export-dark.png' : '/pro-export.png'"
-          width="1200"
-          height="600"
+          width="1248"
+          height="640"
           alt="The mk-kit Pro export demo: an orders table with an export split button offering CSV, XLSX and PDF, and a bar chart that ends up in the PDF report."
           loading="lazy"
         />
