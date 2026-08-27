@@ -108,6 +108,8 @@ export class MkMultiSelect implements ControlValueAccessor, Validator {
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** The list of options to choose from. Update from `search` for async. */
+  /** Accessible name when the control is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
   readonly options = input<readonly MkMultiSelectOption[]>([]);
   /** Placeholder shown when no value is selected. */
   readonly placeholder = input<string>('');

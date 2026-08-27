@@ -9,6 +9,7 @@
     [disabled]="isDisabled()"
     autocomplete="off"
     role="combobox"
+    [attr.aria-label]="ariaLabelAttr()"
     aria-haspopup="dialog"
     [attr.aria-expanded]="open()"
     [attr.aria-controls]="panelId"

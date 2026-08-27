@@ -7,6 +7,7 @@ import {
   input,
   numberAttribute,
   signal,
+  output,
 } from '@angular/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { mkChartAutoWidth } from './chart-autowidth';
@@ -128,6 +129,10 @@ export class MkBarChart {
   readonly labelAngle = input<number | 'auto'>('auto');
   /** Accessible summary; generated from the data when omitted. */
   readonly label = input<string>('');
+  /** Make bars clickable + keyboard-focusable (`role="button"`, accessible name) and emit `barClick`. */
+  readonly interactive = input(false, { transform: booleanAttribute });
+  /** A bar was clicked or activated with Enter / Space (needs `interactive`). */
+  readonly barClick = output<{ series: MkChartSeries; seriesIndex: number; category: string; categoryIndex: number; value: number }>();
 
   protected readonly hovered = signal<BarRect | null>(null);
   /** Tap-to-pin: a touch tap on a bar pins the tooltip until a tap lands
@@ -380,6 +385,21 @@ export class MkBarChart {
     if (!s.length || !cats.length) return 'Bar chart, no data';
     return `Bar chart of ${s.map((x) => x.name).join(', ')} across ${cats.length} categories`;
   });
+
+  protected emitBar(b: BarRect, event?: Event): void {
+    if (!this.interactive()) return;
+    if (event instanceof KeyboardEvent) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+    }
+    const series = this.series()[b.seriesIndex];
+    if (!series) return;
+    this.barClick.emit({ series, seriesIndex: b.seriesIndex, category: this.categories()[b.categoryIndex] ?? '', categoryIndex: b.categoryIndex, value: b.value });
+  }
+
+  protected barLabel(b: BarRect): string {
+    return `${this.series()[b.seriesIndex]?.name ?? ''}, ${this.categories()[b.categoryIndex] ?? ''}: ${b.value}`;
+  }
 
   protected setHover(bar: BarRect | null): void {
     this.tapPin.hover(bar);

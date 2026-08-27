@@ -3,7 +3,9 @@
     class="mk-chart__svg"
     [attr.viewBox]="'0 0 ' + drawWidth() + ' ' + height()"
     preserveAspectRatio="xMidYMid meet"
-    aria-hidden="true"
+    [attr.aria-hidden]="interactive() ? null : true"
+    [attr.role]="interactive() ? 'group' : null"
+    [attr.aria-label]="interactive() ? resolvedLabel() : null"
     focusable="false"
   >
     <!-- Gridlines + value-axis labels -->
@@ -39,9 +41,17 @@
         [attr.height]="b.h"
         [style.fill]="b.color"
         rx="3"
+        [class.mk-chart__bar--interactive]="interactive()"
+        [attr.role]="interactive() ? 'button' : null"
+        [attr.tabindex]="interactive() ? 0 : null"
+        [attr.aria-label]="interactive() ? barLabel(b) : null"
         (pointerenter)="setHover(b)"
         (pointerleave)="setHover(null)"
         (pointerdown)="pinHover(b, $event)"
+        (click)="emitBar(b)"
+        (keydown)="emitBar(b, $event)"
+        (focus)="setHover(b)"
+        (blur)="setHover(null)"
       />
     }
 

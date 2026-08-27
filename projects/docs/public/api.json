@@ -6258,9 +6258,15 @@
      "formControl": true,
      "inputs": [
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the control is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "options",
        "type": "readonly MkAutocompleteOption[]",
-       "description": "The list of suggestions. Update it from `search` for async sources.",
+       "description": "",
        "default": "[]"
       },
       {
@@ -6965,9 +6971,15 @@
      "formControl": true,
      "inputs": [
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the control is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "currency",
        "type": "string",
-       "description": "ISO 4217 currency code (`PLN`, `USD`, …). Empty = plain decimal.",
+       "description": "",
        "default": "''"
       },
       {
@@ -7749,9 +7761,15 @@
      "formControl": true,
      "inputs": [
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the control is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "options",
        "type": "readonly MkMultiSelectOption[]",
-       "description": "The list of options to choose from. Update from `search` for async.",
+       "description": "",
        "default": "[]"
       },
       {
@@ -7868,9 +7886,15 @@
      "formControl": true,
      "inputs": [
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the control is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "min",
        "type": "number | null",
-       "description": "Minimum value.",
+       "description": "",
        "default": "null"
       },
       {
@@ -8856,9 +8880,15 @@
      "formControl": true,
      "inputs": [
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the control is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "options",
        "type": "readonly MkSelectOption[]",
-       "description": "The list of options to choose from.",
+       "description": "",
        "default": "[]"
       },
       {
@@ -10749,9 +10779,15 @@
        "default": "null"
       },
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the picker is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "min",
        "type": "Date | null",
-       "description": "Earliest selectable date (inclusive).",
+       "description": "",
        "default": "null"
       },
       {
@@ -11357,9 +11393,15 @@
        "default": "null"
       },
       {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name when the picker is used without an `mk-form-field` label.",
+       "default": "''"
+      },
+      {
        "name": "valueFormat",
        "type": "\"string\" | \"date\"",
-       "description": "Shape of the form value: a `HH:mm` string or a `Date`.",
+       "description": "",
        "default": "'string'"
       },
       {
@@ -13081,9 +13123,21 @@
        "type": "string",
        "description": "Accessible summary; generated from the data when omitted.",
        "default": "''"
+      },
+      {
+       "name": "interactive",
+       "type": "boolean",
+       "description": "Make bars clickable + keyboard-focusable (`role=\"button\"`, accessible name) and emit `barClick`.",
+       "default": "false"
       }
      ],
-     "outputs": [],
+     "outputs": [
+      {
+       "name": "barClick",
+       "type": "{ series: MkChartSeries; seriesIndex: number; category: string; categoryIndex: number; value: number; }",
+       "description": "A bar was clicked or activated with Enter / Space (needs `interactive`)."
+      }
+     ],
      "methods": [],
      "properties": [],
      "queries": [],
@@ -13636,9 +13690,21 @@
        "type": "string",
        "description": "Accessible summary; generated from the data when omitted.",
        "default": "''"
+      },
+      {
+       "name": "interactive",
+       "type": "boolean",
+       "description": "Make slices (and legend rows) clickable and keyboard-focusable: they get\n`role=\"button\"` + an accessible name and emit `sliceClick`. Off by default —\nthe chart stays a static picture with its screen-reader table.",
+       "default": "false"
       }
      ],
-     "outputs": [],
+     "outputs": [
+      {
+       "name": "sliceClick",
+       "type": "{ slice: MkChartSlice; index: number; }",
+       "description": "A slice was clicked or activated with Enter / Space (needs `interactive`)."
+      }
+     ],
      "methods": [],
      "properties": [],
      "queries": [],
@@ -14146,9 +14212,21 @@
        "type": "string",
        "description": "Accessible summary; generated from the data when omitted.",
        "default": "''"
+      },
+      {
+       "name": "interactive",
+       "type": "boolean",
+       "description": "Make x positions keyboard-focusable (`role=\"button\"`, accessible name) and emit `pointClick`.",
+       "default": "false"
       }
      ],
-     "outputs": [],
+     "outputs": [
+      {
+       "name": "pointClick",
+       "type": "{ index: number; category: string; values: Array<{ series: MkChartSeries; value: number; }>; }",
+       "description": "A category (x position) was clicked or activated with Enter / Space (needs `interactive`)."
+      }
+     ],
      "methods": [],
      "properties": [],
      "queries": [],

@@ -116,6 +116,8 @@ export class MkAutocomplete implements ControlValueAccessor {
   }
 
   /** The list of suggestions. Update it from `search` for async sources. */
+  /** Accessible name when the control is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
   readonly options = input<readonly MkAutocompleteOption[]>([]);
   /** Placeholder shown when the input is empty. */
   readonly placeholder = input<string>('');

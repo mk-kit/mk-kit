@@ -82,7 +82,8 @@ import { DocsExample } from '../../shared/docs-example';
       <p>Compare a measure across categories; group or stack multiple series.</p>
       <docs-example [code]="barCode" column>
         <div style="width: 100%; max-width: 40rem;">
-          <mk-bar-chart [categories]="quarters" [series]="revenue" />
+          <mk-bar-chart [categories]="quarters" [series]="revenue" interactive (barClick)="picked.set($event.category + ': ' + $event.value)" />
+          <p class="docs-lead" style="margin-top: var(--mk-space-3)">Click or focus a bar (Tab, Enter): {{ picked() || '—' }}</p>
         </div>
       </docs-example>
 
@@ -346,6 +347,7 @@ import { DocsExample } from '../../shared/docs-example';
   ],
 })
 export class ChartsPage {
+  protected readonly picked = signal('');
   protected readonly trend = [4, 6, 5, 8, 7, 10, 9, 12, 11, 14];
   protected readonly quarters = ['Q1', 'Q2', 'Q3', 'Q4'];
   /** A full day — the canonical axis that cannot fit its labels flat. */

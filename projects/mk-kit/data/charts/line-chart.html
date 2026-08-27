@@ -3,7 +3,9 @@
     class="mk-chart__svg"
     [attr.viewBox]="'0 0 ' + drawWidth() + ' ' + height()"
     preserveAspectRatio="xMidYMid meet"
-    aria-hidden="true"
+    [attr.aria-hidden]="interactive() ? null : true"
+    [attr.role]="interactive() ? 'group' : null"
+    [attr.aria-label]="interactive() ? resolvedLabel() : null"
     focusable="false"
   >
     <!-- Gridlines + value-axis labels -->
@@ -84,9 +86,17 @@
         [attr.width]="band.w"
         [attr.height]="band.h"
         fill="transparent"
+        [class.mk-chart__band--interactive]="interactive()"
+        [attr.role]="interactive() ? 'button' : null"
+        [attr.tabindex]="interactive() ? 0 : null"
+        [attr.aria-label]="interactive() ? pointLabel(band.index) : null"
         (pointerenter)="setHover(band.index)"
         (pointerleave)="setHover(null)"
         (pointerdown)="pinHover(band.index, $event)"
+        (click)="emitPoint(band.index)"
+        (keydown)="emitPoint(band.index, $event)"
+        (focus)="setHover(band.index)"
+        (blur)="setHover(null)"
       />
     }
   </svg>

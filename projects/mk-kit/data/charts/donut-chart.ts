@@ -7,6 +7,7 @@ import {
   input,
   numberAttribute,
   signal,
+  output,
 } from '@angular/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { mkChartTapPin } from './chart-tap-pin';
@@ -66,6 +67,14 @@ export class MkDonutChart {
   readonly centerSublabel = input<string>('');
   /** Accessible summary; generated from the data when omitted. */
   readonly label = input<string>('');
+  /**
+   * Make slices (and legend rows) clickable and keyboard-focusable: they get
+   * `role="button"` + an accessible name and emit `sliceClick`. Off by default —
+   * the chart stays a static picture with its screen-reader table.
+   */
+  readonly interactive = input(false, { transform: booleanAttribute });
+  /** A slice was clicked or activated with Enter / Space (needs `interactive`). */
+  readonly sliceClick = output<{ slice: MkChartSlice; index: number }>();
 
   protected readonly hovered = signal<number | null>(null);
   /** Tap-to-pin: a touch tap on a slice pins the tooltip until a tap lands
@@ -143,6 +152,21 @@ export class MkDonutChart {
     if (!s.length) return 'Donut chart, no data';
     return `Donut chart with ${s.length} slices totalling ${mkFormatCompact(this.total())}`;
   });
+
+  protected emitSlice(index: number, event?: Event): void {
+    if (!this.interactive()) return;
+    if (event instanceof KeyboardEvent) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+    }
+    const slice = this.slices()[index];
+    if (slice) this.sliceClick.emit({ slice, index });
+  }
+
+  protected sliceLabel(index: number): string {
+    const s = this.slices()[index];
+    return s ? `${s.name}: ${s.value}` : '';
+  }
 
   protected setHover(index: number | null): void {
     this.tapPin.hover(index);

@@ -91,6 +91,8 @@ export class MkCurrencyInput implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
 
   /** ISO 4217 currency code (`PLN`, `USD`, …). Empty = plain decimal. */
+  /** Accessible name when the control is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
   readonly currency = input<string>('');
   /** BCP 47 locale for separators/symbol; defaults to the runtime locale. */
   readonly locale = input<string | undefined>(undefined);

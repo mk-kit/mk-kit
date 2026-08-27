@@ -77,6 +77,8 @@ export class MkSelect implements ControlValueAccessor, OnDestroy {
     viewChild<ElementRef<HTMLButtonElement>>('trigger');
 
   /** The list of options to choose from. */
+  /** Accessible name when the control is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
   readonly options = input<readonly MkSelectOption[]>([]);
   /** Placeholder shown when nothing is selected. */
   readonly placeholder = input<string>(this.i18n.selectPlaceholder);

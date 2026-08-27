@@ -100,15 +100,20 @@
   gap: var(--mk-space-1);
 }
 
+/* `color: inherit` on both — the alert's tone decides the text colour, and a
+   host page's generic `p { color }` rule must not override it (the solid
+   variant would otherwise show muted grey on a green background). */
 .mk-alert__title {
   margin: 0;
   font-weight: var(--mk-font-weight-semibold);
   font-size: var(--mk-font-size-sm);
   line-height: var(--mk-line-height-snug);
+  color: inherit;
 }
 
 .mk-alert__message {
   margin: 0;
+  color: inherit;
 }
 
 /* Close button */

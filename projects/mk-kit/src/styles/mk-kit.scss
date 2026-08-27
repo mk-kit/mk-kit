@@ -126,7 +126,7 @@
   /* Text */
   --mk-text: #1a1d23;
   --mk-text-muted: #56606e;
-  --mk-text-subtle: #687280;
+  --mk-text-subtle: #626d7a;
   --mk-text-inverse: #ffffff;
   --mk-text-disabled: #adb5c0;
 
@@ -170,7 +170,7 @@
   --mk-danger-contrast: #ffffff;
   /* Danger as TEXT on surfaces. Same as --mk-danger in light; lighter in dark,
      where the button-label-safe base falls below 4.5:1 as body text. */
-  --mk-danger-text: #dc2626;
+  --mk-danger-text: #c81e1e;
   --mk-danger-subtle: #fdeaea;
   --mk-danger-subtle-text: #b3201a;
 
@@ -232,7 +232,7 @@ $mk-dark: (
 
   'text': '#e6edf3',
   'text-muted': '#9aa5b1',
-  'text-subtle': '#788494',
+  'text-subtle': '#8a97a6',
   'text-inverse': '#0d1117',
   'text-disabled': '#4b545f',
 

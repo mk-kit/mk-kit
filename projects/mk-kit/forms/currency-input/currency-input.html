@@ -15,7 +15,7 @@
   [placeholder]="placeholder()"
   [disabled]="isDisabled()"
   [attr.aria-labelledby]="labelledBy()"
-  [attr.aria-label]="labelledBy() ? null : i18n.amount"
+  [attr.aria-label]="labelledBy() ? null : (ariaLabel() || i18n.amount)"
   [attr.aria-describedby]="describedBy()"
   [attr.aria-invalid]="isInvalid() || null"
   [attr.aria-required]="isRequired() || null"

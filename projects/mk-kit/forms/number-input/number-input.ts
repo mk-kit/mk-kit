@@ -66,6 +66,8 @@ export class MkNumberInput implements ControlValueAccessor, Validator {
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
 
   /** Minimum value. */
+  /** Accessible name when the control is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
   readonly min = input<number | null>(null);
   /** Maximum value. */
   readonly max = input<number | null>(null);

@@ -3932,7 +3932,8 @@ Inputs:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `readonly MkAutocompleteOption[]` | `[]` | The list of suggestions. Update it from `search` for async sources. |
+| `aria-label` | `string` | `''` | Accessible name when the control is used without an `mk-form-field` label. |
+| `options` | `readonly MkAutocompleteOption[]` | `[]` |  |
 | `placeholder` | `string` | `''` | Placeholder shown when the input is empty. |
 | `size` | `MkSize` | `'md'` | Control size. Ignored when nested in an `mk-form-field`. |
 | `invalid` | `boolean` | `false` | Force invalid styling + `aria-invalid` when used standalone. |
@@ -4323,7 +4324,8 @@ Inputs:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `currency` | `string` | `''` | ISO 4217 currency code (`PLN`, `USD`, …). Empty = plain decimal. |
+| `aria-label` | `string` | `''` | Accessible name when the control is used without an `mk-form-field` label. |
+| `currency` | `string` | `''` |  |
 | `locale` | `string \| undefined` | `undefined` | BCP 47 locale for separators/symbol; defaults to the runtime locale. |
 | `decimals` | `number \| null` | `null` | Max fraction digits; defaults to the currency's convention (else 2). |
 | `min` | `number \| null` | `null` | Clamp the value to at least this on blur. |
@@ -4853,7 +4855,8 @@ Inputs:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `readonly MkMultiSelectOption[]` | `[]` | The list of options to choose from. Update from `search` for async. |
+| `aria-label` | `string` | `''` | Accessible name when the control is used without an `mk-form-field` label. |
+| `options` | `readonly MkMultiSelectOption[]` | `[]` |  |
 | `placeholder` | `string` | `''` | Placeholder shown when no value is selected. |
 | `size` | `MkSize` | `'md'` | Control size. Ignored when nested in an `mk-form-field`. |
 | `invalid` | `boolean` | `false` | Force invalid styling + `aria-invalid` when used standalone. |
@@ -4901,7 +4904,8 @@ Inputs:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `min` | `number \| null` | `null` | Minimum value. |
+| `aria-label` | `string` | `''` | Accessible name when the control is used without an `mk-form-field` label. |
+| `min` | `number \| null` | `null` |  |
 | `max` | `number \| null` | `null` | Maximum value. |
 | `step` | `number` | `1` | Step increment for buttons + Arrow keys. |
 | `value` (two-way) | `number \| null` | `null` | Two-way value. |
@@ -5492,7 +5496,8 @@ Inputs:
 
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
-| `options` | `readonly MkSelectOption[]` | `[]` | The list of options to choose from. |
+| `aria-label` | `string` | `''` | Accessible name when the control is used without an `mk-form-field` label. |
+| `options` | `readonly MkSelectOption[]` | `[]` |  |
 | `placeholder` | `string` | `this.i18n.selectPlaceholder` | Placeholder shown when nothing is selected. |
 | `size` | `MkSize` | `'md'` | Control size. Ignored when nested in an `mk-form-field`. |
 | `invalid` | `boolean` | `false` | Force invalid styling + `aria-invalid` when used standalone. |
@@ -6840,7 +6845,8 @@ Inputs:
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` (two-way) | `Date \| null` | `null` | Two-way selected date. |
-| `min` | `Date \| null` | `null` | Earliest selectable date (inclusive). |
+| `aria-label` | `string` | `''` | Accessible name when the picker is used without an `mk-form-field` label. |
+| `min` | `Date \| null` | `null` |  |
 | `max` | `Date \| null` | `null` | Latest selectable date (inclusive). |
 | `disabledDate` | `((d: Date) => boolean) \| null` | `null` | Predicate marking individual days as disabled (threaded to the calendar). |
 | `placeholder` | `string` | `this.i18n.selectDate` | Placeholder shown when empty. |
@@ -7166,7 +7172,8 @@ Inputs:
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `value` (two-way) | `string \| Date \| null` | `null` | Two-way selected time: a canonical `HH:mm` (24h) string, a `Date` when `valueFormat="date"`, or `null`. Either shape may be assigned in either mode; it is normalised to the configured format. |
-| `valueFormat` | `"string" \| "date"` | `'string'` | Shape of the form value: a `HH:mm` string or a `Date`. |
+| `aria-label` | `string` | `''` | Accessible name when the picker is used without an `mk-form-field` label. |
+| `valueFormat` | `"string" \| "date"` | `'string'` |  |
 | `min` | `string \| null` | `null` | Earliest selectable time `HH:mm` (inclusive). |
 | `max` | `string \| null` | `null` | Latest selectable time `HH:mm` (inclusive). |
 | `step` | `number` | `30` | Interval between generated options, in minutes. |
@@ -8270,6 +8277,13 @@ Inputs:
 | `showLegend` | `boolean \| undefined` | `undefined` | Force the legend on/off (defaults to on when there are ≥ 2 series). |
 | `labelAngle` | `number \| "auto"` | `'auto'` | Category-label tilt in degrees. `'auto'` (the default) leaves labels flat while they fit and tilts them 45° when they would collide — the axis of a narrow chart is otherwise an unreadable smear. A number pins the angle (0 = always flat, 30/45 = always tilted); values are clamped to 0…90.  Tilting reserves the extra vertical room it needs, so `height` still means the height you asked for. When even tilted labels cannot fit, the chart thins them — every Nth label is dropped rather than overlapped. |
 | `label` | `string` | `''` | Accessible summary; generated from the data when omitted. |
+| `interactive` | `boolean` | `false` | Make bars clickable + keyboard-focusable (`role="button"`, accessible name) and emit `barClick`. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `barClick` | `{ series: MkChartSeries; seriesIndex: number; category: string; categoryIndex: number; value: number; }` | A bar was clicked or activated with Enter / Space (needs `interactive`). |
 
 ### MkCalendarHeatmap (component)
 
@@ -8619,6 +8633,13 @@ Inputs:
 | `centerLabel` | `string` | `''` | Big centre label (e.g. a total). Donut only. |
 | `centerSublabel` | `string` | `''` | Small centre caption under the label. |
 | `label` | `string` | `''` | Accessible summary; generated from the data when omitted. |
+| `interactive` | `boolean` | `false` | Make slices (and legend rows) clickable and keyboard-focusable: they get `role="button"` + an accessible name and emit `sliceClick`. Off by default — the chart stays a static picture with its screen-reader table. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `sliceClick` | `{ slice: MkChartSlice; index: number; }` | A slice was clicked or activated with Enter / Space (needs `interactive`). |
 
 ### MkEmptyState (component)
 
@@ -8901,6 +8922,13 @@ Inputs:
 | `showGrid` | `boolean` | `true` | Show gridlines. |
 | `showLegend` | `boolean \| undefined` | `undefined` | Force the legend on/off (defaults to on when there are ≥ 2 series). |
 | `label` | `string` | `''` | Accessible summary; generated from the data when omitted. |
+| `interactive` | `boolean` | `false` | Make x positions keyboard-focusable (`role="button"`, accessible name) and emit `pointClick`. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `pointClick` | `{ index: number; category: string; values: Array<{ series: MkChartSeries; value: number; }>; }` | A category (x position) was clicked or activated with Enter / Space (needs `interactive`). |
 
 ### MkList (component)
 
