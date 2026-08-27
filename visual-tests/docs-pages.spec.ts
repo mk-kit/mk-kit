@@ -76,6 +76,7 @@ const ROUTES: ReadonlyArray<{
     viewportOnly: true,
   },
   { path: '/components/signature', slug: 'signature' },
+  { path: '/components/drag-drop', slug: 'drag-drop' },
 ];
 
 const FREEZE_CSS = `

@@ -4,6 +4,18 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Fixed
+
+- **Nested drop lists** (`@mk-kit/ui/dnd`) — a `[mkDropList]` inside a
+  draggable item (sections with items, swimlanes, form designers) now works:
+  the pointer hit-test picks the innermost connected list under the pointer
+  instead of the first registered one, an item can never be dropped into a
+  list nested inside itself, and a press or key on a nested item no longer
+  starts (and steals the pointer from) the outer item's drag. Docs: "Nested
+  lists" example on the drag & drop page.
+
 ## [0.39.0] — 2026-08-27
 
 ### Added
@@ -1845,6 +1857,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.39.0...HEAD
 [0.39.0]: https://github.com/mk-kit/mk-kit/compare/v0.38.0...v0.39.0
 [0.38.0]: https://github.com/mk-kit/mk-kit/compare/v0.37.0...v0.38.0
 [0.7.0]: https://github.com/mk-kit/mk-kit/compare/v0.6.0...v0.7.0
