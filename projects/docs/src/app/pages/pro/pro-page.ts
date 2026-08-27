@@ -273,6 +273,7 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
       </dl>
       <p class="pro-actions">
         <a mkButton href="/#pricing">Pricing &amp; waitlist</a>
+        <a mkButton variant="outline" routerLink="/pro/key">Already licensed? Get your key</a>
         <a mkButton variant="ghost" routerLink="/components/dynamic-form">See the free dynamic form →</a>
       </p>
     </div>

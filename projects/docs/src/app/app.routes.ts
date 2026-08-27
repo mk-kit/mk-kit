@@ -369,6 +369,16 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/testing/testing-page').then((m) => m.TestingPage),
   },
   {
+    path: 'pro/thanks',
+    title: 'Thank you — mk-kit Pro',
+    loadComponent: () => import('./pages/pro/pro-thanks-page').then((m) => m.ProThanksPage),
+  },
+  {
+    path: 'pro/key',
+    title: 'Your licence key — mk-kit Pro',
+    loadComponent: () => import('./pages/pro/pro-key-page').then((m) => m.ProKeyPage),
+  },
+  {
     path: 'pro',
     title: 'mk-kit Pro — mk-kit',
     loadComponent: () => import('./pages/pro/pro-page').then((m) => m.ProPage),
