@@ -80,6 +80,8 @@ interface Tier {
   link?: string;
   /** Opens the AZ Widgets contact form tagged with this topic instead. */
   form?: 'waitlist' | 'team';
+  /** Stripe plan — when its Payment Link is configured the CTA becomes a Buy button. */
+  buy?: 'developer' | 'team';
   highlight?: boolean;
 }
 interface Faq {
@@ -502,7 +504,7 @@ interface Mapping {
                 <div class="tier__head">
                   <h3 class="tier__name">{{ t.name }}</h3>
                   @if (t.highlight) {
-                    <mk-tag tone="primary">Waitlist open</mk-tag>
+                    <mk-tag tone="primary">{{ buyLink(t) ? 'Available now' : 'Waitlist open' }}</mk-tag>
                   }
                 </div>
                 <p class="tier__price">
@@ -514,7 +516,13 @@ interface Mapping {
                     <li>{{ f }}</li>
                   }
                 </ul>
-                @if (t.form) {
+                @if (buyLink(t); as href) {
+                  <a mkButton [tone]="t.highlight ? 'primary' : 'neutral'"
+                     [variant]="t.highlight ? 'solid' : 'outline'" fullWidth
+                     [href]="href" rel="noopener">
+                    Buy {{ t.name }} — {{ t.price }}{{ t.per }}
+                  </a>
+                } @else if (t.form) {
                   <button mkButton type="button" [tone]="t.highlight ? 'primary' : 'neutral'"
                           [variant]="t.highlight ? 'solid' : 'outline'" fullWidth
                           (click)="openForm(t.form)">
@@ -1390,6 +1398,11 @@ export class HomePage {
    * the visible control. If the widget is not loaded (blocked, offline,
    * module disabled) fall back to a pre-filled email.
    */
+  /** Payment Link for a tier, once configured in site.config.ts. */
+  protected buyLink(t: Tier): string | null {
+    return (t.buy && this.site.stripe[t.buy]) || null;
+  }
+
   protected openForm(which: 'waitlist' | 'team'): void {
     const host = (which === 'waitlist' ? this.waitlistForm() : this.teamForm())?.nativeElement;
     const trigger = host?.shadowRoot?.querySelector<HTMLButtonElement>('.trigger');
@@ -1529,33 +1542,35 @@ export class HomePage {
     {
       name: 'Pro',
       price: '$149',
-      per: '/ developer, one-time',
-      blurb: 'Finished screens and premium widgets so the first week is the last week.',
+      per: '/ developer / year',
+      blurb: 'The vendor-class widgets, finished — so the first week is the last week.',
       features: [
         'Everything in Open source',
-        'Admin starter: auth, dashboard, CRUD, settings, users & roles, billing',
-        'Premium widgets: scheduler & Gantt, pivot grid, org chart',
-        'Figma kit matching every token',
-        '12 months of updates, lifetime use',
+        'Dashboard grid, resource scheduler, Gantt',
+        'Export pack (XLSX + PDF), form builder, pivot grid',
+        'Admin Starter when it ships — included',
+        'A year of updates; perpetual use of every release you received',
         'Priority issues, 2-business-day response',
       ],
       cta: 'Join the waitlist',
       form: 'waitlist',
+      buy: 'developer',
       highlight: true,
     },
     {
       name: 'Team',
       price: '$499',
-      per: '/ up to 10 developers',
+      per: '/ 5 developers / year',
       blurb: 'One licence for the whole squad, invoiced to your company.',
       features: [
-        'Everything in Pro for up to 10 seats',
+        'Everything in Pro for 5 seats',
         'Private support channel',
-        'Invoice & purchase-order billing',
+        'Invoice & purchase-order billing on request',
         'Early access to new premium widgets',
       ],
       cta: 'Talk to us',
       form: 'team',
+      buy: 'team',
     },
   ];
 
