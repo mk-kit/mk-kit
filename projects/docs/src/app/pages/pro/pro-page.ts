@@ -28,7 +28,7 @@ const WIDGETS: ProWidget[] = [
     status: 'planned',
     blurb: 'A finished admin: auth & 2FA, dashboard, CRUD list / detail / form on mk-dynamic-form, users & roles, settings, billing, notifications, audit log. Source code, mock API and tests.',
   },
-  { name: 'Gantt', status: 'planned', blurb: 'Tasks, dependencies, drag / resize, baselines, critical path, zoom levels.' },
+  { name: 'Gantt', status: 'available', entry: '@mk-kit/pro/gantt', blurb: 'Phases and tasks as a tree, milestones, four dependency types with lag, critical path, auto-schedule cascade, drag / resize / progress, day / week / month zoom, keyboard editing.' },
   { name: 'Export pack', status: 'planned', blurb: 'XLSX with styles and multiple sheets, PDF for tables and charts, large exports off the main thread. CSV and print stay free.' },
   { name: 'Form builder', status: 'planned', blurb: 'Drag-and-drop designer that emits the free mk-dynamic-form schema: field palette, properties, conditions editor, live preview.' },
   { name: 'Pivot grid', status: 'planned', blurb: 'Rows / columns / values with a field chooser, totals and drill-down.' },
@@ -108,6 +108,30 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         <figcaption>Day view with working-hours shading, a pinned team meeting, a disabled row and a multi-day maintenance block.</figcaption>
       </figure>
       <pre class="pro-code"><code>{{ schedulerCode }}</code></pre>
+
+      <h2 id="gantt">Gantt <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        <code class="docs-inline">&lt;mk-gantt&gt;</code> plans a project: a task
+        table on the left (collapsible phases, dates, progress), the timeline on
+        the right with summary brackets, milestone diamonds and dependency
+        arrows. Drag a task, resize it, or drag its progress handle; with
+        <code class="docs-inline">autoSchedule</code> the successors move with it
+        and the change you receive lists the cascade. The critical path is
+        computed for you (finish-to-start, start-to-start, finish-to-finish,
+        start-to-finish, with lag) and highlighted on request. Zoom by day,
+        week or month; everything is keyboard-operable and announced.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-gantt-dark.png' : '/pro-gantt.png'"
+          width="1200"
+          height="614"
+          alt="The mk-kit Pro Gantt: a task table with Discovery, Design and Build phases beside a day-zoom timeline with bars, a milestone, dependency arrows and the critical path in red."
+          loading="lazy"
+        />
+        <figcaption>Day zoom with the critical path highlighted; a milestone (diamond) and phase summaries (brackets).</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ ganttCode }}</code></pre>
 
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
@@ -314,6 +338,22 @@ resources = [
 apply(e: MkSchedulerEventEdit) {
   // e.event is the original object; e.resourceId / e.start / e.end the proposal; e.conflicts what it overlaps
   this.bookings.update((all) => all.map((b) => (b.id === e.event.id ? { ...b, resourceId: e.resourceId, start: e.start, end: e.end } : b)));
+}`;
+
+  protected readonly ganttCode = `import { MkGantt, MkGanttChange } from '@mk-kit/pro/gantt';
+
+tasks = [
+  { id: 'design',  title: 'Design', start: d('2026-09-09'), end: d('2026-09-23') },
+  { id: 'wire',    title: 'Wireframes', parentId: 'design', start: d('2026-09-09'), end: d('2026-09-15'), progress: 60 },
+  { id: 'visual',  title: 'Visual design', parentId: 'design', start: d('2026-09-14'), end: d('2026-09-21'), progress: 20 },
+  { id: 'beta',    title: 'Beta', start: d('2026-10-15'), end: d('2026-10-15'), milestone: true },
+];
+dependencies = [{ from: 'wire', to: 'visual' }, { from: 'visual', to: 'beta', type: 'FS', lag: 2 * 1440 }];
+
+<mk-gantt [tasks]="tasks" [dependencies]="dependencies" [(zoom)]="zoom" editable criticalPath autoSchedule (taskChange)="apply($event)" />
+
+apply(c: MkGanttChange) {
+  // c.task / c.start / c.end / c.progress — and c.cascade[] for successors auto-schedule pushed
 }`;
 
   protected readonly licenseCode = `// main.ts — once per app
