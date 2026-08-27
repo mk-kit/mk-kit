@@ -359,6 +359,11 @@ export const routes: Routes = [
       import('./pages/kanban/kanban-page').then((m) => m.KanbanPage),
   },
   {
+    path: 'api',
+    title: 'API reference — mk-kit',
+    loadComponent: () => import('./pages/api/api-page').then((m) => m.ApiPage),
+  },
+  {
     path: 'components-index',
     title: 'All components — mk-kit',
     loadComponent: () =>

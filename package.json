@@ -6,14 +6,17 @@
     "start": "npm run build:theme && ng serve docs",
     "build": "ng build docs",
     "gen:selectors": "node scripts/gen-selectors.mjs",
+    "gen:api": "node scripts/gen-api.mjs",
     "build:theme": "sass projects/mk-kit/src/styles/mk-kit.scss projects/mk-kit/src/styles/mk-kit.css --no-source-map --style expanded --no-charset",
     "build:lib": "npm run build:theme && ng build mk-kit && npm run build:schematics",
+    "build:mcp": "tsc -p projects/mcp/tsconfig.json && node scripts/build-mcp.mjs",
     "build:schematics": "tsc -p projects/mk-kit/schematics/tsconfig.schematics.json && cp projects/mk-kit/schematics/collection.json projects/mk-kit/schematics/package.json dist/mk-kit/schematics/ && cp projects/mk-kit/schematics/ng-add/schema.json dist/mk-kit/schematics/ng-add/schema.json",
     "watch:lib": "ng build mk-kit --watch --configuration development",
     "watch": "ng build --watch --configuration development",
     "test": "ng test mk-kit --no-watch",
     "test:lib": "ng test mk-kit --no-watch",
     "test:docs": "ng test docs --no-watch",
+    "test:mcp": "vitest run --root projects/mcp",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots"
   },
@@ -34,7 +37,9 @@
     "@angular/cli": "^22.0.5",
     "@angular/compiler-cli": "^22.0.7",
     "@angular/platform-server": "^22.0.7",
+    "@modelcontextprotocol/sdk": "^1.30.0",
     "@playwright/test": "^1.62.1",
+    "@types/node": "^24.13.3",
     "axe-core": "^4.12.1",
     "jsdom": "^28.0.0",
     "lucide-static": "^1.34.0",
@@ -42,6 +47,7 @@
     "prettier": "^3.8.1",
     "sass": "^1.101.0",
     "typescript": "~6.0.2",
-    "vitest": "^4.0.8"
+    "vitest": "^4.0.8",
+    "zod": "^4.4.3"
   }
 }

@@ -61,6 +61,12 @@ const ROUTES: ReadonlyArray<{
   { path: '/components/kanban', slug: 'kanban' },
   { path: '/components-index', slug: 'components-index' },
   {
+    path: '/api?entry=button#MkButton',
+    slug: 'api',
+    waitFor: '.api-item[open] .api-table',
+    viewportOnly: true,
+  },
+  {
     path: '/changelog',
     slug: 'changelog',
     waitFor: '.mk-markdown h2',

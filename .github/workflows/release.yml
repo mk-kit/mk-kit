@@ -2,7 +2,8 @@ name: Release
 
 # Publishes @mk-kit/ui to the public npm registry with a provenance
 # attestation, then tags the release and opens a GitHub Release with that
-# version's CHANGELOG section.
+# version's CHANGELOG section. @mk-kit/mcp (same version) is published in the
+# same run, best-effort.
 #
 # Auth: npm trusted publishing (OIDC). No long-lived token lives in this repo.
 # One-time setup on npmjs.com → package @mk-kit/ui → Settings → Trusted
@@ -146,6 +147,34 @@ jobs:
             npm publish --access public --provenance
           else
             echo "::warning::Private repository — publishing WITHOUT provenance (npm only attests public sources)."
+            npm publish --access public
+          fi
+
+      # @mk-kit/mcp shares the library's version (it bundles that release's
+      # API snapshot). It needs its own trusted publisher on npmjs.com; until
+      # that exists — or if it ever breaks — the library release must not be
+      # held up, hence continue-on-error. The very first version is published
+      # by hand from dist/mcp, like the library was.
+      - name: Publish @mk-kit/mcp
+        continue-on-error: true
+        env:
+          REPO_PRIVATE: ${{ github.event.repository.private }}
+          VERSION: ${{ needs.resolve.outputs.version }}
+        run: |
+          set -euo pipefail
+          if ! npm view @mk-kit/mcp version >/dev/null 2>&1; then
+            echo "::warning::@mk-kit/mcp does not exist on npm yet — publish it once by hand from dist/mcp, then configure its trusted publisher."
+            exit 0
+          fi
+          if npm view "@mk-kit/mcp@$VERSION" version >/dev/null 2>&1; then
+            echo "@mk-kit/mcp@$VERSION already published — skipping."
+            exit 0
+          fi
+          npm run build:mcp
+          cd dist/mcp
+          if [ "$REPO_PRIVATE" = "false" ]; then
+            npm publish --access public --provenance
+          else
             npm publish --access public
           fi
 

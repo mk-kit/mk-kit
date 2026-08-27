@@ -1,0 +1,82 @@
+# mk-kit
+
+> Themable, accessible Angular 22 component library for admin dashboards and UIs. Signals-based, WCAG 2.1 AA, controlled entirely through CSS variables with light/dark out of the box. — `@mk-kit/ui` 0.37.0. 167 components, 38 directives, 16 services and 102 helper functions across 20 tree-shakeable entry points. MIT licensed, zero runtime dependencies beyond Angular. Standalone components, signals, OnPush, zoneless-ready, SSR-safe, RTL and i18n via `provideMkI18n`.
+
+Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/styles/mk-kit.css`). Import from the group entry points (`@mk-kit/ui/forms`, `@mk-kit/ui/table`, …) so each lazy chunk only carries what it uses; the root `@mk-kit/ui` entry re-exports everything. Every component is standalone: add the class to a component's `imports`. Theme with `--mk-*` CSS custom properties; `MkThemeService` switches light/dark/system and density.
+
+## Docs
+
+- [mk-kit — Introduction](https://mk-kit.dev/introduction)
+- [Getting started](https://mk-kit.dev/getting-started)
+- [Theming](https://mk-kit.dev/theming)
+- [Core & services](https://mk-kit.dev/core-services)
+- [Touch & mobile](https://mk-kit.dev/touch)
+- [Material migration](https://mk-kit.dev/migration)
+- [All components](https://mk-kit.dev/components-index)
+- [Changelog](https://mk-kit.dev/changelog)
+
+## Component pages
+
+- [Badges & labels](https://mk-kit.dev/components/badges-avatars)
+- [Cards & lists](https://mk-kit.dev/components/cards-lists)
+- [Table & data grid](https://mk-kit.dev/components/table)
+- [Loading & progress](https://mk-kit.dev/components/loading)
+- [Text inputs](https://mk-kit.dev/components/text-inputs)
+- [Phone & postal code](https://mk-kit.dev/components/phone-postal)
+- [Money & payment](https://mk-kit.dev/components/payment)
+- [Signature pad](https://mk-kit.dev/components/signature)
+- [Keypad & on-screen keyboard](https://mk-kit.dev/components/touch-keys)
+- [Images & lightbox](https://mk-kit.dev/components/images)
+- [Media manager](https://mk-kit.dev/components/media-manager)
+- [Toggles & switches](https://mk-kit.dev/components/toggles)
+- [Sliders & rating](https://mk-kit.dev/components/sliders)
+- [Tooltips & popovers](https://mk-kit.dev/components/popovers)
+- [Dialogs](https://mk-kit.dev/components/dialogs)
+- [Status & notifications](https://mk-kit.dev/components/status)
+- [Proportion & KPI charts](https://mk-kit.dev/components/proportion-charts)
+- [Dashboard example](https://mk-kit.dev/examples/dashboard)
+- [Data table example](https://mk-kit.dev/examples/data-table)
+- [Content editor](https://mk-kit.dev/components/content-editor)
+- [Date & time](https://mk-kit.dev/components/date-time)
+- [Drag & drop](https://mk-kit.dev/components/drag-drop)
+- [Context menu](https://mk-kit.dev/components/context-menu)
+- [Buttons](https://mk-kit.dev/components/buttons)
+- [Forms](https://mk-kit.dev/components/forms)
+- [Selection](https://mk-kit.dev/components/selection)
+- [Rich text](https://mk-kit.dev/components/rich-text)
+- [Code & content](https://mk-kit.dev/components/markdown)
+- [Stepper](https://mk-kit.dev/components/stepper)
+- [Tree](https://mk-kit.dev/components/tree)
+- [Icon](https://mk-kit.dev/components/icon)
+- [Snackbar](https://mk-kit.dev/components/snackbar)
+- [Bottom sheet](https://mk-kit.dev/components/bottom-sheet)
+- [Sort](https://mk-kit.dev/components/sort)
+- [Trend charts](https://mk-kit.dev/components/charts)
+- [Empty state & timeline](https://mk-kit.dev/components/empty-timeline)
+- [Structure](https://mk-kit.dev/components/structure)
+- [Layout](https://mk-kit.dev/components/layout)
+- [Chat](https://mk-kit.dev/components/chat)
+- [Query builder](https://mk-kit.dev/components/query-builder)
+- [Drawer](https://mk-kit.dev/components/drawer)
+- [Command palette & nav](https://mk-kit.dev/components/command-nav)
+- [Misc display](https://mk-kit.dev/components/data)
+- [Feedback](https://mk-kit.dev/components/feedback)
+- [Navigation](https://mk-kit.dev/components/navigation)
+- [Utilities](https://mk-kit.dev/components/utilities)
+- [Kanban](https://mk-kit.dev/components/kanban)
+
+## API reference
+
+- [API reference (browsable)](https://mk-kit.dev/api)
+- [api.json](https://mk-kit.dev/api.json): every export with inputs, outputs, methods and types, machine-readable
+- [llms-full.txt](https://mk-kit.dev/llms-full.txt): the complete API reference as Markdown in one file
+
+## For AI assistants
+
+- MCP server: `npx -y @mk-kit/mcp` (tools: search_mk_kit, get_mk_kit_export, list_mk_kit_exports, get_mk_kit_overview) — https://www.npmjs.com/package/@mk-kit/mcp
+
+## Source
+
+- [GitHub](https://github.com/mk-kit/mk-kit)
+- [npm](https://www.npmjs.com/package/@mk-kit/ui)
+- [Changelog](https://github.com/mk-kit/mk-kit/blob/main/CHANGELOG.md)
