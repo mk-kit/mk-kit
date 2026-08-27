@@ -19,9 +19,9 @@ const WIDGETS: ProWidget[] = [
   },
   {
     name: 'Resource scheduler',
-    status: 'building',
+    status: 'available',
     entry: '@mk-kit/pro/scheduler',
-    blurb: 'Resources as rows, day / week timeline, drag bookings across resources, availability and conflict rules — on top of the free event calendar.',
+    blurb: 'Resources as rows — rooms, people, machines. Day / week / month timeline, drag bookings in time and across resources, resize, working hours with optional enforcement, conflict rules, keyboard editing with announcements, RTL.',
   },
   {
     name: 'Admin Starter',
@@ -86,6 +86,29 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
       </figure>
       <pre class="pro-code"><code>{{ gridCode }}</code></pre>
 
+      <h2 id="scheduler">Resource scheduler <mk-badge tone="success" size="sm">available</mk-badge></h2>
+      <p>
+        <code class="docs-inline">&lt;mk-scheduler&gt;</code> is the booking
+        board: rooms, people or machines as rows, time across. Drag a booking
+        later, earlier or onto another resource; resize either end; click an
+        empty slot to create. Working hours shade the timeline and can reject
+        drops outside them; overlaps can be allowed, reported or refused.
+        Keyboard does everything the mouse does, with screen-reader
+        announcements. Like the free calendar it never mutates your data — it
+        emits the proposed change and your app decides.
+      </p>
+      <figure class="pro-figure">
+        <img
+          [src]="theme.isDark() ? '/pro-scheduler-dark.png' : '/pro-scheduler.png'"
+          width="1200"
+          height="425"
+          alt="The mk-kit Pro scheduler in day view: doctors and rooms as rows, bookings as coloured bars, hatched working-hours shading, a red now-line."
+          loading="lazy"
+        />
+        <figcaption>Day view with working-hours shading, a pinned team meeting, a disabled row and a multi-day maintenance block.</figcaption>
+      </figure>
+      <pre class="pro-code"><code>{{ schedulerCode }}</code></pre>
+
       <h2 id="whats-inside">What's in Pro</h2>
       <div class="pro-grid">
         @for (w of widgets; track w.name) {
@@ -104,7 +127,7 @@ const STATUS_LABEL: Record<ProWidget['status'], string> = {
         }
       </div>
       <p>
-        Order is by demand: the scheduler is next, the Admin Starter follows once
+        Order is by demand: the Admin Starter follows once
         the free library has enough users to justify four weeks of work. Tell us
         what you need through the
         <a href="/#pricing">waitlist</a> — that list decides the order.
@@ -268,6 +291,30 @@ layouts = signal<MkGridLayouts>({
   <mk-dashboard-widget id="traffic" title="Traffic"><mk-line-chart … /></mk-dashboard-widget>
   <mk-dashboard-widget id="pinned"  title="Pinned">Others flow around me.</mk-dashboard-widget>
 </mk-dashboard-grid>`;
+
+  protected readonly schedulerCode = `import { MkScheduler, MkSchedulerEventEdit } from '@mk-kit/pro/scheduler';
+
+resources = [
+  { id: 'kim', title: 'Dr Kim', group: 'Doctors', availability: [{ days: [1, 2, 3, 4, 5], from: '09:00', to: '17:00' }] },
+  { id: 'r1',  title: 'Room 1', group: 'Rooms' },
+];
+
+<mk-scheduler
+  [resources]="resources"
+  [events]="bookings()"
+  [(view)]="view"
+  [(date)]="date"
+  editable
+  [allowOverlap]="false"
+  enforceAvailability
+  (eventChange)="apply($event)"
+  (slotClick)="create($event)"
+/>
+
+apply(e: MkSchedulerEventEdit) {
+  // e.event is the original object; e.resourceId / e.start / e.end the proposal; e.conflicts what it overlaps
+  this.bookings.update((all) => all.map((b) => (b.id === e.event.id ? { ...b, resourceId: e.resourceId, start: e.start, end: e.end } : b)));
+}`;
 
   protected readonly licenseCode = `// main.ts — once per app
 import { provideMkProLicense } from '@mk-kit/pro/license';
