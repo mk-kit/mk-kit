@@ -95,6 +95,9 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
   /** Two-way selected date. */
   readonly value = model<Date | null>(null);
   /** Earliest selectable date (inclusive). */
+  /** Accessible name when the picker is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
+  protected readonly ariaLabelAttr = computed(() => (this.field ? null : this.ariaLabel() || null));
   readonly min = input<Date | null>(null);
   /** Latest selectable date (inclusive). */
   readonly max = input<Date | null>(null);

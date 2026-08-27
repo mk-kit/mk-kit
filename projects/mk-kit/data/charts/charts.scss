@@ -254,3 +254,34 @@
     transition: none;
   }
 }
+
+/* Interactive marks (`interactive` input): pointer + keyboard targets. */
+.mk-chart__slice--interactive,
+.mk-chart__bar--interactive,
+.mk-chart__band--interactive,
+.mk-chart__legend-item--interactive {
+  cursor: pointer;
+}
+.mk-chart__slice--interactive:focus-visible,
+.mk-chart__bar--interactive:focus-visible,
+.mk-chart__band--interactive:focus-visible {
+  outline: 2px solid var(--mk-primary);
+  outline-offset: 2px;
+}
+.mk-chart__legend-button {
+  display: inline-flex;
+  align-items: center;
+  gap: inherit;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  font: inherit;
+  cursor: pointer;
+  border-radius: var(--mk-radius-sm);
+}
+.mk-chart__legend-button:focus-visible {
+  outline: 2px solid var(--mk-primary);
+  outline-offset: 2px;
+}

@@ -53,7 +53,8 @@ export class MkPromptDialog {
   private readonly ref = inject<MkOverlayRef<string | null>>(MkOverlayRef);
   protected readonly data = inject<MkPromptDialogData>(MK_OVERLAY_DATA);
   protected readonly i18n = inject(MK_I18N);
-  private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('input');
+  // `read: ElementRef` — the template ref also carries the MkInput directive, which would otherwise win.
+  private readonly inputRef = viewChild('input', { read: ElementRef });
 
   protected readonly value = signal(this.data.value ?? '');
   protected readonly confirmText = computed(
@@ -67,7 +68,7 @@ export class MkPromptDialog {
   );
 
   constructor() {
-    afterNextRender(() => this.inputRef()?.nativeElement.focus());
+    afterNextRender(() => (this.inputRef()?.nativeElement as HTMLInputElement | undefined)?.focus());
   }
 
   protected onInput(event: Event): void {

@@ -78,6 +78,20 @@ describe('MkDialogService — confirm / alert / prompt', () => {
     expect(await result).toBe('final');
   });
 
+  it('prompt focuses its input once rendered', async () => {
+    // jsdom has no layout, so the overlay's focus trap cannot see the input as
+    // tabbable and parks focus on the panel afterwards; assert the prompt's own
+    // focus call reached the input element (it used to throw: the template ref
+    // resolved to the MkInput directive, not the element).
+    const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');
+    service.prompt({ title: 'Rename', label: 'Name' });
+    appRef.tick();
+    await new Promise((r) => setTimeout(r));
+    const input = document.querySelector('.mk-overlay-panel input') as HTMLInputElement;
+    expect(focus.mock.instances).toContain(input);
+    focus.mockRestore();
+  });
+
   it('prompt resolves null on cancel', async () => {
     const result = service.prompt({ title: 'Rename' });
     appRef.tick();

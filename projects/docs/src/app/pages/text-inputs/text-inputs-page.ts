@@ -219,7 +219,7 @@ import { DocsExample } from '../../shared/docs-example';
         (<code class="docs-inline">spinbutton</code>).
       </p>
       <docs-example [code]="numberCode" [column]="true">
-        <mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />
+        <mk-number-input aria-label="Quantity" [(value)]="qty" [min]="0" [max]="20" [step]="1" />
         <p class="echo">Quantity: {{ qty() ?? '—' }}</p>
       </docs-example>
 
@@ -464,7 +464,7 @@ export class TextInputsPage {
   <mk-password-input [(value)]="password" [minLength]="10" placeholder="Create a password" />
 </mk-form-field>`;
 
-  protected readonly numberCode = `<mk-number-input [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
+  protected readonly numberCode = `<mk-number-input aria-label="Quantity" [(value)]="qty" [min]="0" [max]="20" [step]="1" />`;
   protected readonly otpCode = `<mk-otp [(value)]="code" [length]="6" />`;
 
   protected readonly i18nCode = `locales = [

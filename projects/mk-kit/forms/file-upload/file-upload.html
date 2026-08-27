@@ -23,19 +23,20 @@
     <span class="mk-file-upload__hint">{{ hint() }}</span>
   }
 
-  <input
-    #fileInput
-    type="file"
-    class="mk-file-upload__input"
-    [id]="inputId"
-    [accept]="accept()"
-    [multiple]="multiple()"
-    [disabled]="isDisabled()"
-    tabindex="-1"
-    aria-hidden="true"
-    (change)="onInputChange($event)"
-  />
 </div>
+
+<input
+  #fileInput
+  type="file"
+  class="mk-file-upload__input"
+  [id]="inputId"
+  [accept]="accept()"
+  [multiple]="multiple()"
+  [disabled]="isDisabled()"
+  tabindex="-1"
+  aria-hidden="true"
+  (change)="onInputChange($event)"
+/>
 
 <div class="mk-file-upload__sr" role="status" aria-live="polite">
   {{ announcement() }}

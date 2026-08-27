@@ -31,6 +31,7 @@
       open() && activeIndex() >= 0 ? optionId(activeIndex()) : null
     "
     [attr.aria-labelledby]="labelledBy()"
+    [attr.aria-label]="labelledBy() ? null : (ariaLabel() || null)"
     [attr.aria-describedby]="describedBy()"
     [attr.aria-invalid]="isInvalid() || null"
     [attr.aria-required]="isRequired() || null"

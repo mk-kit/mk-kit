@@ -58,6 +58,9 @@ import { MkPagination } from '@mk-kit/ui/navigation/pagination';
 import { MkStep, MkStepper } from '@mk-kit/ui/navigation/stepper';
 import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation/tree';
 import { MkNavGroup, MkNavItem, MkNavList } from '@mk-kit/ui/navigation/nav-list';
+import { MkFileUpload } from '@mk-kit/ui/forms/file-upload';
+import { MkDonutChart } from '@mk-kit/ui/data/charts';
+import { MkNumberInput } from '@mk-kit/ui/forms/number-input';
 import { MkDescItem, MkDescriptionList } from '@mk-kit/ui/data/description-list';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkBadge } from '@mk-kit/ui/data/badge';
@@ -514,6 +517,32 @@ class NavListHost {}
 })
 class DescriptionListHost {}
 
+@Component({
+  imports: [MkFileUpload],
+  template: `<mk-file-upload label="Drop files here" hint="PNG or JPG up to 5 MB" accept="image/*" multiple />`,
+})
+class FileUploadHost {}
+
+@Component({
+  imports: [MkDonutChart],
+  template: `<mk-donut-chart label="Orders by status" interactive [slices]="slices" />`,
+})
+class InteractiveDonutHost {
+  readonly slices = [
+    { name: 'Paid', value: 40 },
+    { name: 'Pending', value: 25 },
+  ];
+}
+
+@Component({
+  imports: [MkNumberInput, MkSelect],
+  template: `
+    <mk-number-input aria-label="Quantity" />
+    <mk-select aria-label="Role" [options]="[{ label: 'Admin', value: 'a' }]" />
+  `,
+})
+class StandaloneControlsHost {}
+
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
@@ -552,6 +581,9 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'tree', host: TreeHost },
   { name: 'nav list with groups', host: NavListHost },
   { name: 'description list', host: DescriptionListHost },
+  { name: 'file upload (dropzone)', host: FileUploadHost },
+  { name: 'interactive donut chart', host: InteractiveDonutHost },
+  { name: 'standalone controls with aria-label', host: StandaloneControlsHost },
 ];
 
 describe('a11y smoke (axe-core)', () => {

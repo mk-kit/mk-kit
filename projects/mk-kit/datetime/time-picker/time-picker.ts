@@ -115,6 +115,9 @@ export class MkTimePicker implements ControlValueAccessor, Validator {
    */
   readonly value = model<string | Date | null>(null);
   /** Shape of the form value: a `HH:mm` string or a `Date`. */
+  /** Accessible name when the picker is used without an `mk-form-field` label. */
+  readonly ariaLabel = input<string>('', { alias: 'aria-label' });
+  protected readonly ariaLabelAttr = computed(() => (this.field ? null : this.ariaLabel() || null));
   readonly valueFormat = input<'string' | 'date'>('string');
   /** Earliest selectable time `HH:mm` (inclusive). */
   readonly min = input<string | null>(null);

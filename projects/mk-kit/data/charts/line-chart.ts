@@ -7,6 +7,7 @@ import {
   input,
   numberAttribute,
   signal,
+  output,
 } from '@angular/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { mkChartAutoWidth } from './chart-autowidth';
@@ -98,6 +99,10 @@ export class MkLineChart {
   readonly showLegend = input<boolean | undefined>(undefined);
   /** Accessible summary; generated from the data when omitted. */
   readonly label = input<string>('');
+  /** Make x positions keyboard-focusable (`role="button"`, accessible name) and emit `pointClick`. */
+  readonly interactive = input(false, { transform: booleanAttribute });
+  /** A category (x position) was clicked or activated with Enter / Space (needs `interactive`). */
+  readonly pointClick = output<{ index: number; category: string; values: Array<{ series: MkChartSeries; value: number }> }>();
 
   protected readonly hoverIndex = signal<number | null>(null);
   /** Tap-to-pin: a touch tap on a hit band pins the tooltip until a tap lands
@@ -268,6 +273,24 @@ export class MkLineChart {
     if (!s.length) return 'Line chart, no data';
     return `Line chart of ${s.map((x) => x.name).join(', ')} over ${this.categories().length} points`;
   });
+
+  protected emitPoint(index: number, event?: Event): void {
+    if (!this.interactive()) return;
+    if (event instanceof KeyboardEvent) {
+      if (event.key !== 'Enter' && event.key !== ' ') return;
+      event.preventDefault();
+    }
+    this.pointClick.emit({
+      index,
+      category: this.categories()[index] ?? '',
+      values: this.series().map((series) => ({ series, value: series.data[index] ?? 0 })),
+    });
+  }
+
+  protected pointLabel(index: number): string {
+    const values = this.series().map((s) => `${s.name} ${s.data[index] ?? 0}`).join(', ');
+    return `${this.categories()[index] ?? ''}: ${values}`;
+  }
 
   protected setHover(index: number | null): void {
     this.tapPin.hover(index);

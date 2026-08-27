@@ -3,7 +3,9 @@
     class="mk-chart__svg mk-donut__svg"
     [attr.viewBox]="'0 0 ' + size() + ' ' + size()"
     preserveAspectRatio="xMidYMid meet"
-    aria-hidden="true"
+    [attr.aria-hidden]="interactive() ? null : true"
+    [attr.aria-label]="interactive() ? resolvedLabel() : null"
+    [attr.role]="interactive() ? 'group' : null"
     focusable="false"
   >
     @for (g of geom(); track g.index) {
@@ -12,9 +14,17 @@
         [class.mk-chart__slice--dim]="hovered() !== null && hovered() !== g.index"
         [attr.d]="g.path"
         [style.fill]="g.color"
+        [class.mk-chart__slice--interactive]="interactive()"
+        [attr.role]="interactive() ? 'button' : null"
+        [attr.tabindex]="interactive() ? 0 : null"
+        [attr.aria-label]="interactive() ? sliceLabel(g.index) : null"
         (pointerenter)="setHover(g.index)"
         (pointerleave)="setHover(null)"
         (pointerdown)="pinHover(g.index, $event)"
+        (click)="emitSlice(g.index)"
+        (keydown)="emitSlice(g.index, $event)"
+        (focus)="setHover(g.index)"
+        (blur)="setHover(null)"
       />
     }
   </svg>
@@ -43,11 +53,19 @@
 
 @if (showLegend()) {
   <ul class="mk-chart__legend mk-donut__legend">
-    @for (item of legend(); track item.name) {
+    @for (item of legend(); track item.name; let i = $index) {
       <li class="mk-chart__legend-item">
-        <span class="mk-chart__swatch" [style.background]="item.color"></span>
-        <span class="mk-donut__legend-name">{{ item.name }}</span>
-        <span class="mk-donut__legend-value">{{ item.value }} · {{ item.percent }}%</span>
+        @if (interactive()) {
+          <button type="button" class="mk-chart__legend-button" (click)="emitSlice(i)">
+            <span class="mk-chart__swatch" [style.background]="item.color"></span>
+            <span class="mk-donut__legend-name">{{ item.name }}</span>
+            <span class="mk-donut__legend-value">{{ item.value }} · {{ item.percent }}%</span>
+          </button>
+        } @else {
+          <span class="mk-chart__swatch" [style.background]="item.color"></span>
+          <span class="mk-donut__legend-name">{{ item.name }}</span>
+          <span class="mk-donut__legend-value">{{ item.value }} · {{ item.percent }}%</span>
+        }
       </li>
     }
   </ul>

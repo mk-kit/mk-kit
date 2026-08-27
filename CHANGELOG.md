@@ -4,6 +4,32 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Clickable charts** — `interactive` input on `mk-donut-chart`, `mk-bar-chart`
+  and `mk-line-chart` makes slices / bars / x positions real buttons (pointer,
+  Enter / Space, accessible names, focus ring) and adds `(sliceClick)`,
+  `(barClick)`, `(pointClick)` outputs with the datum and index. Off by
+  default: the chart stays a picture with its screen-reader table.
+- **`aria-label` on standalone controls** — `mk-number-input`, `mk-select`,
+  `mk-multi-select`, `mk-autocomplete`, `mk-currency-input`, `mk-date-picker`
+  and `mk-time-picker` accept `aria-label` and put it on their focusable
+  control when they are used without an `mk-form-field` label (the field's
+  label still wins when present).
+
+### Fixed
+
+- **`dialog.prompt()` threw** `Cannot read properties of undefined (reading 'focus')`:
+  the prompt's `viewChild('input')` resolved to the `MkInput` directive instead
+  of the element. The input is focused on open again (spec added).
+- **File upload dropzone** no longer nests the hidden file input inside its
+  `role="button"` (axe `nested-interactive`); the hint text uses `--mk-text-muted`.
+- **Contrast** — `--mk-danger-text` (light) is `#c81e1e` and `--mk-text-subtle` is
+  `#626d7a` / `#8a97a6` (dark) so validation errors, hints and subtle text pass
+  4.5:1 on the page background and on `--mk-surface-2`.
+
 ## [0.40.0] — 2026-08-27
 
 ### Fixed
@@ -1859,6 +1885,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...HEAD
 [0.40.0]: https://github.com/mk-kit/mk-kit/compare/v0.39.0...v0.40.0
 [0.39.0]: https://github.com/mk-kit/mk-kit/compare/v0.38.0...v0.39.0
 [0.38.0]: https://github.com/mk-kit/mk-kit/compare/v0.37.0...v0.38.0

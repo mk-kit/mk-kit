@@ -266,7 +266,7 @@ interface OrderLine {
       </p>
 
       <docs-example [code]="selectCode" [column]="true">
-        <mk-select placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />
+        <mk-select aria-label="Role" placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />
         <p class="echo">Selected: {{ role() ?? '—' }}</p>
       </docs-example>
 
@@ -687,7 +687,7 @@ onSubmit() { this.submitted.set(true); }
   { label: 'Owner (locked)', value: 'owner', disabled: true },
 ];
 
-<mk-select placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />`;
+<mk-select aria-label="Role" placeholder="Pick a role" [options]="roleOptions" [(value)]="role" />`;
 
   protected readonly submitInputCode = `<mk-form-field label="Discount code" hint="Try SUMMER10">
   <mk-submit-input
