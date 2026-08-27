@@ -5311,6 +5311,12 @@
        "type": "string",
        "description": "Id of the items region (for `aria-controls`).",
        "readonly": true
+      },
+      {
+       "name": "headerId",
+       "type": "string",
+       "description": "Id of the header, used to name the nested item list.",
+       "readonly": true
       }
      ],
      "queries": [],
@@ -13436,7 +13442,7 @@
     },
     {
      "name": "MkDescItem",
-     "description": "A single term/detail row inside `MkDescriptionList`. Renders a `<dt>`\n(the `term`) and a `<dd>` (the projected value). The host is `display:contents`\nso the `<dt>`/`<dd>` participate directly in the list's grid.",
+     "description": "A single term/detail row of `MkDescriptionList`: `term` becomes the\n`<dt>`, the projected content the `<dd>`. The row itself renders nothing —\nthe list reads its rows and writes `<dt>`/`<dd>` as direct children of the\n`<dl>`, which is what HTML and assistive tech require (a wrapper element\nbetween `<dl>` and `<dt>` fails axe `definition-list` / `dlitem`).",
      "file": "projects/mk-kit/data/description-list/description-list.ts",
      "kind": "component",
      "selector": "mk-desc-item",
@@ -13458,7 +13464,7 @@
     },
     {
      "name": "MkDescriptionList",
-     "description": "DescriptionList — a semantic `<dl>` of term/detail pairs for entity-detail and\nmetadata panels. Project `MkDescItem` rows; values may be rich content\n(badges, links, …). In `grid` layout terms align in a shared column; in\n`stacked` each term sits above its value.\n\n```html\n<mk-description-list>\n  <mk-desc-item term=\"Status\"><mk-badge tone=\"success\">Active</mk-badge></mk-desc-item>\n  <mk-desc-item term=\"Owner\">Ada Lovelace</mk-desc-item>\n</mk-description-list>\n```",
+     "description": "DescriptionList — a semantic `<dl>` of term/detail pairs for entity-detail and\nmetadata panels. Project `MkDescItem` rows; values may be rich content\n(badges, links, …). In `grid` layout terms align in a shared column; in\n`stacked` each term sits above its value.\n\n```html\n<mk-description-list>\n  <mk-desc-item term=\"Status\"><mk-badge tone=\"success\">Active</mk-badge></mk-desc-item>\n  <mk-desc-item term=\"Owner\">Ada Lovelace</mk-desc-item>\n</mk-description-list>\n```\n\nOnly `mk-desc-item` children are rendered; the `<dl>` always contains plain\n`<dt>`/`<dd>` pairs.",
      "file": "projects/mk-kit/data/description-list/description-list.ts",
      "kind": "component",
      "selector": "mk-description-list",

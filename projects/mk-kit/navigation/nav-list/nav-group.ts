@@ -34,8 +34,10 @@ import { MkNavList } from './nav-list';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-nav-group',
-    role: 'group',
-    '[attr.aria-label]': 'label() || null',
+    // The group is an item of the enclosing `role="list"`; its own items form a
+    // nested list below (see the template). Anything else breaks the ARIA
+    // list → listitem contract for both the outer list and the items.
+    role: 'listitem',
     '[class.mk-nav-group--collapsed-rail]': 'railCollapsed()',
     '[class.mk-nav-group--closed]': 'collapsible() && !expanded()',
   },
@@ -52,6 +54,8 @@ export class MkNavGroup {
 
   /** Id of the items region (for `aria-controls`). */
   readonly regionId = mkUniqueId('mk-nav-group');
+  /** Id of the header, used to name the nested item list. */
+  readonly headerId = `${this.regionId}-label`;
 
   /** Whether the enclosing list is a collapsed icon rail. */
   protected readonly railCollapsed = computed(

@@ -31,7 +31,9 @@ import {
     '[class.mk-list-item--selected]': 'selected()',
     '[class.mk-list-item--disabled]': 'disabled()',
     '[attr.tabindex]': 'interactive() && !disabled() ? 0 : null',
-    '[attr.aria-selected]': 'interactive() ? selected() : null',
+    // `aria-selected` is not permitted on `listitem`; `aria-current` is the
+    // ARIA way to mark the current row of a plain list.
+    '[attr.aria-current]': "interactive() && selected() ? 'true' : null",
     '[attr.aria-disabled]': "disabled() ? 'true' : null",
     '(click)': 'onClick()',
     '(keydown)': 'onKeydown($event)',

@@ -1,4 +1,4 @@
-<div #viewport class="mk-virtual-scroll__viewport" (scroll)="onScroll($event)">
+<div #viewport class="mk-virtual-scroll__viewport" tabindex="0" (scroll)="onScroll($event)">
   <div class="mk-virtual-scroll__spacer" [style.height.px]="totalHeight()">
     <div
       class="mk-virtual-scroll__content"

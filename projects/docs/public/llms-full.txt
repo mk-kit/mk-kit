@@ -3236,6 +3236,7 @@ Properties:
 | Name | Type | Description |
 | --- | --- | --- |
 | `regionId` | `string` | Id of the items region (for `aria-controls`). |
+| `headerId` | `string` | Id of the header, used to name the nested item list. |
 
 ### MkNavItem (component)
 
@@ -8492,9 +8493,11 @@ Selector: `mk-desc-item`
 
 Import: `import { MkDescItem } from '@mk-kit/ui/data';`
 
-A single term/detail row inside `MkDescriptionList`. Renders a `<dt>`
-(the `term`) and a `<dd>` (the projected value). The host is `display:contents`
-so the `<dt>`/`<dd>` participate directly in the list's grid.
+A single term/detail row of `MkDescriptionList`: `term` becomes the
+`<dt>`, the projected content the `<dd>`. The row itself renders nothing —
+the list reads its rows and writes `<dt>`/`<dd>` as direct children of the
+`<dl>`, which is what HTML and assistive tech require (a wrapper element
+between `<dl>` and `<dt>` fails axe `definition-list` / `dlitem`).
 
 Inputs:
 
@@ -8521,6 +8524,9 @@ metadata panels. Project `MkDescItem` rows; values may be rich content
   <mk-desc-item term="Owner">Ada Lovelace</mk-desc-item>
 </mk-description-list>
 ```
+
+Only `mk-desc-item` children are rendered; the `<dl>` always contains plain
+`<dt>`/`<dd>` pairs.
 
 Inputs:
 

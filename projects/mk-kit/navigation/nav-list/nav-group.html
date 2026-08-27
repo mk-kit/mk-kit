@@ -2,6 +2,7 @@
   <button
     type="button"
     class="mk-nav-group__header mk-nav-group__header--toggle"
+    [id]="headerId"
     [attr.aria-expanded]="expanded()"
     [attr.aria-controls]="regionId"
     (click)="toggle()"
@@ -10,14 +11,17 @@
     <span class="mk-nav-group__chevron" aria-hidden="true"></span>
   </button>
 } @else if (!railCollapsed()) {
-  <p class="mk-nav-group__header">
+  <p class="mk-nav-group__header" [id]="headerId">
     <span class="mk-nav-group__label">{{ label() }}</span>
   </p>
 }
 
 <div
   class="mk-nav-group__items"
+  role="list"
   [id]="regionId"
+  [attr.aria-labelledby]="railCollapsed() ? null : headerId"
+  [attr.aria-label]="railCollapsed() ? label() || null : null"
   [attr.hidden]="itemsVisible() ? null : ''"
 >
   <ng-content />
