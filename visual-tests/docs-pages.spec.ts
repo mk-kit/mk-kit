@@ -62,6 +62,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/components/kanban', slug: 'kanban' },
   { path: '/components-index', slug: 'components-index' },
   { path: '/testing', slug: 'testing' },
+  { path: '/pro', slug: 'pro' },
   {
     path: '/api?entry=button#MkButton',
     slug: 'api',
