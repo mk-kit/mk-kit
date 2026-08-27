@@ -1,0 +1,157 @@
+@for (f of fields(); track f.type + ':' + ($any(f).key ?? $any(f).label ?? $index)) {
+  @if (isVisible(f)) {
+    @if (isSection(f)) {
+      <div class="mk-dynamic-fields__section" [style.--mk-dyn-span]="span(f)">
+        <h3 class="mk-dynamic-fields__section-title">{{ f.label }}</h3>
+        @if (f.hint) {
+          <p class="mk-dynamic-fields__section-hint">{{ f.hint }}</p>
+        }
+      </div>
+    } @else if (isGroup(f)) {
+      <fieldset class="mk-dynamic-fields__group" [style.--mk-dyn-span]="span(f)" [disabled]="control(f).disabled">
+        @if (f.label) {
+          <legend class="mk-dynamic-fields__legend">{{ f.label }}</legend>
+        }
+        @if (f.hint) {
+          <p class="mk-dynamic-fields__section-hint">{{ f.hint }}</p>
+        }
+        <mk-dynamic-fields [fields]="f.fields" [group]="formGroup(f)" [columns]="columnsOf(f)" [scope]="scope()" />
+      </fieldset>
+    } @else if (isArray(f)) {
+      <fieldset class="mk-dynamic-fields__array" [style.--mk-dyn-span]="span(f)" [disabled]="control(f).disabled">
+        @if (f.label) {
+          <legend class="mk-dynamic-fields__legend">{{ f.label }}</legend>
+        }
+        @if (f.hint) {
+          <p class="mk-dynamic-fields__section-hint">{{ f.hint }}</p>
+        }
+        @for (item of formArray(f).controls; track item; let i = $index) {
+          <div class="mk-dynamic-fields__item">
+            <mk-dynamic-fields class="mk-dynamic-fields__item-fields" [fields]="f.fields" [group]="item" [columns]="columnsOf(f)" [scope]="itemScope(f, i)" />
+            <button
+              mkButton
+              type="button"
+              variant="ghost"
+              tone="neutral"
+              size="sm"
+              iconOnly
+              class="mk-dynamic-fields__remove"
+              [attr.aria-label]="i18n.dynamicFormRemove(i + 1)"
+              [title]="i18n.dynamicFormRemove(i + 1)"
+              [disabled]="!canRemove(f)"
+              (click)="removeItem(f, i)"
+            >
+              <svg viewBox="0 0 16 16" width="16" height="16" aria-hidden="true" focusable="false">
+                <path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" />
+              </svg>
+            </button>
+          </div>
+        }
+        <div class="mk-dynamic-fields__array-actions">
+          <button mkButton type="button" variant="soft" size="sm" [disabled]="!canAdd(f)" (click)="addItem(f)">
+            {{ f.addLabel || i18n.dynamicFormAdd }}
+          </button>
+        </div>
+      </fieldset>
+    } @else if (isValue(f)) {
+      @let ctrl = control(f);
+      @let custom = customTemplate(f);
+      <mk-form-field
+        class="mk-dynamic-fields__field"
+        [style.--mk-dyn-span]="span(f)"
+        [label]="f.type === 'checkbox' || f.type === 'switch' ? '' : (f.label ?? '')"
+        [hint]="f.hint ?? ''"
+        [required]="!!f.required"
+        [size]="size()"
+        [labelPosition]="labelPosition()"
+      >
+        @if (custom) {
+          <ng-container *ngTemplateOutlet="custom; context: customContext(f)" />
+        } @else {
+          @switch (f.type) {
+            @case ('textarea') {
+              <textarea mkInput [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [rows]="p(f, 'rows', 3)"></textarea>
+            }
+            @case ('password') {
+              <mk-password-input [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [showStrength]="p(f, 'showStrength', false)" [showRules]="p(f, 'showRules', false)" [minLength]="p(f, 'minLength', 8)" />
+            }
+            @case ('number') {
+              <mk-number-input [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [min]="p(f, 'min', f.validators?.min ?? null)" [max]="p(f, 'max', f.validators?.max ?? null)" [step]="p(f, 'step', 1)" />
+            }
+            @case ('currency') {
+              <mk-currency-input [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [currency]="p(f, 'currency', 'USD')" [locale]="p(f, 'locale', undefined)" [min]="p(f, 'min', f.validators?.min ?? null)" [max]="p(f, 'max', f.validators?.max ?? null)" />
+            }
+            @case ('date') {
+              <mk-date-picker [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [min]="p(f, 'min', null)" [max]="p(f, 'max', null)" [clearable]="p(f, 'clearable', true)" />
+            }
+            @case ('time') {
+              <mk-time-picker [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [step]="p(f, 'step', 15)" [hour12]="p(f, 'hour12', false)" [clearable]="p(f, 'clearable', true)" />
+            }
+            @case ('datetime') {
+              <mk-datetime-picker [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [min]="p(f, 'min', null)" [max]="p(f, 'max', null)" [clearable]="p(f, 'clearable', true)" />
+            }
+            @case ('select') {
+              <mk-select [formControl]="$any(ctrl)" [options]="$any(f.options ?? [])" [placeholder]="f.placeholder ?? ''" />
+            }
+            @case ('multi-select') {
+              <mk-multi-select [formControl]="$any(ctrl)" [options]="$any(f.options ?? [])" [placeholder]="f.placeholder ?? ''" [max]="p(f, 'max', 0)" />
+            }
+            @case ('autocomplete') {
+              <mk-autocomplete [formControl]="$any(ctrl)" [options]="$any(f.options ?? [])" [placeholder]="f.placeholder ?? ''" [requireSelection]="p(f, 'requireSelection', false)" />
+            }
+            @case ('radio') {
+              <mk-radio-group [formControl]="$any(ctrl)" [orientation]="p(f, 'orientation', 'vertical')">
+                @for (o of f.options ?? []; track $index) {
+                  <mk-radio [value]="o.value" [disabled]="!!o.disabled">{{ o.label }}</mk-radio>
+                }
+              </mk-radio-group>
+            }
+            @case ('toggle') {
+              <mk-button-toggle-group [formControl]="$any(ctrl)" [multiple]="p(f, 'multiple', false)" [aria-label]="f.label ?? ''">
+                @for (o of f.options ?? []; track $index) {
+                  <mk-button-toggle [value]="o.value" [disabled]="!!o.disabled">{{ o.label }}</mk-button-toggle>
+                }
+              </mk-button-toggle-group>
+            }
+            @case ('checkbox') {
+              <mk-checkbox [formControl]="$any(ctrl)" [required]="!!f.required">{{ f.label }}</mk-checkbox>
+            }
+            @case ('switch') {
+              <mk-switch [formControl]="$any(ctrl)">{{ f.label }}</mk-switch>
+            }
+            @case ('slider') {
+              <mk-slider [formControl]="$any(ctrl)" [min]="p(f, 'min', f.validators?.min ?? 0)" [max]="p(f, 'max', f.validators?.max ?? 100)" [step]="p(f, 'step', 1)" [aria-label]="f.label ?? ''" />
+            }
+            @case ('rating') {
+              <mk-rating [formControl]="$any(ctrl)" [max]="p(f, 'max', 5)" [ariaLabel]="f.label ?? ''" />
+            }
+            @case ('color') {
+              <mk-color-picker [formControl]="$any(ctrl)" [swatches]="p(f, 'swatches', [])" [ariaLabel]="f.label ?? ''" />
+            }
+            @case ('tags') {
+              <mk-tag-input [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [max]="p(f, 'max', 0)" />
+            }
+            @case ('phone') {
+              <mk-phone-input [formControl]="$any(ctrl)" [placeholder]="f.placeholder ?? ''" [valueFormat]="p(f, 'valueFormat', 'e164')" [country]="p(f, 'country', undefined)" />
+            }
+            @case ('file') {
+              <mk-file-upload [formControl]="$any(ctrl)" [accept]="p(f, 'accept', '')" [multiple]="p(f, 'multiple', false)" [maxSize]="p(f, 'maxSize', 0)" [maxFiles]="p(f, 'maxFiles', 0)" />
+            }
+            @case ('code') {
+              <mk-code-editor [formControl]="$any(ctrl)" [language]="p(f, 'language', 'json')" [rows]="p(f, 'rows', 8)" [placeholder]="f.placeholder ?? ''" />
+            }
+            @default {
+              <input
+                mkInput
+                [type]="inputType(f)"
+                [formControl]="$any(ctrl)"
+                [placeholder]="f.placeholder ?? ''"
+                [attr.maxlength]="f.validators?.maxLength ?? null"
+              />
+            }
+          }
+        }
+      </mk-form-field>
+    }
+  }
+}

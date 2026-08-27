@@ -26,4 +26,5 @@ export * from '@mk-kit/ui/context-menu';
 export * from '@mk-kit/ui/layout';
 export * from '@mk-kit/ui/chat';
 export * from '@mk-kit/ui/query-builder';
+export * from '@mk-kit/ui/dynamic-form';
 export * from '@mk-kit/ui/media';

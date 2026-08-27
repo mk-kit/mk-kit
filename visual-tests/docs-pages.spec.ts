@@ -44,6 +44,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/getting-started', slug: 'getting-started' },
   { path: '/components/buttons', slug: 'buttons' },
   { path: '/components/forms', slug: 'forms' },
+  { path: '/components/dynamic-form', slug: 'dynamic-form' },
   { path: '/components/table', slug: 'table' },
   { path: '/components/charts', slug: 'charts' },
   { path: '/components/date-time', slug: 'date-time' },

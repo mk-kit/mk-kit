@@ -2063,6 +2063,16 @@
        "description": "Chat: tool call failed."
       },
       {
+       "name": "dynamicFormAdd",
+       "type": "string",
+       "description": "Dynamic form: add an item to an array field."
+      },
+      {
+       "name": "dynamicFormRemove",
+       "type": "(index: number) => string",
+       "description": "Dynamic form: remove one item of an array field (index is 1-based)."
+      },
+      {
        "name": "queryBuilderLabel",
        "type": "string",
        "description": "Query builder: accessible name of the whole builder."
@@ -19647,6 +19657,754 @@
      "methods": [],
      "properties": [],
      "queries": []
+    }
+   ]
+  },
+  {
+   "name": "dynamic-form",
+   "import": "@mk-kit/ui/dynamic-form",
+   "exports": [
+    {
+     "name": "MkDynamicFields",
+     "description": "Renders one field list (the root, a group, or one array item) as a grid.\nInternal — projected by `MkDynamicForm`; recursive for groups/arrays.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.ts",
+     "kind": "component",
+     "selector": "mk-dynamic-fields",
+     "selectors": [
+      "mk-dynamic-fields"
+     ],
+     "inputs": [
+      {
+       "name": "fields",
+       "type": "readonly MkDynamicField[]",
+       "description": "",
+       "required": true
+      },
+      {
+       "name": "group",
+       "type": "FormGroup<any>",
+       "description": "",
+       "required": true
+      },
+      {
+       "name": "columns",
+       "type": "number",
+       "description": "",
+       "default": "1"
+      },
+      {
+       "name": "scope",
+       "type": "Record<string, unknown>",
+       "description": "Value the conditions of this level are evaluated against.",
+       "required": true
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
+    },
+    {
+     "name": "MkDynamicForm",
+     "description": "Dynamic form — renders a form from a JSON schema and manages one reactive\n`FormGroup` for it. Every value field renders inside `mk-form-field`, so\nlabels, hints, required marks and localised validation messages come from\nthe schema alone.\n\n```html\n<mk-dynamic-form [schema]=\"schema\" [(value)]=\"user\" (formSubmit)=\"save($event)\">\n  <button mkButton type=\"submit\">Save</button>\n</mk-dynamic-form>\n```\n\n```ts\nschema: MkDynamicSchema = {\n  columns: 2,\n  fields: [\n    { key: 'name', type: 'text', label: 'Name', required: true },\n    { key: 'role', type: 'select', label: 'Role', options: roles },\n    { key: 'company', type: 'text', label: 'Company', showWhen: { field: 'role', eq: 'b2b' } },\n  ],\n};\n```\n\n- Hidden fields (`showWhen` false) are disabled, so `value` only carries\n  what the user can see; `form.getRawValue()` has everything.\n- `form` is the live `FormGroup` for anything the schema does not cover.\n- Custom field types: project an `ng-template[mkDynamicField]`.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.ts",
+     "kind": "component",
+     "selector": "mk-dynamic-form",
+     "selectors": [
+      "mk-dynamic-form"
+     ],
+     "inputs": [
+      {
+       "name": "schema",
+       "type": "MkDynamicSchema",
+       "description": "The schema. Changing it rebuilds the form (values of surviving keys are kept).",
+       "required": true
+      },
+      {
+       "name": "value",
+       "type": "Record<string, unknown>",
+       "description": "Two-way form value (visible, enabled fields only).",
+       "model": true,
+       "default": "{}"
+      },
+      {
+       "name": "disabled",
+       "type": "boolean",
+       "description": "Disable every control.",
+       "default": "false"
+      },
+      {
+       "name": "labelPosition",
+       "type": "\"top\" | \"float\"",
+       "description": "Label placement forwarded to every `mk-form-field`.",
+       "default": "'top'"
+      },
+      {
+       "name": "size",
+       "type": "\"sm\" | \"md\" | \"lg\"",
+       "description": "Control size forwarded to the fields.",
+       "default": "'md'"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "valueChange",
+       "type": "Record<string, unknown>",
+       "description": "Emits when `value` changes (two-way binding).",
+       "model": true
+      },
+      {
+       "name": "formSubmit",
+       "type": "Record<string, unknown>",
+       "description": "Emits the value when the form is submitted and valid."
+      },
+      {
+       "name": "invalidSubmit",
+       "type": "FormGroup<any>",
+       "description": "Emits when a submit is attempted while invalid (every control is marked touched)."
+      }
+     ],
+     "methods": [
+      {
+       "name": "patch",
+       "signature": "(value: Record<string, unknown>): void",
+       "description": "Patch part of the value."
+      },
+      {
+       "name": "reset",
+       "signature": "(value?: Record<string, unknown>): void",
+       "description": "Reset to the schema defaults (or the given value)."
+      },
+      {
+       "name": "touchAll",
+       "signature": "(): void",
+       "description": "Mark every control touched so validation messages show."
+      }
+     ],
+     "properties": [
+      {
+       "name": "form",
+       "type": "FormGroup<any>",
+       "description": "The live reactive form.",
+       "readonly": true
+      },
+      {
+       "name": "valid",
+       "type": "Signal<boolean>",
+       "description": "`true` while every control passes validation.",
+       "readonly": true
+      }
+     ],
+     "queries": [],
+     "docs": "/components/dynamic-form"
+    },
+    {
+     "name": "MkDynamicFieldDef",
+     "description": "Registers a renderer for a custom field type:\n\n```html\n<mk-dynamic-form [schema]=\"schema\">\n  <ng-template mkDynamicField=\"signature\" let-field let-control=\"control\">\n    <mk-signature-pad [formControl]=\"control\" />\n  </ng-template>\n</mk-dynamic-form>\n```\n\nA field `{ type: 'custom', key: 'sig', props: { renderer: 'signature' } }`\n(or any built-in `type` you want to override) then renders this template\ninside the usual `mk-form-field`.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.ts",
+     "kind": "directive",
+     "selector": "ng-template[mkDynamicField]",
+     "selectors": [
+      "mkDynamicField"
+     ],
+     "inputs": [
+      {
+       "name": "mkDynamicField",
+       "type": "string",
+       "description": "The type (or `props.renderer` name) this template renders.",
+       "required": true
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
+    },
+    {
+     "name": "mkDynamicCondition",
+     "description": "Evaluate a condition against a form value. `value` is normally the whole\nform value; inside an array item the item's own value is used, with the\nroot available under `$root`.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(cond: MkDynamicCondition | undefined, value: Record<string, unknown>): boolean"
+     ]
+    },
+    {
+     "name": "mkDynamicControl",
+     "description": "Build the `FormControl` / `FormGroup` / `FormArray` for one field.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(field: MkDynamicField, value?: unknown): AbstractControl"
+     ]
+    },
+    {
+     "name": "mkDynamicDefaults",
+     "description": "Default value object of a field list (groups nested, arrays as item lists).",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(fields: readonly MkDynamicField[]): Record<string, unknown>"
+     ]
+    },
+    {
+     "name": "mkDynamicEmptyValue",
+     "description": "The empty value a field type starts with when no `default` is given.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(field: MkDynamicFieldBase): unknown"
+     ]
+    },
+    {
+     "name": "mkDynamicFlatten",
+     "description": "Depth-first list of every value field with its dotted path.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(fields: readonly MkDynamicField[], prefix?: string): Array<{ path: string; field: MkDynamicFieldBase | MkDynamicGroup | MkDynamicArray; }>"
+     ]
+    },
+    {
+     "name": "mkDynamicForm",
+     "description": "Build the reactive form of a whole schema.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(schema: MkDynamicSchema, value?: Record<string, unknown>): FormGroup"
+     ]
+    },
+    {
+     "name": "mkDynamicGroup",
+     "description": "A `FormGroup` for a field list; `value` (partial) overrides the defaults.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(fields: readonly MkDynamicField[], value?: Record<string, unknown>): FormGroup"
+     ]
+    },
+    {
+     "name": "mkDynamicSpan",
+     "description": "Column span a field takes in a grid of `columns`.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(field: MkDynamicField, columns: number): number"
+     ]
+    },
+    {
+     "name": "mkDynamicValidators",
+     "description": "Angular validators for one value field, from its declarative `validators` + `required`.",
+     "file": "projects/mk-kit/dynamic-form/schema.ts",
+     "kind": "function",
+     "signatures": [
+      "(field: MkDynamicFieldBase): ValidatorFn[]"
+     ]
+    },
+    {
+     "name": "mkIsArray",
+     "description": "",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "function",
+     "signatures": [
+      "(f: MkDynamicField): f is MkDynamicArray"
+     ]
+    },
+    {
+     "name": "mkIsGroup",
+     "description": "",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "function",
+     "signatures": [
+      "(f: MkDynamicField): f is MkDynamicGroup"
+     ]
+    },
+    {
+     "name": "mkIsSection",
+     "description": "",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "function",
+     "signatures": [
+      "(f: MkDynamicField): f is MkDynamicSection"
+     ]
+    },
+    {
+     "name": "mkIsValueField",
+     "description": "",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "function",
+     "signatures": [
+      "(f: MkDynamicField): f is MkDynamicFieldBase"
+     ]
+    },
+    {
+     "name": "MkDynamicArray",
+     "description": "A list of objects: a `FormArray` of groups with add / remove controls.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "type",
+       "type": "\"array\"",
+       "description": ""
+      },
+      {
+       "name": "key",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "hint",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "fields",
+       "type": "MkDynamicField[]",
+       "description": "Fields of one item."
+      },
+      {
+       "name": "min",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "max",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "addLabel",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "default",
+       "type": "Record<string, unknown>[] | undefined",
+       "description": "Initial items (each is patched over the item defaults).",
+       "optional": true
+      },
+      {
+       "name": "span",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "columns",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "showWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "disabledWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicFieldBase",
+     "description": "Properties shared by every field that holds a value.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "key",
+       "type": "string",
+       "description": "Key in the form value."
+      },
+      {
+       "name": "type",
+       "type": "MkDynamicFieldType",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "hint",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "placeholder",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "required",
+       "type": "boolean | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "disabled",
+       "type": "boolean | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "default",
+       "type": "unknown",
+       "description": "Initial value when the form (or a new array item) is created.",
+       "optional": true
+      },
+      {
+       "name": "validators",
+       "type": "MkDynamicValidators | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "options",
+       "type": "readonly MkDynamicOption[] | undefined",
+       "description": "Options for select / multi-select / radio / toggle / autocomplete.",
+       "optional": true
+      },
+      {
+       "name": "props",
+       "type": "Record<string, unknown> | undefined",
+       "description": "Extra inputs forwarded to the underlying control — the subset each type\nunderstands (`rows`, `min`, `max`, `step`, `currency`, `accept`,\n`multiple`, `swatches`, `language`, …). See the docs table.",
+       "optional": true
+      },
+      {
+       "name": "span",
+       "type": "number | undefined",
+       "description": "Grid columns (1–12) the field spans. Default: the form's `columns` split.",
+       "optional": true
+      },
+      {
+       "name": "showWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "Render (and enable) only when the condition holds. Hidden fields are excluded from the value.",
+       "optional": true
+      },
+      {
+       "name": "disabledWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "Disable while the condition holds.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicFieldContext",
+     "description": "Context handed to a custom field template.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "$implicit",
+       "type": "MkDynamicFieldBase",
+       "description": ""
+      },
+      {
+       "name": "field",
+       "type": "MkDynamicFieldBase",
+       "description": ""
+      },
+      {
+       "name": "control",
+       "type": "FormControl<any>",
+       "description": "The field's `FormControl` — bind it with `[formControl]`."
+      },
+      {
+       "name": "value",
+       "type": "Record<string, unknown>",
+       "description": "The current value of the whole form (or array item)."
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicGroup",
+     "description": "A nested object: its fields become a child `FormGroup` under `key`.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "type",
+       "type": "\"group\"",
+       "description": ""
+      },
+      {
+       "name": "key",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "hint",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "fields",
+       "type": "MkDynamicField[]",
+       "description": ""
+      },
+      {
+       "name": "span",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "columns",
+       "type": "number | undefined",
+       "description": "Columns for the group's own grid (default: inherits the form's).",
+       "optional": true
+      },
+      {
+       "name": "showWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "disabledWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicGroupField",
+     "description": "A nested object: its fields become a child `FormGroup` under `key`.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "type",
+       "type": "\"group\"",
+       "description": ""
+      },
+      {
+       "name": "key",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "hint",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "fields",
+       "type": "MkDynamicField[]",
+       "description": ""
+      },
+      {
+       "name": "span",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "columns",
+       "type": "number | undefined",
+       "description": "Columns for the group's own grid (default: inherits the form's).",
+       "optional": true
+      },
+      {
+       "name": "showWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "disabledWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicOption",
+     "description": "One option of a select / radio / toggle / autocomplete field.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "label",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "value",
+       "type": "unknown",
+       "description": ""
+      },
+      {
+       "name": "disabled",
+       "type": "boolean | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicSchema",
+     "description": "The whole form.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "fields",
+       "type": "MkDynamicField[]",
+       "description": ""
+      },
+      {
+       "name": "columns",
+       "type": "number | undefined",
+       "description": "Default number of columns fields are laid out in (1–12). Default 1.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicSection",
+     "description": "A heading + description with no value of its own.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "type",
+       "type": "\"section\"",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "hint",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "span",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "showWhen",
+       "type": "MkDynamicCondition | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicValidators",
+     "description": "Declarative validators — plain data so a schema can be stored as JSON.\n`custom` takes Angular validator functions for anything else.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "min",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "max",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "minLength",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "maxLength",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "pattern",
+       "type": "string | RegExp | undefined",
+       "description": "A RegExp or its source string.",
+       "optional": true
+      },
+      {
+       "name": "email",
+       "type": "boolean | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "custom",
+       "type": "ValidatorFn[] | undefined",
+       "description": "Angular validator functions appended after the declarative ones.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkDynamicCondition",
+     "description": "A serialisable condition over the form value (dotted paths reach into\ngroups: `address.country`). Combine with `and` / `or`; a function is the\nescape hatch for TypeScript-only schemas.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "type",
+     "definition": "| { field: string; eq?: unknown; neq?: unknown; in?: unknown[]; notIn?: unknown[]; truthy?: boolean; empty?: boolean } | { and: MkDynamicCondition[] } | { or: MkDynamicCondition[] } | { not: MkDynamicCondition } | ((value: Record<string, unknown>) => boolean)"
+    },
+    {
+     "name": "MkDynamicField",
+     "description": "",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "type",
+     "definition": "MkDynamicFieldBase | MkDynamicGroup | MkDynamicArray | MkDynamicSection"
+    },
+    {
+     "name": "MkDynamicFieldType",
+     "description": "Field kinds `mk-dynamic-form` renders out of the box. Each maps to one\nmk-kit control; `custom` renders a projected `mkDynamicField` template.",
+     "file": "projects/mk-kit/dynamic-form/dynamic-form.types.ts",
+     "kind": "type",
+     "definition": "| 'text' | 'email' | 'password' | 'url' | 'tel' | 'search' | 'textarea' | 'number' | 'currency' | 'date' | 'time' | 'datetime' | 'select' | 'multi-select' | 'autocomplete' | 'radio' | 'toggle' | 'checkbox' | 'switch' | 'slider' | 'rating' | 'color' | 'tags' | 'phone' | 'file' | 'code' | 'custom'"
     }
    ]
   },

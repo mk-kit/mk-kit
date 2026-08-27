@@ -214,6 +214,11 @@ export const routes: Routes = [
       import('./pages/buttons/buttons-page').then((m) => m.ButtonsPage),
   },
   {
+    path: 'components/dynamic-form',
+    title: 'Dynamic form — mk-kit',
+    loadComponent: () => import('./pages/dynamic-form/dynamic-form-page').then((m) => m.DynamicFormPage),
+  },
+  {
     path: 'components/forms',
     title: 'Forms — mk-kit',
     loadComponent: () =>
