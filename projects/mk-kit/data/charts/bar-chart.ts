@@ -58,6 +58,16 @@ interface Band {
 const CHAR_PX = 6.2;
 const estimateLabelPx = (label: string) => label.length * CHAR_PX;
 
+/**
+ * Fraction of its band a label may fill before `auto` tilts the axis.
+ *
+ * Not 1.0: labels that *technically* fit still read as a cramped run of words
+ * with no gap between them ("mar" "kwi" "maj" touching each other), which is
+ * the look tilting exists to avoid. Leaving a fifth of the band as breathing
+ * room tilts the tight cases and leaves genuinely roomy axes alone.
+ */
+const TILT_THRESHOLD = 0.8;
+
 /** Bar orientation. */
 export type MkBarOrientation = 'vertical' | 'horizontal';
 
@@ -163,7 +173,7 @@ export class MkBarChart {
     const count = this.categories().length;
     if (!count) return 0;
     const band = Math.max(this.drawWidth() - 58, 1) / count;
-    return this.widestLabelPx() <= band ? 0 : 45;
+    return this.widestLabelPx() <= band * TILT_THRESHOLD ? 0 : 45;
   });
 
   /**

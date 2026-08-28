@@ -54,6 +54,29 @@ describe('MkBarChart category labels', () => {
       f.destroy();
     });
 
+    // A 12-month axis in a card fits by the strict measure (labels are just
+    // narrower than their band) but reads as one cramped run of words with no
+    // gap. Tilt on "tight", not only on "overlapping".
+    it('tilts a technically-fitting but cramped axis', () => {
+      const months = [
+        'sie', 'wrz', 'paź', 'lis', 'gru', 'sty',
+        'lut', 'mar', 'kwi', 'maj', 'cze', 'lip', 'sie',
+      ];
+      const f = make(months, 326);
+      const cmp = f.componentInstance as any;
+      const band = Math.max(326 - 58, 1) / months.length;
+      // Genuinely fits — this is not an overlap case.
+      expect(cmp.widestLabelPx()).toBeLessThan(band);
+      expect(cmp.resolvedAngle()).toBe(45);
+      f.destroy();
+    });
+
+    it('leaves a roomy axis flat rather than tilting everything', () => {
+      const f = make(['Q1', 'Q2', 'Q3', 'Q4'], 600);
+      expect((f.componentInstance as any).resolvedAngle()).toBe(0);
+      f.destroy();
+    });
+
     it('rotates each label about its own tick, not the origin', () => {
       const f = make(hours, 326);
       const band = (f.componentInstance as any).bands()[3];

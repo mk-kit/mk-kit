@@ -25,6 +25,11 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 - Docs: "Pipes" section on the Utilities page; StackBlitz export now detects
   pipes used in snippets (`{{ x | mkCurrency }}`).
 
+### Fixed
+
+- **charts:** `mk-bar-chart` `labelAngle="auto"` now tilts once a label fills more than 80% of its band, so a 12-month axis in a card no longer renders as a cramped run of touching labels; roomy axes stay flat.
+
+
 ## [0.41.0] — 2026-08-27
 
 ### Added
