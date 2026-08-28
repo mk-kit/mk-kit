@@ -4,7 +4,7 @@
   "scripts": {
     "ng": "ng",
     "start": "npm run build:theme && ng serve docs",
-    "build": "ng build docs",
+    "build": "ng build docs && node scripts/gen-blog.mjs",
     "gen:selectors": "node scripts/gen-selectors.mjs",
     "gen:api": "node scripts/gen-api.mjs",
     "build:theme": "sass projects/mk-kit/src/styles/mk-kit.scss projects/mk-kit/src/styles/mk-kit.css --no-source-map --style expanded --no-charset",

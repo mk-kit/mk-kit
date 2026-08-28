@@ -63,6 +63,13 @@ const ROUTES: ReadonlyArray<{
   { path: '/components-index', slug: 'components-index' },
   { path: '/testing', slug: 'testing' },
   { path: '/pro', slug: 'pro' },
+  { path: '/blog', slug: 'blog' },
+  {
+    path: '/blog/switching-from-primeng',
+    slug: 'blog-post',
+    waitFor: '.mk-markdown h2',
+    viewportOnly: true,
+  },
   {
     path: '/api?entry=button#MkButton',
     slug: 'api',

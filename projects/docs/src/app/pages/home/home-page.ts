@@ -463,9 +463,20 @@ interface Mapping {
               parts PrimeUI sells separately: charts, a text editor, a scheduler
               and a task board — and stays MIT.
             </p>
-            <a mkButton variant="outline" tone="neutral" routerLink="/components-index">
-              Full component index →
-            </a>
+            <div class="migrate__actions">
+              <a mkButton tone="primary" routerLink="/blog/switching-from-primeng">
+                Read: switching from PrimeNG →
+              </a>
+              <a mkButton variant="outline" tone="neutral" routerLink="/blog/switching-from-angular-material">
+                …or from Angular Material
+              </a>
+            </div>
+            <p class="migrate__note">
+              A schematic rewrites the imports, selectors and inputs that map
+              1:1 and leaves a note everywhere else:
+              <code>ng g &#64;mk-kit/ui:migrate-primeng --dry-run</code>
+              <a routerLink="/components-index">Full component index →</a>
+            </p>
           </div>
           <div class="mapwrap">
             <table class="map">
@@ -1017,6 +1028,25 @@ interface Mapping {
       }
 
       /* Migration -------------------------------------------------------- */
+      .migrate__actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mk-space-2);
+      }
+      .migrate__note {
+        margin-top: var(--mk-space-4);
+        color: var(--mk-text-muted);
+        font-size: var(--mk-font-size-sm);
+      }
+      .migrate__note a {
+        display: block;
+        margin-top: var(--mk-space-2);
+        color: var(--mk-primary);
+      }
+      .migrate__note code {
+        font-family: var(--mk-font-mono);
+        color: var(--mk-text);
+      }
       .migrate {
         display: grid;
         grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);

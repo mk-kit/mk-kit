@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "switching-from-primeng",
+    "title": "Switching from PrimeNG? Here's the MIT path.",
+    "date": "2026-08-28",
+    "summary": "What the PrimeUI licence changes, your four options, and how far the migrate-primeng schematic gets you — with the honest gaps listed up front.",
+    "tags": ["migration", "primeng", "licensing"]
+  },
+  {
+    "slug": "switching-from-angular-material",
+    "title": "Moving from Angular Material to mk-kit, view by view",
+    "date": "2026-08-28",
+    "summary": "The component map, the icon alias provider that keeps your Material names, error handling without ErrorStateMatcher, theming with CSS variables, and the order to do it in.",
+    "tags": ["migration", "angular-material", "theming"]
+  },
+  {
+    "slug": "why-mk-kit-stays-mit",
+    "title": "Why mk-kit stays MIT (and how the lights stay on)",
+    "date": "2026-08-28",
+    "summary": "The promise in writing: every release MIT, nothing moves behind a paywall, no runtime checks — and the open-core model that pays for it.",
+    "tags": ["licensing", "open-core"]
+  }
+]

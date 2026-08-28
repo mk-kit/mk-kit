@@ -397,6 +397,18 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'blog',
+    title: 'Blog — mk-kit',
+    loadComponent: () =>
+      import('./pages/blog/blog-index-page').then((m) => m.BlogIndexPage),
+  },
+  {
+    path: 'blog/:slug',
+    // The page sets its own title from the post registry.
+    loadComponent: () =>
+      import('./pages/blog/blog-post-page').then((m) => m.BlogPostPage),
+  },
+  {
     path: 'changelog',
     title: 'Changelog — mk-kit',
     loadComponent: () =>

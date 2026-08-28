@@ -118,6 +118,11 @@ export class App {
             'overlay overlay-service focus-trap live-announcer hotkeys history undo redo i18n date-names theme-service overlay-ref',
         },
         {
+          label: 'Blog',
+          path: '/blog',
+          keywords: 'blog posts articles news primeng migration licensing mit open-core',
+        },
+        {
           label: 'Material migration',
           path: '/migration',
           keywords: 'angular material migration mapping equivalents mat-dialog mat-snackbar switch',
