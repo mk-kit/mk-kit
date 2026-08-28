@@ -730,6 +730,10 @@ export interface MkI18nStrings {
   /** Default accessible label of a QR code, carrying its encoded content. */
   qrCodeLabel: (text: string) => string;
 
+  // --- Sortable list --------------------------------------------------------
+  /** Default accessible name of `mk-sortable-list` when no `label` is given. */
+  sortableListLabel: string;
+
   // --- Block editor -------------------------------------------------------------
   /** Block editor chrome (deep-merged by provideMkI18n). */
   blockEditor: MkBlockEditorStrings;
@@ -1089,6 +1093,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   chartLabel: 'Label',
 
   qrCodeLabel: (text) => `QR code: ${text}`,
+
+  sortableListLabel: 'Sortable list',
 
   blockEditor: {
     addBlock: 'Add block',

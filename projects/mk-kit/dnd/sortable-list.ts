@@ -4,11 +4,14 @@ import {
   Component,
   TemplateRef,
   booleanAttribute,
+  computed,
   contentChild,
+  inject,
   input,
   model,
   output,
 } from '@angular/core';
+import { MK_I18N } from '@mk-kit/ui/core';
 import { MkDrag } from './drag';
 import { mkMoveItemInArray } from './drag-drop-utils';
 import { MkDropList } from './drop-list';
@@ -22,8 +25,13 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
  *
  * For connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.
  *
+ * The list renders as a named `group` of `button` items: pass `label` (or
+ * `labelledBy` pointing at a visible heading) so screen readers say what is
+ * being reordered — the i18n `sortableListLabel` ("Sortable list") is the
+ * fallback.
+ *
  * ```html
- * <mk-sortable-list [(items)]="rows">
+ * <mk-sortable-list [(items)]="rows" label="Steps">
  *   <ng-template let-row let-i="index">
  *     <span mkDragHandle aria-hidden="true">⠿</span> {{ i + 1 }}. {{ row.name }}
  *   </ng-template>
@@ -40,8 +48,22 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
   imports: [MkDropList, MkDrag, NgTemplateOutlet],
 })
 export class MkSortableList<T = unknown> {
+  private readonly i18n = inject(MK_I18N);
+
   /** The ordered items (two-way). Reordered in place on drop. */
   readonly items = model<T[]>([]);
+
+  /**
+   * Accessible name of the list (`aria-label`), also used in the
+   * "moved into …" announcements. Defaults to the i18n `sortableListLabel`.
+   */
+  readonly label = input<string>();
+
+  /**
+   * Id of an element that names the list (`aria-labelledby`), e.g. a visible
+   * heading. Wins over `label` as the accessible name.
+   */
+  readonly labelledBy = input<string>();
 
   /** Layout axis of the list. */
   readonly orientation = input<MkDropListOrientation>('vertical');
@@ -59,6 +81,11 @@ export class MkSortableList<T = unknown> {
 
   /** The row template projected as `<ng-template>`. */
   protected readonly itemTemplate = contentChild.required(TemplateRef);
+
+  /** `label`, else the i18n default. */
+  protected readonly resolvedLabel = computed(
+    () => this.label() || this.i18n.sortableListLabel,
+  );
 
   protected onDrop(event: MkDropEvent<T>): void {
     const next = [...this.items()];

@@ -132,6 +132,14 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'accessibility',
+    title: 'Accessibility — mk-kit',
+    loadComponent: () =>
+      import('./pages/accessibility/accessibility-page').then(
+        (m) => m.AccessibilityPage,
+      ),
+  },
+  {
     path: 'getting-started',
     title: 'Getting started — mk-kit',
     loadComponent: () =>

@@ -639,7 +639,7 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
         </thead>
         <tbody>
           <tr><td><code>mkCurrency</code></td><td><code>currency?: string</code> (default <code>i18n.currency</code> → <code>'USD'</code>), <code>options?: MkCurrencyOptions</code> — <code>locale</code>, <code>display</code> (<code>'symbol' | 'narrowSymbol' | 'code' | 'name'</code>), <code>minimumFractionDigits</code>, <code>maximumFractionDigits</code>, <code>signDisplay</code>, <code>notation</code> (<code>'compact'</code>), <code>useGrouping</code></td><td><code>€1,234.50</code>, <code>1234,50 zł</code>, <code>$1.2M</code></td></tr>
-          <tr><td><code>mkRelativeTime</code></td><td><code>now?: Date | number | string</code> (default <code>Date.now()</code>), <code>options?: MkRelativeTimeOptions</code> — <code>locale</code>, <code>numeric</code> (<code>'auto'</code> default → "yesterday"; <code>'always'</code> → "1 day ago"), <code>style</code> (<code>'long' | 'short' | 'narrow'</code>), <code>maxUnit</code></td><td><code>3 minutes ago</code>, <code>in 2 days</code>, <code>last week</code></td></tr>
+          <tr><td><code>mkRelativeTime</code></td><td><code>now?: Date | number | string</code> (default <code>Date.now()</code>) <em>or</em> the options object directly, <code>options?: MkRelativeTimeOptions</code> — <code>locale</code>, <code>numeric</code> (<code>'auto'</code> default → "yesterday"; <code>'always'</code> → "1 day ago"), <code>style</code> (<code>'long' | 'short' | 'narrow'</code>), <code>maxUnit</code></td><td><code>3 minutes ago</code>, <code>in 2 days</code>, <code>last week</code></td></tr>
           <tr><td><code>mkFileSize</code></td><td><code>options?: MkFileSizeOptions</code> — <code>base</code> (<code>'decimal'</code> default: ÷1000, <code>kB MB GB</code>; <code>'binary'</code>: ÷1024, <code>KiB MiB GiB</code>), <code>digits</code> (default <code>1</code>), <code>locale</code></td><td><code>1.2 MB</code>, <code>1.2 MiB</code>, <code>512 B</code></td></tr>
           <tr><td><code>mkInitials</code></td><td><code>max?: number</code> (default <code>2</code>) — first + last word; one word → its first <code>max</code> letters; <code>max ≥ words</code> → one per word</td><td><code>AL</code>, <code>JLP</code>, <code>GR</code></td></tr>
           <tr><td><code>mkTruncate</code></td><td><code>length?: number</code> (default <code>50</code>, ellipsis included), <code>options?: MkTruncateOptions</code> — <code>ellipsis</code> (default <code>'…'</code>), <code>wordBoundary</code></td><td><code>The quick brown…</code></td></tr>
@@ -1038,7 +1038,7 @@ bootstrapApplication(App, { providers: [provideMkI18n({ locale: 'pl-PL', currenc
 
 {{ comment.createdAt | mkRelativeTime }}                  <!-- 3 minutes ago -->
 {{ due | mkRelativeTime:now() }}                          <!-- in 2 days — now() ticks, see below -->
-{{ due | mkRelativeTime:null:{ style: 'short', numeric: 'always' } }}
+{{ due | mkRelativeTime:{ style: 'short', numeric: 'always' } }}  <!-- options only, no now placeholder -->
 
 {{ file.size | mkFileSize }}                              <!-- 1.2 MB -->
 {{ file.size | mkFileSize:{ base: 'binary', digits: 2 } }} <!-- 1.18 MiB -->

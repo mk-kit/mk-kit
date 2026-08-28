@@ -82,7 +82,9 @@ const AXE_RUN_OPTIONS: axe.RunOptions = {
   rules: {
     // jsdom has no layout/paint engine: computed colors resolve to defaults
     // (no theme stylesheet is loaded in unit tests either), so contrast
-    // cannot be evaluated meaningfully here. Covered by manual/E2E review.
+    // cannot be evaluated meaningfully here. Token pairs are held to WCAG AA
+    // in contrast-smoke.spec.ts instead; per-component colour combinations
+    // are reviewed manually (see the docs /accessibility page, "Known gaps").
     'color-contrast': { enabled: false },
   },
 };
@@ -636,15 +638,36 @@ class DropListHandleHost {
   ];
 }
 
+/** Default name (i18n `sortableListLabel`) and an explicit `label`. */
 @Component({
   imports: [MkSortableList],
   template: `
     <mk-sortable-list [items]="rows">
       <ng-template let-item let-i="index">{{ i + 1 }}. {{ item.title }}</ng-template>
     </mk-sortable-list>
+    <mk-sortable-list [items]="rows" label="Brief steps">
+      <ng-template let-item let-i="index">{{ i + 1 }}. {{ item.title }}</ng-template>
+    </mk-sortable-list>
   `,
 })
 class SortableListHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
+/** Named by a visible heading through `labelledBy`. */
+@Component({
+  imports: [MkSortableList],
+  template: `
+    <h2 id="sortable-heading">Brief steps</h2>
+    <mk-sortable-list [items]="rows" labelledBy="sortable-heading">
+      <ng-template let-item let-i="index">{{ i + 1 }}. {{ item.title }}</ng-template>
+    </mk-sortable-list>
+  `,
+})
+class SortableListLabelledByHost {
   rows = [
     { id: 1, title: 'Write the brief' },
     { id: 2, title: 'Review the brief' },
@@ -735,6 +758,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'drop list (ul: listbox of options)', host: DropListListboxHost },
   { name: 'drop list (ul: rows with focusable handles)', host: DropListHandleHost },
   { name: 'sortable list', host: SortableListHost },
+  { name: 'sortable list (labelledBy heading)', host: SortableListLabelledByHost },
   { name: 'repeater (reorderable rows with inputs)', host: RepeaterHost },
   { name: 'heatmap with values', host: HeatmapHost },
   { name: 'calendar', host: CalendarHost },

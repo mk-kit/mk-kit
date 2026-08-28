@@ -97,6 +97,11 @@ export class App {
           keywords: 'testing harness harnesses testbed spec unit test vitest jest loader MkHarnessLoader',
         },
         {
+          label: 'Accessibility',
+          path: '/accessibility',
+          keywords: 'accessibility a11y wcag statement conformance screen reader keyboard contrast',
+        },
+        {
           label: 'Pro',
           path: '/pro',
           keywords: 'pro commercial licence license dashboard grid scheduler gantt admin starter pricing buy',

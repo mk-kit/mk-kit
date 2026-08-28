@@ -84,6 +84,7 @@ const ORIENTATION_ROLES = new Set([
     class: 'mk-drop-list',
     '[attr.role]': 'role()',
     '[attr.aria-label]': 'ariaLabel()',
+    '[attr.aria-labelledby]': 'mkDropListLabelledBy() || null',
     '[attr.aria-orientation]': 'orientationAllowed() ? mkDropListOrientation() : null',
     '[attr.aria-disabled]': 'mkDropListDisabled() || null',
     '[class.mk-drop-list--horizontal]': "mkDropListOrientation() === 'horizontal'",
@@ -113,6 +114,13 @@ export class MkDropList<T = unknown> {
    * move items across lists by keyboard.
    */
   readonly mkDropListLabel = input<string>('');
+
+  /**
+   * Id of the element that names the list (`aria-labelledby`), e.g. a
+   * visible heading. Takes precedence over `mkDropListLabel` as the
+   * accessible name; the label is still used in announcements.
+   */
+  readonly mkDropListLabelledBy = input<string>('');
 
   /** Layout axis; controls pointer hit-testing and arrow-key direction. */
   readonly mkDropListOrientation = input<MkDropListOrientation>('vertical');
@@ -154,9 +162,15 @@ export class MkDropList<T = unknown> {
   /** A static `aria-label` written in the template, kept when no label input is set. */
   private readonly staticAriaLabel = this.element.getAttribute('aria-label');
 
-  /** Accessible name of the list: `mkDropListLabel`, else the template's own. */
-  protected readonly ariaLabel = computed(
-    () => this.mkDropListLabel() || this.staticAriaLabel || null,
+  /**
+   * Accessible name of the list: `mkDropListLabel`, else the template's own.
+   * Omitted while `mkDropListLabelledBy` names the list, so the referenced
+   * element is the single source of the name.
+   */
+  protected readonly ariaLabel = computed(() =>
+    this.mkDropListLabelledBy()
+      ? null
+      : this.mkDropListLabel() || this.staticAriaLabel || null,
   );
 
   /** Connected-list ids, normalised to a plain array. */

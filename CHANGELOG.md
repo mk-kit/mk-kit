@@ -4,6 +4,33 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Accessibility statement** — new docs page at `/accessibility` (Overview
+  nav, `llms.txt` guide list): the WCAG 2.1 AA target, what the repo verifies
+  automatically (the axe-core smoke and its rule set, the token-contrast
+  pairs, keyboard specs, SSR and visual sweeps), the testing harnesses, the
+  theme / preference features, the keyboard model per component family with
+  links, an honest list of known gaps and how to report a barrier. Linked
+  from the introduction page and both READMEs.
+- **`mk-sortable-list` `label` / `labelledBy`** (`@mk-kit/ui/dnd`) — the
+  inner drop list was an unnamed `group`. `label` flows to the drop list's
+  `mkDropListLabel` / `aria-label` (and the drag announcements) and defaults
+  to the new i18n key `sortableListLabel` ("Sortable list"); `labelledBy`
+  names it by a visible heading instead. `[mkDropList]` gained the matching
+  `mkDropListLabelledBy` input (`aria-labelledby`; `aria-label` is dropped
+  while it is set). Spec + two a11y-smoke fixtures.
+
+### Changed
+
+- **`mkRelativeTime`** (`@mk-kit/ui/directives`) — the second argument now
+  accepts either the reference `now` (`Date | number | string`) or the
+  options object, so `{{ d | mkRelativeTime:{ style: 'short' } }}` works
+  without the `null` placeholder. The three-argument form
+  (`value:now:options`) and `:null:options` keep working.
+
 ## [0.43.0] — 2026-08-28
 
 ### Added
@@ -2097,6 +2124,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.43.0...HEAD
 [0.43.0]: https://github.com/mk-kit/mk-kit/compare/v0.42.0...v0.43.0
 [0.42.0]: https://github.com/mk-kit/mk-kit/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...v0.41.0

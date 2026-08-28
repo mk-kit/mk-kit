@@ -2705,6 +2705,11 @@
        "description": "Default accessible label of a QR code, carrying its encoded content."
       },
       {
+       "name": "sortableListLabel",
+       "type": "string",
+       "description": "Default accessible name of `mk-sortable-list` when no `label` is given."
+      },
+      {
        "name": "blockEditor",
        "type": "MkBlockEditorStrings",
        "description": "Block editor chrome (deep-merged by provideMkI18n)."
@@ -4305,11 +4310,11 @@
     },
     {
      "name": "MkRelativeTimePipe",
-     "description": "`mkRelativeTime` — \"3 minutes ago\" / \"in 2 days\" / \"yesterday\" from a\n`Date`, timestamp or ISO string, via `Intl.RelativeTimeFormat` in the\n`provideMkI18n` locale (no Angular locale data). Pure: `null`, `undefined`\nand unparsable input render as `''`.\n\nThe pipe picks the largest unit whose magnitude is at least 1 (seconds →\nminutes → hours → days → weeks → months → years) and rounds. Pass `now`\nfor deterministic output in tests, or bind a ticking signal to keep a\nlist live — a pure pipe only re-runs when an argument changes:\n\n```html\n{{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->\n{{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->\n{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->\n{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->\n```",
+     "description": "`mkRelativeTime` — \"3 minutes ago\" / \"in 2 days\" / \"yesterday\" from a\n`Date`, timestamp or ISO string, via `Intl.RelativeTimeFormat` in the\n`provideMkI18n` locale (no Angular locale data). Pure: `null`, `undefined`\nand unparsable input render as `''`.\n\nThe pipe picks the largest unit whose magnitude is at least 1 (seconds →\nminutes → hours → days → weeks → months → years) and rounds. Pass `now`\nfor deterministic output in tests, or bind a ticking signal to keep a\nlist live — a pure pipe only re-runs when an argument changes. The second\nargument is either that `now` or the options object, so options alone\nneed no `null` placeholder; the three-argument form (`now`, then options)\nworks too:\n\n```html\n{{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->\n{{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->\n{{ due | mkRelativeTime:{ style: 'short' } }}               <!-- in 2 days -->\n{{ ts | mkRelativeTime:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->\n{{ due | mkRelativeTime:now():{ style: 'short' } }}         <!-- in 2 days (ticking) -->\n```",
      "file": "projects/mk-kit/directives/pipes/relative-time.pipe.ts",
      "kind": "pipe",
      "pipeName": "mkRelativeTime",
-     "signature": "(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string"
+     "signature": "(value: Date | number | string | null | undefined, nowOrOptions?: Date | number | string | MkRelativeTimeOptions | null, options?: MkRelativeTimeOptions): string"
     },
     {
      "name": "MkTruncatePipe",
@@ -4865,6 +4870,12 @@
        "default": "''"
       },
       {
+       "name": "mkDropListLabelledBy",
+       "type": "string",
+       "description": "Id of the element that names the list (`aria-labelledby`), e.g. a\nvisible heading. Takes precedence over `mkDropListLabel` as the\naccessible name; the label is still used in announcements.",
+       "default": "''"
+      },
+      {
        "name": "mkDropListOrientation",
        "type": "MkDropListOrientation",
        "description": "Layout axis; controls pointer hit-testing and arrow-key direction.",
@@ -4948,7 +4959,7 @@
     },
     {
      "name": "MkSortableList",
-     "description": "Thin convenience wrapper over a single `[mkDropList]` for the common\n\"reorderable list\" case. Bind `items` two-way and provide an `<ng-template>`\nto render each row; drops are applied to the model for you (via\n`mkMoveItemInArray`).\n\nFor connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.\n\n```html\n<mk-sortable-list [(items)]=\"rows\">\n  <ng-template let-row let-i=\"index\">\n    <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ i + 1 }}. {{ row.name }}\n  </ng-template>\n</mk-sortable-list>\n```",
+     "description": "Thin convenience wrapper over a single `[mkDropList]` for the common\n\"reorderable list\" case. Bind `items` two-way and provide an `<ng-template>`\nto render each row; drops are applied to the model for you (via\n`mkMoveItemInArray`).\n\nFor connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.\n\nThe list renders as a named `group` of `button` items: pass `label` (or\n`labelledBy` pointing at a visible heading) so screen readers say what is\nbeing reordered — the i18n `sortableListLabel` (\"Sortable list\") is the\nfallback.\n\n```html\n<mk-sortable-list [(items)]=\"rows\" label=\"Steps\">\n  <ng-template let-row let-i=\"index\">\n    <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ i + 1 }}. {{ row.name }}\n  </ng-template>\n</mk-sortable-list>\n```",
      "file": "projects/mk-kit/dnd/sortable-list.ts",
      "kind": "component",
      "selector": "mk-sortable-list",
@@ -4962,6 +4973,16 @@
        "description": "The ordered items (two-way). Reordered in place on drop.",
        "model": true,
        "default": "[]"
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "Accessible name of the list (`aria-label`), also used in the\n\"moved into …\" announcements. Defaults to the i18n `sortableListLabel`."
+      },
+      {
+       "name": "labelledBy",
+       "type": "string | undefined",
+       "description": "Id of an element that names the list (`aria-labelledby`), e.g. a visible\nheading. Wins over `label` as the accessible name."
       },
       {
        "name": "orientation",

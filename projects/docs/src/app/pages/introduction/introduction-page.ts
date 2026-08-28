@@ -93,7 +93,8 @@ interface Feature {
         complete <code class="docs-inline">aria-*</code> wiring, roving tabindex for
         composite widgets, focus trapping for overlays, live-region announcements, and
         contrast that holds up in both themes. Information is never conveyed by color
-        alone.
+        alone. The <a routerLink="/accessibility">accessibility statement</a> lists
+        what is verified automatically and the known gaps.
       </p>
 
       <div class="intro-footcta">

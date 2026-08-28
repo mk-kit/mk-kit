@@ -103,6 +103,16 @@ describe('MkRelativeTimePipe', () => {
     expect(pipe.transform('2026-08-26T12:00:00Z', '2026-08-28T12:00:00Z')).toBe('2 days ago');
   });
 
+  it('accepts the options object as the second argument (no now placeholder)', () => {
+    const pipe = make(MkRelativeTimePipe, provideMkI18n({ locale: 'en-US' }));
+    expect(pipe.transform(new Date(Date.now() - 3 * MIN), { style: 'short' })).toBe('3 min. ago');
+    expect(pipe.transform(new Date(Date.now() + DAY), { numeric: 'always' })).toBe('in 1 day');
+    expect(pipe.transform(new Date(Date.now() - 45 * DAY), { maxUnit: 'day' })).toBe('45 days ago');
+    // The legacy `null` placeholder and the three-argument form keep working.
+    expect(pipe.transform(new Date(Date.now() - 3 * MIN), null, { style: 'short' })).toBe('3 min. ago');
+    expect(pipe.transform(new Date(NOW.getTime() - 3 * MIN), NOW, { style: 'narrow' })).toBe('3m ago');
+  });
+
   it('caps the unit with maxUnit', () => {
     const pipe = make(MkRelativeTimePipe, provideMkI18n({ locale: 'en-US' }));
     expect(pipe.transform(new Date(NOW.getTime() - 45 * DAY), NOW, { maxUnit: 'day' })).toBe('45 days ago');

@@ -62,6 +62,7 @@ export for the theme.
 - **CSS-variable theming** — re-brand by overriding `--mk-*` tokens.
 - **Light & dark** out of the box (OS-aware + explicit override + `MkThemeService`).
 - **WCAG 2.1 AA** — roles, aria wiring, keyboard nav, focus trapping, live regions.
+  See the [accessibility statement](https://mk-kit.dev/accessibility) for what is verified and the known gaps.
 - **Admin-oriented** — AppShell, sidebar nav, sortable tables, stat cards, dialogs, toasts.
 
 See [projects/mk-kit/README.md](./projects/mk-kit/README.md) for library usage.

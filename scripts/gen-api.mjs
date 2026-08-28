@@ -409,7 +409,7 @@ const api = {
 // llms.txt + llms-full.txt
 // ---------------------------------------------------------------------------
 
-const GUIDE_PAGES = ['/introduction', '/getting-started', '/cost', '/theming', '/core-services', '/touch', '/migration', '/blog', '/components-index', '/changelog'];
+const GUIDE_PAGES = ['/introduction', '/getting-started', '/accessibility', '/cost', '/theming', '/core-services', '/touch', '/migration', '/blog', '/components-index', '/changelog'];
 const componentPages = [...routeTitles.entries()].filter(([p]) => p.startsWith('/components/') || p.startsWith('/examples/'));
 
 const counts = entries.flatMap((e) => e.exports).reduce((acc, x) => ((acc[x.kind] = (acc[x.kind] ?? 0) + 1), acc), {});
