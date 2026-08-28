@@ -36,7 +36,7 @@
  * CLI) the script falls back to `method: "entry-share"`: whole-entry sizes
  * only, per-export numbers null.
  */
-import { existsSync, readFileSync, readdirSync, statSync, writeFileSync } from 'node:fs';
+import { existsSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 import { join, relative, resolve } from 'node:path';
 import { brotliCompressSync, constants as zlib } from 'node:zlib';
@@ -64,15 +64,32 @@ const api = JSON.parse(readFileSync(API, 'utf8'));
 const budget = JSON.parse(readFileSync(BUDGET, 'utf8'));
 const pkg = JSON.parse(readFileSync(join(ROOT, 'dist/mk-kit/package.json'), 'utf8'));
 
-const fesmOf = (entry) => join(FESM, entry ? `mk-kit-ui-${entry}.mjs` : 'mk-kit-ui.mjs');
 const brotli = (text) =>
   brotliCompressSync(Buffer.from(text), { params: { [zlib.BROTLI_PARAM_QUALITY]: 11 } }).length;
 
-/** Secondary entry points, from the built package (the root barrel only re-exports). */
-const ENTRIES = readdirSync(FESM)
-  .map((f) => /^mk-kit-ui-([\w-]+)\.mjs$/.exec(f)?.[1])
-  .filter(Boolean)
-  .sort();
+/**
+ * Secondary entry points, from the built package's exports map (the root
+ * barrel only re-exports): subpath → FESM file. Nested entries like
+ * `icon/extended` build to a flattened file name (`mk-kit-ui-icon-extended.mjs`),
+ * so the exports map — not the file list — is the source of truth.
+ */
+const ENTRIES = Object.entries(pkg.exports ?? {})
+  .flatMap(([sub, cond]) => {
+    const m = /^\.\/fesm2022\/(mk-kit-ui-[\w-]+\.mjs)$/.exec(cond?.default ?? '');
+    return m && sub !== '.' ? [{ name: sub.replace(/^\.\//, ''), file: m[1] }] : [];
+  })
+  .sort((a, b) => a.name.localeCompare(b.name));
+const FILE_OF = new Map(ENTRIES.map((e) => [e.name, e.file]));
+const fesmOf = (entry) => join(FESM, entry ? FILE_OF.get(entry) : 'mk-kit-ui.mjs');
+/** The entry point a source file belongs to — the longest entry path prefixing it. */
+const homeOf = (file) => {
+  const rel = file.replace(/^projects\/mk-kit\//, '');
+  let best = '';
+  for (const { name } of ENTRIES) {
+    if ((rel === name || rel.startsWith(`${name}/`)) && name.length > best.length) best = name;
+  }
+  return best;
+};
 
 // ---------------------------------------------------------------------------
 // Toolchain: esbuild + the Angular linker + the CLI's optimisation plugins.
@@ -154,20 +171,20 @@ function mkPlugin(mode, entry) {
   return {
     name: 'mk-kit-cost',
     setup(b) {
-      b.onResolve({ filter: /^@mk-kit\/ui(\/[\w-]+)?$/ }, (args) => {
-        const e = args.path.split('/')[2] ?? '';
+      b.onResolve({ filter: /^@mk-kit\/ui(\/[\w-]+)*$/ }, (args) => {
+        const e = args.path.slice('@mk-kit/ui/'.length);
         if (mode === 'own' && e !== entry) return { path: args.path, external: true, sideEffects: false };
         return { path: fesmOf(e) };
       });
       b.onResolve({ filter: /^(@angular\/|rxjs(\/|$)|tslib$)/ }, (args) => ({ path: args.path, external: true }));
       b.onLoad({ filter: /fesm2022[\\/][\w-]+\.mjs$/ }, async (args) => {
         let contents = await link(args.path);
-        if (mode === 'own') contents = contents.replace(/^export \* from '@mk-kit\/ui\/[\w-]+';$/gm, '');
+        if (mode === 'own') contents = contents.replace(/^export \* from '@mk-kit\/ui\/[\w/-]+';$/gm, '');
         return { contents, loader: 'js', resolveDir: FESM };
       });
       b.onResolve({ filter: /^cost:/ }, (args) => ({ path: args.path, namespace: 'cost' }));
       b.onLoad({ filter: /.*/, namespace: 'cost' }, (args) => {
-        const [, e, name] = /^cost:([\w-]+)\/(.*)$/.exec(args.path);
+        const [, e, name] = /^cost:([\w/-]*)::(.*)$/.exec(args.path);
         const from = JSON.stringify(fesmOf(e));
         const contents = name === '__entry__' ? `export * from ${from};` : `export { ${name} } from ${from};`;
         return { contents, loader: 'js', resolveDir: FESM };
@@ -182,7 +199,7 @@ async function bundle(mode, entry, names) {
   const result = await tc.esbuild.build({
     // Output names are case-insensitive for esbuild (`MkX` vs `mkX` would
     // clash), so outputs are keyed by index.
-    entryPoints: names.map((n, i) => ({ in: `cost:${entry}/${n === '*' ? '__entry__' : n}`, out: `o${i}` })),
+    entryPoints: names.map((n, i) => ({ in: `cost:${entry}::${n === '*' ? '__entry__' : n}`, out: `o${i}` })),
     bundle: true,
     splitting: false,
     treeShaking: true,
@@ -210,11 +227,11 @@ async function bundle(mode, entry, names) {
 // ---------------------------------------------------------------------------
 
 /** Exports per home entry point (where the source lives), deduplicated across re-exporting barrels. */
-const byHome = new Map(ENTRIES.map((e) => [e, new Map()]));
+const byHome = new Map(ENTRIES.map((e) => [e.name, new Map()]));
 for (const e of api.entries) {
   for (const x of e.exports) {
     if (SKIP_KINDS.has(x.kind)) continue;
-    const home = x.file.split('/')[2];
+    const home = homeOf(x.file);
     if (!byHome.has(home) || byHome.get(home).has(x.name)) continue;
     byHome.get(home).set(x.name, x);
   }
@@ -222,10 +239,10 @@ for (const e of api.entries) {
 
 const entries = [];
 const started = Date.now();
-for (const name of ENTRIES) {
+for (const { name, file: fileName } of ENTRIES) {
   const file = fesmOf(name);
   const raw = statSync(file).size;
-  const budgetKiB = budget.bundles[`mk-kit-ui-${name}.mjs`] ?? null;
+  const budgetKiB = budget.bundles[fileName] ?? null;
   const exported = ownExportNames(name);
   const wanted = [...byHome.get(name).values()].filter((x) => exported.has(x.name));
 
@@ -261,7 +278,7 @@ for (const name of ENTRIES) {
     }));
   }
   items.sort((a, b) => (b.own ?? 0) - (a.own ?? 0) || a.name.localeCompare(b.name));
-  entries.push({ name, import: `@mk-kit/ui/${name}`, file: `mk-kit-ui-${name}.mjs`, raw, min, brotli: br, budgetKiB, items });
+  entries.push({ name, import: `@mk-kit/ui/${name}`, file: fileName, raw, min, brotli: br, budgetKiB, items });
   console.error(`  ${name.padEnd(14)} ${String(items.length).padStart(3)} exports  ${(br / 1024).toFixed(1).padStart(6)} KiB brotli`);
 }
 

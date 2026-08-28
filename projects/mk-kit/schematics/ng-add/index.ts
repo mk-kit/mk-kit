@@ -5,6 +5,9 @@
  *   in angular.json (physical path — exports maps don't apply there).
  * - Optionally (`--i18n`) inserts a `provideMkI18n({})` override block into
  *   the application config via the CLI's standalone-app AST helpers.
+ * - Optionally (`--extended-icons`) inserts `provideMkExtendedIcons()` so the
+ *   Lucide-derived icon set (≈13 KiB brotli, opt-in) is available to
+ *   `<mk-icon name="…">`.
  * - Prints a short getting-started note.
  */
 import {
@@ -39,7 +42,8 @@ export function ngAdd(options: Schema): Rule {
     return chain([
       addThemeStyles(projectName),
       options.i18n ? addI18nProvider(projectName) : noop(),
-      logGettingStarted(),
+      options.extendedIcons ? addExtendedIconsProvider(projectName) : noop(),
+      logGettingStarted(options),
     ]);
   };
 }
@@ -134,12 +138,44 @@ function addI18nProvider(projectName: string): Rule {
   };
 }
 
+/**
+ * Inserts `provideMkExtendedIcons()` into the application config so the
+ * opt-in Lucide-derived icon set resolves. Same graceful fallback as the i18n
+ * rule when the app is not a standard standalone app.
+ */
+function addExtendedIconsProvider(projectName: string): Rule {
+  return async (tree: Tree, context: SchematicContext) => {
+    const rule = addRootProvider(
+      projectName,
+      ({ code, external }) => code`${external('provideMkExtendedIcons', '@mk-kit/ui/icon/extended')}()`,
+    );
+
+    try {
+      return await lastValueFrom(callRule(rule, tree, context));
+    } catch {
+      context.logger.warn(
+        'Could not set up provideMkExtendedIcons automatically (the application config does not ' +
+          'match the standard standalone shape). To use the extended icon set, add it manually:',
+      );
+      context.logger.warn(`  import { provideMkExtendedIcons } from '@mk-kit/ui/icon/extended';`);
+      context.logger.warn('  providers: [provideMkExtendedIcons()]');
+      return tree;
+    }
+  };
+}
+
 /** Prints a short getting-started message at the end of a successful run. */
-function logGettingStarted(): Rule {
+function logGettingStarted(options: Schema): Rule {
   return (_tree: Tree, context: SchematicContext) => {
     context.logger.info('');
     context.logger.info('@mk-kit/ui has been set up.');
     context.logger.info(`  - Theme stylesheet wired into angular.json (${THEME_STYLE_PATH}).`);
+    context.logger.info(
+      options.extendedIcons
+        ? '  - Extended icon set registered (provideMkExtendedIcons()).'
+        : '  - Only the default icon set is registered; for the 300+ extended (Lucide) names re-run with ' +
+            "--extended-icons or add provideMkExtendedIcons() from '@mk-kit/ui/icon/extended'.",
+    );
     context.logger.info(
       "  - Scaffold a dashboard layout with MkAppShell: import { MkAppShell } from '@mk-kit/ui/navigation';",
     );

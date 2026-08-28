@@ -58,6 +58,11 @@ export class I18nDemo {}
         another), and with <code class="docs-inline">--i18n</code> it also
         inserts an empty <code class="docs-inline">provideMkI18n({{ '{' }}{{ '}' }})</code>
         override block into your application config, ready for translations.
+        Pass <code class="docs-inline">--extended-icons</code> to also register
+        the opt-in, 300+ glyph Lucide-derived icon set
+        (<code class="docs-inline">provideMkExtendedIcons()</code>, ≈13 KiB brotli);
+        by default only the compact default set ships — see
+        <a href="/components/icon">Icon</a> for subsets and lazy loading.
         If you use it, step 2 below is already done — continue at step 3.
       </p>
       <p>Or install manually:</p>

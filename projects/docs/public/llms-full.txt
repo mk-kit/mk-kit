@@ -1408,7 +1408,7 @@ type MkVariant = 'solid' | 'soft' | 'outline' | 'ghost' | 'link';
 
 ## @mk-kit/ui/icon
 
-6 exports. `import { … } from '@mk-kit/ui/icon';`
+8 exports. `import { … } from '@mk-kit/ui/icon';`
 
 ### MkIcon (component)
 
@@ -1446,11 +1446,13 @@ Docs: https://mk-kit.dev/components/icon
 
 Import: `import { MkIconRegistry } from '@mk-kit/ui/icon';`
 
-IconRegistry — the name → SVG store behind `<mk-icon name="…">`. The built-in
-sets — the hand-made `MK_DEFAULT_ICONS` and the Lucide-derived
-`MK_EXTENDED_ICONS` — are registered on construction; add your own SVGs
-(from a sprite, a design export, anything) with `register` /
-`registerIcons`.
+IconRegistry — the name → SVG store behind `<mk-icon name="…">`. The
+hand-made `MK_DEFAULT_ICONS` are registered on construction and ship
+with every app. Everything else is opt-in and tree-shakeable: the
+Lucide-derived extended set via `provideMkExtendedIcons()` (from
+`@mk-kit/ui/icon/extended`), a themed subset or your own SVGs (from a
+sprite, a design export, anything) via `provideMkIcons()`, or at runtime
+with `register` / `registerIcons` / `load`.
 
 SVG markup is trusted verbatim (bypassed through `DomSanitizer`), so only
 register icons from sources you control — never user input.
@@ -1459,6 +1461,7 @@ register icons from sources you control — never user input.
 const reg = inject(MkIconRegistry);
 reg.register('logo', '<svg viewBox="0 0 24 24">…</svg>');
 reg.registerIcons({ save: '<svg…>', share: '<svg…>' });
+reg.load(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS_FILES));
 ```
 
 Methods:
@@ -1466,11 +1469,56 @@ Methods:
 | Signature | Description |
 | --- | --- |
 | `register(name: string, svg: string): this` | Register (or overwrite) a single named icon from raw SVG markup. |
-| `registerIcons(icons: Readonly<Record<string, string>>): this` | Register many icons at once from a `{ name: svg }` map. |
-| `registerAliases(aliases: Readonly<Record<string, string>>): this` | Register alternative names that resolve to existing icons — e.g. map Material Symbols ligature names onto the built-in set (`{ delete: 'trash', expand_more: 'chevron-down' }`). A real icon registered under an alias name always wins over the alias. |
+| `registerIcons(icons: MkIconMap): this` | Register many icons at once from a `{ name: svg }` map — a whole set, a themed subset (`MK_EXTENDED_ICONS_FILES`) or a hand-picked few. Later registrations overwrite earlier ones on a shared name. |
+| `registerAliases(aliases: Readonly<Record<string, string>>): this` | Register alternative names that resolve to existing icons — e.g. map Material Symbols ligature names onto the built-in set (`{ delete: 'trash', expand_more: 'chevron-down' }`). A real icon registered under an alias name always wins over the alias; an alias whose target is not registered resolves to nothing (and, in dev mode, warns once naming the missing target). |
+| `load(loader: MkIconLoader): Promise<void>` | Load an icon map asynchronously and register it once it arrives. Icons already on screen fill in when the map lands (see `changes`); the missing-icon warning stays quiet while a load is pending. Server-side rendering waits for it (Angular's `PendingTasks`), so the HTML ships with the icons in place.  ```ts registry.load(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS)); ``` |
 | `get(name: string): SafeHtml \| null` | Sanitized SVG for a name (aliases resolved), or `null` when unknown. |
 | `has(name: string): boolean` | Whether an icon with this name (or alias) is registered. |
 | `names(): string[]` | All registered icon names (useful for a picker / catalogue). |
+| `warnMissing(name: string): void` | Dev-mode only: warn once per unknown name with a hint about the opt-in extended set. Silent in production builds and while a `load` is pending (the name may be on its way). Called by `<mk-icon>`. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `changes` | `Signal<number>` | Bumps on every registration. `<mk-icon>` reads it, so an icon that arrives late (a lazy `load`, a runtime `register`) renders in place without any re-binding. |
+| `pending` | `Signal<boolean>` | Whether a lazy `load` is still in flight. |
+
+### provideMkIcons (function)
+
+Import: `import { provideMkIcons } from '@mk-kit/ui/icon';`
+
+Registers extra icons at bootstrap — a themed subset of the extended set,
+a hand-picked few, your own SVGs, or a lazily loaded map. Call it as many
+times as you like; each call adds to the `MkIconRegistry`. The
+hand-made defaults are always there; this is for everything else.
+
+```ts
+import { provideMkIcons } from '@mk-kit/ui/icon';
+import { MK_EXTENDED_ICONS_FILES, MK_EXTENDED_ICONS_DATA } from '@mk-kit/ui/icon/extended';
+
+bootstrapApplication(App, {
+  providers: [
+    // themed subsets — only these glyphs end up in the bundle
+    provideMkIcons(MK_EXTENDED_ICONS_FILES),
+    provideMkIcons(MK_EXTENDED_ICONS_DATA),
+    // your own
+    provideMkIcons({ logo: '<svg viewBox="0 0 24 24">…</svg>' }),
+    // or the whole extended set in its own lazy chunk, off the critical path
+    provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS)),
+  ],
+});
+```
+
+A loader runs once at bootstrap without blocking it: icons already on
+screen fill in when the chunk lands, and server-side rendering waits for
+it. Picking single names out of the full map
+(`{ receipt: MK_EXTENDED_ICONS['receipt'] }`) works but still bundles the
+whole map — use a subset or copy the SVG when size matters.
+
+```ts
+function provideMkIcons(icons: MkIconMap | MkIconLoader): EnvironmentProviders
+```
 
 ### provideMkMaterialIcons (function)
 
@@ -1495,20 +1543,10 @@ function provideMkMaterialIcons(): EnvironmentProviders
 
 Import: `import { MK_DEFAULT_ICONS } from '@mk-kit/ui/icon';`
 
-Name → SVG markup map of the default icons.
+Name → SVG markup map of the default icons (registered by `MkIconRegistry` on construction).
 
 ```ts
 const MK_DEFAULT_ICONS: Readonly<Record<string, string>>;
-```
-
-### MK_EXTENDED_ICONS (const)
-
-Import: `import { MK_EXTENDED_ICONS } from '@mk-kit/ui/icon';`
-
-Name → SVG markup map of the Lucide-derived icons registered by default.
-
-```ts
-const MK_EXTENDED_ICONS: Readonly<Record<string, string>>;
 ```
 
 ### MK_MATERIAL_ICON_ALIASES (const)
@@ -1521,12 +1559,253 @@ names when migrating: `<mk-icon name="delete" />` renders the `trash`
 glyph once `provideMkMaterialIcons` is installed.
 
 Several Material names intentionally collapse onto one mk glyph (all the
-calendar variants → `calendar`, the delete variants → `trash`, …). Names
-not listed here have no sensible built-in equivalent — register your own
-SVG under the Material name via `MkIconRegistry.register`.
+calendar variants → `calendar`, the delete variants → `trash`, …). Every
+target is a default icon, so the aliases work without the opt-in extended
+set. Names not listed here have no sensible built-in equivalent — register
+your own SVG under the Material name via `MkIconRegistry.register`, or
+alias it onto an extended glyph with `registerAliases` once
+`provideMkExtendedIcons()` is installed (an alias whose target is missing
+renders nothing and warns once in dev mode).
 
 ```ts
 const MK_MATERIAL_ICON_ALIASES: Readonly<Record<string, string>>;
+```
+
+### MkIconLoader (type)
+
+Import: `import { MkIconLoader } from '@mk-kit/ui/icon';`
+
+Loads an icon map on demand — typically a dynamic import of the extended
+set: `() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS)`.
+
+```ts
+type MkIconLoader = () => Promise<MkIconMap>;
+```
+
+### MkIconMap (type)
+
+Import: `import { MkIconMap } from '@mk-kit/ui/icon';`
+
+A `{ name: '<svg …>…</svg>' }` map — what every registration API accepts.
+
+```ts
+type MkIconMap = Readonly<Record<string, string>>;
+```
+
+## @mk-kit/ui/icon/extended
+
+19 exports. `import { … } from '@mk-kit/ui/icon/extended';`
+
+### provideMkExtendedIcons (function)
+
+Import: `import { provideMkExtendedIcons } from '@mk-kit/ui/icon/extended';`
+
+Registers the whole Lucide-derived extended set (`MK_EXTENDED_ICONS`)
+so every `<mk-icon name="…">` in the catalogue resolves. Opt-in: without
+it only the hand-made defaults are available and an unknown name warns
+once in dev mode.
+
+```ts
+import { provideMkExtendedIcons } from '@mk-kit/ui/icon/extended';
+
+bootstrapApplication(App, {
+  providers: [provideMkExtendedIcons()],
+});
+```
+
+Size-conscious alternatives (see `provideMkIcons`): register only the
+themed subsets you use (`provideMkIcons(MK_EXTENDED_ICONS_FILES)`), or load
+the full set lazily in its own chunk:
+`provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.
+The hand-made defaults keep their names — the generated set never
+overlaps them.
+
+```ts
+function provideMkExtendedIcons(): EnvironmentProviders
+```
+
+### MK_EXTENDED_ICON_GROUPS (const)
+
+Import: `import { MK_EXTENDED_ICON_GROUPS } from '@mk-kit/ui/icon/extended';`
+
+The themed subsets by group name — handy for a picker or for registering
+several groups at once: `provideMkIcons(MK_EXTENDED_ICON_GROUPS['files'])`.
+
+```ts
+const MK_EXTENDED_ICON_GROUPS: Readonly<Record<string, Readonly<Record<string, string>>>>;
+```
+
+### MK_EXTENDED_ICONS (const)
+
+Import: `import { MK_EXTENDED_ICONS } from '@mk-kit/ui/icon/extended';`
+
+Every Lucide-derived icon (305 glyphs). Not registered by
+default — install it with `provideMkExtendedIcons()`, pass a themed subset
+to `provideMkIcons()`, or load it lazily:
+`provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.
+
+```ts
+const MK_EXTENDED_ICONS: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_COMMERCE (const)
+
+Import: `import { MK_EXTENDED_ICONS_COMMERCE } from '@mk-kit/ui/icon/extended';`
+
+`commerce` subset of `MK_EXTENDED_ICONS` (23 icons).
+
+```ts
+const MK_EXTENDED_ICONS_COMMERCE: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_COMMUNICATION (const)
+
+Import: `import { MK_EXTENDED_ICONS_COMMUNICATION } from '@mk-kit/ui/icon/extended';`
+
+`communication` subset of `MK_EXTENDED_ICONS` (15 icons).
+
+```ts
+const MK_EXTENDED_ICONS_COMMUNICATION: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_DATA (const)
+
+Import: `import { MK_EXTENDED_ICONS_DATA } from '@mk-kit/ui/icon/extended';`
+
+`data` subset of `MK_EXTENDED_ICONS` (15 icons).
+
+```ts
+const MK_EXTENDED_ICONS_DATA: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_DEVELOPER (const)
+
+Import: `import { MK_EXTENDED_ICONS_DEVELOPER } from '@mk-kit/ui/icon/extended';`
+
+`developer` subset of `MK_EXTENDED_ICONS` (23 icons).
+
+```ts
+const MK_EXTENDED_ICONS_DEVELOPER: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_DEVICES (const)
+
+Import: `import { MK_EXTENDED_ICONS_DEVICES } from '@mk-kit/ui/icon/extended';`
+
+`devices` subset of `MK_EXTENDED_ICONS` (15 icons).
+
+```ts
+const MK_EXTENDED_ICONS_DEVICES: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_EDITING (const)
+
+Import: `import { MK_EXTENDED_ICONS_EDITING } from '@mk-kit/ui/icon/extended';`
+
+`editing` subset of `MK_EXTENDED_ICONS` (34 icons).
+
+```ts
+const MK_EXTENDED_ICONS_EDITING: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_FILES (const)
+
+Import: `import { MK_EXTENDED_ICONS_FILES } from '@mk-kit/ui/icon/extended';`
+
+`files` subset of `MK_EXTENDED_ICONS` (22 icons).
+
+```ts
+const MK_EXTENDED_ICONS_FILES: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_LAYOUT (const)
+
+Import: `import { MK_EXTENDED_ICONS_LAYOUT } from '@mk-kit/ui/icon/extended';`
+
+`layout` subset of `MK_EXTENDED_ICONS` (17 icons).
+
+```ts
+const MK_EXTENDED_ICONS_LAYOUT: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_LIFESTYLE (const)
+
+Import: `import { MK_EXTENDED_ICONS_LIFESTYLE } from '@mk-kit/ui/icon/extended';`
+
+`lifestyle` subset of `MK_EXTENDED_ICONS` (40 icons).
+
+```ts
+const MK_EXTENDED_ICONS_LIFESTYLE: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_MEDIA (const)
+
+Import: `import { MK_EXTENDED_ICONS_MEDIA } from '@mk-kit/ui/icon/extended';`
+
+`media` subset of `MK_EXTENDED_ICONS` (14 icons).
+
+```ts
+const MK_EXTENDED_ICONS_MEDIA: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_NAVIGATION (const)
+
+Import: `import { MK_EXTENDED_ICONS_NAVIGATION } from '@mk-kit/ui/icon/extended';`
+
+`navigation` subset of `MK_EXTENDED_ICONS` (34 icons).
+
+```ts
+const MK_EXTENDED_ICONS_NAVIGATION: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_PEOPLE (const)
+
+Import: `import { MK_EXTENDED_ICONS_PEOPLE } from '@mk-kit/ui/icon/extended';`
+
+`people` subset of `MK_EXTENDED_ICONS` (11 icons).
+
+```ts
+const MK_EXTENDED_ICONS_PEOPLE: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_SECURITY (const)
+
+Import: `import { MK_EXTENDED_ICONS_SECURITY } from '@mk-kit/ui/icon/extended';`
+
+`security` subset of `MK_EXTENDED_ICONS` (5 icons).
+
+```ts
+const MK_EXTENDED_ICONS_SECURITY: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_STATUS (const)
+
+Import: `import { MK_EXTENDED_ICONS_STATUS } from '@mk-kit/ui/icon/extended';`
+
+`status` subset of `MK_EXTENDED_ICONS` (20 icons).
+
+```ts
+const MK_EXTENDED_ICONS_STATUS: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_TIME (const)
+
+Import: `import { MK_EXTENDED_ICONS_TIME } from '@mk-kit/ui/icon/extended';`
+
+`time` subset of `MK_EXTENDED_ICONS` (8 icons).
+
+```ts
+const MK_EXTENDED_ICONS_TIME: Readonly<Record<string, string>>;
+```
+
+### MK_EXTENDED_ICONS_TRAVEL (const)
+
+Import: `import { MK_EXTENDED_ICONS_TRAVEL } from '@mk-kit/ui/icon/extended';`
+
+`travel` subset of `MK_EXTENDED_ICONS` (9 icons).
+
+```ts
+const MK_EXTENDED_ICONS_TRAVEL: Readonly<Record<string, string>>;
 ```
 
 ## @mk-kit/ui/chip

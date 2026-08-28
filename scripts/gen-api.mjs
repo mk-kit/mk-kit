@@ -34,7 +34,7 @@ const pkg = JSON.parse(readFileSync(join(LIB, 'package.json'), 'utf8'));
 
 /** Secondary entry points in the order the root barrel re-exports them. */
 const rootBarrel = readFileSync(join(LIB, 'src/public-api.ts'), 'utf8');
-const ENTRIES = [...rootBarrel.matchAll(/from '@mk-kit\/ui\/([\w-]+)'/g)].map((m) => m[1]);
+const ENTRIES = [...rootBarrel.matchAll(/from '@mk-kit\/ui\/([\w/-]+)'/g)].map((m) => m[1]);
 for (const dir of readdirSync(LIB)) {
   if (statSync(join(LIB, dir)).isDirectory() && existsSync(join(LIB, dir, 'ng-package.json')) && !ENTRIES.includes(dir)) {
     ENTRIES.push(dir);

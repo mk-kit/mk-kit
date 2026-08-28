@@ -26,7 +26,8 @@ describe('cost.json (scripts/gen-cost.mjs)', () => {
     let measured = 0;
     for (const e of committed.entries) {
       expect(e.import).toBe(`@mk-kit/ui/${e.name}`);
-      expect(e.file).toBe(`mk-kit-ui-${e.name}.mjs`);
+      // Nested entries (`icon/extended`) build to a flattened FESM name.
+      expect(e.file).toBe(`mk-kit-ui-${e.name.replace(/\//g, '-')}.mjs`);
       expect(e.brotli).toBeGreaterThan(0);
       expect(e.raw).toBeGreaterThan(e.brotli);
       if (e.budgetKiB !== null) expect(e.raw / 1024).toBeLessThanOrEqual(e.budgetKiB);

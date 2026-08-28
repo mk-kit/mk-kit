@@ -16,6 +16,12 @@
       "default": false,
       "description": "Insert a provideMkI18n({}) override block into the application config so built-in strings can be localised.",
       "x-prompt": "Set up a provideMkI18n override block?"
+    },
+    "extendedIcons": {
+      "type": "boolean",
+      "default": false,
+      "description": "Insert provideMkExtendedIcons() into the application config so the 300+ Lucide-derived icon names resolve (about 13 KiB brotli; only the default set ships otherwise).",
+      "x-prompt": "Register the extended (Lucide-derived) icon set? Adds provideMkExtendedIcons(), about 13 KiB."
     }
   },
   "required": []

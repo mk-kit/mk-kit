@@ -52,7 +52,10 @@ function createTree({ styles, mainTs }: { styles?: unknown[]; mainTs?: string } 
   return tree;
 }
 
-async function runNgAdd(tree: Tree, options: { project?: string; i18n?: boolean } = {}) {
+async function runNgAdd(
+  tree: Tree,
+  options: { project?: string; i18n?: boolean; extendedIcons?: boolean } = {},
+) {
   // The ng-add rules only touch the tree and the logger, so a minimal context
   // (no engine) keeps the smoke test fully in-memory.
   const logs: string[] = [];
@@ -109,6 +112,30 @@ describe('ng-add schematic', () => {
     expect(appConfig).toContain(`import { provideMkI18n } from '@mk-kit/ui/core';`);
     expect(appConfig).toContain('provideMkI18n({})');
     expect(readStyles(tree)).toEqual([THEME_STYLE_PATH, 'src/styles.css']);
+  });
+
+  it('leaves the icon set alone by default and says how to opt in', async () => {
+    const { tree, logs } = await runNgAdd(createTree(), { project: 'app' });
+
+    expect(tree.read('/src/app/app.config.ts')!.toString()).toBe(STANDARD_APP_CONFIG);
+    expect(logs.some((l) => l.includes('--extended-icons'))).toBe(true);
+  });
+
+  it('inserts provideMkExtendedIcons() into app.config.ts with --extended-icons', async () => {
+    const { tree, logs } = await runNgAdd(createTree(), { project: 'app', extendedIcons: true });
+
+    const appConfig = tree.read('/src/app/app.config.ts')!.toString();
+    expect(appConfig).toContain(`import { provideMkExtendedIcons } from '@mk-kit/ui/icon/extended';`);
+    expect(appConfig).toContain('provideMkExtendedIcons()');
+    expect(logs.some((l) => l.includes('Extended icon set registered'))).toBe(true);
+  });
+
+  it('combines the i18n and extended-icons providers', async () => {
+    const { tree } = await runNgAdd(createTree(), { project: 'app', i18n: true, extendedIcons: true });
+
+    const appConfig = tree.read('/src/app/app.config.ts')!.toString();
+    expect(appConfig).toContain('provideMkI18n({})');
+    expect(appConfig).toContain('provideMkExtendedIcons()');
   });
 
   it('warns instead of failing when the app is not a standard standalone app', async () => {

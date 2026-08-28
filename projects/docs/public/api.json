@@ -3186,7 +3186,7 @@
     },
     {
      "name": "MkIconRegistry",
-     "description": "IconRegistry — the name → SVG store behind `<mk-icon name=\"…\">`. The built-in\nsets — the hand-made `MK_DEFAULT_ICONS` and the Lucide-derived\n`MK_EXTENDED_ICONS` — are registered on construction; add your own SVGs\n(from a sprite, a design export, anything) with `register` /\n`registerIcons`.\n\nSVG markup is trusted verbatim (bypassed through `DomSanitizer`), so only\nregister icons from sources you control — never user input.\n\n```ts\nconst reg = inject(MkIconRegistry);\nreg.register('logo', '<svg viewBox=\"0 0 24 24\">…</svg>');\nreg.registerIcons({ save: '<svg…>', share: '<svg…>' });\n```",
+     "description": "IconRegistry — the name → SVG store behind `<mk-icon name=\"…\">`. The\nhand-made `MK_DEFAULT_ICONS` are registered on construction and ship\nwith every app. Everything else is opt-in and tree-shakeable: the\nLucide-derived extended set via `provideMkExtendedIcons()` (from\n`@mk-kit/ui/icon/extended`), a themed subset or your own SVGs (from a\nsprite, a design export, anything) via `provideMkIcons()`, or at runtime\nwith `register` / `registerIcons` / `load`.\n\nSVG markup is trusted verbatim (bypassed through `DomSanitizer`), so only\nregister icons from sources you control — never user input.\n\n```ts\nconst reg = inject(MkIconRegistry);\nreg.register('logo', '<svg viewBox=\"0 0 24 24\">…</svg>');\nreg.registerIcons({ save: '<svg…>', share: '<svg…>' });\nreg.load(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS_FILES));\n```",
      "file": "projects/mk-kit/icon/icon-registry.ts",
      "kind": "service",
      "providedIn": "root",
@@ -3198,13 +3198,18 @@
       },
       {
        "name": "registerIcons",
-       "signature": "(icons: Readonly<Record<string, string>>): this",
-       "description": "Register many icons at once from a `{ name: svg }` map."
+       "signature": "(icons: MkIconMap): this",
+       "description": "Register many icons at once from a `{ name: svg }` map — a whole set, a\nthemed subset (`MK_EXTENDED_ICONS_FILES`) or a hand-picked few. Later\nregistrations overwrite earlier ones on a shared name."
       },
       {
        "name": "registerAliases",
        "signature": "(aliases: Readonly<Record<string, string>>): this",
-       "description": "Register alternative names that resolve to existing icons — e.g. map\nMaterial Symbols ligature names onto the built-in set\n(`{ delete: 'trash', expand_more: 'chevron-down' }`). A real icon\nregistered under an alias name always wins over the alias."
+       "description": "Register alternative names that resolve to existing icons — e.g. map\nMaterial Symbols ligature names onto the built-in set\n(`{ delete: 'trash', expand_more: 'chevron-down' }`). A real icon\nregistered under an alias name always wins over the alias; an alias\nwhose target is not registered resolves to nothing (and, in dev mode,\nwarns once naming the missing target)."
+      },
+      {
+       "name": "load",
+       "signature": "(loader: MkIconLoader): Promise<void>",
+       "description": "Load an icon map asynchronously and register it once it arrives. Icons\nalready on screen fill in when the map lands (see `changes`); the\nmissing-icon warning stays quiet while a load is pending. Server-side\nrendering waits for it (Angular's `PendingTasks`), so the HTML ships with\nthe icons in place.\n\n```ts\nregistry.load(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS));\n```"
       },
       {
        "name": "get",
@@ -3220,10 +3225,37 @@
        "name": "names",
        "signature": "(): string[]",
        "description": "All registered icon names (useful for a picker / catalogue)."
+      },
+      {
+       "name": "warnMissing",
+       "signature": "(name: string): void",
+       "description": "Dev-mode only: warn once per unknown name with a hint about the opt-in\nextended set. Silent in production builds and while a `load` is\npending (the name may be on its way). Called by `<mk-icon>`."
       }
      ],
-     "properties": [],
+     "properties": [
+      {
+       "name": "changes",
+       "type": "Signal<number>",
+       "description": "Bumps on every registration. `<mk-icon>` reads it, so an icon that\narrives late (a lazy `load`, a runtime `register`) renders in\nplace without any re-binding.",
+       "readonly": true
+      },
+      {
+       "name": "pending",
+       "type": "Signal<boolean>",
+       "description": "Whether a lazy `load` is still in flight.",
+       "readonly": true
+      }
+     ],
      "docs": "/components/icon"
+    },
+    {
+     "name": "provideMkIcons",
+     "description": "Registers extra icons at bootstrap — a themed subset of the extended set,\na hand-picked few, your own SVGs, or a lazily loaded map. Call it as many\ntimes as you like; each call adds to the `MkIconRegistry`. The\nhand-made defaults are always there; this is for everything else.\n\n```ts\nimport { provideMkIcons } from '@mk-kit/ui/icon';\nimport { MK_EXTENDED_ICONS_FILES, MK_EXTENDED_ICONS_DATA } from '@mk-kit/ui/icon/extended';\n\nbootstrapApplication(App, {\n  providers: [\n    // themed subsets — only these glyphs end up in the bundle\n    provideMkIcons(MK_EXTENDED_ICONS_FILES),\n    provideMkIcons(MK_EXTENDED_ICONS_DATA),\n    // your own\n    provideMkIcons({ logo: '<svg viewBox=\"0 0 24 24\">…</svg>' }),\n    // or the whole extended set in its own lazy chunk, off the critical path\n    provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS)),\n  ],\n});\n```\n\nA loader runs once at bootstrap without blocking it: icons already on\nscreen fill in when the chunk lands, and server-side rendering waits for\nit. Picking single names out of the full map\n(`{ receipt: MK_EXTENDED_ICONS['receipt'] }`) works but still bundles the\nwhole map — use a subset or copy the SVG when size matters.",
+     "file": "projects/mk-kit/icon/provide-icons.ts",
+     "kind": "function",
+     "signatures": [
+      "(icons: MkIconMap | MkIconLoader): EnvironmentProviders"
+     ]
     },
     {
      "name": "provideMkMaterialIcons",
@@ -3236,22 +3268,170 @@
     },
     {
      "name": "MK_DEFAULT_ICONS",
-     "description": "Name → SVG markup map of the default icons.",
+     "description": "Name → SVG markup map of the default icons (registered by `MkIconRegistry` on construction).",
      "file": "projects/mk-kit/icon/default-icons.ts",
      "kind": "const",
      "type": "Readonly<Record<string, string>>"
     },
     {
-     "name": "MK_EXTENDED_ICONS",
-     "description": "Name → SVG markup map of the Lucide-derived icons registered by default.",
-     "file": "projects/mk-kit/icon/extended-icons.ts",
+     "name": "MK_MATERIAL_ICON_ALIASES",
+     "description": "Material Symbols ligature names → built-in mk icon names. Lets templates\nwritten against `<mat-icon>delete</mat-icon>` conventions keep their icon\nnames when migrating: `<mk-icon name=\"delete\" />` renders the `trash`\nglyph once `provideMkMaterialIcons` is installed.\n\nSeveral Material names intentionally collapse onto one mk glyph (all the\ncalendar variants → `calendar`, the delete variants → `trash`, …). Every\ntarget is a default icon, so the aliases work without the opt-in extended\nset. Names not listed here have no sensible built-in equivalent — register\nyour own SVG under the Material name via `MkIconRegistry.register`, or\nalias it onto an extended glyph with `registerAliases` once\n`provideMkExtendedIcons()` is installed (an alias whose target is missing\nrenders nothing and warns once in dev mode).",
+     "file": "projects/mk-kit/icon/material-aliases.ts",
      "kind": "const",
      "type": "Readonly<Record<string, string>>"
     },
     {
-     "name": "MK_MATERIAL_ICON_ALIASES",
-     "description": "Material Symbols ligature names → built-in mk icon names. Lets templates\nwritten against `<mat-icon>delete</mat-icon>` conventions keep their icon\nnames when migrating: `<mk-icon name=\"delete\" />` renders the `trash`\nglyph once `provideMkMaterialIcons` is installed.\n\nSeveral Material names intentionally collapse onto one mk glyph (all the\ncalendar variants → `calendar`, the delete variants → `trash`, …). Names\nnot listed here have no sensible built-in equivalent — register your own\nSVG under the Material name via `MkIconRegistry.register`.",
-     "file": "projects/mk-kit/icon/material-aliases.ts",
+     "name": "MkIconLoader",
+     "description": "Loads an icon map on demand — typically a dynamic import of the extended\nset: `() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS)`.",
+     "file": "projects/mk-kit/icon/icon-registry.ts",
+     "kind": "type",
+     "definition": "() => Promise<MkIconMap>"
+    },
+    {
+     "name": "MkIconMap",
+     "description": "A `{ name: '<svg …>…</svg>' }` map — what every registration API accepts.",
+     "file": "projects/mk-kit/icon/icon-registry.ts",
+     "kind": "type",
+     "definition": "Readonly<Record<string, string>>"
+    }
+   ]
+  },
+  {
+   "name": "icon/extended",
+   "import": "@mk-kit/ui/icon/extended",
+   "exports": [
+    {
+     "name": "provideMkExtendedIcons",
+     "description": "Registers the whole Lucide-derived extended set (`MK_EXTENDED_ICONS`)\nso every `<mk-icon name=\"…\">` in the catalogue resolves. Opt-in: without\nit only the hand-made defaults are available and an unknown name warns\nonce in dev mode.\n\n```ts\nimport { provideMkExtendedIcons } from '@mk-kit/ui/icon/extended';\n\nbootstrapApplication(App, {\n  providers: [provideMkExtendedIcons()],\n});\n```\n\nSize-conscious alternatives (see `provideMkIcons`): register only the\nthemed subsets you use (`provideMkIcons(MK_EXTENDED_ICONS_FILES)`), or load\nthe full set lazily in its own chunk:\n`provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.\nThe hand-made defaults keep their names — the generated set never\noverlaps them.",
+     "file": "projects/mk-kit/icon/extended/provide-extended-icons.ts",
+     "kind": "function",
+     "signatures": [
+      "(): EnvironmentProviders"
+     ]
+    },
+    {
+     "name": "MK_EXTENDED_ICON_GROUPS",
+     "description": "The themed subsets by group name — handy for a picker or for registering\nseveral groups at once: `provideMkIcons(MK_EXTENDED_ICON_GROUPS['files'])`.",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, Readonly<Record<string, string>>>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS",
+     "description": "Every Lucide-derived icon (305 glyphs). Not registered by\ndefault — install it with `provideMkExtendedIcons()`, pass a themed subset\nto `provideMkIcons()`, or load it lazily:\n`provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_COMMERCE",
+     "description": "`commerce` subset of `MK_EXTENDED_ICONS` (23 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_COMMUNICATION",
+     "description": "`communication` subset of `MK_EXTENDED_ICONS` (15 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_DATA",
+     "description": "`data` subset of `MK_EXTENDED_ICONS` (15 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_DEVELOPER",
+     "description": "`developer` subset of `MK_EXTENDED_ICONS` (23 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_DEVICES",
+     "description": "`devices` subset of `MK_EXTENDED_ICONS` (15 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_EDITING",
+     "description": "`editing` subset of `MK_EXTENDED_ICONS` (34 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_FILES",
+     "description": "`files` subset of `MK_EXTENDED_ICONS` (22 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_LAYOUT",
+     "description": "`layout` subset of `MK_EXTENDED_ICONS` (17 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_LIFESTYLE",
+     "description": "`lifestyle` subset of `MK_EXTENDED_ICONS` (40 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_MEDIA",
+     "description": "`media` subset of `MK_EXTENDED_ICONS` (14 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_NAVIGATION",
+     "description": "`navigation` subset of `MK_EXTENDED_ICONS` (34 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_PEOPLE",
+     "description": "`people` subset of `MK_EXTENDED_ICONS` (11 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_SECURITY",
+     "description": "`security` subset of `MK_EXTENDED_ICONS` (5 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_STATUS",
+     "description": "`status` subset of `MK_EXTENDED_ICONS` (20 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_TIME",
+     "description": "`time` subset of `MK_EXTENDED_ICONS` (8 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
+     "kind": "const",
+     "type": "Readonly<Record<string, string>>"
+    },
+    {
+     "name": "MK_EXTENDED_ICONS_TRAVEL",
+     "description": "`travel` subset of `MK_EXTENDED_ICONS` (9 icons).",
+     "file": "projects/mk-kit/icon/extended/extended-icons.ts",
      "kind": "const",
      "type": "Readonly<Record<string, string>>"
     }
