@@ -5,3 +5,4 @@ export * from './directives';
 export * from './history';
 export * from './hotkeys';
 export * from './permissions';
+export * from './pipes';

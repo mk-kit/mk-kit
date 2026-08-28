@@ -26,6 +26,7 @@ function* walk(dir) {
 
 const map = new Map();
 const decoratorRe = /@(Component|Directive)\(\{([\s\S]*?)\}\)\s*export\s+class\s+(\w+)/g;
+const pipeRe = /@Pipe\(\{\s*name:\s*'(\w+)'[\s\S]*?\}\)\s*export\s+class\s+(\w+)/g;
 for (const file of walk(LIB)) {
   const src = readFileSync(file, 'utf8');
   for (const m of src.matchAll(decoratorRe)) {
@@ -39,6 +40,10 @@ for (const file of walk(LIB)) {
       if (tag && tag[1].startsWith('mk-')) map.set(tag[1], cls);
       for (const attr of p.matchAll(/\[(\w+)\]/g)) if (attr[1].startsWith('mk')) map.set(attr[1], cls);
     }
+  }
+  // Pipes: `{{ x | mkCurrency }}` → MkCurrencyPipe.
+  for (const m of src.matchAll(pipeRe)) {
+    if (m[1].startsWith('mk')) map.set(m[1], m[2]);
   }
 }
 

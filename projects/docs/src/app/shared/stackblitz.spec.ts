@@ -6,6 +6,11 @@ describe('stackblitz project builder', () => {
     expect(imports).toEqual(['MkBlockUi', 'MkButton', 'MkCard']);
   });
 
+  it('detects pipes used in interpolations', () => {
+    const imports = detectMkImports(`<p>{{ total | mkCurrency:'EUR' }} · {{ at |mkRelativeTime }}</p>`);
+    expect(imports).toEqual(['MkCurrencyPipe', 'MkRelativeTimePipe']);
+  });
+
   it('splits a snippet into template and class code, keeping signal fields and commenting the rest', () => {
     const app = snippetToApp('Toggles', `<mk-switch [(checked)]="on" />
 <p>{{ on() }}</p>

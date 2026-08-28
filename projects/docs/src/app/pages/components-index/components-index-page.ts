@@ -259,6 +259,12 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mkScrollspy', desc: 'Track which section heading is active while scrolling.', path: '/components/utilities' },
       { name: '*mkCan / *mkCannot / mkCanDisable', desc: 'Permission-gated UI structural directives.', path: '/components/utilities' },
       { name: 'MkPermissionPolicy', desc: 'Provide the can(permission) policy the directives consult.', path: '/components/utilities' },
+      { name: 'mkCurrency', desc: 'Intl money formatting in the i18n locale, with a default currency.', path: '/components/utilities' },
+      { name: 'mkRelativeTime', desc: '"3 minutes ago" / "in 2 days" via Intl.RelativeTimeFormat.', path: '/components/utilities' },
+      { name: 'mkFileSize', desc: 'Bytes → "1.2 MB" (decimal) or "1.2 MiB" (binary).', path: '/components/utilities' },
+      { name: 'mkInitials', desc: '"Ada Lovelace" → "AL", the avatar rule as a pipe.', path: '/components/utilities' },
+      { name: 'mkTruncate', desc: 'Shorten text with an ellipsis, optionally at a word boundary.', path: '/components/utilities' },
+      { name: 'mkPluralize', desc: 'Locale-aware plural word for a count via Intl.PluralRules.', path: '/components/utilities' },
     ],
   },
 ];

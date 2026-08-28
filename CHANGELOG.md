@@ -4,6 +4,27 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Formatting pipes** (`@mk-kit/ui/directives`) — six pure, standalone,
+  `Intl`-based pipes that need no Angular locale data: `mkCurrency`
+  (`Intl.NumberFormat`, default currency + compact / sign / display options),
+  `mkRelativeTime` ("3 minutes ago" / "in 2 days" / "yesterday" via
+  `Intl.RelativeTimeFormat`, optional `now` argument for ticking signals and
+  deterministic tests, `maxUnit` cap), `mkFileSize` ("1.2 MB" decimal or
+  "1.2 MiB" binary), `mkInitials` ("Ada Lovelace" → "AL", `max` letters),
+  `mkTruncate` (length, custom ellipsis, word-boundary mode, grapheme-aware)
+  and `mkPluralize` (`Intl.PluralRules`, English shorthand or a CLDR forms
+  map). `null` / `undefined` render as `''`.
+- **`provideMkI18n({ locale, currency })`** — new optional `locale` (BCP 47)
+  and `currency` (ISO 4217) fields on `MkI18nStrings`; the pipes read them
+  and fall back to the runtime locale / `'USD'`. Every pipe also takes a
+  per-call `locale` override.
+- Docs: "Pipes" section on the Utilities page; StackBlitz export now detects
+  pipes used in snippets (`{{ x | mkCurrency }}`).
+
 ## [0.41.0] — 2026-08-27
 
 ### Added

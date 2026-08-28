@@ -425,7 +425,7 @@ export class App {
           label: 'Utilities',
           path: '/components/utilities',
           keywords:
-            'autofocus click-outside copy-to-clipboard hotkey infinite-scroll intersect mask ripple scrollspy permissions can directive',
+            'autofocus click-outside copy-to-clipboard hotkey infinite-scroll intersect mask ripple scrollspy permissions can directive pipes pipe currency relative-time time-ago file-size bytes initials truncate ellipsis pluralize plural intl locale format',
         },
         {
           label: 'Drag & drop',
