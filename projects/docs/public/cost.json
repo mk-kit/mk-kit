@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.41.0",
+ "version": "0.42.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,9 +9,9 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3504008,
-  "min": 1544003,
-  "brotli": 271050,
+  "raw": 3504416,
+  "min": 1544006,
+  "brotli": 271092,
   "budgetKiB": 3440
  },
  "entries": [
@@ -2884,75 +2884,75 @@
    "name": "table",
    "import": "@mk-kit/ui/table",
    "file": "mk-kit-ui-table.mjs",
-   "raw": 137172,
-   "min": 59178,
-   "brotli": 12277,
+   "raw": 137580,
+   "min": 59181,
+   "brotli": 12319,
    "budgetKiB": 135,
    "items": [
+    {
+     "name": "MkTable",
+     "kind": "component",
+     "selector": "mk-table",
+     "docs": "/components/table",
+     "own": 10348,
+     "size": 16499
+    },
     {
      "name": "MkSortHeader",
      "kind": "component",
      "selector": "[mkSortHeader]",
      "docs": "/components/sort",
-     "own": 11274,
-     "size": 17342
+     "own": 1750,
+     "size": 6615
     },
     {
      "name": "MkTableDataSource",
      "kind": "class",
      "docs": "/components/table#data-source",
-     "own": 11265,
-     "size": 17543
+     "own": 1277,
+     "size": 1636
     },
     {
      "name": "MkSort",
      "kind": "directive",
      "selector": "[mkSort]",
      "docs": "/components/sort",
-     "own": 10707,
-     "size": 16899
+     "own": 869,
+     "size": 5725
     },
     {
      "name": "mkExportCsv",
      "kind": "function",
-     "own": 10390,
-     "size": 16553
+     "own": 859,
+     "size": 1116
     },
     {
      "name": "mkToCsv",
      "kind": "function",
-     "own": 10362,
-     "size": 16521
+     "own": 653,
+     "size": 913
+    },
+    {
+     "name": "mkDownloadText",
+     "kind": "function",
+     "own": 396,
+     "size": 650
     },
     {
      "name": "MkTableCell",
      "kind": "directive",
      "selector": "[mkTableCell]",
      "docs": "/components/table",
-     "own": 10351,
-     "size": 16516
+     "own": 356,
+     "size": 618
     },
     {
      "name": "MkTableRowDetail",
      "kind": "directive",
      "selector": "[mkTableRowDetail]",
      "docs": "/components/table",
-     "own": 10348,
-     "size": 16494
-    },
-    {
-     "name": "MkTable",
-     "kind": "component",
-     "selector": "mk-table",
-     "docs": "/components/table",
-     "own": 10338,
-     "size": 16501
-    },
-    {
-     "name": "mkDownloadText",
-     "kind": "function",
-     "own": 10328,
-     "size": 16515
+     "own": 334,
+     "size": 592
     }
    ]
   },

@@ -4,6 +4,17 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Fixed
+
+- **table:** every export of `@mk-kit/ui/table` cost ~10 KiB (brotli) even when
+  only `mkToCsv` or `MkSortHeader` was imported — `MkTable`'s
+  `static sortCollator = new Intl.Collator()` kept Angular's build optimizer
+  from marking the class as side-effect-free, so the whole entry was retained.
+  The collator is now created lazily; `MkSortHeader` drops from 11.3 to 1.8 KiB
+  and `MkTableDataSource` from 11.3 to 1.3 KiB when used without `mk-table`.
+
 ## [0.42.0] — 2026-08-28
 
 ### Added
@@ -1990,6 +2001,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.42.0...HEAD
 [0.42.0]: https://github.com/mk-kit/mk-kit/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...v0.41.0
 [0.40.0]: https://github.com/mk-kit/mk-kit/compare/v0.39.0...v0.40.0
