@@ -28,6 +28,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '@mk-kit/ui/forms';
 import {
   endOfMonth,
@@ -92,6 +93,8 @@ interface Cell {
 export class MkMonthPicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly triggerRef =
@@ -105,9 +108,15 @@ export class MkMonthPicker implements ControlValueAccessor, Validator {
   /** Pick a month or a whole year. */
   readonly mode = input<MkMonthPickerMode>('month');
   /** Earliest selectable date. */
-  readonly min = input<Date | null>(null);
+  readonly min = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Latest selectable date. */
-  readonly max = input<Date | null>(null);
+  readonly max = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Placeholder shown when empty. */
   readonly placeholder = input<string>('');
   /** Display pattern (defaults to `MMM yyyy` / `yyyy`). */
@@ -139,7 +148,7 @@ export class MkMonthPicker implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);

@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MK_I18N, type MkBlockEditorStrings } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import {
   MK_BLOCK_DOCUMENT_VERSION,
   type MkBlock,
@@ -122,7 +123,9 @@ export class MkBlockEditor implements ControlValueAccessor {
   protected readonly cvaDisabled = signal(false);
 
   /** Invalid visual, forced by the `invalid` input. */
-  protected readonly isInvalid = computed(() => this.invalid());
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
+  protected readonly isInvalid = computed(() => this.invalid() && this.fieldTouched());
 
   private onChange: (value: MkBlockDocument | string) => void = () => {};
   private onTouched: () => void = () => {};

@@ -72,6 +72,16 @@ interface OrderLine {
         <code class="docs-inline">&lt;label&gt;</code>, hint, error and required
         wiring — done automatically via dependency injection.
       </p>
+      <p>
+        Using Angular 22's <strong>Signal Forms</strong>? The same controls bind
+        with the <code class="docs-inline">[formField]</code> directive, and
+        <code class="docs-inline">&lt;mk-form-field&gt;</code> /
+        <code class="docs-inline">&lt;mk-form-error-summary&gt;</code> read the
+        field's <code class="docs-inline">touched()</code> /
+        <code class="docs-inline">errors()</code> / <code class="docs-inline">required()</code>
+        state instead of an <code class="docs-inline">NgControl</code> — see
+        <a routerLink="/components/signal-forms">Signal Forms</a>.
+      </p>
 
       <!-- ============================================================ -->
       <!-- FORM FIELD -->

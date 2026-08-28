@@ -21,6 +21,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { mkHighlight, type MkCodeLanguage } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 
 export type { MkCodeLanguage } from '@mk-kit/ui/core';
 
@@ -159,9 +160,11 @@ export class MkCodeEditor implements ControlValueAccessor, OnDestroy {
     }
   });
 
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly isInvalid = computed(
     () =>
-      this.invalid() || (this.field?.hasError() ?? false) || !!this.jsonError(),
+      (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false) || !!this.jsonError(),
   );
 
   /** `aria-describedby` merging the field's ids with the JSON error id. */

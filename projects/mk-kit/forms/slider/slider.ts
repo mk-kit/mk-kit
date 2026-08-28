@@ -23,6 +23,7 @@ import {
 } from '@angular/forms';
 import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /**
@@ -65,6 +66,8 @@ import { MkFormField } from '../form-field/form-field';
 })
 export class MkSlider implements ControlValueAccessor, Validator, OnDestroy {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly trackRef = viewChild<ElementRef<HTMLElement>>('track');
   private readonly thumbRef = viewChild<ElementRef<HTMLElement>>('thumb');
 
@@ -78,6 +81,8 @@ export class MkSlider implements ControlValueAccessor, Validator, OnDestroy {
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Force the invalid visual + `aria-invalid` when used standalone. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema. */
+  readonly required = input(false, { transform: booleanAttribute });
   /** Control size (track/thumb thickness). */
   readonly size = input<MkSize>('md');
   /** Semantic color tone for the filled track + thumb. */
@@ -101,9 +106,11 @@ export class MkSlider implements ControlValueAccessor, Validator, OnDestroy {
   protected readonly isDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() || (this.field?.isRequired() ?? false),
+  );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => {
     if (this.ariaLabel()) return null;

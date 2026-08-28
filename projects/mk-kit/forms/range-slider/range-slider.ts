@@ -25,6 +25,7 @@ import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MK_I18N } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 
 /** A `[low, high]` value pair. */
 export type MkRange = [number, number];
@@ -69,6 +70,8 @@ export type MkRange = [number, number];
 export class MkRangeSlider implements ControlValueAccessor, Validator, OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly trackRef = viewChildren<ElementRef<HTMLElement>>('track');
   private readonly thumbRefs = viewChildren<ElementRef<HTMLElement>>('thumb');
@@ -112,7 +115,7 @@ export class MkRangeSlider implements ControlValueAccessor, Validator, OnDestroy
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
 

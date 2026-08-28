@@ -28,6 +28,7 @@ import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkChip } from '@mk-kit/ui/chip';
 
@@ -71,6 +72,8 @@ import { MkChip } from '@mk-kit/ui/chip';
 })
 export class MkTagInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly announcer = inject(MkLiveAnnouncer);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
@@ -94,6 +97,8 @@ export class MkTagInput implements ControlValueAccessor, Validator {
   readonly separators = input<readonly string[]>([',']);
   /** Force invalid styling + `aria-invalid` when used standalone. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema. */
+  readonly required = input(false, { transform: booleanAttribute });
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
@@ -118,9 +123,11 @@ export class MkTagInput implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() || (this.field?.isRequired() ?? false),
+  );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,

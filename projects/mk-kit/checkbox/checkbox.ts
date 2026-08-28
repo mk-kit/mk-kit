@@ -21,6 +21,7 @@ import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { MkFieldContext } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 
 /**
  * Checkbox — a themed checkbox built on a visually-hidden native
@@ -68,6 +69,8 @@ import { mkValidatorChange } from '@mk-kit/ui/core';
 })
 export class MkCheckbox implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFieldContext, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
 
   /** Two-way checked state. */
   readonly checked = model(false);
@@ -99,7 +102,7 @@ export class MkCheckbox implements ControlValueAccessor, Validator {
     () => this.required() || (this.field?.isRequired() ?? false),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,

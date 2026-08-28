@@ -225,6 +225,12 @@ export const routes: Routes = [
       import('./pages/forms/forms-page').then((m) => m.FormsPage),
   },
   {
+    path: 'components/signal-forms',
+    title: 'Signal Forms — mk-kit',
+    loadComponent: () =>
+      import('./pages/signal-forms/signal-forms-page').then((m) => m.SignalFormsPage),
+  },
+  {
     path: 'components/selection',
     title: 'Selection — mk-kit',
     loadComponent: () =>

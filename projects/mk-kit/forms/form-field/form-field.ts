@@ -14,17 +14,20 @@ import {
   signal,
 } from '@angular/core';
 import {
+  type AbstractControl,
   FormGroupDirective,
   NgControl,
   NgForm,
   Validators,
 } from '@angular/forms';
+import { FORM_FIELD, type Field, type FieldState } from '@angular/forms/signals';
 import type { Subscription } from 'rxjs';
 import type { MkErrorMessages, MkSize } from '@mk-kit/ui/core';
 import {
   MK_I18N,
   MkFieldContext,
   mkFirstErrorMessage,
+  mkSignalErrorMessage,
   mkUniqueId,
 } from '@mk-kit/ui/core';
 
@@ -47,6 +50,29 @@ import {
  * `errorMessages`. As with `mat-error`, an error only appears once the control
  * is touched or dirty, or its form has been submitted; `errorOn` changes that.
  * `required` and the disabled styling are derived from the control too.
+ *
+ * ## Signal Forms
+ *
+ * The same applies to a control bound with Signal Forms' `[formField]`
+ * directive (`@angular/forms/signals`): the field adopts the projected
+ * `FormField` binding and reads `touched()` / `dirty()` / `invalid()` /
+ * `errors()` / `required()` / `disabled()` from its `FieldState`. Errors
+ * written by the schema (`required(p.email)`, `minLength(p.name, 2)`, …) are
+ * rendered through the same `validation` i18n table, a `message` supplied to
+ * the schema rule wins over the table, and `errorMessages` / `errorOn` work
+ * unchanged. Calling `submit()` marks every field touched, so errors surface
+ * on a failed submit exactly as with `formControlName`. When the control is
+ * not projected (or lives deeper), point the field at it with `[field]`.
+ *
+ * ```html
+ * <mk-form-field label="Email">
+ *   <input mkInput type="email" [formField]="f.email" />
+ * </mk-form-field>
+ *
+ * <mk-form-field label="Country" [field]="f.country">
+ *   <mk-select [formField]="f.country" [options]="countries" />
+ * </mk-form-field>
+ * ```
  *
  * ```html
  * <!-- automatic: message + required marker come from the validators -->
@@ -140,11 +166,31 @@ export class MkFormField implements MkFieldContext {
    * `formControl`; the placeholder stays hidden until the label has moved.
    */
   readonly labelPosition = input<'top' | 'float'>('top');
+  /**
+   * Signal Forms field to read state from explicitly (`[field]="f.email"`).
+   * Not needed when the projected control carries the `[formField]` binding —
+   * the wrapper finds that itself; set it when the control is nested deeper
+   * or when the wrapper should follow a field it does not contain.
+   */
+  readonly field = input<Field<unknown> | null>(null);
 
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
 
   /** The projected control's form binding, when it has one. */
   private readonly ngControl = contentChild(NgControl, { descendants: true });
+  /** The projected control's Signal Forms `[formField]` binding, when it has one. */
+  private readonly signalField = contentChild(FORM_FIELD, { descendants: true });
+
+  /**
+   * The Signal Forms field state driving this wrapper — the explicit `field`
+   * input first, else the projected `[formField]` binding. `undefined` for a
+   * reactive-forms / template-driven control.
+   */
+  private readonly fieldState = computed<FieldState<unknown> | undefined>(() => {
+    const explicit = this.field();
+    if (explicit) return explicit();
+    return this.signalField()?.state();
+  });
 
   /** A control inside the field has focus. */
   protected readonly focused = signal(false);
@@ -153,8 +199,9 @@ export class MkFormField implements MkFieldContext {
   /** The field holds a non-empty value (drives the floating label). */
   protected readonly hasValue = computed(() => {
     this.controlTick();
-    const control = this.ngControl();
-    const v = control ? control.value : this.domValue();
+    const state = this.fieldState();
+    const control = state ? null : this.ngControl();
+    const v = state ? state.value() : control ? control.value : this.domValue();
     if (v == null || v === '') return false;
     if (Array.isArray(v)) return v.length > 0;
     return true;
@@ -198,9 +245,13 @@ export class MkFormField implements MkFieldContext {
     const submitSub = submit?.subscribe(bump) ?? null;
 
     effect(() => {
-      const control = this.ngControl()?.control;
+      // A `[formField]` binding provides an interop `NgControl` without an
+      // `events` stream; its state is read reactively via `fieldState` instead.
+      const control = this.signalField()
+        ? null
+        : (this.ngControl()?.control as Partial<AbstractControl> | null | undefined);
       sub?.unsubscribe();
-      sub = control ? control.events.subscribe(bump) : null;
+      sub = control?.events ? control.events.subscribe(bump) : null;
     });
 
     inject(DestroyRef).onDestroy(() => {
@@ -219,8 +270,23 @@ export class MkFormField implements MkFieldContext {
 
   /** The automatic message for the bound control, when one should show. */
   private readonly autoError = computed<string | null>(() => {
+    const state = this.fieldState();
+    if (state) {
+      if (state.disabled() || state.hidden() || !state.invalid()) return null;
+      const gate = this.errorOn();
+      const visible =
+        gate === 'always' ||
+        (gate === 'dirty' ? state.dirty() : state.touched() || state.dirty());
+      if (!visible) return null;
+      return mkSignalErrorMessage(
+        state.errors(),
+        this.i18n.validation,
+        this.errorMessages() ?? undefined,
+      );
+    }
+
     this.controlTick();
-    const control = this.ngControl()?.control;
+    const control = this.signalField() ? null : this.ngControl()?.control;
     if (!control || control.disabled || !control.invalid) return null;
 
     const gate = this.errorOn();
@@ -248,6 +314,8 @@ export class MkFormField implements MkFieldContext {
   /** Required either explicitly or through the bound control's validators. */
   readonly isRequired = computed(() => {
     if (this.required()) return true;
+    const state = this.fieldState();
+    if (state) return state.required();
     this.controlTick();
     return this.ngControl()?.control?.hasValidator(Validators.required) ?? false;
   });
@@ -255,6 +323,8 @@ export class MkFormField implements MkFieldContext {
   /** Disabled either explicitly or through the bound control. */
   readonly isDisabled = computed(() => {
     if (this.disabled()) return true;
+    const state = this.fieldState();
+    if (state) return state.disabled();
     this.controlTick();
     return this.ngControl()?.control?.disabled ?? false;
   });

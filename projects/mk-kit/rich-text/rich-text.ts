@@ -11,6 +11,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 import { MK_I18N, MkFieldContext } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkRichTextEngine } from './rich-text-engine';
 import { sanitizeInlineHtml } from './sanitize';
 
@@ -53,6 +54,8 @@ import { sanitizeInlineHtml } from './sanitize';
 })
 export class MkRichText implements ControlValueAccessor {
   private readonly field = inject(MkFieldContext, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly i18n = inject(MK_I18N);
 
   /** Two-way HTML string value (sanitised; `''` when visually empty). */
@@ -74,7 +77,7 @@ export class MkRichText implements ControlValueAccessor {
 
   protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = this.field?.labelId ?? null;
   protected readonly describedBy = computed(() => this.field?.describedBy() ?? null);

@@ -16,6 +16,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 import { MK_I18N, mkUniqueId, type MkSize } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /** One row of an `mk-listbox`. */
@@ -73,6 +74,8 @@ type Row = { kind: 'group'; label: string; id: string } | { kind: 'option'; opti
 })
 export class MkListbox implements ControlValueAccessor, OnDestroy {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly listRef = viewChild.required<ElementRef<HTMLElement>>('list');
 
@@ -117,7 +120,7 @@ export class MkListbox implements ControlValueAccessor, OnDestroy {
 
   protected readonly effectiveSize = computed<MkSize>(() => (this.field ? this.field.size() : this.size()));
   protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
-  protected readonly isInvalid = computed(() => this.invalid() || (this.field?.hasError() ?? false));
+  protected readonly isInvalid = computed(() => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false));
   protected readonly labelledBy = computed(() => this.ariaLabelledby() ?? this.field?.labelId ?? null);
   protected readonly describedBy = computed(() => this.field?.describedBy() ?? null);
 

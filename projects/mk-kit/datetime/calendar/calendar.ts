@@ -29,6 +29,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkLiveAnnouncer } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import {
   addDays,
   addMonths,
@@ -110,9 +111,15 @@ export class MkCalendar implements ControlValueAccessor, Validator {
   /** Two-way selected date (single-date mode). */
   readonly value = model<Date | null>(null);
   /** Earliest selectable date (inclusive, day granularity). */
-  readonly min = input<Date | null>(null);
+  readonly min = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Latest selectable date (inclusive, day granularity). */
-  readonly max = input<Date | null>(null);
+  readonly max = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** First column of the week: 0 = Sunday … 6 = Saturday. */
   readonly firstDayOfWeek = input(0, { transform: numberAttribute });
   /** Disable the whole calendar. */
@@ -166,7 +173,9 @@ export class MkCalendar implements ControlValueAccessor, Validator {
   protected readonly isControlDisabled = computed(
     () => this.disabled() || this.cvaDisabled(),
   );
-  protected readonly isInvalid = computed(() => this.invalid());
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
+  protected readonly isInvalid = computed(() => this.invalid() && this.fieldTouched());
 
   /** First day of the visible month. */
   protected readonly viewMonth = computed(() =>

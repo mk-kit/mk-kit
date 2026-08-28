@@ -20,6 +20,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkButton } from '@mk-kit/ui/button';
 import { MkFormField } from '../form-field/form-field';
 
@@ -85,6 +86,8 @@ type MkTransferSide = 'available' | 'selected';
 export class MkTransferList implements ControlValueAccessor {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly announcer = inject(MkLiveAnnouncer);
   private readonly injector = inject(Injector);
@@ -145,7 +148,7 @@ export class MkTransferList implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
 
   /** Items keyed by value, for resolving the selected order. */

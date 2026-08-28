@@ -170,6 +170,12 @@ export class App {
             'form-field input select number-input file-upload repeater code-editor form-error-summary validation errors submit-input',
         },
         {
+          label: 'Signal Forms',
+          path: '/components/signal-forms',
+          keywords:
+            'signal forms formField form() schema required FieldTree FormValueControl errors touched submit angular 22 signals',
+        },
+        {
           label: 'Dynamic form',
           path: '/components/dynamic-form',
           keywords: 'dynamic form schema json renderer formly generated fields conditions validators',

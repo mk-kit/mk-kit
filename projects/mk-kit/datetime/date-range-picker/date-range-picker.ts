@@ -27,6 +27,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '@mk-kit/ui/forms';
 import { MkCalendar } from '../calendar/calendar';
 import { formatDate, isAfter, isBefore, startOfDay } from '../datetime/date-utils';
@@ -80,6 +81,8 @@ export interface MkDateRange {
 export class MkDateRangePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly triggerRef =
@@ -90,9 +93,15 @@ export class MkDateRangePicker implements ControlValueAccessor, Validator {
   /** Two-way selected range. */
   readonly value = model<MkDateRange>({ start: null, end: null });
   /** Earliest selectable date (inclusive). */
-  readonly min = input<Date | null>(null);
+  readonly min = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Latest selectable date (inclusive). */
-  readonly max = input<Date | null>(null);
+  readonly max = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Predicate marking individual days as disabled. */
   readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Placeholder shown when no range is selected. */
@@ -129,7 +138,7 @@ export class MkDateRangePicker implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);

@@ -13,6 +13,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize, MkTone } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkButtonToggle } from './button-toggle';
 
@@ -69,6 +70,8 @@ export class MkButtonToggleGroup implements ControlValueAccessor {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   /** Optional surrounding form field — supplies label/hint/error wiring. */
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
 
   /** Live list of projected toggle items, in DOM order. */
   readonly toggles = contentChildren(MkButtonToggle);
@@ -110,7 +113,7 @@ export class MkButtonToggleGroup implements ControlValueAccessor {
 
   readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
 
   /** The single item that currently owns the tab stop (roving tabindex). */

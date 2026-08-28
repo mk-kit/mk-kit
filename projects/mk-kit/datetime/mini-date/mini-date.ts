@@ -24,6 +24,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '@mk-kit/ui/forms';
 import { clampDate, isAfter, isBefore, isSameDay, startOfDay } from '../datetime/date-utils';
 
@@ -102,14 +103,22 @@ function daysInMonth(m: number, year: number): number {
 })
 export class MkMiniDate implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly segEls =
     viewChildren<ElementRef<HTMLElement>>('seg');
 
   /** Minimum selectable date (inclusive). */
-  readonly min = input<Date | null>(null);
+  readonly min = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Maximum selectable date (inclusive). */
-  readonly max = input<Date | null>(null);
+  readonly max = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Two-way value — a real `Date`, or `null` while incomplete. */
   readonly value = model<Date | null>(null);
   /** Disable the control. */
@@ -146,7 +155,7 @@ export class MkMiniDate implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);

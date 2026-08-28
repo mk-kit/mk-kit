@@ -437,6 +437,15 @@
      ]
     },
     {
+     "name": "mkInjectFieldTouched",
+     "description": "Touched-gate for a control's `invalid` input under Signal Forms.\n\nWhen a control is bound with the `[formField]` directive, Angular writes the\nfield's `invalid()` state straight into the control's `invalid` input — from\nthe first render, before the user has reached the field. mk-kit controls\npass that input through this gate so the invalid visual (and `aria-invalid`)\nonly shows once the field is touched or dirty, matching how `mk-form-field`\nreveals its message and how `submit()` (which marks every field touched)\nsurfaces the remaining problems.\n\nReturns a signal that is always `true` for a control that is not bound with\n`[formField]`, so a standalone `[invalid]=\"true\"` keeps working as before.\nCall it in a field initializer (an injection context):\n\n```ts\nprivate readonly fieldTouched = mkInjectFieldTouched();\nprotected readonly isInvalid = computed(\n  () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),\n);\n```\n\nThe binding is looked up lazily, on first read: the `FormField` directive\nitself injects the element's `NG_VALUE_ACCESSOR` (the control) while it is\ncreated, so resolving it from the control's constructor would be circular.",
+     "file": "projects/mk-kit/core/forms/signal-field.ts",
+     "kind": "function",
+     "signatures": [
+      "(): Signal<boolean>"
+     ]
+    },
+    {
      "name": "mkIsQueryGroup",
      "description": "True for a group node (as opposed to a rule).",
      "file": "projects/mk-kit/core/query/query.ts",
@@ -533,6 +542,24 @@
      "kind": "function",
      "signatures": [
       "(group: MkQueryGroup, fields?: readonly MkQueryField[], i18n?: MkI18nStrings): string"
+     ]
+    },
+    {
+     "name": "mkSignalErrorMessage",
+     "description": "Resolves the message for the first Signal Forms error on a field, the way\n`mkFirstErrorMessage` does for reactive forms.\n\nLookup order: the field's `overrides` for that kind, then the `message` the\nschema attached to the error (`required(p.email, { message: '…' })`), then\nthe i18n `validation` table, then the generic fallback.",
+     "file": "projects/mk-kit/core/forms/signal-forms.ts",
+     "kind": "function",
+     "signatures": [
+      "(errors: readonly MkSignalValidationError[] | null | undefined, strings: MkValidationStrings, overrides?: MkErrorMessages): string | null"
+     ]
+    },
+    {
+     "name": "mkSignalErrorsToValidationErrors",
+     "description": "Converts Signal Forms errors to the reactive-forms `ValidationErrors` shape\nthe `validation` i18n table is keyed by, so both form systems render the\nsame messages. The built-in kinds map to Angular's classic keys and payloads\n(`minLength` → `minlength: { requiredLength }`, `minDate` → `mkMinDate`,\n…); any other kind is kept as-is with its payload spread into the value.",
+     "file": "projects/mk-kit/core/forms/signal-forms.ts",
+     "kind": "function",
+     "signatures": [
+      "(errors: readonly MkSignalValidationError[] | null | undefined): ValidationErrors | null"
      ]
     },
     {
@@ -2868,6 +2895,27 @@
        "type": "unknown",
        "description": "",
        "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkSignalValidationError",
+     "description": "The shape of a Signal Forms validation error as `mk-kit` reads it — the\n`{ kind, message? }` contract of `ValidationError` from\n`@angular/forms/signals`, plus whatever payload the error class carries\n(`min`, `maxLength`, `pattern`, …). Declared structurally so `@mk-kit/ui/core`\nstays free of a runtime dependency on the signals entry point.",
+     "file": "projects/mk-kit/core/forms/signal-forms.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "kind",
+       "type": "string",
+       "description": "Identifies the kind of error (`'required'`, `'minLength'`, …).",
+       "readonly": true
+      },
+      {
+       "name": "message",
+       "type": "string | undefined",
+       "description": "Human-readable message, when the schema supplied one.",
+       "optional": true,
+       "readonly": true
       }
      ]
     },
@@ -6758,6 +6806,12 @@
        "default": "false"
       },
       {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
+       "default": "false"
+      },
+      {
        "name": "disabled",
        "type": "boolean",
        "description": "Disable the control.",
@@ -7468,13 +7522,15 @@
        "name": "min",
        "type": "number | null",
        "description": "Clamp the value to at least this on blur.",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "number | null",
        "description": "Clamp the value to at most this on blur.",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "allowNegative",
@@ -7665,7 +7721,7 @@
     },
     {
      "name": "MkFormErrorSummary",
-     "description": "FormErrorSummary — an accessible summary of a form's validation errors,\nshown at the top of the form on a failed submit. Each entry links to its\nfield and focuses it on click. Following the WAI/GOV.UK pattern it is an\n`alert` region and, when the surrounding form is submitted with errors,\nfocus moves here automatically (opt out with `[autoFocus]=\"false\"`) so\nscreen-reader and keyboard users are taken straight to the problems. The\npublic `focus()` remains for manual flows (e.g. server-side errors).\n\n## Automatic collection\n\nPoint `form` at a `FormGroup` and the summary walks it itself: one entry per\ninvalid control, worded from the `validation` i18n table (override per key\nwith `errorMessages`). Pass `labels` to name the fields — without an entry\nthe control's path is used. Entries appear once the form is submitted;\n`showOn=\"always\"` lists them as soon as they exist.\n\nEach entry is linked to its field by locating the control in the DOM, so\n`formControlName` must be a static attribute (`formControlName=\"email\"`,\nthe usual form) rather than a binding.\n\n```html\n<!-- automatic -->\n<form [formGroup]=\"form\" (ngSubmit)=\"submit()\">\n  <mk-form-error-summary #summary [form]=\"form\"\n    [labels]=\"{ email: 'Email address', age: 'Age' }\" />\n  …\n</form>\n\n<!-- manual -->\n<mk-form-error-summary #summary [errors]=\"errors()\" />\n…\nonSubmit() { if (invalid) { this.errors.set(collect()); this.summary.focus(); } }\n```",
+     "description": "FormErrorSummary — an accessible summary of a form's validation errors,\nshown at the top of the form on a failed submit. Each entry links to its\nfield and focuses it on click. Following the WAI/GOV.UK pattern it is an\n`alert` region and, when the surrounding form is submitted with errors,\nfocus moves here automatically (opt out with `[autoFocus]=\"false\"`) so\nscreen-reader and keyboard users are taken straight to the problems. The\npublic `focus()` remains for manual flows (e.g. server-side errors).\n\n## Automatic collection\n\nPoint `form` at a `FormGroup` and the summary walks it itself: one entry per\ninvalid control, worded from the `validation` i18n table (override per key\nwith `errorMessages`). Pass `labels` to name the fields — without an entry\nthe control's path is used. Entries appear once the form is submitted;\n`showOn=\"always\"` lists them as soon as they exist.\n\nEach entry is linked to its field by locating the control in the DOM, so\n`formControlName` must be a static attribute (`formControlName=\"email\"`,\nthe usual form) rather than a binding.\n\n## Signal Forms\n\nPoint `field` at a Signal Forms root (`[field]=\"f\"`) instead of `form` and\nthe summary reads `errorSummary()` from the `FieldTree`: one entry per\ninvalid field, keyed by dotted path in `labels` / `errorMessages` like the\nreactive path. With the default `showOn=\"submit\"` an entry appears once its\nfield is touched — `submit()` marks every field touched, so a failed submit\nlists them all. Clicking an entry focuses the control bound with\n`[formField]`. When the summary sits inside the `<form>`, focus also moves\nto it after the form's `submit` event, as with `ngSubmit`.\n\n```html\n<form (submit)=\"save($event)\">\n  <mk-form-error-summary [field]=\"f\" [labels]=\"{ email: 'Email address' }\" />\n  …\n</form>\n```\n\n```html\n<!-- automatic -->\n<form [formGroup]=\"form\" (ngSubmit)=\"submit()\">\n  <mk-form-error-summary #summary [form]=\"form\"\n    [labels]=\"{ email: 'Email address', age: 'Age' }\" />\n  …\n</form>\n\n<!-- manual -->\n<mk-form-error-summary #summary [errors]=\"errors()\" />\n…\nonSubmit() { if (invalid) { this.errors.set(collect()); this.summary.focus(); } }\n```",
      "file": "projects/mk-kit/forms/form-error-summary/form-error-summary.ts",
      "kind": "component",
      "selector": "mk-form-error-summary",
@@ -7684,6 +7740,12 @@
        "name": "form",
        "type": "AbstractControl<any, any, any> | null",
        "description": "Collect errors from this control tree instead of passing them in.",
+       "default": "null"
+      },
+      {
+       "name": "field",
+       "type": "Field<unknown> | null",
+       "description": "Collect errors from this Signal Forms field (usually the root returned by\n`form()`) instead of `form`. Entries are keyed by dotted path for `labels`.",
        "default": "null"
       },
       {
@@ -7731,7 +7793,7 @@
     },
     {
      "name": "MkFormField",
-     "description": "FormField — an accessible wrapper that provides a real `<label>`, optional\nhint text, error text and a required indicator for any nested control\n(`input[mkInput]`, `mk-select`, `mk-checkbox`, …).\n\nIt generates stable ids (via `mkUniqueId`) and exposes them so nested\ncontrols can wire `aria-labelledby` / `aria-describedby` / `aria-invalid`\nautomatically by injecting this component. While an error shows, the hint is\nhidden and the error is announced through a `role=\"alert\"` region.\n\n## Automatic errors\n\nWhen the projected control is bound to a form (`formControlName`,\n`[formControl]` or `[(ngModel)]`) the field adopts its `NgControl` and shows\nthe first validation error by itself — no `[error]` binding needed. Messages\ncome from the `validation` i18n table and can be reworded per field with\n`errorMessages`. As with `mat-error`, an error only appears once the control\nis touched or dirty, or its form has been submitted; `errorOn` changes that.\n`required` and the disabled styling are derived from the control too.\n\n```html\n<!-- automatic: message + required marker come from the validators -->\n<mk-form-field label=\"Email\">\n  <input mkInput type=\"email\" formControlName=\"email\" />\n</mk-form-field>\n\n<!-- per-field wording -->\n<mk-form-field label=\"Age\" [errorMessages]=\"{ min: 'You must be 18 or over' }\">\n  <mk-number-input formControlName=\"age\" [min]=\"18\" />\n</mk-form-field>\n\n<!-- fully manual: an explicit [error] always wins -->\n<mk-form-field label=\"Email\" hint=\"We never share it.\" required\n  [error]=\"emailError()\">\n  <input mkInput type=\"email\" [(ngModel)]=\"email\" />\n</mk-form-field>\n```",
+     "description": "FormField — an accessible wrapper that provides a real `<label>`, optional\nhint text, error text and a required indicator for any nested control\n(`input[mkInput]`, `mk-select`, `mk-checkbox`, …).\n\nIt generates stable ids (via `mkUniqueId`) and exposes them so nested\ncontrols can wire `aria-labelledby` / `aria-describedby` / `aria-invalid`\nautomatically by injecting this component. While an error shows, the hint is\nhidden and the error is announced through a `role=\"alert\"` region.\n\n## Automatic errors\n\nWhen the projected control is bound to a form (`formControlName`,\n`[formControl]` or `[(ngModel)]`) the field adopts its `NgControl` and shows\nthe first validation error by itself — no `[error]` binding needed. Messages\ncome from the `validation` i18n table and can be reworded per field with\n`errorMessages`. As with `mat-error`, an error only appears once the control\nis touched or dirty, or its form has been submitted; `errorOn` changes that.\n`required` and the disabled styling are derived from the control too.\n\n## Signal Forms\n\nThe same applies to a control bound with Signal Forms' `[formField]`\ndirective (`@angular/forms/signals`): the field adopts the projected\n`FormField` binding and reads `touched()` / `dirty()` / `invalid()` /\n`errors()` / `required()` / `disabled()` from its `FieldState`. Errors\nwritten by the schema (`required(p.email)`, `minLength(p.name, 2)`, …) are\nrendered through the same `validation` i18n table, a `message` supplied to\nthe schema rule wins over the table, and `errorMessages` / `errorOn` work\nunchanged. Calling `submit()` marks every field touched, so errors surface\non a failed submit exactly as with `formControlName`. When the control is\nnot projected (or lives deeper), point the field at it with `[field]`.\n\n```html\n<mk-form-field label=\"Email\">\n  <input mkInput type=\"email\" [formField]=\"f.email\" />\n</mk-form-field>\n\n<mk-form-field label=\"Country\" [field]=\"f.country\">\n  <mk-select [formField]=\"f.country\" [options]=\"countries\" />\n</mk-form-field>\n```\n\n```html\n<!-- automatic: message + required marker come from the validators -->\n<mk-form-field label=\"Email\">\n  <input mkInput type=\"email\" formControlName=\"email\" />\n</mk-form-field>\n\n<!-- per-field wording -->\n<mk-form-field label=\"Age\" [errorMessages]=\"{ min: 'You must be 18 or over' }\">\n  <mk-number-input formControlName=\"age\" [min]=\"18\" />\n</mk-form-field>\n\n<!-- fully manual: an explicit [error] always wins -->\n<mk-form-field label=\"Email\" hint=\"We never share it.\" required\n  [error]=\"emailError()\">\n  <input mkInput type=\"email\" [(ngModel)]=\"email\" />\n</mk-form-field>\n```",
      "file": "projects/mk-kit/forms/form-field/form-field.ts",
      "kind": "component",
      "selector": "mk-form-field",
@@ -7792,6 +7854,12 @@
        "type": "\"top\" | \"float\"",
        "description": "Where the label sits: above the control (default), or `float` — inside\nthe control, sliding up once it is focused or has a value. Floating works\nwith `mkInput` / textarea and any control bound with `ngModel` or a\n`formControl`; the placeholder stays hidden until the label has moved.",
        "default": "'top'"
+      },
+      {
+       "name": "field",
+       "type": "Field<unknown> | null",
+       "description": "Signal Forms field to read state from explicitly (`[field]=\"f.email\"`).\nNot needed when the projected control carries the `[formField]` binding —\nthe wrapper finds that itself; set it when the control is nested deeper\nor when the wrapper should follow a field it does not contain.",
+       "default": "null"
       }
      ],
      "outputs": [],
@@ -8261,6 +8329,12 @@
        "default": "false"
       },
       {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
+       "default": "false"
+      },
+      {
        "name": "disabled",
        "type": "boolean",
        "description": "Disable the control.",
@@ -8365,13 +8439,15 @@
        "name": "min",
        "type": "number | null",
        "description": "",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "number | null",
        "description": "Maximum value.",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "step",
@@ -8402,6 +8478,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force invalid styling when standalone.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -8457,13 +8539,15 @@
        "name": "min",
        "type": "number | null",
        "description": "Lower bound reported through the validator (`quantity`/`amount`).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "number | null",
        "description": "Upper bound reported through the validator (`quantity`/`amount`).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "mask",
@@ -9380,6 +9464,12 @@
        "default": "false"
       },
       {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
+       "default": "false"
+      },
+      {
        "name": "disabled",
        "type": "boolean",
        "description": "Disable the control.",
@@ -9520,6 +9610,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force the invalid visual + `aria-invalid` when used standalone.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -9738,6 +9834,12 @@
        "default": "false"
       },
       {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
+       "default": "false"
+      },
+      {
        "name": "size",
        "type": "MkSize",
        "description": "Control size.",
@@ -9821,6 +9923,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force invalid styling + `aria-invalid` when used standalone.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -11131,13 +11239,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Earliest selectable date (inclusive, day granularity).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable date (inclusive, day granularity).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "firstDayOfWeek",
@@ -11258,13 +11368,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "disabledDate",
@@ -11300,6 +11412,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force invalid styling + `aria-invalid`.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -11356,13 +11474,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Earliest selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "disabledDate",
@@ -11454,13 +11574,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Earliest selectable instant (inclusive, minute precision).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable instant (inclusive, minute precision).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "disabledDate",
@@ -11508,6 +11630,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force invalid styling + `aria-invalid`.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -11681,13 +11809,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Minimum selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Maximum selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "value",
@@ -11780,13 +11910,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Earliest selectable date.",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable date.",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "placeholder",
@@ -11878,13 +12010,15 @@
        "name": "min",
        "type": "string | null",
        "description": "Earliest selectable time `HH:mm` (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "string | null",
        "description": "Latest selectable time `HH:mm` (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "step",
@@ -11920,6 +12054,12 @@
        "name": "invalid",
        "type": "boolean",
        "description": "Force invalid styling + `aria-invalid`.",
+       "default": "false"
+      },
+      {
+       "name": "required",
+       "type": "boolean",
+       "description": "Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema.",
        "default": "false"
       },
       {
@@ -11970,13 +12110,15 @@
        "name": "min",
        "type": "Date | null",
        "description": "Earliest selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "max",
        "type": "Date | null",
        "description": "Latest selectable date (inclusive).",
-       "default": "null"
+       "default": "null",
+       "transform": "(v) => v ?? null"
       },
       {
        "name": "firstDayOfWeek",
@@ -20931,6 +21073,16 @@
      "signatures": [
       "(schema: MkDynamicSchema, value?: Record<string, unknown>): FormGroup"
      ]
+    },
+    {
+     "name": "mkDynamicFormToSignalSchema",
+     "description": "Converts an `mk-dynamic-form` schema into a Signal Forms `Schema`, so the\nsame JSON definition can drive `form()` from `@angular/forms/signals`:\n\n```ts\nconst definition: MkDynamicSchema = { fields: [ … ] };\nconst model = signal(mkDynamicDefaults(definition.fields));\nconst f = form(model, mkDynamicFormToSignalSchema(definition));\n```\n\nWhat maps:\n- `required` → `required()` (for `checkbox` / `switch` this means \"must be\n  on\", as Signal Forms treats `false` as empty — the `requiredTrue`\n  behaviour of the renderer);\n- `validators.min` / `max` / `minLength` / `maxLength` / `pattern` / `email`\n  (and `type: 'email'`) → the matching built-in rules, so the field's\n  `min()` / `maxLength()` / `pattern()` state is set as well;\n- `validators.custom` → `validate()` running each `ValidatorFn` against a\n  throw-away `FormControl` holding the field's value; the reactive error\n  keys become error `kind`s with their payload attached, so\n  `mk-form-field` renders them through the same i18n table;\n- `disabled: true` and `disabledWhen` → `disabled()`, `showWhen` →\n  `hidden()` — the condition is evaluated against the form value exactly as\n  the renderer does it (dotted paths, `and` / `or` / `not`, and inside an\n  array item the item's own value with the root under `$root` and the\n  position under `$index`);\n- `group` → the nested fields under the group's key, `array` → `applyEach`\n  over the items plus `minItems` / `maxItems` errors from `min` / `max`.\n\nWhat differs from the renderer: a hidden Signal Forms field is skipped for\nvalidation and touched / dirty state but **keeps its value in the model**\n(the model is your data — nothing is stripped), so remove hidden controls\nfrom the template with `@if (!f.company().hidden())` and drop the value\nyourself before saving if it must not be sent. Layout properties (`span`,\n`columns`), `options`, `props` and `section` entries have no schema\nequivalent and are ignored.",
+     "file": "projects/mk-kit/dynamic-form/signal-schema.ts",
+     "kind": "function",
+     "signatures": [
+      "<TModel extends object = Record<string, unknown>>(definition: MkDynamicSchema | readonly MkDynamicField[]): Schema<TModel>"
+     ],
+     "docs": "/components/signal-forms"
     },
     {
      "name": "mkDynamicGroup",

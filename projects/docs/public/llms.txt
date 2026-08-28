@@ -1,6 +1,6 @@
 # mk-kit
 
-> Themable, accessible Angular 22 component library for admin dashboards and UIs. Signals-based, WCAG 2.1 AA, controlled entirely through CSS variables with light/dark out of the box. — `@mk-kit/ui` 0.42.0. 170 components, 41 directives, 16 services and 125 helper functions across 23 tree-shakeable entry points. MIT licensed, zero runtime dependencies beyond Angular. Standalone components, signals, OnPush, zoneless-ready, SSR-safe, RTL and i18n via `provideMkI18n`.
+> Themable, accessible Angular 22 component library for admin dashboards and UIs. Signals-based, WCAG 2.1 AA, controlled entirely through CSS variables with light/dark out of the box. — `@mk-kit/ui` 0.42.0. 169 components, 40 directives, 16 services and 126 helper functions across 22 tree-shakeable entry points. MIT licensed, zero runtime dependencies beyond Angular. Standalone components, signals, OnPush, zoneless-ready, SSR-safe, RTL and i18n via `provideMkI18n`.
 
 Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/styles/mk-kit.css`). Import from the group entry points (`@mk-kit/ui/forms`, `@mk-kit/ui/table`, …) so each lazy chunk only carries what it uses; the root `@mk-kit/ui` entry re-exports everything. Every component is standalone: add the class to a component's `imports`. Theme with `--mk-*` CSS custom properties; `MkThemeService` switches light/dark/system and density.
 
@@ -45,11 +45,11 @@ Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/sty
 - [Buttons](https://mk-kit.dev/components/buttons)
 - [Dynamic form](https://mk-kit.dev/components/dynamic-form)
 - [Forms](https://mk-kit.dev/components/forms)
+- [Signal Forms](https://mk-kit.dev/components/signal-forms)
 - [Selection](https://mk-kit.dev/components/selection)
 - [Rich text](https://mk-kit.dev/components/rich-text)
 - [Code & content](https://mk-kit.dev/components/markdown)
 - [Stepper](https://mk-kit.dev/components/stepper)
-- [Organisation chart](https://mk-kit.dev/components/org-chart)
 - [Tree](https://mk-kit.dev/components/tree)
 - [Icon](https://mk-kit.dev/components/icon)
 - [Snackbar](https://mk-kit.dev/components/snackbar)

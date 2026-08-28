@@ -20,9 +20,10 @@ import {
   FormGroupDirective,
   NgForm,
 } from '@angular/forms';
+import type { Field, ReadonlyFieldState } from '@angular/forms/signals';
 import type { Subscription } from 'rxjs';
 import type { MkErrorMessages } from '@mk-kit/ui/core';
-import { MK_I18N, mkFirstErrorMessage } from '@mk-kit/ui/core';
+import { MK_I18N, mkFirstErrorMessage, mkSignalErrorMessage } from '@mk-kit/ui/core';
 
 /** One field-level error to surface in {@link MkFormErrorSummary}. */
 export interface MkFormError {
@@ -55,6 +56,24 @@ export interface MkFormError {
  * Each entry is linked to its field by locating the control in the DOM, so
  * `formControlName` must be a static attribute (`formControlName="email"`,
  * the usual form) rather than a binding.
+ *
+ * ## Signal Forms
+ *
+ * Point `field` at a Signal Forms root (`[field]="f"`) instead of `form` and
+ * the summary reads `errorSummary()` from the `FieldTree`: one entry per
+ * invalid field, keyed by dotted path in `labels` / `errorMessages` like the
+ * reactive path. With the default `showOn="submit"` an entry appears once its
+ * field is touched — `submit()` marks every field touched, so a failed submit
+ * lists them all. Clicking an entry focuses the control bound with
+ * `[formField]`. When the summary sits inside the `<form>`, focus also moves
+ * to it after the form's `submit` event, as with `ngSubmit`.
+ *
+ * ```html
+ * <form (submit)="save($event)">
+ *   <mk-form-error-summary [field]="f" [labels]="{ email: 'Email address' }" />
+ *   …
+ * </form>
+ * ```
  *
  * ```html
  * <!-- automatic -->
@@ -100,6 +119,11 @@ export class MkFormErrorSummary {
   readonly errors = input<readonly MkFormError[]>([]);
   /** Collect errors from this control tree instead of passing them in. */
   readonly form = input<AbstractControl | null>(null);
+  /**
+   * Collect errors from this Signal Forms field (usually the root returned by
+   * `form()`) instead of `form`. Entries are keyed by dotted path for `labels`.
+   */
+  readonly field = input<Field<unknown> | null>(null);
   /** Field names for automatic entries, keyed by control path. */
   readonly labels = input<Readonly<Record<string, string>>>({});
   /** Per-key wording for automatic entries, as on `mk-form-field`. */
@@ -125,16 +149,26 @@ export class MkFormErrorSummary {
     let sub: Subscription | null = null;
 
     const injector = inject(Injector);
+    const onSubmit = () => {
+      bump();
+      // After the entries have rendered (and [hidden] cleared), take the
+      // user straight to the problems. `focus()` no-ops without errors.
+      if (this.autoFocus()) {
+        afterNextRender(() => this.focus(), { injector });
+      }
+    };
     const submit = this.parentFormGroup?.ngSubmit ?? this.parentForm?.ngSubmit;
-    const submitSub =
-      submit?.subscribe(() => {
-        bump();
-        // After the entries have rendered (and [hidden] cleared), take the
-        // user straight to the problems. `focus()` no-ops without errors.
-        if (this.autoFocus()) {
-          afterNextRender(() => this.focus(), { injector });
-        }
-      }) ?? null;
+    const submitSub = submit?.subscribe(onSubmit) ?? null;
+
+    // Signal Forms has no `ngSubmit`; a summary placed inside the `<form>`
+    // follows the native submit event instead (`submit()` marks every field
+    // touched synchronously, so the entries exist by the next render).
+    let nativeForm: HTMLFormElement | null = null;
+    afterNextRender(() => {
+      if (!this.field()) return;
+      nativeForm = this.host.nativeElement.closest('form');
+      nativeForm?.addEventListener('submit', onSubmit);
+    });
 
     effect(() => {
       const form = this.form();
@@ -145,6 +179,7 @@ export class MkFormErrorSummary {
     inject(DestroyRef).onDestroy(() => {
       sub?.unsubscribe();
       submitSub?.unsubscribe();
+      nativeForm?.removeEventListener('submit', onSubmit);
     });
   }
 
@@ -156,8 +191,46 @@ export class MkFormErrorSummary {
     );
   });
 
+  /**
+   * Entries collected from `field` (a Signal Forms root), each with the element
+   * carrying the field's `[formField]` binding so a click can focus it the way
+   * `focusBoundControl()` would.
+   */
+  private readonly signalEntries = computed<
+    readonly { error: MkFormError; element: HTMLElement | null }[]
+  >(() => {
+    const field = this.field();
+    if (!field) return [];
+    const root = field();
+    const gateOnTouch = this.showOn() === 'submit';
+    const labels = this.labels();
+    const overrides = this.errorMessages() ?? undefined;
+    const seen = new Set<string>();
+    const out: { error: MkFormError; element: HTMLElement | null }[] = [];
+
+    for (const err of root.errorSummary()) {
+      const state = err.fieldTree();
+      const name = state.name();
+      if (seen.has(name) || state.disabled() || state.hidden()) continue;
+      if (gateOnTouch && !state.touched()) continue;
+      seen.add(name);
+      const message = mkSignalErrorMessage([err], this.i18n.validation, overrides);
+      if (!message) continue;
+      const path = signalFieldPath(root, state) ?? '';
+      const label = labels[path] ?? path;
+      const element = state.formFieldBindings()[0]?.element ?? null;
+      const fieldId = element?.id || name;
+      out.push({
+        error: { fieldId, message: label ? `${label}: ${message}` : message },
+        element,
+      });
+    }
+    return out;
+  });
+
   /** Entries collected from `form`, when one is set and they should show. */
   private readonly autoErrors = computed<readonly MkFormError[]>(() => {
+    if (this.field()) return this.signalEntries().map((e) => e.error);
     this.formTick();
     const form = this.form();
     if (!form) return [];
@@ -200,6 +273,7 @@ export class MkFormErrorSummary {
   /** Focus the field an entry points at (native anchor jump is unreliable). */
   protected focusField(event: Event, fieldId: string): void {
     const target =
+      this.signalEntries().find((e) => e.error.fieldId === fieldId)?.element ??
       this.document.getElementById(fieldId) ??
       this.document.querySelector<HTMLElement>(
         `[formcontrolname="${cssEscape(fieldId)}"]`,
@@ -240,6 +314,33 @@ function* eachControl(
   } else if (path) {
     yield [path, control];
   }
+}
+
+/**
+ * Dotted path of a Signal Forms field under `root` (`'address.city'`,
+ * `'contacts.0.name'`), found by walking the field tree along the model's
+ * keys; `''` for the root itself, `null` when the field is not under `root`.
+ */
+function signalFieldPath(
+  root: ReadonlyFieldState<unknown>,
+  target: ReadonlyFieldState<unknown>,
+): string | null {
+  const wanted = target.name();
+  const walk = (tree: Field<unknown>, path: string): string | null => {
+    const state = tree();
+    if (state.name() === wanted) return path;
+    const value = state.value();
+    if (!value || typeof value !== 'object') return null;
+    const children = tree as unknown as Record<string, Field<unknown> | undefined>;
+    for (const key of Object.keys(value)) {
+      const child = children[key];
+      if (typeof child !== 'function') continue;
+      const found = walk(child, path ? `${path}.${key}` : key);
+      if (found !== null) return found;
+    }
+    return null;
+  };
+  return walk(root.fieldTree as unknown as Field<unknown>, '');
 }
 
 /** Minimal attribute-value escaping for the selectors built above. */

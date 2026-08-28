@@ -20,6 +20,7 @@ import { isPlatformBrowser } from '@angular/common';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /** One drawn stroke: pointer positions in CSS pixels. */
@@ -70,6 +71,8 @@ type Stroke = { x: number; y: number }[];
 export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
@@ -120,7 +123,7 @@ export class MkSignaturePad implements ControlValueAccessor, OnDestroy {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(

@@ -19,6 +19,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkFieldContext } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 
 /**
  * InlineEdit — click a piece of text to edit it in place. The display is a
@@ -55,6 +56,8 @@ import { MkFieldContext } from '@mk-kit/ui/core';
 export class MkInlineEdit implements ControlValueAccessor {
   private readonly injector = inject(Injector);
   private readonly field = inject(MkFieldContext, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly displayRef =
     viewChild<ElementRef<HTMLButtonElement>>('display');
@@ -98,7 +101,7 @@ export class MkInlineEdit implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
