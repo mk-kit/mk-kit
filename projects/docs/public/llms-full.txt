@@ -1122,7 +1122,10 @@ Members:
 | `chartShare` | `string` |  |
 | `chartLabel` | `string` |  |
 | `qrCodeLabel` | `(text: string) => string` | Default accessible label of a QR code, carrying its encoded content. |
-| `sortableListLabel` | `string` | Default accessible name of `mk-sortable-list` when no `label` is given. |
+| `filterColumn` | `(column: string) => string` | Table filter row: accessible name of a column's filter control. |
+| `clearFilter` | `(column: string) => string` | Table filter row: the per-control clear (×) button. |
+| `filterAny` | `string` | Table filter row: the "no filter" option of a select filter. |
+| `filterMin` | `string` | Table filter row: placeholder of a number / date filter (matches values ≥ the entry). |
 | `blockEditor` | `MkBlockEditorStrings` | Block editor chrome (deep-merged by provideMkI18n). |
 
 ### MkOverlayConfig (interface)
@@ -2574,7 +2577,7 @@ Pure: `null`, `undefined`, `''` and non-numeric counts render as `''`.
 
 ### MkRelativeTimePipe (pipe)
 
-Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, nowOrOptions?: Date | number | string | MkRelativeTimeOptions | null, options?: MkRelativeTimeOptions): string`
+Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string`
 
 Import: `import { MkRelativeTimePipe } from '@mk-kit/ui/directives';`
 
@@ -2586,17 +2589,13 @@ and unparsable input render as `''`.
 The pipe picks the largest unit whose magnitude is at least 1 (seconds →
 minutes → hours → days → weeks → months → years) and rounds. Pass `now`
 for deterministic output in tests, or bind a ticking signal to keep a
-list live — a pure pipe only re-runs when an argument changes. The second
-argument is either that `now` or the options object, so options alone
-need no `null` placeholder; the three-argument form (`now`, then options)
-works too:
+list live — a pure pipe only re-runs when an argument changes:
 
 ```html
 {{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->
 {{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->
-{{ due | mkRelativeTime:{ style: 'short' } }}               <!-- in 2 days -->
-{{ ts | mkRelativeTime:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
-{{ due | mkRelativeTime:now():{ style: 'short' } }}         <!-- in 2 days (ticking) -->
+{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->
+{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
 ```
 
 ### MkTruncatePipe (pipe)
@@ -3172,7 +3171,6 @@ Inputs:
 | `mkDropListId` | `string \| undefined` |  | Stable id used to connect lists. Auto-generated when omitted. |
 | `mkDropListConnectedTo` | `readonly string[]` | `[]` | Ids of other lists items may be transferred into. |
 | `mkDropListLabel` | `string` | `''` | Human-readable name used in screen-reader announcements when an item is moved into this list (e.g. `"In progress"`). Falls back to the list `id` — which may be auto-generated gibberish — so set it wherever users can move items across lists by keyboard. |
-| `mkDropListLabelledBy` | `string` | `''` | Id of the element that names the list (`aria-labelledby`), e.g. a visible heading. Takes precedence over `mkDropListLabel` as the accessible name; the label is still used in announcements. |
 | `mkDropListOrientation` | `MkDropListOrientation` | `'vertical'` | Layout axis; controls pointer hit-testing and arrow-key direction. |
 | `mkDropListDisabled` | `boolean` | `false` | Disable dropping into (and dragging out of) this list. |
 
@@ -3217,13 +3215,8 @@ to render each row; drops are applied to the model for you (via
 
 For connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.
 
-The list renders as a named `group` of `button` items: pass `label` (or
-`labelledBy` pointing at a visible heading) so screen readers say what is
-being reordered — the i18n `sortableListLabel` ("Sortable list") is the
-fallback.
-
 ```html
-<mk-sortable-list [(items)]="rows" label="Steps">
+<mk-sortable-list [(items)]="rows">
   <ng-template let-row let-i="index">
     <span mkDragHandle aria-hidden="true">⠿</span> {{ i + 1 }}. {{ row.name }}
   </ng-template>
@@ -3235,8 +3228,6 @@ Inputs:
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` (two-way) | `T[]` | `[]` | The ordered items (two-way). Reordered in place on drop. |
-| `label` | `string \| undefined` |  | Accessible name of the list (`aria-label`), also used in the "moved into …" announcements. Defaults to the i18n `sortableListLabel`. |
-| `labelledBy` | `string \| undefined` |  | Id of an element that names the list (`aria-labelledby`), e.g. a visible heading. Wins over `label` as the accessible name. |
 | `orientation` | `MkDropListOrientation` | `'vertical'` | Layout axis of the list. |
 | `disabled` | `boolean` | `false` | Disable reordering. |
 | `trackBy` | `(index: number, item: T) => unknown` | `(_, item) => item` | `@for` tracking function. Defaults to identity (track by item). |
@@ -8277,7 +8268,7 @@ type MkWeekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ## @mk-kit/ui/table
 
-32 exports. `import { … } from '@mk-kit/ui/table';`
+37 exports. `import { … } from '@mk-kit/ui/table';`
 
 ### MkSortHeader (component)
 
@@ -8345,6 +8336,14 @@ Inputs:
 | `reorderableColumns` | `boolean` | `false` | Enable drag-to-reorder of column headers (data-grid pro). |
 | `groupBy` | `string \| ((row: T) => unknown) \| null` | `null` | Group rows by a column key or an accessor. Renders a collapsible group header row (sticky, with a row count) above each group. Sorting still applies within groups; groups follow their first row's sorted position. |
 | `groupLabel` | `((value: unknown, rows: T[]) => string) \| null` | `null` | Formats a group header label; defaults to `String(value)`. |
+| `virtual` | `boolean` | `false` | Render only the rows in view (plus `overscan`) — for tables of thousands of rows. The `<table>` scrolls inside its own box sized by `height` / `maxHeight` (`max-height: 60vh` when neither is set) with the header pinned; spacer rows keep the scrollbar honest.  Works with sorting, selection (select-all still covers every row), tree rows, grouping (group headers are rows too), expandable detail rows (their height is measured once rendered; an unmeasured detail counts as one row) and the header filter row. Falls back to the full render while stacked into cards. Export and select-all always see every row, not the window. |
+| `rowHeight` | `number \| null` | `null` | Height (px) of one row in virtual mode. Leave unset to have it measured from the first rendered row — which follows `density` and `data-mk-density` automatically — starting from 44 (comfortable). |
+| `overscan` | `number` | `6` | Rows rendered beyond each edge of the viewport in virtual mode. |
+| `height` | `string \| number \| null` | `null` | Fixed height of the scroll box (CSS length, or px as a number). |
+| `maxHeight` | `string \| number \| null` | `null` | Maximum height of the scroll box (CSS length, or px as a number). |
+| `filterable` | `boolean` | `false` | Render a second header row with a filter control per column — a text box, a select, a number or a date field as the column's `MkTableColumn.filter` says. Values live in `filters`. |
+| `filters` (two-way) | `MkTableFilters` | `{}` | The active filters, keyed by column key (`[(filters)]`; `filtersChange` emits the whole map on every edit). Text filters hold the typed string, select filters the chosen option value, number / date filters the lower bound or a `{ min, max }` range. Set programmatically to pre-filter. |
+| `clientFilter` | `boolean` | `true` | Filter rows in the browser (default). Turn off when the server applies the filters — `MkTableDataSource.setFilters($event)` on `filtersChange` — so the page it returns is shown as-is. |
 | `childrenKey` | `string \| null` | `null` | Tree rows: the property on each row holding its child rows (`T[]`). When set, the table renders a tree grid — child rows are indented under their parent behind an expand toggle in the first column, sorting applies per sibling group, and ArrowRight / ArrowLeft on a row open / close it. |
 
 Outputs:
@@ -8352,6 +8351,7 @@ Outputs:
 | Name | Type | Description |
 | --- | --- | --- |
 | `selectedChange` | `T[]` | Emits when `selected` changes (two-way binding). |
+| `filtersChange` | `MkTableFilters` | Emits when `filters` changes (two-way binding). |
 | `sortChange` | `MkSortChange` | Emitted when the sort column/direction changes. |
 | `rowClick` | `T` | Emitted when a row is clicked (enable via `clickableRows`). |
 | `selectionChange` | `T[]` | Emitted with the new selection whenever it changes (enable via `selectable`). |
@@ -8366,12 +8366,16 @@ Methods:
 
 | Signature | Description |
 | --- | --- |
+| `setFilter(key: string, value: unknown): void` | Set one column's filter (`null` / `''` clears it). Updates `filters` and emits `filtersChange`; a no-op when unchanged. |
+| `clearFilter(key: string): void` | Clear one column's filter. |
+| `clearFilters(): void` | Clear every filter. |
+| `scrollToRow(target: unknown, by?: "index" \| "key"): boolean` | Scroll a row into view. A number is the row's **display index** — its position among the rendered rows, group headers included, after sorting, filtering and tree expansion; anything else is a row key (the `trackKey` value, or the row object when there is none). Pass `'key'` to look a numeric key up. Returns `false` when the row is not currently displayed (filtered out, under a collapsed parent or group).  In virtual mode the row lands at the top of the viewport, just under the header; otherwise it is scrolled to the nearest edge. |
 | `isTreeExpanded(row: T): boolean` | Whether a parent row's children are currently shown (tree mode). |
 | `toggleTreeRow(row: T, event?: Event): void` | Show or hide a parent row's children (tree mode). |
 | `expandAllRows(): void` | Expand every parent row (tree mode). |
 | `collapseAllRows(): void` | Collapse every parent row (tree mode). |
-| `getExportRows(options?: MkTableExportRowsOptions): MkTableExportRows<T>` | The rows and columns an export writes — exactly what `exportCsv` serialises, for other formats (XLSX, PDF, the clipboard, …): rows in display order with the current sort applied and tree children (`childrenKey`) flattened under their parent whether or not they are expanded, optionally only the selected ones; columns in the table's current order, restricted to `options.columns` when given, each carrying its header and `format` so what the user saw is what gets written.  ```ts const { rows, columns } = table.getExportRows({ selectedOnly: true }); const sheet = rows.map((row) =>   Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])), ); ``` |
-| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. Built on `getExportRows`. |
+| `getExportRows(options?: MkTableExportRowsOptions): MkTableExportRows<T>` | The rows and columns an export writes — exactly what `exportCsv` serialises, for other formats (XLSX, PDF, the clipboard, …): rows in display order with the current sort and header `filters` applied (every matching row, never just the virtual window) and tree children (`childrenKey`) flattened under their parent whether or not they are expanded, optionally only the selected ones; columns in the table's current order, restricted to `options.columns` when given, each carrying its header and `format` so what the user saw is what gets written.  ```ts const { rows, columns } = table.getExportRows({ selectedOnly: true }); const sheet = rows.map((row) =>   Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])), ); ``` |
+| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted and filtered the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. Built on `getExportRows`. |
 | `collapseAllGroups(): void` | Collapse every group. |
 | `expandAllGroups(): void` | Expand every group. |
 
@@ -8526,6 +8530,7 @@ Methods:
 | `setSort(sort: MkSortState \| MkSortChange \| null): void` | Change the sort; resets to page 1 and loads immediately. Accepts either the `mkSort` directive's `MkSortState` or `mk-table`'s `MkSortChange` payload; a cleared sort (`direction: 'none'` or an empty column id) normalises to `null`. A no-op when the sort is unchanged. |
 | `setFilter(query: string): void` | Change the free-text filter. The `filter` signal updates (and the page resets to 1) immediately, but the request is debounced — `refresh()` flushes it early. A no-op when the query is unchanged. |
 | `setQuery(query: MkQueryGroup \| null): void` | Set (or clear with `null`) the structured query from `mk-query-builder`. Empty groups and unfinished rules are dropped before the request; a query with nothing left is sent as `null`. Resets to page 1 and loads at once. |
+| `setFilters(filters: MkTableFilters \| null): void` | Set (or clear with `null` / `{}`) the per-column filters from `mk-table`'s header filter row — bind `(filtersChange)="ds.setFilters($event)"` and turn the table's `clientFilter` off. Empty entries are dropped before the request; nothing left is sent as `null`. Resets to page 1 and loads at once (the table already debounces nothing, so debounce the fetcher if your API needs it). A no-op when unchanged. |
 | `refresh(): void` | Re-run the current request immediately (e.g. after a mutation). Flushes a pending debounced filter, since the request reads the live filter value. |
 | `connectSort(sort: MkSort): void` | Pipe an `mkSort` directive's changes into `setSort`. Idempotent per directive instance; all subscriptions are released by `destroy`. |
 | `destroy(): void` | Cancel pending work: the debounce timer, any in-flight Observable fetch, and `connectSort` subscriptions. In-flight Promise settles are discarded. Called automatically on host destroy when created in an injection context. |
@@ -8543,7 +8548,18 @@ Properties:
 | `sort` | `Signal<MkSortState \| null>` | Current sort, or `null` when unsorted. |
 | `filter` | `Signal<string>` | Current filter query (updates immediately, even while debouncing). |
 | `query` | `Signal<MkQueryGroup \| null>` | Current structured query, or `null`. |
+| `filters` | `Signal<MkTableFilters \| null>` | Current per-column filters, or `null`. |
 | `empty` | `Signal<boolean>` | True when a settled load reported no rows at all. |
+
+### mkCompactFilters (function)
+
+Import: `import { mkCompactFilters } from '@mk-kit/ui/table';`
+
+Drop the empty entries of a filter map (`null` when nothing is left).
+
+```ts
+function mkCompactFilters(filters: MkTableFilters | null | undefined): MkTableFilters | null
+```
 
 ### mkDownloadText (function)
 
@@ -8677,6 +8693,7 @@ Members:
 | `sort` | `MkSortState \| null` | Active sort, or `null` when unsorted (cleared sorts normalise to `null`). |
 | `filter` | `string` | Free-text filter query (`''` = none). |
 | `query` | `MkQueryGroup \| null` | Structured filter from `mk-query-builder` (`null` = none). Compacted: no empty groups or unfinished rules. |
+| `filters` | `MkTableFilters \| null` | Per-column filters from `mk-table`'s header filter row (`null` = none), keyed by column key with empty entries dropped — see `MkTableDataSource.setFilters`. |
 
 ### MkGroupToggle (interface)
 
@@ -8766,6 +8783,9 @@ Members:
 | `pinned`? | `"left" \| "right" \| undefined` | Pin (freeze) this column to a side while the body scrolls horizontally. |
 | `minWidth`? | `number \| undefined` | Minimum width in px when resizing (default 60). |
 | `stack`? | `"footer" \| "title" \| "hide" \| undefined` | What becomes of this column when the table stacks into cards (see `MkTable.stackAt`). Omitted, the column renders as a labelled field: its `header` on one side, its value on the other.  - `'title'` — the card's heading. No label; the value identifies the   record at a glance (an order number, a product name). Mark one, or two   if something short belongs beside it such as a status or a total. - `'footer'` — pinned to the bottom of the card, full width and unlabelled.   Where an actions cell belongs: buttons read as buttons, rather than as   the answer to a label. - `'hide'` — not rendered at all. Not merely invisible: the cell is never   created, so a screen reader does not read it either. For columns that   only earn their place while scanning a grid, and especially for anything   an expandable row detail already repeats. |
+| `filter`? | `false \| MkTableFilterKind \| undefined` | The header-row filter control for this column (rendered when the table is `MkTable.filterable`). Omitted, a filterable table gives the column a text filter; `false` leaves its filter cell empty.  - `'text'` — case-insensitive *contains* on the displayed (formatted) text. - `'select'` — equality against one of `filterOptions`; without   options, the distinct values found in `data`. - `'number'` / `'date'` — the control keeps rows whose value is **≥** the   entry. Set `{ min, max }` through `MkTable.filters` for an   inclusive range. Dates compare by local calendar day. |
+| `filterOptions`? | `readonly (string \| number \| MkTableFilterOption)[] \| undefined` | Options of a `select` filter — strings / numbers, or `{ value, label }`. Omitted: every distinct value of the column in `data`, sorted. |
+| `filterPlaceholder`? | `string \| undefined` | Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`). |
 
 ### MkTableDataSourceOptions (interface)
 
@@ -8817,6 +8837,33 @@ Members:
 | --- | --- | --- |
 | `selectedOnly`? | `boolean \| undefined` | Export only the selected rows (default: every row). |
 | `columns`? | `readonly string[] \| undefined` | Restrict to these column keys, in table order (default: every column). |
+
+### MkTableFilterOption (interface)
+
+Import: `import { MkTableFilterOption } from '@mk-kit/ui/table';`
+
+One option of a `select` header filter.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `value` | `unknown` | The value compared against the cell (by `String()` equality). |
+| `label` | `string` | Visible option text. |
+
+### MkTableFilterRange (interface)
+
+Import: `import { MkTableFilterRange } from '@mk-kit/ui/table';`
+
+An inclusive range accepted as the value of a `number` or `date` filter
+(dates as `YYYY-MM-DD`, `Date` or a timestamp). Either bound may be omitted.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `min`? | `V \| null \| undefined` |  |
+| `max`? | `V \| null \| undefined` |  |
 
 ### MkTableGroup (interface)
 
@@ -8886,6 +8933,28 @@ Row vertical density.
 
 ```ts
 type MkTableDensity = 'comfortable' | 'compact';
+```
+
+### MkTableFilterKind (type)
+
+Import: `import { MkTableFilterKind } from '@mk-kit/ui/table';`
+
+Which control a column's header filter renders (see `MkTableColumn.filter`).
+
+```ts
+type MkTableFilterKind = 'text' | 'select' | 'number' | 'date';
+```
+
+### MkTableFilters (type)
+
+Import: `import { MkTableFilters } from '@mk-kit/ui/table';`
+
+Active header filters keyed by column key: a string for `text`, an option
+value for `select`, a number / date (`>=`) or a `MkTableFilterRange`
+for `number` and `date`. Empty strings and `null` mean "no filter".
+
+```ts
+type MkTableFilters = Record<string, unknown>;
 ```
 
 ## @mk-kit/ui/data
@@ -15138,6 +15207,10 @@ Methods:
 | `selectedRowCount(): Promise<number>` |  |
 | `toggleAll(): Promise<void>` | Toggle the header "select all" checkbox. |
 | `isEmpty(): boolean` |  |
+| `setFilter(key: string, value: string): Promise<void>` | Set a header-row filter (table is `filterable`). `value` is typed into a text / number / date box, or picked from a select by option label or value; `''` clears that filter. |
+| `filterValue(key: string): string` | The current value of a header-row filter control (`''` when unset). |
+| `clearFilters(): Promise<void>` | Clear every header-row filter. |
+| `scrollToRow(index: number): Promise<void>` | Scroll a `virtual` table so the row at display `index` is at the top of the viewport (drives the scroll box, so only the rows around it render). |
 
 ### MkTableRowHarness (class)
 

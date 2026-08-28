@@ -13,10 +13,11 @@
   --_cell-pad-x: var(--mk-space-3);
 }
 
-/* Horizontal scroll container */
+/* Scroll container — horizontal always; vertical too once `height` /
+   `maxHeight` bound it (virtual mode always does). */
 .mk-table__scroll {
   width: 100%;
-  overflow-x: auto;
+  overflow: auto;
   border: var(--mk-border-width) solid var(--mk-border);
   border-radius: var(--mk-radius-lg);
 }
@@ -117,8 +118,10 @@
 .mk-table__th[data-align='end'],
 .mk-table__td[data-align='end'] { text-align: right; }
 
-/* Zebra */
-:host(.mk-table--zebra) .mk-table__body .mk-table__row:nth-child(even) .mk-table__td {
+/* Zebra. In virtual mode the stripe follows the row's absolute index (the
+   top spacer row would otherwise flip the parity on every window shift). */
+:host(.mk-table--zebra:not(.mk-table--virtual)) .mk-table__body .mk-table__row:nth-child(even) .mk-table__td,
+:host(.mk-table--zebra) .mk-table__body .mk-table__row--even .mk-table__td {
   background-color: var(--mk-surface-2);
 }
 
@@ -147,6 +150,7 @@
 /* Selected rows — win over zebra + hover backgrounds */
 :host .mk-table__body .mk-table__row--selected .mk-table__td,
 :host(.mk-table--zebra) .mk-table__body .mk-table__row--selected:nth-child(even) .mk-table__td,
+:host(.mk-table--zebra) .mk-table__body .mk-table__row--selected.mk-table__row--even .mk-table__td,
 :host(.mk-table--hover) .mk-table__body .mk-table__row--selected:hover .mk-table__td {
   background-color: var(--mk-selected-bg);
   color: var(--mk-selected-text);
@@ -290,11 +294,122 @@
   box-shadow: 2px 0 4px -2px var(--mk-shadow-color, rgba(0, 0, 0, 0.15));
 }
 /* Keep zebra/selected backgrounds on pinned body cells opaque. */
-:host(.mk-table--zebra)
+:host(.mk-table--zebra:not(.mk-table--virtual))
   .mk-table__body
   .mk-table__row:nth-child(even)
-  .mk-table__td--pinned {
+  .mk-table__td--pinned,
+:host(.mk-table--zebra) .mk-table__body .mk-table__row--even .mk-table__td--pinned {
   background-color: var(--mk-surface-2);
+}
+
+/* --- Header filter row --------------------------------------------------- */
+.mk-table__filter-cell {
+  position: relative;
+  padding: var(--mk-space-1) var(--mk-space-2);
+  background-color: var(--mk-surface-2);
+  border-bottom: var(--mk-border-width) solid var(--mk-border);
+  vertical-align: middle;
+}
+/* Sticks under the header row; --_filter-top is the measured header-row
+   height, set by the component. */
+:host(.mk-table--sticky) .mk-table__filter-cell {
+  position: sticky;
+  top: var(--_filter-top, 0px);
+  z-index: var(--mk-z-sticky);
+}
+:host(.mk-table--sticky) .mk-table__filter-cell.mk-table__th--pinned {
+  z-index: calc(var(--mk-z-sticky) + 1);
+}
+.mk-table__filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+/* Native controls, dressed in the kit's tokens — the same recipe as
+   `input[mkInput]`, minus the forms entry point. */
+.mk-table__filter-control {
+  width: 100%;
+  min-width: 4rem;
+  height: var(--mk-control-height-sm);
+  padding: 0 var(--mk-space-2);
+  font: inherit;
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-normal);
+  color: var(--mk-text);
+  background-color: var(--mk-surface);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-sm);
+  outline: none;
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-table__filter-control::placeholder {
+  color: var(--mk-text-subtle);
+}
+.mk-table__filter-control:hover {
+  border-color: var(--mk-border-strong);
+}
+.mk-table__filter-control:focus-visible {
+  @include mk.focus-ring(0px);
+  border-color: var(--mk-primary);
+}
+.mk-table__filter-control--active,
+.mk-table__filter--active .mk-table__filter-control {
+  border-color: var(--mk-primary);
+}
+/* Room for the clear button; the native search "x" would double it up. */
+.mk-table__filter--active .mk-table__filter-input {
+  padding-inline-end: calc(var(--mk-space-2) + 1.5rem);
+}
+.mk-table__filter-input::-webkit-search-cancel-button,
+.mk-table__filter-input::-webkit-search-decoration {
+  -webkit-appearance: none;
+  appearance: none;
+}
+.mk-table__filter-select {
+  cursor: pointer;
+}
+.mk-table__filter-clear {
+  position: absolute;
+  inset-inline-end: var(--mk-space-1);
+  top: 50%;
+  display: inline-grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  transform: translateY(-50%);
+  font-size: var(--mk-font-size-md);
+  line-height: 1;
+  color: var(--mk-text-muted);
+  background: transparent;
+  border: 0;
+  border-radius: var(--mk-radius-sm);
+  cursor: pointer;
+  @include mk.touch-target(24px, $position: null);
+}
+.mk-table__filter-clear:hover {
+  color: var(--mk-text);
+  background-color: var(--mk-hover-overlay);
+}
+.mk-table__filter-clear:focus-visible {
+  @include mk.focus-ring(0px);
+}
+
+/* --- Virtual rows --------------------------------------------------------- */
+/* Spacer rows carry the height of the rows not rendered. */
+.mk-table__spacer > td {
+  padding: 0;
+  border: 0;
+}
+/* A row's height must not drift from the value the spacers are computed
+   with — long values clip instead of wrapping. */
+:host(.mk-table--virtual) .mk-table__row .mk-table__td {
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 /* Inline-editable cells */
@@ -420,7 +535,8 @@
   .mk-table__scroll {
     /* Cards size themselves; nothing overflows sideways any more, and leaving
        the border here would draw a box around a stack of boxes. */
-    overflow-x: visible;
+    overflow: visible;
+    max-height: none;
     border: none;
     border-radius: 0;
     background: none;
@@ -436,6 +552,9 @@
      and removing it also takes the sort controls, which is why `stackAt`
      suits list screens rather than data grids. */
   .mk-table__head {
+    display: none;
+  }
+  .mk-table__spacer {
     display: none;
   }
 
@@ -562,13 +681,19 @@
 @media print {
   .mk-table__scroll {
     overflow: visible;
+    max-height: none;
+    height: auto;
     border-radius: 0;
+  }
+  .mk-table__filter-row {
+    display: none;
   }
   .mk-table__head {
     display: table-header-group;
   }
   .mk-table__th,
-  .mk-table__td {
+  .mk-table__td,
+  .mk-table__filter-cell {
     position: static;
     box-shadow: none;
     /* Beats selected / hover / zebra tints, which mean nothing on paper. */

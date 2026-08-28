@@ -733,6 +733,15 @@ export interface MkI18nStrings {
   // --- Sortable list --------------------------------------------------------
   /** Default accessible name of `mk-sortable-list` when no `label` is given. */
   sortableListLabel: string;
+  // --- Table filter row --------------------------------------------------------
+  /** Table filter row: accessible name of a column's filter control. */
+  filterColumn: (column: string) => string;
+  /** Table filter row: the per-control clear (×) button. */
+  clearFilter: (column: string) => string;
+  /** Table filter row: the "no filter" option of a select filter. */
+  filterAny: string;
+  /** Table filter row: placeholder of a number / date filter (matches values ≥ the entry). */
+  filterMin: string;
 
   // --- Block editor -------------------------------------------------------------
   /** Block editor chrome (deep-merged by provideMkI18n). */
@@ -1095,6 +1104,10 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   qrCodeLabel: (text) => `QR code: ${text}`,
 
   sortableListLabel: 'Sortable list',
+  filterColumn: (column) => `Filter ${column}`,
+  clearFilter: (column) => `Clear filter for ${column}`,
+  filterAny: 'All',
+  filterMin: 'Min',
 
   blockEditor: {
     addBlock: 'Add block',

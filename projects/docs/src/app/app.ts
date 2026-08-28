@@ -309,7 +309,7 @@ export class App {
           label: 'Table & data grid',
           path: '/components/table',
           keywords:
-            'table data-grid pagination inline-edit row-detail grouping data-source fetcher sticky columns cells',
+            'table data-grid pagination inline-edit row-detail grouping data-source fetcher sticky columns cells virtual virtual-scroll filter filters filter-row',
         },
         {
           label: 'Query builder',

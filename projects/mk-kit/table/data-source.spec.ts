@@ -47,7 +47,7 @@ describe('MkTableDataSource', () => {
     expect(ds.loading()).toBe(true);
     expect(ds.rows()).toEqual([]);
     expect(requests).toEqual([
-      { page: 1, pageSize: 10, sort: null, filter: '', query: null },
+      { page: 1, pageSize: 10, sort: null, filter: '', query: null, filters: null },
     ]);
 
     await drain();
@@ -122,6 +122,7 @@ describe('MkTableDataSource', () => {
         sort: null,
         filter: '',
         query: null,
+        filters: null,
       });
     });
 
@@ -180,7 +181,7 @@ describe('MkTableDataSource', () => {
       expect(requests).toEqual([]);
       vi.advanceTimersByTime(1);
       expect(requests).toEqual([
-        { page: 1, pageSize: 10, sort: null, filter: 'an', query: null },
+        { page: 1, pageSize: 10, sort: null, filter: 'an', query: null, filters: null },
       ]);
       ds.destroy();
     });
@@ -253,7 +254,7 @@ describe('MkTableDataSource', () => {
       ds.setFilter('q');
       ds.setPage(2);
       expect(requests).toEqual([
-        { page: 2, pageSize: 10, sort: null, filter: 'q', query: null },
+        { page: 2, pageSize: 10, sort: null, filter: 'q', query: null, filters: null },
       ]);
       vi.advanceTimersByTime(1000);
       expect(requests).toHaveLength(1); // debounce timer was cancelled
@@ -447,7 +448,7 @@ describe('MkTableDataSource', () => {
       ) as HTMLButtonElement;
       button.click();
       expect(requests).toEqual([
-        { page: 1, pageSize: 10, sort: { active: 'name', direction: 'asc' }, filter: '', query: null },
+        { page: 1, pageSize: 10, sort: { active: 'name', direction: 'asc' }, filter: '', query: null, filters: null },
       ]);
 
       button.click();
@@ -499,6 +500,33 @@ describe('MkTableDataSource', () => {
       ds.setQuery({ id: 'x', combinator: 'or', rules: [] });
       await drain();
       expect(reqs[reqs.length - 1].query).toBeNull();
+      ds.destroy();
+    });
+
+    it('setFilters compacts the header-row filters onto the request, resets to page 1 and dedupes', async () => {
+      const reqs: MkDataRequest[] = [];
+      const ds = new MkTableDataSource<Row>(async (req) => {
+        reqs.push(req);
+        return pageOf([1]);
+      });
+      await drain();
+      ds.setPage(3);
+      ds.setFilters({ name: 'ada', role: '', orders: { min: 10, max: null }, joined: null });
+      await drain();
+      const last = reqs[reqs.length - 1];
+      expect(last.page).toBe(1);
+      expect(last.filters).toEqual({ name: 'ada', orders: { min: 10, max: null } });
+      expect(ds.filters()).toEqual({ name: 'ada', orders: { min: 10, max: null } });
+      const count = reqs.length;
+      ds.setFilters({ orders: { min: 10, max: null }, name: 'ada' }); // same content → no reload
+      await drain();
+      expect(reqs.length).toBe(count);
+      ds.setFilters({ name: '' });
+      await drain();
+      expect(reqs[reqs.length - 1].filters).toBeNull();
+      ds.setFilters(null);
+      await drain();
+      expect(reqs.length).toBe(count + 1);
       ds.destroy();
     });
   });

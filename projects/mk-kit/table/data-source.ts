@@ -1,7 +1,7 @@
 import { DestroyRef, Signal, computed, inject, signal } from '@angular/core';
 import type { Observable, Unsubscribable } from 'rxjs';
 import { mkQueryCompact, type MkQueryGroup } from '@mk-kit/ui/core';
-import type { MkSortChange } from './table/table';
+import { mkCompactFilters, type MkSortChange, type MkTableFilters } from './table/table';
 import type { MkSort, MkSortState } from './sort/sort';
 
 /** The request handed to a {@link MkDataFetcher} on every load. */
@@ -16,6 +16,12 @@ export interface MkDataRequest {
   filter: string;
   /** Structured filter from `mk-query-builder` (`null` = none). Compacted: no empty groups or unfinished rules. */
   query: MkQueryGroup | null;
+  /**
+   * Per-column filters from `mk-table`'s header filter row (`null` = none),
+   * keyed by column key with empty entries dropped — see
+   * {@link MkTableDataSource.setFilters}.
+   */
+  filters: MkTableFilters | null;
 }
 
 /** One page of server data returned by a {@link MkDataFetcher}. */
@@ -64,6 +70,19 @@ function sameSort(a: MkSortState | null, b: MkSortState | null): boolean {
   if (a === b) return true;
   if (!a || !b) return false;
   return a.active === b.active && a.direction === b.direction;
+}
+
+/** JSON with object keys sorted, so `{ a, b }` and `{ b, a }` compare equal. */
+function canonicalJson(value: unknown): string {
+  return JSON.stringify(value, (_key, v: unknown) =>
+    v && typeof v === 'object' && !Array.isArray(v)
+      ? Object.fromEntries(
+          Object.keys(v as object)
+            .sort()
+            .map((k) => [k, (v as Record<string, unknown>)[k]]),
+        )
+      : v,
+  );
 }
 
 /** Duck-typed Observable check, so rxjs is a type-only dependency here. */
@@ -165,6 +184,7 @@ export class MkTableDataSource<T> {
   private readonly _sort = signal<MkSortState | null>(null);
   private readonly _filter = signal('');
   private readonly _query = signal<MkQueryGroup | null>(null);
+  private readonly _filters = signal<MkTableFilters | null>(null);
 
   /** Rows of the current page (`[]` until the first load lands). */
   readonly rows = this._rows.asReadonly();
@@ -184,6 +204,8 @@ export class MkTableDataSource<T> {
   readonly filter = this._filter.asReadonly();
   /** Current structured query, or `null`. */
   readonly query = this._query.asReadonly();
+  /** Current per-column filters, or `null`. */
+  readonly filters = this._filters.asReadonly();
   /** True when a settled load reported no rows at all. */
   readonly empty: Signal<boolean> = computed(
     () => !this._loading() && this._total() === 0,
@@ -279,6 +301,22 @@ export class MkTableDataSource<T> {
   }
 
   /**
+   * Set (or clear with `null` / `{}`) the per-column filters from `mk-table`'s
+   * header filter row — bind `(filtersChange)="ds.setFilters($event)"` and
+   * turn the table's `clientFilter` off. Empty entries are dropped before the
+   * request; nothing left is sent as `null`. Resets to page 1 and loads at
+   * once (the table already debounces nothing, so debounce the fetcher if
+   * your API needs it). A no-op when unchanged.
+   */
+  setFilters(filters: MkTableFilters | null): void {
+    const next = mkCompactFilters(filters);
+    if (canonicalJson(next) === canonicalJson(this._filters())) return;
+    this._filters.set(next);
+    this._page.set(1);
+    this.load();
+  }
+
+  /**
    * Re-run the current request immediately (e.g. after a mutation). Flushes a
    * pending debounced filter, since the request reads the live filter value.
    */
@@ -327,6 +365,7 @@ export class MkTableDataSource<T> {
       sort: this._sort(),
       filter: this._filter(),
       query: this._query(),
+      filters: this._filters(),
     };
     let result: Promise<MkDataPage<T>> | Observable<MkDataPage<T>>;
     try {

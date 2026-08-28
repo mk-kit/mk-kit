@@ -96,6 +96,62 @@ export class MkTableHarness extends MkHarness {
     return !this.q('tr.mk-table__row');
   }
 
+  /**
+   * Set a header-row filter (table is `filterable`). `value` is typed into
+   * a text / number / date box, or picked from a select by option label or
+   * value; `''` clears that filter.
+   */
+  async setFilter(key: string, value: string): Promise<void> {
+    const control = this.filterControl(key);
+    if (control.native instanceof HTMLSelectElement) {
+      const options = Array.from(control.native.options);
+      const match =
+        value === ''
+          ? options[0]
+          : options.find((o) => o.value === value || o.textContent?.trim() === value);
+      if (!match) throw new Error(`Filter "${key}" has no option "${value}".`);
+      await control.setValue(match.value);
+      return;
+    }
+    await control.setValue(value);
+  }
+
+  /** The current value of a header-row filter control (`''` when unset). */
+  filterValue(key: string): string {
+    return (this.filterControl(key).native as HTMLInputElement).value ?? '';
+  }
+
+  /** Clear every header-row filter. */
+  async clearFilters(): Promise<void> {
+    for (const control of this.qAll('.mk-table__filter-control')) {
+      if ((control.native as HTMLInputElement).value !== '') await control.setValue('');
+    }
+  }
+
+  /**
+   * Scroll a `virtual` table so the row at display `index` is at the top of
+   * the viewport (drives the scroll box, so only the rows around it render).
+   */
+  async scrollToRow(index: number): Promise<void> {
+    const scroller = this.q('.mk-table__scroll');
+    if (!scroller) throw new Error('Table has no scroll container.');
+    const rowHeight = Number(scroller.attr('data-row-height')) || 44;
+    const top = Math.max(0, index) * rowHeight;
+    const el = scroller.native;
+    el.scrollTop = top;
+    if (el.scrollTop !== top) {
+      // jsdom has no layout, so scrollTop does not stick — pin it.
+      Object.defineProperty(el, 'scrollTop', { value: top, configurable: true, writable: true });
+    }
+    await scroller.dispatch(new Event('scroll', { bubbles: false }));
+  }
+
+  private filterControl(key: string): MkTestElement {
+    const control = this.q(`.mk-table__filter-control[data-filter-key="${key}"]`);
+    if (!control) throw new Error(`Table has no filter control for column "${key}" (is it filterable?).`);
+    return control;
+  }
+
   private headerCells(): MkTestElement[] {
     return this.qAll('th.mk-table__th').filter(
       (th) => !th.hasClass('mk-table__th--expand') && !th.hasClass('mk-table__th--select'),

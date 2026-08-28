@@ -36,7 +36,29 @@ interface DemoUser {
   role: string;
   orders: number;
   status: string;
+  joined: string;
 }
+
+interface BigRow {
+  id: number;
+  sku: string;
+  product: string;
+  category: string;
+  stock: number;
+  price: number;
+}
+
+// ----- 10,000 generated rows for the virtual-scroll demo --------------------
+const BIG_CATEGORIES = ['Audio', 'Cables', 'Displays', 'Input', 'Storage', 'Power'];
+const BIG_NOUNS = ['Hub', 'Adapter', 'Dock', 'Charger', 'Cable', 'Stand', 'Mount', 'Case'];
+const BIG_ROWS: BigRow[] = Array.from({ length: 10_000 }, (_, i) => ({
+  id: i + 1,
+  sku: `SKU-${String(i + 1).padStart(5, '0')}`,
+  product: `${BIG_CATEGORIES[i % BIG_CATEGORIES.length]} ${BIG_NOUNS[(i * 7) % BIG_NOUNS.length]} ${(i % 12) + 1}`,
+  category: BIG_CATEGORIES[i % BIG_CATEGORIES.length],
+  stock: (i * 37) % 500,
+  price: ((i * 53) % 900) / 10 + 4.9,
+}));
 
 interface DemoCustomer {
   name: string;
@@ -89,6 +111,7 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
       <p class="docs-lead">
         A fully sortable data table built on a native
         <code class="docs-inline">&lt;table&gt;</code> — with expandable rows,
+        a per-column filter row, virtual scrolling for very large lists,
         click-to-edit text and opt-in data-grid power features like column
         resize, reorder, pinning and inline cell editing. Every component is
         themed with <code class="docs-inline">--mk-*</code> tokens and ships
@@ -300,6 +323,56 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td>—</td>
             <td><code class="docs-inline">{{ '{' }} row, key, value {{ '}' }}</code> when an <code class="docs-inline">editable</code> cell is saved.</td>
           </tr>
+          <tr><td colspan="4"><strong>Filter row</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">filterable</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Render a second header row with one filter control per column (kind from <code class="docs-inline">MkTableColumn.filter</code>).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">filters</code></td>
+            <td><code class="docs-inline">model&lt;Record&lt;string, unknown&gt;&gt;</code></td>
+            <td><code class="docs-inline">{{ '{' }}{{ '}' }}</code></td>
+            <td>Two-way <code class="docs-inline">[(filters)]</code> map keyed by column key; <code class="docs-inline">(filtersChange)</code> emits on every edit. Set it to pre-filter. Also <code class="docs-inline">setFilter(key, value)</code> / <code class="docs-inline">clearFilter(key)</code> / <code class="docs-inline">clearFilters()</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">clientFilter</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code></td>
+            <td>Filter the rows in the browser. Turn off when the server filters (<code class="docs-inline">MkTableDataSource.setFilters</code>).</td>
+          </tr>
+          <tr><td colspan="4"><strong>Virtual rows</strong></td></tr>
+          <tr>
+            <td><code class="docs-inline">virtual</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">false</code></td>
+            <td>Render only the rows in view (plus <code class="docs-inline">overscan</code>) inside a scroll box with a pinned header. Off while stacked into cards.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">rowHeight</code></td>
+            <td><code class="docs-inline">number | null</code></td>
+            <td><code class="docs-inline">null</code> (measured, 44)</td>
+            <td>Row height in px. Unset, it is measured from the first rendered row, so <code class="docs-inline">density</code> and <code class="docs-inline">data-mk-density</code> are picked up automatically.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">overscan</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td><code class="docs-inline">6</code></td>
+            <td>Extra rows rendered beyond each edge of the viewport.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">height</code> / <code class="docs-inline">maxHeight</code></td>
+            <td><code class="docs-inline">string | number | null</code></td>
+            <td><code class="docs-inline">null</code></td>
+            <td>Size of the scroll box (CSS length, or px). With neither set, <code class="docs-inline">virtual</code> defaults to <code class="docs-inline">max-height: 60vh</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">scrollToRow(target, by?)</code></td>
+            <td><code class="docs-inline">(number | key, 'index' | 'key') =&gt; boolean</code></td>
+            <td>—</td>
+            <td>Method. A number is the display index (after sort / filter / expansion, group headers included); anything else a <code class="docs-inline">trackKey</code> value (pass <code class="docs-inline">'key'</code> for numeric keys). <code class="docs-inline">false</code> when the row is not displayed.</td>
+          </tr>
           <tr><td colspan="4"><strong>Stacked mode</strong></td></tr>
           <tr>
             <td><code class="docs-inline">stackAt</code></td>
@@ -324,8 +397,12 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
         <code class="docs-inline">MkSortChange</code>,
         <code class="docs-inline">MkColumnResize</code>,
         <code class="docs-inline">MkCellEdit</code>,
-        <code class="docs-inline">MkTableGroup</code> and
-        <code class="docs-inline">MkGroupToggle</code>, alongside the sort
+        <code class="docs-inline">MkTableGroup</code>,
+        <code class="docs-inline">MkGroupToggle</code>,
+        <code class="docs-inline">MkTableFilters</code>,
+        <code class="docs-inline">MkTableFilterKind</code>,
+        <code class="docs-inline">MkTableFilterOption</code> and
+        <code class="docs-inline">MkTableFilterRange</code>, alongside the sort
         directives and <code class="docs-inline">MkTableDataSource</code>.
       </p>
 
@@ -389,6 +466,21 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td><code class="docs-inline">stack</code></td>
             <td><code class="docs-inline">'title' | 'footer' | 'hide'</code></td>
             <td>Role in stacked-card mode: card heading, unlabelled footer, or not rendered at all. Omitted = labelled field.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">filter</code></td>
+            <td><code class="docs-inline">'text' | 'select' | 'number' | 'date' | false</code></td>
+            <td>Filter-row control (needs <code class="docs-inline">filterable</code>). Omitted = text; <code class="docs-inline">false</code> = no control.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">filterOptions</code></td>
+            <td><code class="docs-inline">(string | number | {{ '{' }} value, label {{ '}' }})[]</code></td>
+            <td>Options of a <code class="docs-inline">select</code> filter. Omitted = the column's distinct values in <code class="docs-inline">data</code>, sorted.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">filterPlaceholder</code></td>
+            <td><code class="docs-inline">string</code></td>
+            <td>Placeholder of the filter control (text: "Filter…", number / date: "Min", select: "All").</td>
           </tr>
         </tbody>
       </table>
@@ -511,6 +603,111 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
         <p class="echo">Last toggle: {{ treeStatus() }}</p>
       </docs-example>
 
+      <h2 id="filter-row">Header filter row</h2>
+      <p>
+        Set <code class="docs-inline">filterable</code> and every column gets a
+        control in a second header row: a text box by default, or a
+        <code class="docs-inline">select</code>, <code class="docs-inline">number</code>
+        or <code class="docs-inline">date</code> field as its
+        <code class="docs-inline">filter</code> says
+        (<code class="docs-inline">false</code> leaves the cell empty). The
+        values live in the two-way <code class="docs-inline">[(filters)]</code>
+        map — keyed by column key, so it serialises straight into a URL or a
+        request body.
+      </p>
+      <p>
+        Client-side rules are deliberately simple: text is a case-insensitive
+        <em>contains</em> on the displayed (formatted) text, select is
+        equality, and the number / date boxes keep rows whose value is
+        <strong>≥</strong> the entry — set
+        <code class="docs-inline">{{ '{' }} min, max {{ '}' }}</code> through
+        <code class="docs-inline">filters</code> for an inclusive range (dates
+        compare by local calendar day, as
+        <code class="docs-inline">Date</code>, ISO string or timestamp).
+        Filtering composes with sorting, grouping (counts follow), tree rows (a
+        matching child keeps its parents) and select-all; CSV export and
+        <code class="docs-inline">getExportRows()</code> write the filtered
+        rows. Each active control shows an <kbd>×</kbd> (Escape clears too), and
+        <code class="docs-inline">clearFilters()</code> resets the lot. Every
+        change is announced with the number of matching rows.
+      </p>
+      <p>
+        The controls are native inputs dressed in the kit's tokens rather than
+        <code class="docs-inline">mk-select</code> /
+        <code class="docs-inline">mk-date-picker</code>, so the table entry
+        point stays independent of the forms and datetime bundles. For
+        server-side filtering, turn <code class="docs-inline">clientFilter</code>
+        off and forward <code class="docs-inline">(filtersChange)</code> to
+        <code class="docs-inline">MkTableDataSource.setFilters()</code>.
+        Filters: <strong>{{ filterEcho() }}</strong>.
+      </p>
+      <docs-example [code]="filterCode" column>
+        <div style="display: flex; gap: var(--mk-space-2); margin-bottom: var(--mk-space-3)">
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="filterTable.clearFilters()">Clear filters</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="tableFilters.set({ role: 'Editor', orders: { min: 10, max: 60 } })">Editors with 10–60 orders</button>
+        </div>
+        <mk-table
+          #filterTable
+          [columns]="filterColumns"
+          [data]="users"
+          filterable
+          zebra
+          trackKey="email"
+          [(filters)]="tableFilters"
+          style="width: 100%"
+        />
+      </docs-example>
+
+      <h2 id="virtual">Virtual rows — 10,000 rows</h2>
+      <p>
+        Set <code class="docs-inline">virtual</code> and the table renders only
+        the rows in view (plus <code class="docs-inline">overscan</code>) inside
+        its own scroll box, with spacer rows keeping the scrollbar honest and
+        the header pinned. Size the box with
+        <code class="docs-inline">height</code> or
+        <code class="docs-inline">maxHeight</code> (default
+        <code class="docs-inline">60vh</code>). The row height is measured from
+        the first rendered row — so <code class="docs-inline">density</code> and
+        <code class="docs-inline">data-mk-density</code> just work — or pinned
+        with <code class="docs-inline">rowHeight</code>.
+      </p>
+      <p>
+        Everything else keeps working on the <em>whole</em> list: sorting,
+        the filter row, select-all, tree rows, grouping (group headers are
+        rows in the window), CSV export and
+        <code class="docs-inline">getExportRows()</code>. Expandable detail
+        rows are measured once rendered; until then an open detail counts as
+        one extra row. <code class="docs-inline">scrollToRow(index | key)</code>
+        jumps to a row. The table carries
+        <code class="docs-inline">aria-rowcount</code> and each row its
+        <code class="docs-inline">aria-rowindex</code>, so screen readers know
+        where they are in the list. Cards (<code class="docs-inline">stackAt</code>)
+        render in full — a stacked list is short by design. Below:
+        <strong>{{ bigStatus() }}</strong>.
+      </p>
+      <docs-example [code]="virtualCode" column>
+        <div style="display: flex; flex-wrap: wrap; gap: var(--mk-space-2); margin-bottom: var(--mk-space-3)">
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="bigTable.scrollToRow(0)">Top</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="bigTable.scrollToRow(4999)">Row 5,000</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="bigTable.scrollToRow('SKU-09000')">SKU-09000</button>
+          <button mkButton size="sm" variant="outline" tone="neutral" (click)="bigTable.exportCsv({ filename: 'products' })">CSV ({{ bigSelected().length || 'all' }})</button>
+        </div>
+        <mk-table
+          #bigTable
+          [columns]="bigColumns"
+          [data]="bigRows"
+          virtual
+          filterable
+          selectable
+          zebra
+          trackKey="sku"
+          [maxHeight]="360"
+          [(selected)]="bigSelected"
+          [(filters)]="bigFilters"
+          style="width: 100%"
+        />
+      </docs-example>
+
       <h2>Inline edit</h2>
       <p>
         <code class="docs-inline">&lt;mk-inline-edit&gt;</code> turns text into a
@@ -567,8 +764,10 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
       <h2>Export to CSV &amp; print</h2>
       <p>
         <code class="docs-inline">table.exportCsv()</code> downloads what the
-        user sees: the current column order and sort, column formatters applied,
-        tree children flattened under their parent. Options narrow it to
+        user sees: the current column order, sort and header filters, column
+        formatters applied, tree children flattened under their parent (and
+        every row of a <code class="docs-inline">virtual</code> table, not the
+        rendered window). Options narrow it to
         <code class="docs-inline">selectedOnly</code> or a
         <code class="docs-inline">columns</code> subset, change the
         <code class="docs-inline">filename</code> or
@@ -759,6 +958,16 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td>Free-text query (<code class="docs-inline">''</code> = none).</td>
           </tr>
           <tr>
+            <td><code class="docs-inline">MkDataRequest.query</code></td>
+            <td><code class="docs-inline">MkQueryGroup | null</code></td>
+            <td>Structured query from <code class="docs-inline">mk-query-builder</code>, compacted.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">MkDataRequest.filters</code></td>
+            <td><code class="docs-inline">Record&lt;string, unknown&gt; | null</code></td>
+            <td>Per-column filters from the table's filter row, empty entries dropped (<code class="docs-inline">null</code> = none).</td>
+          </tr>
+          <tr>
             <td><code class="docs-inline">MkDataPage.rows</code></td>
             <td><code class="docs-inline">T[]</code></td>
             <td>The rows for the requested page.</td>
@@ -832,6 +1041,16 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
             <td>Debounced; resets to page 1. <code class="docs-inline">filter()</code> updates immediately.</td>
           </tr>
           <tr>
+            <td><code class="docs-inline">setFilters(filters)</code></td>
+            <td><code class="docs-inline">(Record&lt;string, unknown&gt; | null) =&gt; void</code></td>
+            <td>Per-column filters from <code class="docs-inline">(filtersChange)</code> (pair with <code class="docs-inline">clientFilter="false"</code>); compacted, resets to page 1, loads at once, no-op when unchanged.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">setQuery(query)</code></td>
+            <td><code class="docs-inline">(MkQueryGroup | null) =&gt; void</code></td>
+            <td>Structured query from <code class="docs-inline">mk-query-builder</code>; compacted, resets to page 1.</td>
+          </tr>
+          <tr>
             <td><code class="docs-inline">refresh()</code></td>
             <td><code class="docs-inline">() =&gt; void</code></td>
             <td>Re-run the current request now (e.g. after a mutation); flushes a pending debounce.</td>
@@ -890,13 +1109,87 @@ export class TablePage {
   ];
 
   protected readonly users: DemoUser[] = [
-    { name: 'Ada Lovelace', email: 'ada@example.com', role: 'Admin', orders: 42, status: 'active' },
-    { name: 'Grace Hopper', email: 'grace@example.com', role: 'Editor', orders: 17, status: 'active' },
-    { name: 'Alan Turing', email: 'alan@example.com', role: 'Viewer', orders: 8, status: 'invited' },
-    { name: 'Katherine Johnson', email: 'kat@example.com', role: 'Editor', orders: 63, status: 'active' },
-    { name: 'Edsger Dijkstra', email: 'edsger@example.com', role: 'Admin', orders: 29, status: 'suspended' },
-    { name: 'Barbara Liskov', email: 'barbara@example.com', role: 'Viewer', orders: 51, status: 'active' },
+    { name: 'Ada Lovelace', email: 'ada@example.com', role: 'Admin', orders: 42, status: 'active', joined: '2024-01-15' },
+    { name: 'Grace Hopper', email: 'grace@example.com', role: 'Editor', orders: 17, status: 'active', joined: '2024-03-02' },
+    { name: 'Alan Turing', email: 'alan@example.com', role: 'Viewer', orders: 8, status: 'invited', joined: '2025-06-30' },
+    { name: 'Katherine Johnson', email: 'kat@example.com', role: 'Editor', orders: 63, status: 'active', joined: '2023-11-20' },
+    { name: 'Edsger Dijkstra', email: 'edsger@example.com', role: 'Admin', orders: 29, status: 'suspended', joined: '2025-01-09' },
+    { name: 'Barbara Liskov', email: 'barbara@example.com', role: 'Viewer', orders: 51, status: 'active', joined: '2024-09-12' },
   ];
+
+  // ----- Header filter row ---------------------------------------------
+  protected readonly filterColumns: MkTableColumn<DemoUser>[] = [
+    { key: 'name', header: 'Name', sortable: true },
+    { key: 'email', header: 'Email', filter: false },
+    { key: 'role', header: 'Role', sortable: true, filter: 'select' },
+    { key: 'orders', header: 'Orders', sortable: true, align: 'end', filter: 'number' },
+    { key: 'joined', header: 'Joined', filter: 'date' },
+    {
+      key: 'status',
+      header: 'Status',
+      align: 'center',
+      filter: 'select',
+      filterOptions: ['active', 'invited', 'suspended'],
+      format: (v) => String(v).toUpperCase(),
+    },
+  ];
+  protected readonly tableFilters = signal<Record<string, unknown>>({});
+  protected readonly filterEcho = computed(() => {
+    const entries = Object.entries(this.tableFilters());
+    return entries.length ? JSON.stringify(this.tableFilters()) : 'none';
+  });
+  protected readonly filterCode = `columns: MkTableColumn<User>[] = [
+  { key: 'name',   header: 'Name' },                       // text (default)
+  { key: 'email',  header: 'Email',  filter: false },      // no control
+  { key: 'role',   header: 'Role',   filter: 'select' },   // distinct values
+  { key: 'orders', header: 'Orders', filter: 'number' },   // ≥ entry
+  { key: 'joined', header: 'Joined', filter: 'date' },     // ≥ day
+  { key: 'status', header: 'Status', filter: 'select',
+    filterOptions: ['active', 'invited', 'suspended'] },
+];
+
+<mk-table #table [columns]="columns" [data]="users" filterable [(filters)]="filters" />
+<button mkButton (click)="table.clearFilters()">Clear filters</button>
+
+// filters(): { role: 'Editor', orders: 10 } — or a range: { orders: { min: 10, max: 60 } }
+
+// Server-side: the table only edits the map, the data source sends it
+<mk-table [columns]="columns" [data]="ds.rows()" filterable clientFilter="false"
+  (filtersChange)="ds.setFilters($event)" />
+// → req.filters === { role: 'Editor', orders: 10 }`;
+
+  // ----- Virtual rows --------------------------------------------------
+  protected readonly bigColumns: MkTableColumn<BigRow>[] = [
+    { key: 'sku', header: 'SKU', sortable: true, width: '130px' },
+    { key: 'product', header: 'Product', sortable: true },
+    { key: 'category', header: 'Category', sortable: true, filter: 'select' },
+    { key: 'stock', header: 'Stock', sortable: true, align: 'end', filter: 'number' },
+    { key: 'price', header: 'Price', sortable: true, align: 'end', filter: 'number', format: (v) => `${(v as number).toFixed(2)} zł` },
+  ];
+  protected readonly bigRows = BIG_ROWS;
+  protected readonly bigSelected = signal<BigRow[]>([]);
+  protected readonly bigFilters = signal<Record<string, unknown>>({});
+  protected readonly bigStatus = computed(
+    () => `${this.bigRows.length.toLocaleString()} rows, ${this.bigSelected().length} selected`,
+  );
+  protected readonly virtualCode = `// rows: Product[] — 10,000 of them
+<mk-table
+  #table
+  [columns]="columns"
+  [data]="rows"
+  virtual
+  filterable
+  selectable
+  trackKey="sku"
+  [maxHeight]="360"
+  [(selected)]="selected" />
+
+<button mkButton (click)="table.scrollToRow(4999)">Row 5,000</button>
+<button mkButton (click)="table.scrollToRow('SKU-09000')">By key</button>
+<button mkButton (click)="table.exportCsv()">CSV — every row, not the window</button>
+
+// rowHeight is measured from the first row (density-aware); pin it if you must:
+<mk-table virtual [rowHeight]="36" [overscan]="10" height="480px" … />`;
 
   protected readonly tableStatus = signal('idle');
 
