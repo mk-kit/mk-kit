@@ -12,7 +12,7 @@ Every component and directive below is standalone — import the class from its 
 
 ## @mk-kit/ui/core
 
-68 exports. `import { … } from '@mk-kit/ui/core';`
+70 exports. `import { … } from '@mk-kit/ui/core';`
 
 ### MkAnchoredPanel (directive)
 
@@ -160,6 +160,8 @@ Methods:
 | --- | --- |
 | `setDensity(density: MkDensity): void` | Set the global density mode. |
 | `toggleDensity(): void` | Toggle between comfortable and compact — the two modes a density switch in a UI offers. `touch` is a deliberate choice for a specific screen, not something to land on by toggling, so from `touch` this returns to comfortable rather than cycling. |
+| `setContrast(contrast: MkContrastPreference): void` | Set the contrast preference explicitly. |
+| `toggleContrast(): void` | Toggle between normal and high contrast (resolving `system` first). |
 | `setTheme(preference: MkThemePreference): void` | Set the theme preference explicitly. |
 | `toggle(): void` | Toggle between light and dark (resolving `system` first). |
 
@@ -171,6 +173,9 @@ Properties:
 | `resolvedTheme` | `Signal<MkResolvedTheme>` | The concrete theme in effect (`light` or `dark`). |
 | `isDark` | `Signal<boolean>` | Convenience boolean for template bindings. |
 | `density` | `Signal<MkDensity>` | The global density mode. `compact` tightens control heights and the core spacing steps via the `data-mk-density` attribute, `touch` enlarges them — every component follows automatically because they read the same tokens.  This signal is the GLOBAL mode only. To make one screen or dialog touch- sized inside an otherwise comfortable app, put `data-mk-density="touch"` on that element instead; the tokens inherit and this service stays out of it. |
+| `contrast` | `Signal<MkContrastPreference>` | The user's contrast preference: `normal`, `high` or `system` (follow the OS `prefers-contrast` setting — the default). Written as `data-mk-contrast` on `<html>` and persisted; `system` removes the attribute so the pure-CSS `prefers-contrast: more` mapping takes over.  Like density, the attribute also works per subtree: put `data-mk-contrast="high"` on any element to raise contrast there only. |
+| `resolvedContrast` | `Signal<MkResolvedContrast>` | The concrete contrast in effect (`normal` or `high`). |
+| `isHighContrast` | `Signal<boolean>` | Convenience boolean for template bindings. |
 
 ### MkFieldContext (class)
 
@@ -787,6 +792,8 @@ Members:
 
 | Name | Type | Description |
 | --- | --- | --- |
+| `locale`? | `string \| undefined` | BCP 47 locale tag (`'pl-PL'`, `'de'`) used by the formatting pipes (`mkCurrency`, `mkRelativeTime`, `mkFileSize`, `mkPluralize`) and any other `Intl`-based formatting that has no explicit locale of its own. Unset → the runtime (browser / Node) default locale. |
+| `currency`? | `string \| undefined` | ISO 4217 currency code the `mkCurrency` pipe falls back to when the template passes none. Unset → `'USD'`. |
 | `validation` | `MkValidationStrings` | Validation messages (deep-merged by provideMkI18n). |
 | `close` | `string` | Generic "Close" control (dialog, drawer, bottom-sheet). |
 | `dismiss` | `string` | Generic "Dismiss" control (alert, banner, toast, snackbar). |
@@ -1222,6 +1229,22 @@ Languages with built-in highlighting. Unknown values render plain text.
 type MkCodeLanguage = 'json' | 'plaintext';
 ```
 
+### MkContrastPreference (type)
+
+Import: `import { MkContrastPreference } from '@mk-kit/ui/core';`
+
+Contrast preference.
+
+`high` applies the high-contrast token preset (`data-mk-contrast="high"`):
+pure text colours, line-like borders, opaque interaction washes, a thicker
+focus ring. `system` (the default) writes no attribute and lets the
+stylesheet follow the OS `prefers-contrast: more` setting; `normal` opts
+out of that even when the OS asks for more contrast.
+
+```ts
+type MkContrastPreference = 'normal' | 'high' | 'system';
+```
+
 ### MkDensity (type)
 
 Import: `import { MkDensity } from '@mk-kit/ui/core';`
@@ -1296,6 +1319,16 @@ Value kind of a filterable field; decides the editor and the operators offered.
 
 ```ts
 type MkQueryValueType = 'string' | 'number' | 'boolean' | 'date' | 'select';
+```
+
+### MkResolvedContrast (type)
+
+Import: `import { MkResolvedContrast } from '@mk-kit/ui/core';`
+
+Concrete resolved contrast (never `system`).
+
+```ts
+type MkResolvedContrast = 'normal' | 'high';
 ```
 
 ### MkResolvedTheme (type)
@@ -1631,7 +1664,7 @@ Inputs:
 
 ## @mk-kit/ui/directives
 
-31 exports. `import { … } from '@mk-kit/ui/directives';`
+43 exports. `import { … } from '@mk-kit/ui/directives';`
 
 ### MkAutofocus (directive)
 
@@ -2102,6 +2135,122 @@ Properties:
 | --- | --- | --- |
 | `activeId` | `WritableSignal<string \| null>` | The id of the currently active section (`null` before the first one). |
 
+### MkCurrencyPipe (pipe)
+
+Pipe name: `mkCurrency` · `transform(value: number | string | null | undefined, currency?: string | null, options?: MkCurrencyOptions): string`
+
+Import: `import { MkCurrencyPipe } from '@mk-kit/ui/directives';`
+
+`mkCurrency` — format a number as money with `Intl.NumberFormat`, honouring
+the locale and default currency from `provideMkI18n({ locale, currency })`.
+No Angular locale data is needed. Pure: `null`, `undefined`, `''` and
+non-numeric input render as `''`.
+
+```html
+{{ 1234.5 | mkCurrency }}                                <!-- $1,234.50 (i18n currency, default USD) -->
+{{ 1234.5 | mkCurrency:'EUR' }}                          <!-- €1,234.50 -->
+{{ 1234.5 | mkCurrency:'PLN':{ locale: 'pl-PL' } }}      <!-- 1234,50 zł -->
+{{ 1234567 | mkCurrency:'USD':{ notation: 'compact' } }} <!-- $1.2M -->
+{{ total() | mkCurrency:'GBP':{ signDisplay: 'always' } }} <!-- signals work as-is -->
+```
+
+### MkFileSizePipe (pipe)
+
+Pipe name: `mkFileSize` · `transform(value: number | string | null | undefined, options?: MkFileSizeOptions): string`
+
+Import: `import { MkFileSizePipe } from '@mk-kit/ui/directives';`
+
+`mkFileSize` — bytes → a human-readable size such as `1.2 MB`, with the
+number formatted by `Intl.NumberFormat` in the `provideMkI18n` locale.
+Pure: `null`, `undefined`, `''` and non-numeric input render as `''`.
+
+```html
+{{ 1_234_567 | mkFileSize }}                        <!-- 1.2 MB -->
+{{ 1_234_567 | mkFileSize:{ base: 'binary' } }}     <!-- 1.2 MiB -->
+{{ 1_234_567 | mkFileSize:{ digits: 2, locale: 'de' } }} <!-- 1,23 MB -->
+{{ 512 | mkFileSize }}                              <!-- 512 B -->
+```
+
+### MkInitialsPipe (pipe)
+
+Pipe name: `mkInitials` · `transform(value: string | null | undefined, max?: number): string`
+
+Import: `import { MkInitialsPipe } from '@mk-kit/ui/directives';`
+
+`mkInitials` — "Ada Lovelace" → "AL", the same rule `mk-avatar` uses for
+its fallback: first letter of the first and last word, upper-cased. A
+single word yields its first `max` letters ("Ada" → "AD"); more than two
+words with `max` > 2 take one letter per word from the start ("Jean
+Luc Picard" with `max: 3` → "JLP"). Leading/trailing/duplicate whitespace
+is ignored, and grapheme-aware slicing keeps emoji and accents intact.
+Pure: `null`, `undefined` and blank input render as `''`.
+
+```html
+{{ user.name | mkInitials }}      <!-- Grace Hopper → GH -->
+{{ user.name | mkInitials:1 }}    <!-- Grace Hopper → G -->
+{{ 'Jean Luc Picard' | mkInitials:3 }} <!-- JLP -->
+```
+
+### MkPluralizePipe (pipe)
+
+Pipe name: `mkPluralize` · `transform(value: number | string | null | undefined, singular: string | MkPluralForms, plural?: string | null, options?: MkPluralizeOptions): string`
+
+Import: `import { MkPluralizePipe } from '@mk-kit/ui/directives';`
+
+`mkPluralize` — pick the right word for a count using the locale's plural
+rules (`Intl.PluralRules`), optionally prefixed with the formatted count.
+The English shorthand takes a singular and an optional plural (default
+`singular + 's'`); other languages pass a `MkPluralForms` map.
+Pure: `null`, `undefined`, `''` and non-numeric counts render as `''`.
+
+```html
+{{ count | mkPluralize:'item' }}                 <!-- 1 item / 3 items -->
+{{ count | mkPluralize:'entry':'entries' }}      <!-- 1 entry / 2 entries -->
+{{ count | mkPluralize:'file':null:{ withCount: false } }} <!-- files -->
+{{ n | mkPluralize:{ one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' }:null:{ locale: 'pl' } }}
+```
+
+### MkRelativeTimePipe (pipe)
+
+Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string`
+
+Import: `import { MkRelativeTimePipe } from '@mk-kit/ui/directives';`
+
+`mkRelativeTime` — "3 minutes ago" / "in 2 days" / "yesterday" from a
+`Date`, timestamp or ISO string, via `Intl.RelativeTimeFormat` in the
+`provideMkI18n` locale (no Angular locale data). Pure: `null`, `undefined`
+and unparsable input render as `''`.
+
+The pipe picks the largest unit whose magnitude is at least 1 (seconds →
+minutes → hours → days → weeks → months → years) and rounds. Pass `now`
+for deterministic output in tests, or bind a ticking signal to keep a
+list live — a pure pipe only re-runs when an argument changes:
+
+```html
+{{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->
+{{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->
+{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->
+{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
+```
+
+### MkTruncatePipe (pipe)
+
+Pipe name: `mkTruncate` · `transform(value: string | null | undefined, length?: number, options?: MkTruncateOptions): string`
+
+Import: `import { MkTruncatePipe } from '@mk-kit/ui/directives';`
+
+`mkTruncate` — shorten text to `length` characters and append an ellipsis.
+The ellipsis counts toward the limit, so the output never exceeds
+`length` characters; counting is grapheme-aware (emoji and accented
+letters are one character). Text that already fits is returned as-is.
+Pure: `null` and `undefined` render as `''`.
+
+```html
+{{ post.body | mkTruncate:80 }}                          <!-- hard cut at 80 -->
+{{ post.body | mkTruncate:80:{ wordBoundary: true } }}   <!-- cut at the last space -->
+{{ hash | mkTruncate:12:{ ellipsis: '...' } }}
+```
+
 ### MkHistoryService (service)
 
 Docs: https://mk-kit.dev/core-services
@@ -2373,6 +2522,40 @@ wherever `spellcheck` is `false`.
 const MK_FIELD_PRESETS: Readonly<Record<MkFieldKind, Partial<Record<"type" | "inputmode" | "autocomplete" | "autocapitalize" | "autocorrect" | "spellcheck" | "enterkeyhint", string>>>>;
 ```
 
+### MkCurrencyOptions (interface)
+
+Import: `import { MkCurrencyOptions } from '@mk-kit/ui/directives';`
+
+Options accepted by `MkCurrencyPipe`. They map onto
+`Intl.NumberFormat` currency options; `locale` overrides the i18n /
+runtime locale for this call only.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `locale`? | `string \| undefined` | BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale. |
+| `display`? | `"symbol" \| "name" \| "narrowSymbol" \| "code" \| undefined` | How the currency is shown. Default `'symbol'` (`€`, `$`, `zł`). |
+| `minimumFractionDigits`? | `number \| undefined` | Fraction digits; both default to the currency's own (2 for EUR, 0 for JPY). |
+| `maximumFractionDigits`? | `number \| undefined` |  |
+| `signDisplay`? | `"auto" \| "never" \| "always" \| "exceptZero" \| undefined` | Sign display, e.g. `'always'` for `+€10.00` or `'exceptZero'`. |
+| `notation`? | `"compact" \| "standard" \| undefined` | Compact notation for dashboards (`$1.2M`). Default `'standard'`. |
+| `useGrouping`? | `boolean \| undefined` | Thousands grouping; default `true`. |
+
+### MkFileSizeOptions (interface)
+
+Import: `import { MkFileSizeOptions } from '@mk-kit/ui/directives';`
+
+Options accepted by `MkFileSizePipe`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `locale`? | `string \| undefined` | BCP 47 locale for the number part (decimal separator); defaults to the i18n / runtime locale. |
+| `base`? | `"decimal" \| "binary" \| undefined` | `'decimal'` (default) divides by 1000 and labels `kB MB GB …` (what operating systems and file dialogs show); `'binary'` divides by 1024 and labels `KiB MiB GiB …`. |
+| `digits`? | `number \| undefined` | Maximum fraction digits. Default `1`; bytes never get fractions. |
+
 ### MkHistoryEntry (interface)
 
 Import: `import { MkHistoryEntry } from '@mk-kit/ui/directives';`
@@ -2435,6 +2618,47 @@ Members:
 | `alt` | `boolean` | The Alt / Option key. |
 | `shift` | `boolean` | The Shift key. |
 
+### MkPluralizeOptions (interface)
+
+Import: `import { MkPluralizeOptions } from '@mk-kit/ui/directives';`
+
+Options accepted by `MkPluralizePipe`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `locale`? | `string \| undefined` | BCP 47 locale for the plural rules and number; defaults to the i18n / runtime locale. |
+| `withCount`? | `boolean \| undefined` | Prefix the formatted count (`"3 items"`); `false` gives just the word. Default `true`. |
+
+### MkRelativeTimeOptions (interface)
+
+Import: `import { MkRelativeTimeOptions } from '@mk-kit/ui/directives';`
+
+Options accepted by `MkRelativeTimePipe`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `locale`? | `string \| undefined` | BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale. |
+| `numeric`? | `"auto" \| "always" \| undefined` | `'auto'` (default) uses phrases like "yesterday" / "now" where the locale has them; `'always'` sticks to "1 day ago" / "in 0 seconds". |
+| `style`? | `"long" \| "short" \| "narrow" \| undefined` | Length of the unit word: `'long'` (default, "minutes"), `'short'` ("min."), `'narrow'` ("m"). |
+| `maxUnit`? | `Intl.RelativeTimeFormatUnit \| undefined` | Largest unit to use. Default `'year'`; e.g. `'day'` keeps "45 days ago" instead of "1 month ago". |
+
+### MkTruncateOptions (interface)
+
+Import: `import { MkTruncateOptions } from '@mk-kit/ui/directives';`
+
+Options accepted by `MkTruncatePipe`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `ellipsis`? | `string \| undefined` | Suffix appended when text is cut. Default `'…'` (a single ellipsis character). |
+| `wordBoundary`? | `boolean \| undefined` | Cut at the last whitespace before the limit instead of mid-word (falls back to a hard cut when the first word alone is longer). Default `false`. |
+
 ### MkFieldKind (type)
 
 Import: `import { MkFieldKind } from '@mk-kit/ui/directives';`
@@ -2453,6 +2677,22 @@ The attribute bundle applied for one `MkFieldKind`. Omitted = not set.
 
 ```ts
 type MkFieldPreset = Partial<Record<MkFieldAttr, string>>;
+```
+
+### MkPluralForms (type)
+
+Import: `import { MkPluralForms } from '@mk-kit/ui/directives';`
+
+Per-category word forms for `MkPluralizePipe`, keyed by the CLDR
+plural categories `Intl.PluralRules` returns. `other` is required; the
+pipe falls back to it for any category you leave out.
+
+```ts
+const files: MkPluralForms = { one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' };
+```
+
+```ts
+type MkPluralForms = { other: string } & Partial<Record<Intl.LDMLPluralRule, string>>;
 ```
 
 ## @mk-kit/ui/dnd
@@ -4581,7 +4821,7 @@ Inputs:
 | `hint` | `string` | `''` | Optional helper text shown below the control (hidden while an error shows). |
 | `error` | `string \| null` | `null` | Explicit error message. When non-null it overrides the automatic message derived from the projected control; `''` suppresses errors entirely. |
 | `errorMessages` | `Readonly<Record<string, string \| ((err: any) => string)>> \| null` | `null` | Per-field wording for automatic errors, keyed by `ValidationErrors` key. Each value is either a fixed string or a function of the error payload. |
-| `errorOn` | `"touched" \| "dirty" \| "always"` | `'touched'` | When automatic errors become visible. `touched` (the default) matches Material: after the control is touched or dirty, or the form is submitted. `dirty` waits for an actual edit; `always` shows as soon as it is invalid. |
+| `errorOn` | `"always" \| "touched" \| "dirty"` | `'touched'` | When automatic errors become visible. `touched` (the default) matches Material: after the control is touched or dirty, or the form is submitted. `dirty` waits for an actual edit; `always` shows as soon as it is invalid. |
 | `required` | `boolean` | `false` | Marks the field required (adds an indicator + `aria-required`). Derived from the projected control's validators when it is bound to a form. |
 | `disabled` | `boolean` | `false` | Visually reflect a disabled control. Derived from the projected control when it is bound to a form. |
 | `size` | `MkSize` | `'md'` | Control size; nested controls inherit it. |
@@ -8238,7 +8478,7 @@ type MkTableDensity = 'comfortable' | 'compact';
 
 ## @mk-kit/ui/data
 
-120 exports. `import { … } from '@mk-kit/ui/data';`
+122 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -9680,6 +9920,61 @@ Inputs:
 | `itemHeight` | `number` | `40` | Fixed height of each row in px. |
 | `overscan` | `number` | `4` | Extra rows rendered above/below the viewport to smooth fast scrolls. |
 
+### MkBadgeOverlay (directive)
+
+Selector: `[mkBadgeOverlay]`
+
+Docs: https://mk-kit.dev/components/badges-avatars
+
+Import: `import { MkBadgeOverlay } from '@mk-kit/ui/data';`
+
+Badge overlay — anchors a small badge (count, dot or short text) to a corner
+of ANY element: an icon button, an avatar, a tab label. The host stays a
+single tab stop; the badge is a decorative, non-focusable child.
+
+- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.
+- `mkBadgeOverlayDot` renders a textless dot ("something is new").
+- `mkBadgeOverlayAriaLabel` is the screen-reader text ("3 unread"). It is
+  rendered in a visually hidden span and wired to the host with
+  `aria-describedby`, so it is announced after the host's own name even
+  when the host has an `aria-label`. When it is given, the visible badge is
+  `aria-hidden` so the count is not read twice.
+- Positions use logical insets, so `top-end` sits at the top-right in LTR
+  and the top-left in RTL.
+
+The badge is painted with the global `.mk-badge-overlay` styles from
+`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.
+
+```html
+<button mkButton iconOnly aria-label="Notifications"
+        [mkBadgeOverlay]="unread()" mkBadgeOverlayTone="danger"
+        [mkBadgeOverlayAriaLabel]="unread() + ' unread'">
+  <mk-icon name="bell" />
+</button>
+
+<mk-avatar name="Ada Lovelace" mkBadgeOverlay mkBadgeOverlayDot
+           mkBadgeOverlayTone="success" mkBadgeOverlayPosition="bottom-end" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mkBadgeOverlay` | `string \| number \| null \| undefined` | `null` | Badge content — a count or a short label. `null` / empty hides the badge unless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers so `mkBadgeOverlay="120"` also collapses to `99+`. |
+| `mkBadgeOverlayPosition` | `MkBadgeOverlayPosition` | `'top-end'` | Corner the badge is anchored to (logical: `end` flips in RTL). |
+| `mkBadgeOverlayTone` | `MkTone` | `'primary'` | Semantic color tone (same scale as `mk-badge`). |
+| `mkBadgeOverlayDot` | `boolean` | `false` | Render a textless dot instead of the content. |
+| `mkBadgeOverlayMax` | `number` | `99` | Numbers above this render as `<max>+`. `0` disables the cap. |
+| `mkBadgeOverlayHidden` | `boolean` | `false` | Hide the badge while keeping the directive (and its aria wiring) in place. |
+| `mkBadgeOverlayAriaLabel` | `string` | `''` | Screen-reader text for the badge, e.g. `"3 unread"`. Announced as the host's description; the visible badge becomes `aria-hidden`. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `label` | `Signal<string>` | The text painted in the badge (`''` in dot mode). |
+| `visible` | `Signal<boolean>` | Whether the badge is currently rendered. |
+
 ### MkCarouselSlide (directive)
 
 Selector: `[mkCarouselSlide]`
@@ -10358,6 +10653,16 @@ Presence status shown as a corner dot on an `MkAvatar`.
 
 ```ts
 type MkAvatarStatus = 'online' | 'offline' | 'away' | 'busy';
+```
+
+### MkBadgeOverlayPosition (type)
+
+Import: `import { MkBadgeOverlayPosition } from '@mk-kit/ui/data';`
+
+Corner of the host an `MkBadgeOverlay` is anchored to.
+
+```ts
+type MkBadgeOverlayPosition = | 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
 ```
 
 ### MkBadgeVariant (type)
