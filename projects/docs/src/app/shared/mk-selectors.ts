@@ -176,6 +176,7 @@ export const MK_SELECTORS: Readonly<Record<string, string>> = {
   'mkAnchoredPanel': 'MkAnchoredPanel',
   'mkAutofocus': 'MkAutofocus',
   'mkAutosize': 'MkAutosize',
+  'mkBadgeOverlay': 'MkBadgeOverlay',
   'mkBlockUi': 'MkBlockUi',
   'mkButton': 'MkButton',
   'mkCan': 'MkCan',

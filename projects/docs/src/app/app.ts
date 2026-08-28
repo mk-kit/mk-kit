@@ -99,7 +99,8 @@ export class App {
         {
           label: 'Theming',
           path: '/theming',
-          keywords: 'theme css variables tokens dark light mode colors density theme-service',
+          keywords:
+            'theme css variables tokens dark light mode colors density contrast high-contrast prefers-contrast forced-colors theme-service',
         },
         {
           label: 'Theme builder',
@@ -239,7 +240,8 @@ export class App {
         {
           label: 'Badges & labels',
           path: '/components/badges-avatars',
-          keywords: 'badge chip tag avatar avatar-group presence label pill',
+          keywords:
+            'badge badge-overlay mkBadgeOverlay notification count dot unread chip tag avatar avatar-group presence label pill',
         },
         {
           label: 'Cards & lists',
@@ -461,6 +463,17 @@ export class App {
   protected densityIcon(): string {
     const d = this.theme.density();
     return d === 'compact' ? '▤' : d === 'touch' ? '◉' : '☰';
+  }
+
+  protected contrastLabel(): string {
+    const c = this.theme.contrast();
+    return c === 'system' ? 'System' : c === 'high' ? 'High' : 'Normal';
+  }
+
+  protected cycleContrast(): void {
+    const order = ['system', 'high', 'normal'] as const;
+    const next = order[(order.indexOf(this.theme.contrast()) + 1) % 3];
+    this.theme.setContrast(next);
   }
 
   protected cycleTheme(): void {

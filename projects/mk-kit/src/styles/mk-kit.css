@@ -339,6 +339,424 @@
 }
 
 /* -------------------------------------------------------------------------
+ * 3b. High-contrast preset — `data-mk-contrast="high"`.
+ *
+ *    The same tokens again, pushed to the ends of the scale: pure text
+ *    colours, borders that read as lines rather than tints, opaque
+ *    interaction washes (no low-alpha surfaces), shadows replaced by a crisp
+ *    outline, darker/lighter tone families so tinted text clears 7:1, and a
+ *    thicker focus ring.
+ *
+ *    Applied
+ *      - explicitly, via `[data-mk-contrast="high"]` on <html>
+ *        (MkThemeService.setContrast('high')) or on ANY subtree — these are
+ *        plain custom properties, so they inherit;
+ *      - automatically, from the OS `prefers-contrast: more` setting, unless
+ *        the app opts out with `data-mk-contrast="normal"`
+ *        (MkThemeService.setContrast('normal')).
+ *
+ *    Light and dark each have their own set, resolved with the same
+ *    precedence as the base theme. Windows High Contrast (forced-colors) is
+ *    a separate mechanism — see the forced-colors block at the end.
+ * ---------------------------------------------------------------------- */
+/* Explicit high contrast — light values. Wins over the base light `:root`
+   (same specificity, later) and over the OS-dark `:root:not(...)` rule only
+   through the dark-specific selectors below. */
+[data-mk-contrast=high] {
+  --mk-bg: #ffffff;
+  --mk-surface: #ffffff;
+  --mk-surface-2: #eef0f3;
+  --mk-surface-3: #dfe3e8;
+  --mk-surface-inverse: #000000;
+  --mk-overlay-scrim: rgba(0, 0, 0, 0.8);
+  --mk-text: #000000;
+  --mk-text-muted: #1f2933;
+  --mk-text-subtle: #2b3440;
+  --mk-text-inverse: #ffffff;
+  --mk-text-disabled: #4b5563;
+  --mk-border: #1a1d23;
+  --mk-border-strong: #000000;
+  --mk-border-subtle: #56606e;
+  --mk-hover-overlay: #dfe3e8;
+  --mk-active-overlay: #c9cfd6;
+  --mk-selected-bg: #c7d2fe;
+  --mk-selected-text: #1e1b4b;
+  --mk-primary: #3730a3;
+  --mk-primary-hover: #312e81;
+  --mk-primary-active: #1e1b4b;
+  --mk-primary-contrast: #ffffff;
+  --mk-primary-subtle: #e0e7ff;
+  --mk-primary-subtle-hover: #c7d2fe;
+  --mk-primary-subtle-text: #1e1b4b;
+  --mk-success: #166534;
+  --mk-success-hover: #14532d;
+  --mk-success-contrast: #ffffff;
+  --mk-success-subtle: #dcfce7;
+  --mk-success-subtle-text: #14532d;
+  --mk-warning: #92400e;
+  --mk-warning-hover: #78350f;
+  --mk-warning-contrast: #ffffff;
+  --mk-warning-subtle: #fef3c7;
+  --mk-warning-subtle-text: #78350f;
+  --mk-danger: #b91c1c;
+  --mk-danger-hover: #991b1b;
+  --mk-danger-contrast: #ffffff;
+  --mk-danger-text: #991b1b;
+  --mk-danger-subtle: #fee2e2;
+  --mk-danger-subtle-text: #7f1d1d;
+  --mk-info: #075985;
+  --mk-info-hover: #0c4a6e;
+  --mk-info-contrast: #ffffff;
+  --mk-info-subtle: #e0f2fe;
+  --mk-info-subtle-text: #0c4a6e;
+  --mk-neutral-subtle: #e5e8ec;
+  --mk-neutral-subtle-hover: #d5d9df;
+  --mk-neutral-subtle-text: #000000;
+  --mk-focus-ring: #000000;
+  --mk-focus-ring-width: 3px;
+  --mk-shadow-xs: 0 0 0 1px #000000;
+  --mk-shadow-sm: 0 0 0 1px #000000;
+  --mk-shadow-md: 0 0 0 1px #000000;
+  --mk-shadow-lg: 0 0 0 2px #000000;
+  --mk-shadow-xl: 0 0 0 2px #000000;
+  --mk-skeleton-base: #d5d9df;
+  --mk-skeleton-shine: #eef0f3;
+  --mk-scrollbar-thumb: #4b5563;
+  --mk-scrollbar-thumb-hover: #1f2933;
+  --mk-code-bg: #eef0f3;
+}
+
+/* High contrast under OS dark (no explicit light override), whether the
+   attribute sits on <html> or on a subtree. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mk-theme=light])[data-mk-contrast=high],
+  :root:not([data-mk-theme=light]) [data-mk-contrast=high] {
+    --mk-bg: #000000;
+    --mk-surface: #000000;
+    --mk-surface-2: #14181d;
+    --mk-surface-3: #1f252c;
+    --mk-surface-inverse: #ffffff;
+    --mk-overlay-scrim: rgba(0, 0, 0, 0.85);
+    --mk-text: #ffffff;
+    --mk-text-muted: #e6edf3;
+    --mk-text-subtle: #d0d7de;
+    --mk-text-disabled: #9aa5b1;
+    --mk-text-inverse: #000000;
+    --mk-border: #e6edf3;
+    --mk-border-strong: #ffffff;
+    --mk-border-subtle: #9aa5b1;
+    --mk-hover-overlay: #2a323c;
+    --mk-active-overlay: #3a444f;
+    --mk-selected-bg: #312e81;
+    --mk-selected-text: #ffffff;
+    --mk-primary: #a5b4fc;
+    --mk-primary-hover: #c7d2fe;
+    --mk-primary-active: #e0e7ff;
+    --mk-primary-contrast: #000000;
+    --mk-primary-subtle: #1e1b4b;
+    --mk-primary-subtle-hover: #312e81;
+    --mk-primary-subtle-text: #e0e7ff;
+    --mk-success: #4ade80;
+    --mk-success-hover: #86efac;
+    --mk-success-contrast: #052e13;
+    --mk-success-subtle: #052e13;
+    --mk-success-subtle-text: #bbf7d0;
+    --mk-warning: #fbbf24;
+    --mk-warning-hover: #fcd34d;
+    --mk-warning-contrast: #2a1a02;
+    --mk-warning-subtle: #2a1a02;
+    --mk-warning-subtle-text: #fde68a;
+    --mk-danger: #f87171;
+    --mk-danger-hover: #fca5a5;
+    --mk-danger-contrast: #000000;
+    --mk-danger-text: #fca5a5;
+    --mk-danger-subtle: #2c1416;
+    --mk-danger-subtle-text: #fecaca;
+    --mk-info: #7dd3fc;
+    --mk-info-hover: #bae6fd;
+    --mk-info-contrast: #04222e;
+    --mk-info-subtle: #0c2733;
+    --mk-info-subtle-text: #e0f2fe;
+    --mk-neutral-subtle: #1f252c;
+    --mk-neutral-subtle-hover: #2a323c;
+    --mk-neutral-subtle-text: #ffffff;
+    --mk-focus-ring: #ffffff;
+    --mk-focus-ring-width: 3px;
+    --mk-shadow-xs: 0 0 0 1px #ffffff;
+    --mk-shadow-sm: 0 0 0 1px #ffffff;
+    --mk-shadow-md: 0 0 0 1px #ffffff;
+    --mk-shadow-lg: 0 0 0 2px #ffffff;
+    --mk-shadow-xl: 0 0 0 2px #ffffff;
+    --mk-skeleton-base: #2a323c;
+    --mk-skeleton-shine: #3a444f;
+    --mk-scrollbar-thumb: #9aa5b1;
+    --mk-scrollbar-thumb-hover: #e6edf3;
+    --mk-code-bg: #14181d;
+  }
+}
+/* High contrast under explicit dark. */
+[data-mk-theme=dark][data-mk-contrast=high],
+[data-mk-theme=dark] [data-mk-contrast=high] {
+  --mk-bg: #000000;
+  --mk-surface: #000000;
+  --mk-surface-2: #14181d;
+  --mk-surface-3: #1f252c;
+  --mk-surface-inverse: #ffffff;
+  --mk-overlay-scrim: rgba(0, 0, 0, 0.85);
+  --mk-text: #ffffff;
+  --mk-text-muted: #e6edf3;
+  --mk-text-subtle: #d0d7de;
+  --mk-text-disabled: #9aa5b1;
+  --mk-text-inverse: #000000;
+  --mk-border: #e6edf3;
+  --mk-border-strong: #ffffff;
+  --mk-border-subtle: #9aa5b1;
+  --mk-hover-overlay: #2a323c;
+  --mk-active-overlay: #3a444f;
+  --mk-selected-bg: #312e81;
+  --mk-selected-text: #ffffff;
+  --mk-primary: #a5b4fc;
+  --mk-primary-hover: #c7d2fe;
+  --mk-primary-active: #e0e7ff;
+  --mk-primary-contrast: #000000;
+  --mk-primary-subtle: #1e1b4b;
+  --mk-primary-subtle-hover: #312e81;
+  --mk-primary-subtle-text: #e0e7ff;
+  --mk-success: #4ade80;
+  --mk-success-hover: #86efac;
+  --mk-success-contrast: #052e13;
+  --mk-success-subtle: #052e13;
+  --mk-success-subtle-text: #bbf7d0;
+  --mk-warning: #fbbf24;
+  --mk-warning-hover: #fcd34d;
+  --mk-warning-contrast: #2a1a02;
+  --mk-warning-subtle: #2a1a02;
+  --mk-warning-subtle-text: #fde68a;
+  --mk-danger: #f87171;
+  --mk-danger-hover: #fca5a5;
+  --mk-danger-contrast: #000000;
+  --mk-danger-text: #fca5a5;
+  --mk-danger-subtle: #2c1416;
+  --mk-danger-subtle-text: #fecaca;
+  --mk-info: #7dd3fc;
+  --mk-info-hover: #bae6fd;
+  --mk-info-contrast: #04222e;
+  --mk-info-subtle: #0c2733;
+  --mk-info-subtle-text: #e0f2fe;
+  --mk-neutral-subtle: #1f252c;
+  --mk-neutral-subtle-hover: #2a323c;
+  --mk-neutral-subtle-text: #ffffff;
+  --mk-focus-ring: #ffffff;
+  --mk-focus-ring-width: 3px;
+  --mk-shadow-xs: 0 0 0 1px #ffffff;
+  --mk-shadow-sm: 0 0 0 1px #ffffff;
+  --mk-shadow-md: 0 0 0 1px #ffffff;
+  --mk-shadow-lg: 0 0 0 2px #ffffff;
+  --mk-shadow-xl: 0 0 0 2px #ffffff;
+  --mk-skeleton-base: #2a323c;
+  --mk-skeleton-shine: #3a444f;
+  --mk-scrollbar-thumb: #9aa5b1;
+  --mk-scrollbar-thumb-hover: #e6edf3;
+  --mk-code-bg: #14181d;
+}
+
+/* OS "increase contrast" — same preset, unless the app opted out. */
+@media (prefers-contrast: more) {
+  :root:not([data-mk-contrast=normal]) {
+    --mk-bg: #ffffff;
+    --mk-surface: #ffffff;
+    --mk-surface-2: #eef0f3;
+    --mk-surface-3: #dfe3e8;
+    --mk-surface-inverse: #000000;
+    --mk-overlay-scrim: rgba(0, 0, 0, 0.8);
+    --mk-text: #000000;
+    --mk-text-muted: #1f2933;
+    --mk-text-subtle: #2b3440;
+    --mk-text-inverse: #ffffff;
+    --mk-text-disabled: #4b5563;
+    --mk-border: #1a1d23;
+    --mk-border-strong: #000000;
+    --mk-border-subtle: #56606e;
+    --mk-hover-overlay: #dfe3e8;
+    --mk-active-overlay: #c9cfd6;
+    --mk-selected-bg: #c7d2fe;
+    --mk-selected-text: #1e1b4b;
+    --mk-primary: #3730a3;
+    --mk-primary-hover: #312e81;
+    --mk-primary-active: #1e1b4b;
+    --mk-primary-contrast: #ffffff;
+    --mk-primary-subtle: #e0e7ff;
+    --mk-primary-subtle-hover: #c7d2fe;
+    --mk-primary-subtle-text: #1e1b4b;
+    --mk-success: #166534;
+    --mk-success-hover: #14532d;
+    --mk-success-contrast: #ffffff;
+    --mk-success-subtle: #dcfce7;
+    --mk-success-subtle-text: #14532d;
+    --mk-warning: #92400e;
+    --mk-warning-hover: #78350f;
+    --mk-warning-contrast: #ffffff;
+    --mk-warning-subtle: #fef3c7;
+    --mk-warning-subtle-text: #78350f;
+    --mk-danger: #b91c1c;
+    --mk-danger-hover: #991b1b;
+    --mk-danger-contrast: #ffffff;
+    --mk-danger-text: #991b1b;
+    --mk-danger-subtle: #fee2e2;
+    --mk-danger-subtle-text: #7f1d1d;
+    --mk-info: #075985;
+    --mk-info-hover: #0c4a6e;
+    --mk-info-contrast: #ffffff;
+    --mk-info-subtle: #e0f2fe;
+    --mk-info-subtle-text: #0c4a6e;
+    --mk-neutral-subtle: #e5e8ec;
+    --mk-neutral-subtle-hover: #d5d9df;
+    --mk-neutral-subtle-text: #000000;
+    --mk-focus-ring: #000000;
+    --mk-focus-ring-width: 3px;
+    --mk-shadow-xs: 0 0 0 1px #000000;
+    --mk-shadow-sm: 0 0 0 1px #000000;
+    --mk-shadow-md: 0 0 0 1px #000000;
+    --mk-shadow-lg: 0 0 0 2px #000000;
+    --mk-shadow-xl: 0 0 0 2px #000000;
+    --mk-skeleton-base: #d5d9df;
+    --mk-skeleton-shine: #eef0f3;
+    --mk-scrollbar-thumb: #4b5563;
+    --mk-scrollbar-thumb-hover: #1f2933;
+    --mk-code-bg: #eef0f3;
+  }
+}
+@media (prefers-contrast: more) and (prefers-color-scheme: dark) {
+  :root:not([data-mk-theme=light]):not([data-mk-contrast=normal]) {
+    --mk-bg: #000000;
+    --mk-surface: #000000;
+    --mk-surface-2: #14181d;
+    --mk-surface-3: #1f252c;
+    --mk-surface-inverse: #ffffff;
+    --mk-overlay-scrim: rgba(0, 0, 0, 0.85);
+    --mk-text: #ffffff;
+    --mk-text-muted: #e6edf3;
+    --mk-text-subtle: #d0d7de;
+    --mk-text-disabled: #9aa5b1;
+    --mk-text-inverse: #000000;
+    --mk-border: #e6edf3;
+    --mk-border-strong: #ffffff;
+    --mk-border-subtle: #9aa5b1;
+    --mk-hover-overlay: #2a323c;
+    --mk-active-overlay: #3a444f;
+    --mk-selected-bg: #312e81;
+    --mk-selected-text: #ffffff;
+    --mk-primary: #a5b4fc;
+    --mk-primary-hover: #c7d2fe;
+    --mk-primary-active: #e0e7ff;
+    --mk-primary-contrast: #000000;
+    --mk-primary-subtle: #1e1b4b;
+    --mk-primary-subtle-hover: #312e81;
+    --mk-primary-subtle-text: #e0e7ff;
+    --mk-success: #4ade80;
+    --mk-success-hover: #86efac;
+    --mk-success-contrast: #052e13;
+    --mk-success-subtle: #052e13;
+    --mk-success-subtle-text: #bbf7d0;
+    --mk-warning: #fbbf24;
+    --mk-warning-hover: #fcd34d;
+    --mk-warning-contrast: #2a1a02;
+    --mk-warning-subtle: #2a1a02;
+    --mk-warning-subtle-text: #fde68a;
+    --mk-danger: #f87171;
+    --mk-danger-hover: #fca5a5;
+    --mk-danger-contrast: #000000;
+    --mk-danger-text: #fca5a5;
+    --mk-danger-subtle: #2c1416;
+    --mk-danger-subtle-text: #fecaca;
+    --mk-info: #7dd3fc;
+    --mk-info-hover: #bae6fd;
+    --mk-info-contrast: #04222e;
+    --mk-info-subtle: #0c2733;
+    --mk-info-subtle-text: #e0f2fe;
+    --mk-neutral-subtle: #1f252c;
+    --mk-neutral-subtle-hover: #2a323c;
+    --mk-neutral-subtle-text: #ffffff;
+    --mk-focus-ring: #ffffff;
+    --mk-focus-ring-width: 3px;
+    --mk-shadow-xs: 0 0 0 1px #ffffff;
+    --mk-shadow-sm: 0 0 0 1px #ffffff;
+    --mk-shadow-md: 0 0 0 1px #ffffff;
+    --mk-shadow-lg: 0 0 0 2px #ffffff;
+    --mk-shadow-xl: 0 0 0 2px #ffffff;
+    --mk-skeleton-base: #2a323c;
+    --mk-skeleton-shine: #3a444f;
+    --mk-scrollbar-thumb: #9aa5b1;
+    --mk-scrollbar-thumb-hover: #e6edf3;
+    --mk-code-bg: #14181d;
+  }
+}
+@media (prefers-contrast: more) {
+  :root[data-mk-theme=dark]:not([data-mk-contrast=normal]) {
+    --mk-bg: #000000;
+    --mk-surface: #000000;
+    --mk-surface-2: #14181d;
+    --mk-surface-3: #1f252c;
+    --mk-surface-inverse: #ffffff;
+    --mk-overlay-scrim: rgba(0, 0, 0, 0.85);
+    --mk-text: #ffffff;
+    --mk-text-muted: #e6edf3;
+    --mk-text-subtle: #d0d7de;
+    --mk-text-disabled: #9aa5b1;
+    --mk-text-inverse: #000000;
+    --mk-border: #e6edf3;
+    --mk-border-strong: #ffffff;
+    --mk-border-subtle: #9aa5b1;
+    --mk-hover-overlay: #2a323c;
+    --mk-active-overlay: #3a444f;
+    --mk-selected-bg: #312e81;
+    --mk-selected-text: #ffffff;
+    --mk-primary: #a5b4fc;
+    --mk-primary-hover: #c7d2fe;
+    --mk-primary-active: #e0e7ff;
+    --mk-primary-contrast: #000000;
+    --mk-primary-subtle: #1e1b4b;
+    --mk-primary-subtle-hover: #312e81;
+    --mk-primary-subtle-text: #e0e7ff;
+    --mk-success: #4ade80;
+    --mk-success-hover: #86efac;
+    --mk-success-contrast: #052e13;
+    --mk-success-subtle: #052e13;
+    --mk-success-subtle-text: #bbf7d0;
+    --mk-warning: #fbbf24;
+    --mk-warning-hover: #fcd34d;
+    --mk-warning-contrast: #2a1a02;
+    --mk-warning-subtle: #2a1a02;
+    --mk-warning-subtle-text: #fde68a;
+    --mk-danger: #f87171;
+    --mk-danger-hover: #fca5a5;
+    --mk-danger-contrast: #000000;
+    --mk-danger-text: #fca5a5;
+    --mk-danger-subtle: #2c1416;
+    --mk-danger-subtle-text: #fecaca;
+    --mk-info: #7dd3fc;
+    --mk-info-hover: #bae6fd;
+    --mk-info-contrast: #04222e;
+    --mk-info-subtle: #0c2733;
+    --mk-info-subtle-text: #e0f2fe;
+    --mk-neutral-subtle: #1f252c;
+    --mk-neutral-subtle-hover: #2a323c;
+    --mk-neutral-subtle-text: #ffffff;
+    --mk-focus-ring: #ffffff;
+    --mk-focus-ring-width: 3px;
+    --mk-shadow-xs: 0 0 0 1px #ffffff;
+    --mk-shadow-sm: 0 0 0 1px #ffffff;
+    --mk-shadow-md: 0 0 0 1px #ffffff;
+    --mk-shadow-lg: 0 0 0 2px #ffffff;
+    --mk-shadow-xl: 0 0 0 2px #ffffff;
+    --mk-skeleton-base: #2a323c;
+    --mk-skeleton-shine: #3a444f;
+    --mk-scrollbar-thumb: #9aa5b1;
+    --mk-scrollbar-thumb-hover: #e6edf3;
+    --mk-code-bg: #14181d;
+  }
+}
+/* -------------------------------------------------------------------------
  * 4. Base / reset — opt-in via the `mk-scope` class or applied globally.
  *    Kept minimal and non-destructive.
  * ---------------------------------------------------------------------- */
@@ -381,6 +799,139 @@ body.mk-app {
   border: 0;
 }
 
+/* Badge overlay — the element `[mkBadgeOverlay]` appends to its host. Lives
+   here because a directive has no stylesheet of its own. Anchored with
+   LOGICAL insets so `end` flips in RTL; the half-outset `translate` flips with
+   it via `:dir(rtl)`. The ring (`box-shadow`) separates the badge from the
+   host it overlaps. */
+.mk-badge-overlay {
+  --_main: var(--mk-primary);
+  --_contrast: var(--mk-primary-contrast);
+  --_dx: 50%;
+  --_dy: -50%;
+  position: absolute;
+  inset-block-start: 0;
+  inset-inline-end: 0;
+  z-index: 1;
+  box-sizing: border-box;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 1.125rem;
+  height: 1.125rem;
+  padding: 0 var(--mk-space-1);
+  border-radius: var(--mk-radius-pill);
+  background-color: var(--_main);
+  color: var(--_contrast);
+  box-shadow: 0 0 0 var(--mk-border-width-strong) var(--mk-surface);
+  font-family: var(--mk-font-sans);
+  font-size: var(--mk-font-size-xs);
+  font-weight: var(--mk-font-weight-medium);
+  line-height: 1;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(var(--_dx), var(--_dy));
+  transition: background-color var(--mk-duration-fast) var(--mk-ease-standard), transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+
+.mk-badge-overlay[data-tone=primary] {
+  --_main: var(--mk-primary);
+  --_hover: var(--mk-primary-hover);
+  --_active: var(--mk-primary-active);
+  --_contrast: var(--mk-primary-contrast);
+  --_subtle: var(--mk-primary-subtle);
+  --_subtle-text: var(--mk-primary-subtle-text);
+}
+
+.mk-badge-overlay[data-tone=success] {
+  --_main: var(--mk-success);
+  --_hover: var(--mk-success-hover);
+  --_active: var(--mk-success-hover);
+  --_contrast: var(--mk-success-contrast);
+  --_subtle: var(--mk-success-subtle);
+  --_subtle-text: var(--mk-success-subtle-text);
+}
+
+.mk-badge-overlay[data-tone=warning] {
+  --_main: var(--mk-warning);
+  --_hover: var(--mk-warning-hover);
+  --_active: var(--mk-warning-hover);
+  --_contrast: var(--mk-warning-contrast);
+  --_subtle: var(--mk-warning-subtle);
+  --_subtle-text: var(--mk-warning-subtle-text);
+}
+
+.mk-badge-overlay[data-tone=danger] {
+  --_main: var(--mk-danger);
+  --_hover: var(--mk-danger-hover);
+  --_active: var(--mk-danger-hover);
+  --_contrast: var(--mk-danger-contrast);
+  --_subtle: var(--mk-danger-subtle);
+  --_subtle-text: var(--mk-danger-subtle-text);
+}
+
+.mk-badge-overlay[data-tone=info] {
+  --_main: var(--mk-info);
+  --_hover: var(--mk-info-hover);
+  --_active: var(--mk-info-hover);
+  --_contrast: var(--mk-info-contrast);
+  --_subtle: var(--mk-info-subtle);
+  --_subtle-text: var(--mk-info-subtle-text);
+}
+
+.mk-badge-overlay[data-tone=neutral] {
+  --_main: var(--mk-surface-inverse);
+  --_hover: var(--mk-surface-inverse);
+  --_active: var(--mk-surface-inverse);
+  --_contrast: var(--mk-text-inverse);
+  --_subtle: var(--mk-neutral-subtle);
+  --_subtle-text: var(--mk-neutral-subtle-text);
+}
+
+.mk-badge-overlay[data-position=top-start] {
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+  --_dx: -50%;
+}
+
+.mk-badge-overlay[data-position=bottom-end] {
+  inset-block-start: auto;
+  inset-block-end: 0;
+  --_dy: 50%;
+}
+
+.mk-badge-overlay[data-position=bottom-start] {
+  inset-block-start: auto;
+  inset-block-end: 0;
+  inset-inline-end: auto;
+  inset-inline-start: 0;
+  --_dx: -50%;
+  --_dy: 50%;
+}
+
+/* RTL: `end` is now the left edge, so the outset points the other way. */
+.mk-badge-overlay:dir(rtl) {
+  --_dx: -50%;
+}
+
+.mk-badge-overlay[data-position=top-start]:dir(rtl),
+.mk-badge-overlay[data-position=bottom-start]:dir(rtl) {
+  --_dx: 50%;
+}
+
+.mk-badge-overlay--dot {
+  width: 0.625rem;
+  height: 0.625rem;
+  min-width: 0;
+  padding: 0;
+  border-radius: var(--mk-radius-circle);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-badge-overlay {
+    transition: none;
+  }
+}
 /* Print helpers: `.mk-print-hidden` drops page chrome (toolbars, filters)
    from paper; `.mk-print-only` shows something (a title, a date) only there.
    Components ship their own `@media print` rules — mk-table prints as one
@@ -651,6 +1202,52 @@ body.mk-app {
    outlines) is left to the system palette on purpose.
    ========================================================================== */
 @media (forced-colors: active) {
+  /* --- Tokens → system colours -------------------------------------------
+     Forced colours already replace author colours on every element that is
+     not opted out, so most of this is moot; it matters for the components
+     below that set `forced-color-adjust: none` and for anything (a canvas
+     chart, an SVG fill) that reads a token directly. Keeping the tokens on
+     the system palette means those spots follow the user's scheme too. */
+  :root,
+  [data-mk-theme=dark],
+  [data-mk-contrast=high] {
+    --mk-bg: Canvas;
+    --mk-surface: Canvas;
+    --mk-surface-2: Canvas;
+    --mk-surface-3: Canvas;
+    --mk-surface-inverse: CanvasText;
+    --mk-text: CanvasText;
+    --mk-text-muted: CanvasText;
+    --mk-text-subtle: CanvasText;
+    --mk-text-inverse: Canvas;
+    --mk-text-disabled: GrayText;
+    --mk-border: CanvasText;
+    --mk-border-strong: CanvasText;
+    --mk-border-subtle: CanvasText;
+    --mk-hover-overlay: transparent;
+    --mk-active-overlay: transparent;
+    --mk-selected-bg: Highlight;
+    --mk-selected-text: HighlightText;
+    --mk-primary: ButtonText;
+    --mk-primary-hover: ButtonText;
+    --mk-primary-active: ButtonText;
+    --mk-primary-contrast: ButtonFace;
+    --mk-focus-ring: Highlight;
+    --mk-focus-ring-width: 3px;
+    --mk-shadow-xs: none;
+    --mk-shadow-sm: none;
+    --mk-shadow-md: none;
+    --mk-shadow-lg: none;
+    --mk-shadow-xl: none;
+  }
+  /* --- Badge overlay: a background-only element would vanish -------------- */
+  .mk-badge-overlay {
+    forced-color-adjust: none;
+    background-color: Highlight;
+    color: HighlightText;
+    border: 1px solid CanvasText;
+    box-shadow: 0 0 0 2px Canvas;
+  }
   /* --- Selection & active states: Highlight on HighlightText -------------- */
   .mk-select__option--selected,
   .mk-cmdk__option--active,

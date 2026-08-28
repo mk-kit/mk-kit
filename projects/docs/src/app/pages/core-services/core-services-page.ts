@@ -221,6 +221,11 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
           <tr><td><code>isDark()</code></td><td><code>Signal&lt;boolean&gt;</code></td><td>Convenience boolean for template bindings.</td></tr>
           <tr><td><code>setTheme(preference)</code></td><td><code>method</code></td><td>Set the preference explicitly.</td></tr>
           <tr><td><code>toggle()</code></td><td><code>method</code></td><td>Flip between light and dark (resolving <code>system</code> first).</td></tr>
+          <tr><td><code>density()</code></td><td><code>Signal&lt;'comfortable' | 'compact' | 'touch'&gt;</code></td><td>Global density mode, written as <code>data-mk-density</code>.</td></tr>
+          <tr><td><code>setDensity(d)</code> / <code>toggleDensity()</code></td><td><code>method</code></td><td>Set the density; toggle flips comfortable ↔ compact.</td></tr>
+          <tr><td><code>contrast()</code></td><td><code>Signal&lt;'normal' | 'high' | 'system'&gt;</code></td><td>Contrast preference, written as <code>data-mk-contrast</code>; <code>system</code> follows the OS <code>prefers-contrast</code>.</td></tr>
+          <tr><td><code>resolvedContrast()</code> / <code>isHighContrast()</code></td><td><code>Signal</code></td><td>The contrast in effect (<code>system</code> resolved) and its boolean form.</td></tr>
+          <tr><td><code>setContrast(c)</code> / <code>toggleContrast()</code></td><td><code>method</code></td><td>Set the preference; toggle flips normal ↔ high (resolving <code>system</code> first).</td></tr>
         </tbody>
       </table>
 
@@ -618,7 +623,11 @@ this.theme.resolvedTheme(); // 'light' | 'dark' (system resolved)
 this.theme.isDark();        // computed boolean
 
 this.theme.setTheme('dark');
-this.theme.toggle();        // flip light <-> dark`;
+this.theme.toggle();        // flip light <-> dark
+
+this.theme.setDensity('compact');   // data-mk-density
+this.theme.setContrast('high');     // data-mk-contrast (or 'system' to follow the OS)
+this.theme.isHighContrast();        // computed boolean`;
 
   protected readonly bp = inject(MkBreakpointService);
 

@@ -72,7 +72,7 @@ import { MkScrollArea } from '@mk-kit/ui/navigation/scroll-area';
 import { MkBackToTop } from '@mk-kit/ui/navigation/back-to-top';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkTooltip } from '@mk-kit/ui/feedback/tooltip';
-import { MkBadge } from '@mk-kit/ui/data/badge';
+import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/data/badge';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
 import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
@@ -128,6 +128,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
     MkAlert,
     MkTooltip,
     MkBadge,
+    MkBadgeOverlay,
     MkProgressBar,
     MkCard,
     MkCardHeader,
@@ -141,6 +142,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
       <a mkButton href="#docs">Docs</a>
 
       <mk-badge tone="success">Live</mk-badge>
+      <button mkButton [mkBadgeOverlay]="3" mkBadgeOverlayAriaLabel="3 unread">Inbox</button>
       <mk-chip removable>Token</mk-chip>
 
       <mk-alert tone="info" title="Heads up">Maintenance window on Sunday.</mk-alert>
