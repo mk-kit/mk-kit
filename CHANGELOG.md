@@ -4,7 +4,7 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.42.0] — 2026-08-28
 
 ### Added
 
@@ -1990,6 +1990,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
+[0.42.0]: https://github.com/mk-kit/mk-kit/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...v0.41.0
 [0.40.0]: https://github.com/mk-kit/mk-kit/compare/v0.39.0...v0.40.0
 [0.39.0]: https://github.com/mk-kit/mk-kit/compare/v0.38.0...v0.39.0
