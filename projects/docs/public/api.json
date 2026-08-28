@@ -12228,7 +12228,7 @@
     },
     {
      "name": "MkTable",
-     "description": "Table — a themed data table built on a native `<table>` for accessibility.\nSupply `columns` and `data`; opt into sortable columns, sticky header,\nzebra striping, hover and density. Sorting is fully keyboard operable\n(Enter/Space on a header) and announces changes via `MkLiveAnnouncer`.\n\n```html\n<mk-table\n  [columns]=\"columns\"\n  [data]=\"rows()\"\n  stickyHeader\n  zebra\n  (sortChange)=\"onSort($event)\"\n  (rowClick)=\"open($event)\" />\n```",
+     "description": "",
      "file": "projects/mk-kit/table/table/table.ts",
      "kind": "component",
      "selector": "mk-table",
