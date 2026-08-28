@@ -192,6 +192,16 @@ type MkTableItem<T> =
  *   (rowClick)="open($event)" />
  * ```
  */
+/**
+ * Shared collator for string sorting. Created lazily at module scope rather
+ * than as a `static` class field: a static initializer that *calls* something
+ * stops Angular's build optimizer from marking the class IIFE as pure, which
+ * pinned `MkTable` — and, through it, the whole table entry point — into every
+ * bundle that imported any export of `@mk-kit/ui/table`.
+ */
+let collator: Intl.Collator | undefined;
+const sortCollator = (): Intl.Collator => (collator ??= new Intl.Collator());
+
 @Component({
   selector: 'mk-table',
   templateUrl: './table.html',
@@ -781,8 +791,6 @@ export class MkTable<T = Record<string, unknown>> {
    * re-resolves locale data on every call; one cached `Intl.Collator` makes
    * large-table sorts several-fold faster with the same default-locale order.
    */
-  private static readonly sortCollator = new Intl.Collator();
-
   /** Data sorted by the active column, or the input order when unsorted. */
   protected readonly sortedData = computed<T[]>(() => this.sortRows(this.data()));
 
@@ -798,7 +806,7 @@ export class MkTable<T = Record<string, unknown>> {
       if (av == null) return -1;
       if (bv == null) return 1;
       if (typeof av === 'number' && typeof bv === 'number') return av - bv;
-      return MkTable.sortCollator.compare(String(av), String(bv));
+      return sortCollator().compare(String(av), String(bv));
     };
     // Negate the comparator for desc (instead of reversing) so the sort stays
     // stable and null ordering is consistent in both directions.
