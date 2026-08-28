@@ -52,7 +52,20 @@
   padding: 1px var(--mk-space-2);
 }
 
+/* Header site nav (Docs / Blog) */
+.docs-header__nav {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  margin-right: var(--mk-space-2);
+}
+.docs-header__nav-link--active {
+  color: var(--mk-primary);
+  background: color-mix(in srgb, var(--mk-primary) 10%, transparent);
+}
+
 @media (max-width: 560px) {
+  .docs-header__nav,
   .docs-brand__ver,
   .docs-github,
   .docs-search-btn .docs-kbd {
