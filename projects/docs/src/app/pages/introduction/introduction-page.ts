@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import {
   MkBadge,
   MkButton,
@@ -15,7 +15,7 @@ interface Feature {
 
 @Component({
   selector: 'docs-introduction-page',
-  imports: [MkButton, MkCard, MkBadge, MkIcon],
+  imports: [MkButton, MkCard, MkBadge, MkIcon, RouterLink],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -57,7 +57,10 @@ interface Feature {
         custom properties, and shipped as modern standalone components you import à la
         carte. No <code class="docs-inline">NgModule</code>s, no Zone gymnastics — just
         <code class="docs-inline">input()</code>, <code class="docs-inline">model()</code>
-        and <code class="docs-inline">output()</code>.
+        and <code class="docs-inline">output()</code>. Every entry point is
+        tree-shakeable, so you ship only what you import — the
+        <a routerLink="/cost">bundle cost page</a> shows the measured size of
+        every component.
       </p>
 
       <h2>What's inside</h2>

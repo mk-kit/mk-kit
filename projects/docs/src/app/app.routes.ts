@@ -389,6 +389,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/api/api-page').then((m) => m.ApiPage),
   },
   {
+    path: 'cost',
+    title: 'Bundle cost — mk-kit',
+    loadComponent: () => import('./pages/cost/cost-page').then((m) => m.CostPage),
+  },
+  {
     path: 'components-index',
     title: 'All components — mk-kit',
     loadComponent: () =>
