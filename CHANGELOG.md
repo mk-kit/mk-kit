@@ -4,7 +4,7 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.43.0] — 2026-08-28
 
 ### Added
 
@@ -23,25 +23,6 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   RTL), Home/End, Enter/Space, `*` expands siblings, `+`/`-`. New i18n keys:
   `orgChartLabel`, `orgChartExpand`, `orgChartCollapse`. Docs page at
   `/components/org-chart`.
-### Changed
-
-- **Extended icons are opt-in.** `MkIconRegistry` registers only the default
-  set on construction; the Lucide-derived extended set moved to its own,
-  tree-shakeable entry point `@mk-kit/ui/icon/extended`. Any import from
-  `@mk-kit/ui/icon` cost ≈17 KiB (brotli) before — the whole `icon` entry is
-  now ≈6.7 KiB and `MkIcon` with the default set ≈5.3 KiB; the extended set
-  costs ≈13 KiB only where it is registered. Seven Lucide glyphs that mk-kit's
-  own components render (`circle-alert`, `file`, `layers`, `loader`,
-  `message-circle`, `paperclip`, `refresh-cw`) joined the default set (114 →
-  121) so every component works out of the box. **Migration:** apps that use
-  extended names (`layout-dashboard`, `receipt`, `file-spreadsheet`, …) add
-  `provideMkExtendedIcons()` (from `@mk-kit/ui/icon/extended`) to their
-  providers — or a themed subset via `provideMkIcons(MK_EXTENDED_ICONS_FILES)`,
-  or the lazy form
-  `provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.
-  Apps that only use default names change nothing.
-
-### Added
 
 - **`provideMkIcons(map | loader)`** (`@mk-kit/ui/icon`) — registers a partial
   icon map at bootstrap (a themed subset, your own SVGs, a hand-picked few)
@@ -101,6 +82,24 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   - docs: new *Signal Forms* page with a login form, form-field errors on
     touch, the error summary and the schema conversion.
 
+### Changed
+
+- **Extended icons are opt-in.** `MkIconRegistry` registers only the default
+  set on construction; the Lucide-derived extended set moved to its own,
+  tree-shakeable entry point `@mk-kit/ui/icon/extended`. Any import from
+  `@mk-kit/ui/icon` cost ≈17 KiB (brotli) before — the whole `icon` entry is
+  now ≈6.7 KiB and `MkIcon` with the default set ≈5.3 KiB; the extended set
+  costs ≈13 KiB only where it is registered. Seven Lucide glyphs that mk-kit's
+  own components render (`circle-alert`, `file`, `layers`, `loader`,
+  `message-circle`, `paperclip`, `refresh-cw`) joined the default set (114 →
+  121) so every component works out of the box. **Migration:** apps that use
+  extended names (`layout-dashboard`, `receipt`, `file-spreadsheet`, …) add
+  `provideMkExtendedIcons()` (from `@mk-kit/ui/icon/extended`) to their
+  providers — or a themed subset via `provideMkIcons(MK_EXTENDED_ICONS_FILES)`,
+  or the lazy form
+  `provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.
+  Apps that only use default names change nothing.
+
 ### Fixed
 
 - **carousel:** slides are projected content, so the component's `flex: 0 0 100%` slide rule never applied under emulated encapsulation — every slide shrank to its content width and all of them rendered inside the first viewport. Fixed with a host-scoped `::ng-deep` rule; the docs demo also lost its slide text to the page's paragraph colour.
@@ -110,6 +109,7 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   from marking the class as side-effect-free, so the whole entry was retained.
   The collator is now created lazily; `MkSortHeader` drops from 11.3 to 1.8 KiB
   and `MkTableDataSource` from 11.3 to 1.3 KiB when used without `mk-table`.
+
 
 ## [0.42.0] — 2026-08-28
 
@@ -2097,7 +2097,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.42.0...HEAD
+[0.43.0]: https://github.com/mk-kit/mk-kit/compare/v0.42.0...v0.43.0
 [0.42.0]: https://github.com/mk-kit/mk-kit/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...v0.41.0
 [0.40.0]: https://github.com/mk-kit/mk-kit/compare/v0.39.0...v0.40.0

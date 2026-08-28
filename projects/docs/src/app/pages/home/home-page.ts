@@ -1394,7 +1394,7 @@ export class HomePage {
   private readonly teamForm = viewChild<ElementRef<HTMLElement>>('teamForm');
 
   protected readonly uiVersion = uiVersion;
-  protected readonly total = 188;
+  protected readonly total = 190;
   protected readonly copied = signal(false);
 
   /* Brand-swap: rewrites the primary token family on the host ------------ */
