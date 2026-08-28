@@ -2,6 +2,7 @@ import {
   ChangeDetectionStrategy,
   Component,
   computed,
+  inject,
   signal,
 } from '@angular/core';
 import {
@@ -11,6 +12,7 @@ import {
   MkCard,
   MkProgressBar,
   MkSwitch,
+  MkThemeService,
 } from '@mk-kit/ui';
 
 interface TokenRow {
@@ -66,6 +68,52 @@ interface TokenGroup {
       <pre class="tp-code"><code>&lt;div data-mk-density="touch"&gt;
   &lt;!-- every mk control in here is finger-sized --&gt;
 &lt;/div&gt;</code></pre>
+
+      <h2>High contrast</h2>
+      <p>
+        <code class="docs-inline">data-mk-contrast="high"</code> swaps the
+        colour tokens for a high-contrast preset: pure black / white text,
+        borders that read as lines rather than tints, opaque hover and pressed
+        washes (no low-alpha surfaces), shadows replaced by a crisp outline,
+        darker (light) or lighter (dark) tone families so tinted text clears
+        7:1, and a 3px focus ring. Light and dark each keep their own set, so
+        it composes with <code class="docs-inline">data-mk-theme</code>.
+      </p>
+      <ul>
+        <li>
+          <strong>Explicit</strong> —
+          <code class="docs-inline">MkThemeService.setContrast('high')</code>
+          writes the attribute on <code class="docs-inline">&lt;html&gt;</code>
+          (persisted, SSR-safe), or put it on <strong>any element</strong> to
+          raise contrast for that subtree only.
+        </li>
+        <li>
+          <strong>Automatic</strong> — with no attribute (the
+          <code class="docs-inline">system</code> preference) the stylesheet
+          follows the OS <code class="docs-inline">prefers-contrast: more</code>
+          setting. <code class="docs-inline">setContrast('normal')</code> opts
+          out of that.
+        </li>
+        <li>
+          <strong>Windows High Contrast</strong> —
+          <code class="docs-inline">forced-colors: active</code> is handled
+          separately: the tokens map to the system palette
+          (<code class="docs-inline">CanvasText</code>,
+          <code class="docs-inline">Highlight</code>,
+          <code class="docs-inline">ButtonText</code>) and state indicators
+          that are background-only re-express themselves with those colours.
+        </li>
+      </ul>
+      <div class="tp-toggle">
+        <button mkButton variant="outline" tone="neutral" (click)="theme.toggleContrast()">
+          {{ theme.isHighContrast() ? 'Turn high contrast off' : 'Turn high contrast on' }}
+        </button>
+        <span class="tp-muted tp-toggle__state">
+          preference: <code>{{ theme.contrast() }}</code> · in effect:
+          <code>{{ theme.resolvedContrast() }}</code>
+        </span>
+      </div>
+      <pre class="tp-code"><code>{{ contrastCode }}</code></pre>
 
       <h2>Live playground</h2>
       <p>
@@ -225,6 +273,16 @@ interface TokenGroup {
         margin: 0 0 var(--mk-space-4);
         font-size: var(--mk-font-size-sm);
       }
+      .tp-toggle {
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        gap: var(--mk-space-3);
+        margin: var(--mk-space-4) 0;
+      }
+      .tp-toggle__state {
+        margin: 0;
+      }
       .tp-code {
         margin: var(--mk-space-3) 0 var(--mk-space-6);
         padding: var(--mk-space-4) var(--mk-space-5);
@@ -240,6 +298,20 @@ interface TokenGroup {
   ],
 })
 export class ThemingPage {
+  protected readonly theme = inject(MkThemeService);
+
+  protected readonly contrastCode = `private readonly theme = inject(MkThemeService);
+
+this.theme.contrast();         // 'normal' | 'high' | 'system'
+this.theme.resolvedContrast(); // 'normal' | 'high' (system resolved)
+this.theme.isHighContrast();   // computed boolean
+
+this.theme.setContrast('high');
+this.theme.toggleContrast();   // flip normal <-> high
+
+/* or, per subtree, no service involved: */
+<section data-mk-contrast="high">…</section>`;
+
   protected readonly primary = signal('#4f46e5');
   protected readonly primaryHover = signal('#4338ca');
   protected readonly radius = signal(8);

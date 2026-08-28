@@ -39,7 +39,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
   {
     group: 'Overview',
     items: [
-      { name: 'MkThemeService', desc: 'Signal-based light/dark/system theme and density switching.', path: '/core-services' },
+      { name: 'MkThemeService', desc: 'Signal-based light/dark/system theme, density and high-contrast switching.', path: '/core-services' },
       { name: 'MkBreakpointService', desc: 'Viewport breakpoints as signals: current(), up(), down(), resolve() for responsive values.', path: '/core-services' },
       { name: 'MkLiveAnnouncer', desc: 'Polite/assertive screen-reader announcements via a shared live region.', path: '/core-services' },
       { name: 'MkFocusTrap', desc: 'Keeps Tab cycles inside overlays; used by dialogs, drawers and sheets.', path: '/core-services' },
@@ -124,6 +124,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
     group: 'Data display',
     items: [
       { name: 'mk-badge', desc: 'Status pill with tones and variants.', path: '/components/badges-avatars' },
+      { name: 'mkBadgeOverlay', desc: 'Anchors a count, dot or label badge to a corner of any element (icon button, avatar).', path: '/components/badges-avatars' },
       { name: 'mk-tag', desc: 'Compact removable label.', path: '/components/badges-avatars' },
       { name: 'mk-chip', desc: 'Interactive chip: selectable, removable, with avatar slot.', path: '/components/badges-avatars' },
       { name: 'mk-avatar', desc: 'Image/initials avatar with status dot.', path: '/components/badges-avatars' },

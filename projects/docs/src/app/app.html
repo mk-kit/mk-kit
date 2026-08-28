@@ -79,6 +79,17 @@
         tone="neutral"
         size="sm"
         iconOnly
+        (click)="cycleContrast()"
+        [attr.aria-label]="'Contrast: ' + contrastLabel() + '. Click to change.'"
+      >
+        ◧
+      </button>
+      <button
+        mkButton
+        variant="ghost"
+        tone="neutral"
+        size="sm"
+        iconOnly
         (click)="cycleTheme()"
         [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
       >

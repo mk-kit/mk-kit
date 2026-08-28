@@ -63,7 +63,7 @@ import { MkDonutChart } from '@mk-kit/ui/data/charts';
 import { MkNumberInput } from '@mk-kit/ui/forms/number-input';
 import { MkDescItem, MkDescriptionList } from '@mk-kit/ui/data/description-list';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
-import { MkBadge } from '@mk-kit/ui/data/badge';
+import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/data/badge';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
 
@@ -405,10 +405,22 @@ class PaginationHost {}
 class AlertHost {}
 
 @Component({
-  imports: [MkBadge],
+  imports: [MkBadge, MkBadgeOverlay, MkButton],
   template: `
     <mk-badge tone="success">Live</mk-badge>
     <mk-badge tone="neutral" variant="soft">Draft</mk-badge>
+    <button
+      mkButton
+      aria-label="Notifications"
+      [mkBadgeOverlay]="3"
+      mkBadgeOverlayTone="danger"
+      mkBadgeOverlayAriaLabel="3 unread"
+    >
+      Bell
+    </button>
+    <button mkButton mkBadgeOverlay mkBadgeOverlayDot mkBadgeOverlayAriaLabel="New activity">
+      Inbox
+    </button>
   `,
 })
 class BadgeHost {}

@@ -15,6 +15,9 @@ const STORAGE_KEY = 'mk-kit-theme';
 const THEME_ATTR = 'data-mk-theme';
 const DENSITY_STORAGE_KEY = 'mk-kit-density';
 const DENSITY_ATTR = 'data-mk-density';
+const CONTRAST_STORAGE_KEY = 'mk-kit-contrast';
+const CONTRAST_ATTR = 'data-mk-contrast';
+const CONTRAST_QUERY = '(prefers-contrast: more)';
 
 /**
  * Global control-density mode.
@@ -25,6 +28,20 @@ const DENSITY_ATTR = 'data-mk-density';
  * both a mouse-driven admin and a touch-driven screen.
  */
 export type MkDensity = 'comfortable' | 'compact' | 'touch';
+
+/**
+ * Contrast preference.
+ *
+ * `high` applies the high-contrast token preset (`data-mk-contrast="high"`):
+ * pure text colours, line-like borders, opaque interaction washes, a thicker
+ * focus ring. `system` (the default) writes no attribute and lets the
+ * stylesheet follow the OS `prefers-contrast: more` setting; `normal` opts
+ * out of that even when the OS asks for more contrast.
+ */
+export type MkContrastPreference = 'normal' | 'high' | 'system';
+
+/** Concrete resolved contrast (never `system`). */
+export type MkResolvedContrast = 'normal' | 'high';
 
 /**
  * Reactive theme controller for mk-kit.
@@ -74,10 +91,57 @@ export class MkThemeService {
    */
   readonly density = this._density.asReadonly();
 
+  private readonly _contrast = signal<MkContrastPreference>(this.readInitialContrast());
+  /**
+   * The user's contrast preference: `normal`, `high` or `system` (follow the
+   * OS `prefers-contrast` setting — the default). Written as
+   * `data-mk-contrast` on `<html>` and persisted; `system` removes the
+   * attribute so the pure-CSS `prefers-contrast: more` mapping takes over.
+   *
+   * Like density, the attribute also works per subtree: put
+   * `data-mk-contrast="high"` on any element to raise contrast there only.
+   */
+  readonly contrast = this._contrast.asReadonly();
+
+  private readonly _systemPrefersContrast = signal<boolean>(this.readSystemContrast());
+
+  /** The concrete contrast in effect (`normal` or `high`). */
+  readonly resolvedContrast = computed<MkResolvedContrast>(() => {
+    const pref = this._contrast();
+    if (pref === 'system') {
+      return this._systemPrefersContrast() ? 'high' : 'normal';
+    }
+    return pref;
+  });
+
+  /** Convenience boolean for template bindings. */
+  readonly isHighContrast = computed(() => this.resolvedContrast() === 'high');
+
   constructor() {
     if (this.isBrowser) {
       this.watchSystemPreference();
+      this.watchSystemContrast();
     }
+
+    // Keep the contrast attribute + storage in sync. `system` is the ABSENCE
+    // of the attribute (the stylesheet then follows `prefers-contrast`);
+    // `normal` and `high` name themselves so CSS can tell an explicit opt-out
+    // from "no preference".
+    effect(() => {
+      const contrast = this._contrast();
+      if (!this.isBrowser) return;
+      const root = this.document.documentElement;
+      if (contrast === 'system') {
+        root.removeAttribute(CONTRAST_ATTR);
+      } else {
+        root.setAttribute(CONTRAST_ATTR, contrast);
+      }
+      try {
+        localStorage.setItem(CONTRAST_STORAGE_KEY, contrast);
+      } catch {
+        /* ignore */
+      }
+    });
 
     // Keep the DOM attribute + storage in sync with the signal.
     effect(() => {
@@ -144,6 +208,43 @@ export class MkThemeService {
       /* ignore */
     }
     return 'comfortable';
+  }
+
+  /** Set the contrast preference explicitly. */
+  setContrast(contrast: MkContrastPreference): void {
+    this._contrast.set(contrast);
+  }
+
+  /** Toggle between normal and high contrast (resolving `system` first). */
+  toggleContrast(): void {
+    this._contrast.set(this.resolvedContrast() === 'high' ? 'normal' : 'high');
+  }
+
+  private readInitialContrast(): MkContrastPreference {
+    if (!this.isBrowserEnv()) return 'system';
+    try {
+      const stored = localStorage.getItem(CONTRAST_STORAGE_KEY);
+      if (stored === 'normal' || stored === 'high' || stored === 'system') {
+        return stored;
+      }
+    } catch {
+      /* ignore */
+    }
+    return 'system';
+  }
+
+  private readSystemContrast(): boolean {
+    if (!this.isBrowserEnv()) return false;
+    return this.document.defaultView?.matchMedia?.(CONTRAST_QUERY).matches ?? false;
+  }
+
+  private watchSystemContrast(): void {
+    const mql = this.document.defaultView?.matchMedia?.(CONTRAST_QUERY);
+    if (!mql) return;
+    const onChange = (e: MediaQueryListEvent) =>
+      this._systemPrefersContrast.set(e.matches);
+    mql.addEventListener('change', onChange);
+    this.destroyRef.onDestroy(() => mql.removeEventListener('change', onChange));
   }
 
   /** Set the theme preference explicitly. */

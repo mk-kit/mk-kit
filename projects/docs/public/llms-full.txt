@@ -12,7 +12,7 @@ Every component and directive below is standalone — import the class from its 
 
 ## @mk-kit/ui/core
 
-68 exports. `import { … } from '@mk-kit/ui/core';`
+70 exports. `import { … } from '@mk-kit/ui/core';`
 
 ### MkAnchoredPanel (directive)
 
@@ -160,6 +160,8 @@ Methods:
 | --- | --- |
 | `setDensity(density: MkDensity): void` | Set the global density mode. |
 | `toggleDensity(): void` | Toggle between comfortable and compact — the two modes a density switch in a UI offers. `touch` is a deliberate choice for a specific screen, not something to land on by toggling, so from `touch` this returns to comfortable rather than cycling. |
+| `setContrast(contrast: MkContrastPreference): void` | Set the contrast preference explicitly. |
+| `toggleContrast(): void` | Toggle between normal and high contrast (resolving `system` first). |
 | `setTheme(preference: MkThemePreference): void` | Set the theme preference explicitly. |
 | `toggle(): void` | Toggle between light and dark (resolving `system` first). |
 
@@ -171,6 +173,9 @@ Properties:
 | `resolvedTheme` | `Signal<MkResolvedTheme>` | The concrete theme in effect (`light` or `dark`). |
 | `isDark` | `Signal<boolean>` | Convenience boolean for template bindings. |
 | `density` | `Signal<MkDensity>` | The global density mode. `compact` tightens control heights and the core spacing steps via the `data-mk-density` attribute, `touch` enlarges them — every component follows automatically because they read the same tokens.  This signal is the GLOBAL mode only. To make one screen or dialog touch- sized inside an otherwise comfortable app, put `data-mk-density="touch"` on that element instead; the tokens inherit and this service stays out of it. |
+| `contrast` | `Signal<MkContrastPreference>` | The user's contrast preference: `normal`, `high` or `system` (follow the OS `prefers-contrast` setting — the default). Written as `data-mk-contrast` on `<html>` and persisted; `system` removes the attribute so the pure-CSS `prefers-contrast: more` mapping takes over.  Like density, the attribute also works per subtree: put `data-mk-contrast="high"` on any element to raise contrast there only. |
+| `resolvedContrast` | `Signal<MkResolvedContrast>` | The concrete contrast in effect (`normal` or `high`). |
+| `isHighContrast` | `Signal<boolean>` | Convenience boolean for template bindings. |
 
 ### MkFieldContext (class)
 
@@ -1224,6 +1229,22 @@ Languages with built-in highlighting. Unknown values render plain text.
 type MkCodeLanguage = 'json' | 'plaintext';
 ```
 
+### MkContrastPreference (type)
+
+Import: `import { MkContrastPreference } from '@mk-kit/ui/core';`
+
+Contrast preference.
+
+`high` applies the high-contrast token preset (`data-mk-contrast="high"`):
+pure text colours, line-like borders, opaque interaction washes, a thicker
+focus ring. `system` (the default) writes no attribute and lets the
+stylesheet follow the OS `prefers-contrast: more` setting; `normal` opts
+out of that even when the OS asks for more contrast.
+
+```ts
+type MkContrastPreference = 'normal' | 'high' | 'system';
+```
+
 ### MkDensity (type)
 
 Import: `import { MkDensity } from '@mk-kit/ui/core';`
@@ -1298,6 +1319,16 @@ Value kind of a filterable field; decides the editor and the operators offered.
 
 ```ts
 type MkQueryValueType = 'string' | 'number' | 'boolean' | 'date' | 'select';
+```
+
+### MkResolvedContrast (type)
+
+Import: `import { MkResolvedContrast } from '@mk-kit/ui/core';`
+
+Concrete resolved contrast (never `system`).
+
+```ts
+type MkResolvedContrast = 'normal' | 'high';
 ```
 
 ### MkResolvedTheme (type)
@@ -8368,7 +8399,7 @@ type MkTableDensity = 'comfortable' | 'compact';
 
 ## @mk-kit/ui/data
 
-111 exports. `import { … } from '@mk-kit/ui/data';`
+113 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -9806,6 +9837,61 @@ Inputs:
 | `itemHeight` | `number` | `40` | Fixed height of each row in px. |
 | `overscan` | `number` | `4` | Extra rows rendered above/below the viewport to smooth fast scrolls. |
 
+### MkBadgeOverlay (directive)
+
+Selector: `[mkBadgeOverlay]`
+
+Docs: https://mk-kit.dev/components/badges-avatars
+
+Import: `import { MkBadgeOverlay } from '@mk-kit/ui/data';`
+
+Badge overlay — anchors a small badge (count, dot or short text) to a corner
+of ANY element: an icon button, an avatar, a tab label. The host stays a
+single tab stop; the badge is a decorative, non-focusable child.
+
+- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.
+- `mkBadgeOverlayDot` renders a textless dot ("something is new").
+- `mkBadgeOverlayAriaLabel` is the screen-reader text ("3 unread"). It is
+  rendered in a visually hidden span and wired to the host with
+  `aria-describedby`, so it is announced after the host's own name even
+  when the host has an `aria-label`. When it is given, the visible badge is
+  `aria-hidden` so the count is not read twice.
+- Positions use logical insets, so `top-end` sits at the top-right in LTR
+  and the top-left in RTL.
+
+The badge is painted with the global `.mk-badge-overlay` styles from
+`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.
+
+```html
+<button mkButton iconOnly aria-label="Notifications"
+        [mkBadgeOverlay]="unread()" mkBadgeOverlayTone="danger"
+        [mkBadgeOverlayAriaLabel]="unread() + ' unread'">
+  <mk-icon name="bell" />
+</button>
+
+<mk-avatar name="Ada Lovelace" mkBadgeOverlay mkBadgeOverlayDot
+           mkBadgeOverlayTone="success" mkBadgeOverlayPosition="bottom-end" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mkBadgeOverlay` | `string \| number \| null \| undefined` | `null` | Badge content — a count or a short label. `null` / empty hides the badge unless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers so `mkBadgeOverlay="120"` also collapses to `99+`. |
+| `mkBadgeOverlayPosition` | `MkBadgeOverlayPosition` | `'top-end'` | Corner the badge is anchored to (logical: `end` flips in RTL). |
+| `mkBadgeOverlayTone` | `MkTone` | `'primary'` | Semantic color tone (same scale as `mk-badge`). |
+| `mkBadgeOverlayDot` | `boolean` | `false` | Render a textless dot instead of the content. |
+| `mkBadgeOverlayMax` | `number` | `99` | Numbers above this render as `<max>+`. `0` disables the cap. |
+| `mkBadgeOverlayHidden` | `boolean` | `false` | Hide the badge while keeping the directive (and its aria wiring) in place. |
+| `mkBadgeOverlayAriaLabel` | `string` | `''` | Screen-reader text for the badge, e.g. `"3 unread"`. Announced as the host's description; the visible badge becomes `aria-hidden`. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `label` | `Signal<string>` | The text painted in the badge (`''` in dot mode). |
+| `visible` | `Signal<boolean>` | Whether the badge is currently rendered. |
+
 ### MkCarouselSlide (directive)
 
 Selector: `[mkCarouselSlide]`
@@ -10383,6 +10469,16 @@ Presence status shown as a corner dot on an `MkAvatar`.
 
 ```ts
 type MkAvatarStatus = 'online' | 'offline' | 'away' | 'busy';
+```
+
+### MkBadgeOverlayPosition (type)
+
+Import: `import { MkBadgeOverlayPosition } from '@mk-kit/ui/data';`
+
+Corner of the host an `MkBadgeOverlay` is anchored to.
+
+```ts
+type MkBadgeOverlayPosition = | 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
 ```
 
 ### MkBadgeVariant (type)

@@ -83,12 +83,12 @@ export class AppRoot {
 | **Date & time** | calendar, date picker, date-range picker, time picker, month/year picker, week picker, inline mini date, event calendar with editable week/day grid (drag to move / resize) |
 | **Tables & grids** (7) | data table — sort, multi-select, expandable rows, tree rows, grouping, sticky header, column resize / reorder / pin, inline cell edit, responsive stacking, CSV export, print styles — plus `MkTableDataSource` for server-side sort/page/filter, query builder (`mk-query-builder` → predicate / readable text / `MkTableDataSource.setQuery()`) |
 | **Charts** (12) | line/area, bar (stacked, horizontal, label fitting), donut, gauge, progress ring, scatter/bubble, radar, funnel, treemap, heatmap, calendar heatmap, sparkline — SVG, themed, accessible |
-| **Data display** (25) | cards, lists, stat cards, badges, tags, chips, avatars & groups, timeline, description list, tree, empty state, countdown, QR code, diff view, JSON viewer, code block, virtual scroll, carousel, kanban |
+| **Data display** (26) | cards, lists, stat cards, badges, badge overlay (`[mkBadgeOverlay]`), tags, chips, avatars & groups, timeline, description list, tree, empty state, countdown, QR code, diff view, JSON viewer, code block, virtual scroll, carousel, kanban |
 | **Navigation & layout** (21) | app shell (responsive sidebar), stack / flex / grid layout primitives, nav list & groups, tabs, stepper, breadcrumb, pagination, menu, context menu, command palette (⌘K), page header, toolbar, splitter, drawer, scroll area, FAB, back-to-top |
 | **Feedback & overlays** (21) | dialogs (+ `confirm()` / `alert()` / `prompt()`), bottom sheet, drawer, popover, popconfirm, hovercard, tooltip, toast, snackbar, alert, banner, result page, notification center, product tour, progress bar, loading bar, spinner, skeletons, block UI (region / page overlay), draggable & resizable dialogs |
 | **Editors & interactions** (31) | block editor (Notion-style, HTML round-trip), rich text, markdown renderer, code editor, log viewer, drag & drop, sortable list, @mentions, hotkeys, undo/redo history, permissions (`*mkCan`), clipboard, intersect, infinite scroll, ripple, scrollspy, chat (streaming message log, tool cards, prompt box), `Intl` formatting pipes (currency, relative time, file size, initials, truncate, pluralize) |
 | **Media** (6) | image with states, gallery, lightbox, cropper, media manager |
-| **Core services** | theme (light/dark/system + density), breakpoints, overlay & anchored panels, focus trap, live announcer, icon registry (426 built-in icons), i18n |
+| **Core services** | theme (light/dark/system + density + high contrast), breakpoints, overlay & anchored panels, focus trap, live announcer, icon registry (426 built-in icons), i18n |
 
 The full, searchable index lives in the docs (`/components-index`).
 

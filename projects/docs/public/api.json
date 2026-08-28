@@ -196,6 +196,16 @@
        "description": "Toggle between comfortable and compact — the two modes a density switch in\na UI offers. `touch` is a deliberate choice for a specific screen, not\nsomething to land on by toggling, so from `touch` this returns to\ncomfortable rather than cycling."
       },
       {
+       "name": "setContrast",
+       "signature": "(contrast: MkContrastPreference): void",
+       "description": "Set the contrast preference explicitly."
+      },
+      {
+       "name": "toggleContrast",
+       "signature": "(): void",
+       "description": "Toggle between normal and high contrast (resolving `system` first)."
+      },
+      {
        "name": "setTheme",
        "signature": "(preference: MkThemePreference): void",
        "description": "Set the theme preference explicitly."
@@ -229,6 +239,24 @@
        "name": "density",
        "type": "Signal<MkDensity>",
        "description": "The global density mode. `compact` tightens control heights and the core\nspacing steps via the `data-mk-density` attribute, `touch` enlarges them —\nevery component follows automatically because they read the same tokens.\n\nThis signal is the GLOBAL mode only. To make one screen or dialog touch-\nsized inside an otherwise comfortable app, put `data-mk-density=\"touch\"`\non that element instead; the tokens inherit and this service stays out of\nit.",
+       "readonly": true
+      },
+      {
+       "name": "contrast",
+       "type": "Signal<MkContrastPreference>",
+       "description": "The user's contrast preference: `normal`, `high` or `system` (follow the\nOS `prefers-contrast` setting — the default). Written as\n`data-mk-contrast` on `<html>` and persisted; `system` removes the\nattribute so the pure-CSS `prefers-contrast: more` mapping takes over.\n\nLike density, the attribute also works per subtree: put\n`data-mk-contrast=\"high\"` on any element to raise contrast there only.",
+       "readonly": true
+      },
+      {
+       "name": "resolvedContrast",
+       "type": "Signal<MkResolvedContrast>",
+       "description": "The concrete contrast in effect (`normal` or `high`).",
+       "readonly": true
+      },
+      {
+       "name": "isHighContrast",
+       "type": "Signal<boolean>",
+       "description": "Convenience boolean for template bindings.",
        "readonly": true
       }
      ],
@@ -2988,6 +3016,13 @@
      "definition": "'json' | 'plaintext'"
     },
     {
+     "name": "MkContrastPreference",
+     "description": "Contrast preference.\n\n`high` applies the high-contrast token preset (`data-mk-contrast=\"high\"`):\npure text colours, line-like borders, opaque interaction washes, a thicker\nfocus ring. `system` (the default) writes no attribute and lets the\nstylesheet follow the OS `prefers-contrast: more` setting; `normal` opts\nout of that even when the OS asks for more contrast.",
+     "file": "projects/mk-kit/core/theme/theme.service.ts",
+     "kind": "type",
+     "definition": "'normal' | 'high' | 'system'"
+    },
+    {
      "name": "MkDensity",
      "description": "Global control-density mode.\n\n`touch` sizes controls for fingers (48px default) rather than a cursor —\ntablets, kiosks, order screens. It is usually applied per-subtree with the\n`data-mk-density` attribute rather than globally, since one app often has\nboth a mouse-driven admin and a touch-driven screen.",
      "file": "projects/mk-kit/core/theme/theme.service.ts",
@@ -3035,6 +3070,13 @@
      "file": "projects/mk-kit/core/query/query.types.ts",
      "kind": "type",
      "definition": "'string' | 'number' | 'boolean' | 'date' | 'select'"
+    },
+    {
+     "name": "MkResolvedContrast",
+     "description": "Concrete resolved contrast (never `system`).",
+     "file": "projects/mk-kit/core/theme/theme.service.ts",
+     "kind": "type",
+     "definition": "'normal' | 'high'"
     },
     {
      "name": "MkResolvedTheme",
@@ -15471,6 +15513,78 @@
      "docs": "/components/data"
     },
     {
+     "name": "MkBadgeOverlay",
+     "description": "Badge overlay — anchors a small badge (count, dot or short text) to a corner\nof ANY element: an icon button, an avatar, a tab label. The host stays a\nsingle tab stop; the badge is a decorative, non-focusable child.\n\n- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.\n- `mkBadgeOverlayDot` renders a textless dot (\"something is new\").\n- `mkBadgeOverlayAriaLabel` is the screen-reader text (\"3 unread\"). It is\n  rendered in a visually hidden span and wired to the host with\n  `aria-describedby`, so it is announced after the host's own name even\n  when the host has an `aria-label`. When it is given, the visible badge is\n  `aria-hidden` so the count is not read twice.\n- Positions use logical insets, so `top-end` sits at the top-right in LTR\n  and the top-left in RTL.\n\nThe badge is painted with the global `.mk-badge-overlay` styles from\n`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.\n\n```html\n<button mkButton iconOnly aria-label=\"Notifications\"\n        [mkBadgeOverlay]=\"unread()\" mkBadgeOverlayTone=\"danger\"\n        [mkBadgeOverlayAriaLabel]=\"unread() + ' unread'\">\n  <mk-icon name=\"bell\" />\n</button>\n\n<mk-avatar name=\"Ada Lovelace\" mkBadgeOverlay mkBadgeOverlayDot\n           mkBadgeOverlayTone=\"success\" mkBadgeOverlayPosition=\"bottom-end\" />\n```",
+     "file": "projects/mk-kit/data/badge/badge-overlay.ts",
+     "kind": "directive",
+     "selector": "[mkBadgeOverlay]",
+     "selectors": [
+      "mkBadgeOverlay"
+     ],
+     "inputs": [
+      {
+       "name": "mkBadgeOverlay",
+       "type": "string | number | null | undefined",
+       "description": "Badge content — a count or a short label. `null` / empty hides the badge\nunless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers\nso `mkBadgeOverlay=\"120\"` also collapses to `99+`.",
+       "default": "null"
+      },
+      {
+       "name": "mkBadgeOverlayPosition",
+       "type": "MkBadgeOverlayPosition",
+       "description": "Corner the badge is anchored to (logical: `end` flips in RTL).",
+       "default": "'top-end'"
+      },
+      {
+       "name": "mkBadgeOverlayTone",
+       "type": "MkTone",
+       "description": "Semantic color tone (same scale as `mk-badge`).",
+       "default": "'primary'"
+      },
+      {
+       "name": "mkBadgeOverlayDot",
+       "type": "boolean",
+       "description": "Render a textless dot instead of the content.",
+       "default": "false"
+      },
+      {
+       "name": "mkBadgeOverlayMax",
+       "type": "number",
+       "description": "Numbers above this render as `<max>+`. `0` disables the cap.",
+       "default": "99"
+      },
+      {
+       "name": "mkBadgeOverlayHidden",
+       "type": "boolean",
+       "description": "Hide the badge while keeping the directive (and its aria wiring) in place.",
+       "default": "false"
+      },
+      {
+       "name": "mkBadgeOverlayAriaLabel",
+       "type": "string",
+       "description": "Screen-reader text for the badge, e.g. `\"3 unread\"`. Announced as the\nhost's description; the visible badge becomes `aria-hidden`.",
+       "default": "''"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [
+      {
+       "name": "label",
+       "type": "Signal<string>",
+       "description": "The text painted in the badge (`''` in dot mode).",
+       "readonly": true
+      },
+      {
+       "name": "visible",
+       "type": "Signal<boolean>",
+       "description": "Whether the badge is currently rendered.",
+       "readonly": true
+      }
+     ],
+     "queries": [],
+     "docs": "/components/badges-avatars"
+    },
+    {
      "name": "MkCarouselSlide",
      "description": "A single slide inside `MkCarousel`. Mark each slide element with\n`mkCarouselSlide`; the carousel wires ARIA + visibility.",
      "file": "projects/mk-kit/data/carousel/carousel.ts",
@@ -16245,6 +16359,13 @@
      "file": "projects/mk-kit/data/avatar/avatar.ts",
      "kind": "type",
      "definition": "'online' | 'offline' | 'away' | 'busy'"
+    },
+    {
+     "name": "MkBadgeOverlayPosition",
+     "description": "Corner of the host an `MkBadgeOverlay` is anchored to.",
+     "file": "projects/mk-kit/data/badge/badge-overlay.ts",
+     "kind": "type",
+     "definition": "| 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start'"
     },
     {
      "name": "MkBadgeVariant",

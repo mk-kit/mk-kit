@@ -24,6 +24,30 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   per-call `locale` override.
 - Docs: "Pipes" section on the Utilities page; StackBlitz export now detects
   pipes used in snippets (`{{ x | mkCurrency }}`).
+- **`[mkBadgeOverlay]`** (`@mk-kit/ui/data/badge`) — anchors a count, dot or
+  short label to a corner of any element (icon button, avatar, tab). Inputs:
+  `mkBadgeOverlay` (content), `mkBadgeOverlayPosition` (`top-end` default,
+  `top-start`, `bottom-end`, `bottom-start` — logical, so they mirror in RTL),
+  `mkBadgeOverlayTone`, `mkBadgeOverlayDot`, `mkBadgeOverlayMax` (99 → `99+`),
+  `mkBadgeOverlayHidden` and `mkBadgeOverlayAriaLabel` (a visually hidden
+  description wired to the host with `aria-describedby`; the visible badge is
+  then `aria-hidden`). The host stays a single tab stop and is only made
+  `position: relative` when it was `static`. Styled by the global
+  `.mk-badge-overlay` rules in `styles.css`; forced-colors safe.
+- **High-contrast preset** — `data-mk-contrast="high"` on `<html>` (or any
+  subtree) swaps the colour tokens for a high-contrast set in both light and
+  dark: pure text colours, line-like borders, opaque hover / pressed washes,
+  shadows replaced by a crisp outline, darker / lighter tone families and a
+  3px focus ring. The same preset applies automatically under the OS
+  `prefers-contrast: more` unless the app opts out with
+  `data-mk-contrast="normal"`. Under `forced-colors: active` (Windows High
+  Contrast) the tokens now map to the system palette (`Canvas`, `CanvasText`,
+  `Highlight`, `ButtonText`, `GrayText`).
+- **`MkThemeService.contrast`** — `contrast()` (`normal` / `high` / `system`),
+  `resolvedContrast()`, `isHighContrast()`, `setContrast()` and
+  `toggleContrast()`, persisted to `localStorage` and live-tracking the OS
+  setting, mirroring the theme preference. The docs header gained a contrast
+  button next to density and theme.
 
 ## [0.41.0] — 2026-08-27
 
