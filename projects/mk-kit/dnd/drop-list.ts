@@ -19,6 +19,24 @@ import { MkDrag } from './drag';
 import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
 
 /**
+ * Roles on which `aria-orientation` is permitted (WAI-ARIA 1.2). On any other
+ * role the attribute is invalid, so the list only exposes it for these.
+ */
+const ORIENTATION_ROLES = new Set([
+  'listbox',
+  'menu',
+  'radiogroup',
+  'scrollbar',
+  'select',
+  'separator',
+  'slider',
+  'tablist',
+  'toolbar',
+  'tree',
+  'treegrid',
+]);
+
+/**
  * A drop container for reorderable `[mkDrag]` items.
  *
  * - **Sort list:** a single `[mkDropList]` over an array — items reorder within it.
@@ -29,14 +47,29 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
  * The array bound to `mkDropListData` is **not** mutated for you — handle
  * `mkDropListDropped` and call {@link mkMoveItemInArray} / {@link mkTransferArrayItem}.
  *
+ * Semantics follow the host element and its items, so the tree is always
+ * valid ARIA:
+ *
+ * - any host other than `<ul>`/`<ol>` is a `role="group"` (named by
+ *   `mkDropListLabel`) of `role="button"` items;
+ * - a `<ul>`/`<ol>` whose `<li mkDrag>` items all carry a *focusable*
+ *   `[mkDragHandle]` stays a plain list — the handles are the controls;
+ * - a `<ul>`/`<ol>` whose items are themselves the keyboard targets becomes a
+ *   `listbox` of `option`s (an `<li>` may not be a `button`); give it a
+ *   `mkDropListLabel`, listboxes need a name.
+ *
+ * A `role` you set in the template is kept, and `aria-orientation` is only
+ * exposed on roles that allow it (`listbox`, `toolbar`, `tree`, …) — the
+ * keyboard model handles both axes regardless.
+ *
  * ```html
- * <ul mkDropList [mkDropListData]="todo()"
- *     mkDropListId="todo" [mkDropListConnectedTo]="['done']"
- *     (mkDropListDropped)="drop($event)">
+ * <div mkDropList [mkDropListData]="todo()" mkDropListLabel="To do"
+ *      mkDropListId="todo" [mkDropListConnectedTo]="['done']"
+ *      (mkDropListDropped)="drop($event)">
  *   @for (t of todo(); track t.id) {
- *     <li mkDrag [mkDragData]="t">{{ t.title }}</li>
+ *     <div mkDrag [mkDragData]="t">{{ t.title }}</div>
  *   }
- * </ul>
+ * </div>
  * ```
  *
  * @typeParam T item data type.
@@ -49,7 +82,9 @@ import type { MkDropEvent, MkDropListOrientation } from './drag-drop.types';
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-drop-list',
-    '[attr.aria-orientation]': 'mkDropListOrientation()',
+    '[attr.role]': 'role()',
+    '[attr.aria-label]': 'ariaLabel()',
+    '[attr.aria-orientation]': 'orientationAllowed() ? mkDropListOrientation() : null',
     '[attr.aria-disabled]': 'mkDropListDisabled() || null',
     '[class.mk-drop-list--horizontal]': "mkDropListOrientation() === 'horizontal'",
     '[class.mk-drop-list--disabled]': 'mkDropListDisabled()',
@@ -94,6 +129,35 @@ export class MkDropList<T = unknown> {
 
   /** Announceable name: the label when set, otherwise the resolved id. */
   readonly label = computed(() => this.mkDropListLabel() || this.id());
+
+  /** A `role` written in the template — always kept. */
+  private readonly explicitRole = this.element.getAttribute('role');
+  private readonly isNativeList = /^(UL|OL)$/.test(this.element.tagName);
+
+  /**
+   * The role the host exposes. One set in the template wins. A `<ul>`/`<ol>`
+   * keeps its implicit `list` role (`null` — nothing is written) while every
+   * item hands the keyboard drag to a focusable handle, and becomes a
+   * `listbox` (its items `option`s) otherwise. Any other element is a `group`.
+   */
+  readonly role = computed<string | null>(() => {
+    if (this.explicitRole) return this.explicitRole;
+    if (!this.isNativeList) return 'group';
+    return this.drags().every((d) => d.keyboardHandle()) ? null : 'listbox';
+  });
+
+  /** Whether `aria-orientation` is valid on the effective role. */
+  protected readonly orientationAllowed = computed(() =>
+    ORIENTATION_ROLES.has(this.role() ?? ''),
+  );
+
+  /** A static `aria-label` written in the template, kept when no label input is set. */
+  private readonly staticAriaLabel = this.element.getAttribute('aria-label');
+
+  /** Accessible name of the list: `mkDropListLabel`, else the template's own. */
+  protected readonly ariaLabel = computed(
+    () => this.mkDropListLabel() || this.staticAriaLabel || null,
+  );
 
   /** Connected-list ids, normalised to a plain array. */
   readonly connectedTo = computed<readonly string[]>(

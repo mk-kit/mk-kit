@@ -87,13 +87,13 @@ describe('MkHeatmap', () => {
     expect(rows[0].cells[1].xLabel).toBe('Tue');
   });
 
-  it('mixes more accent into higher values and flags strong cells', () => {
+  it('mixes more accent into higher values and inverts the text on strong cells', () => {
     const rows = (heat as any).rows();
     // Domain is [0, 10]; the max cell is fully strong, the min is not.
     expect(rows[0].cells[0].bg).toContain('0%'); // value 0
     expect(rows[0].cells[1].bg).toContain('100%'); // value 10
-    expect(rows[0].cells[1].strong).toBe(true);
-    expect(rows[0].cells[0].strong).toBe(false);
+    expect(rows[0].cells[1].inverse).toBe(true);
+    expect(rows[0].cells[0].inverse).toBe(false);
   });
 
   it('renders null cells as blank and transparent', () => {

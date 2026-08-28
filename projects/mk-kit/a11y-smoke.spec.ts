@@ -66,6 +66,10 @@ import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/data/badge';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
+import { MkDrag, MkDragHandle, MkDropList, MkSortableList } from '@mk-kit/ui/dnd';
+import { MkRepeater, MkRepeaterRow } from '@mk-kit/ui/forms/repeater';
+import { MkHeatmap } from '@mk-kit/ui/data/charts';
+import { MkCalendar } from '@mk-kit/ui/datetime/calendar';
 
 /**
  * axe run options shared by every fixture.
@@ -555,6 +559,117 @@ class InteractiveDonutHost {
 })
 class StandaloneControlsHost {}
 
+/** Whole-item drags in a `<div>` list: a labelled group of buttons. */
+@Component({
+  imports: [MkDropList, MkDrag],
+  template: `
+    <div mkDropList mkDropListLabel="Cards" [mkDropListData]="rows">
+      @for (r of rows; track r.id) {
+        <div mkDrag [mkDragData]="r">{{ r.title }}</div>
+      }
+    </div>
+  `,
+})
+class DropListGroupHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
+/** Whole-item drags in a `<ul>` list: a labelled listbox of options. */
+@Component({
+  imports: [MkDropList, MkDrag],
+  template: `
+    <ul mkDropList mkDropListLabel="Tasks" [mkDropListData]="rows">
+      @for (r of rows; track r.id) {
+        <li mkDrag [mkDragData]="r">{{ r.title }}</li>
+      }
+    </ul>
+  `,
+})
+class DropListListboxHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
+/** Rows with focusable handles and their own controls: a plain list. */
+@Component({
+  imports: [MkDropList, MkDrag, MkDragHandle, MkInput],
+  template: `
+    <ul mkDropList [mkDropListData]="rows">
+      @for (r of rows; track r.id) {
+        <li mkDrag [mkDragData]="r">
+          <button type="button" mkDragHandle [attr.aria-label]="'Reorder ' + r.title">⠿</button>
+          <input mkInput aria-label="Title" [value]="r.title" />
+          <a href="#more">More</a>
+        </li>
+      }
+    </ul>
+  `,
+})
+class DropListHandleHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
+@Component({
+  imports: [MkSortableList],
+  template: `
+    <mk-sortable-list [items]="rows">
+      <ng-template let-item let-i="index">{{ i + 1 }}. {{ item.title }}</ng-template>
+    </mk-sortable-list>
+  `,
+})
+class SortableListHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
+/** Reorderable repeater rows holding form controls (axe nested-interactive). */
+@Component({
+  imports: [MkRepeater, MkRepeaterRow, MkInput],
+  template: `
+    <mk-repeater [(items)]="rows" [factory]="factory" reorderable addLabel="Add line">
+      <ng-template mkRepeaterRow let-item>
+        <input mkInput aria-label="Line" [value]="$any(item).name" />
+      </ng-template>
+    </mk-repeater>
+  `,
+})
+class RepeaterHost {
+  rows = [{ name: 'Alpha' }, { name: 'Beta' }];
+  readonly factory = (): { name: string } => ({ name: '' });
+}
+
+@Component({
+  imports: [MkHeatmap],
+  template: `
+    <mk-heatmap
+      [xLabels]="['Mon', 'Tue', 'Wed']"
+      [yLabels]="['AM', 'PM']"
+      [data]="[[1, 5, 9], [3, null, 7]]"
+      label="Visits by weekday and half-day"
+      showValues
+    />
+  `,
+})
+class HeatmapHost {}
+
+@Component({
+  imports: [MkCalendar],
+  template: `<mk-calendar [value]="date" />`,
+})
+class CalendarHost {
+  readonly date = new Date(2026, 7, 15);
+}
+
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
@@ -596,6 +711,13 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'file upload (dropzone)', host: FileUploadHost },
   { name: 'interactive donut chart', host: InteractiveDonutHost },
   { name: 'standalone controls with aria-label', host: StandaloneControlsHost },
+  { name: 'drop list (div: group of buttons)', host: DropListGroupHost },
+  { name: 'drop list (ul: listbox of options)', host: DropListListboxHost },
+  { name: 'drop list (ul: rows with focusable handles)', host: DropListHandleHost },
+  { name: 'sortable list', host: SortableListHost },
+  { name: 'repeater (reorderable rows with inputs)', host: RepeaterHost },
+  { name: 'heatmap with values', host: HeatmapHost },
+  { name: 'calendar', host: CalendarHost },
 ];
 
 describe('a11y smoke (axe-core)', () => {

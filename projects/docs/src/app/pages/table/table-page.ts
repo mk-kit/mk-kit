@@ -581,6 +581,17 @@ const DS_CUSTOMERS: DemoCustomer[] = Array.from({ length: 57 }, (_, i) => {
         controls, repeats the header on every page and keeps rows whole; wrap
         page chrome in <code class="docs-inline">.mk-print-hidden</code>.
       </p>
+      <p>
+        Other formats start from the same place:
+        <code class="docs-inline">table.getExportRows(&#123; selectedOnly, columns &#125;)</code>
+        returns the <code class="docs-inline">rows</code> (display order, current
+        sort, tree children flattened under their parent, selection applied)
+        and the <code class="docs-inline">columns</code> (current order, each
+        with its <code class="docs-inline">header</code> and
+        <code class="docs-inline">format</code>) that
+        <code class="docs-inline">exportCsv()</code> writes — feed them to an
+        XLSX or PDF writer, the clipboard, or the Pro export package.
+      </p>
       <docs-example [code]="exportCode" column>
         <div class="mk-print-hidden" style="display: flex; flex-wrap: wrap; gap: var(--mk-space-2); margin-bottom: var(--mk-space-3)">
           <button mkButton size="sm" variant="outline" tone="neutral" (click)="exportTable.exportCsv({ filename: 'users' })">
@@ -1020,6 +1031,12 @@ mkExportCsv(orders, [
   { key: 'total', header: 'Total', format: (v) => \`\${v} zł\` },
 ], { filename: 'orders', delimiter: ';' });
 const text = mkToCsv(orders);   // just the string
+
+// Other formats: the rows + ordered columns exportCsv() uses
+const { rows, columns } = table.getExportRows({ selectedOnly: true });
+const sheet = rows.map((row) =>
+  Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])),
+);
 
 // Print: keep toolbars off paper
 <div class="mk-print-hidden">…filters…</div>`;

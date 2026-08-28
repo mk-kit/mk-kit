@@ -90,10 +90,12 @@ export class MkRepeaterEmpty {
  *
  * With `reorderable`, each row gets a drag handle wired through the dnd
  * module's touch-safe handle-based configuration (a swipe on the row body
- * still scrolls the page). Reordering also works by keyboard: focus the
- * handle (or the row) and press Space/Enter to pick up, arrows to move,
- * Space/Enter to drop, Escape to cancel. Each completed reorder is announced
- * via {@link MkLiveAnnouncer}.
+ * still scrolls the page). The handle button is the only control the dnd
+ * layer adds — rows stay plain list items, so the inputs and buttons inside
+ * them are never nested in an interactive role. Reordering also works by
+ * keyboard: focus the handle and press Space/Enter to pick up, arrows to
+ * move, Space/Enter to drop, Escape to cancel. Each completed reorder is
+ * announced via {@link MkLiveAnnouncer}.
  *
  * ```html
  * <mk-repeater [(items)]="rows" [min]="1" [max]="10" reorderable

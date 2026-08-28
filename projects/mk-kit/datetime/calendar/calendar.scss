@@ -151,8 +151,12 @@
   @include mk.focus-ring(calc(var(--mk-focus-ring-offset) * -1));
 }
 
+/* Leading/trailing days of the neighbouring months: quieter than the month's
+ * own days but still readable — `--mk-text-subtle` clears 4.5:1 on the
+ * surface in both themes, `--mk-text-disabled` (the previous choice) does not
+ * and is reserved for genuinely inert controls. */
 .mk-calendar__day--outside {
-  color: var(--mk-text-disabled);
+  color: var(--mk-text-subtle);
 }
 
 /* Today — not signalled by color alone: underline dot + aria-current.

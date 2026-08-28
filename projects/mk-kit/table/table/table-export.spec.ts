@@ -85,6 +85,49 @@ describe('MkTable.exportCsv', () => {
     );
   });
 
+  describe('getExportRows (the public plumbing behind exportCsv)', () => {
+    it('returns display-ordered rows and the ordered columns with header + formatter', () => {
+      const { rows, columns } = table().getExportRows();
+      expect(rows.map((r) => r.name)).toEqual(['Zed', 'Ann']);
+      expect(columns.map((c) => c.key)).toEqual(['name', 'amount']);
+      expect(columns[1].header).toBe('Amount');
+      expect(columns[1].format?.(5, rows[1])).toBe('5 zł');
+    });
+
+    it('follows the current sort and restricts to the requested column keys', async () => {
+      (fixture.nativeElement as HTMLElement)
+        .querySelector<HTMLButtonElement>('.mk-table__th-button')!
+        .click();
+      fixture.detectChanges();
+      await fixture.whenStable();
+      const { rows, columns } = table().getExportRows({ columns: ['amount'] });
+      expect(rows.map((r) => r.name)).toEqual(['Ann', 'Zed']);
+      expect(columns.map((c) => c.key)).toEqual(['amount']);
+    });
+
+    it('flattens tree children under their parent while collapsed', async () => {
+      fixture.componentInstance.childrenKey.set('children');
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(table().getExportRows().rows.map((r) => r.id)).toEqual([1, 3, 2]);
+    });
+
+    it('applies selectedOnly', async () => {
+      fixture.componentInstance.selected.set([fixture.componentInstance.rows[1]]);
+      fixture.detectChanges();
+      await fixture.whenStable();
+      expect(table().getExportRows({ selectedOnly: true }).rows.map((r) => r.id)).toEqual([2]);
+    });
+
+    it('is exactly what exportCsv writes', () => {
+      const { rows, columns } = table().getExportRows({ columns: ['name'] });
+      const manual = ['Name', ...rows.map((r) => columns.map((c) => r[c.key as 'name']).join(','))]
+        .join('\r\n')
+        .concat('\r\n');
+      expect(table().exportCsv({ download: false, bom: false, columns: ['name'] })).toBe(manual);
+    });
+  });
+
   it('downloads as table.csv by default', () => {
     const createObjectURL = vi.fn(() => 'blob:x');
     Object.assign(URL, { createObjectURL, revokeObjectURL: vi.fn() });

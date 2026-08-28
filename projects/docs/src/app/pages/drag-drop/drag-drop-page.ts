@@ -84,6 +84,7 @@ interface NestedSection {
         <ul
           mkDropList
           class="dnd-list"
+          mkDropListLabel="Tasks"
           [mkDropListData]="tasks()"
           (mkDropListDropped)="onReorder($event)"
         >
@@ -253,19 +254,23 @@ interface NestedSection {
       <p>
         Applies to every <code class="docs-inline">[mkDrag]</code> item — the
         sortable lists here and the kanban board below inherit it. Each step,
-        drop and cancel is announced via the live announcer.
+        drop and cancel is announced via the live announcer. The item itself is
+        the keyboard target unless it contains a <em>focusable</em>
+        <code class="docs-inline">[mkDragHandle]</code> (a
+        <code class="docs-inline">&lt;button&gt;</code>), in which case the
+        handle is — see <a href="#handle">Drag handle</a>.
       </p>
       <table class="docs-props">
         <thead>
           <tr><th>Key</th><th>Action</th></tr>
         </thead>
         <tbody>
-          <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (on a focused item)</td><td>Pick the item up. Announces its position and the available keys.</td></tr>
+          <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (on a focused item or its handle)</td><td>Pick the item up. Announces its position and the available keys.</td></tr>
           <tr><td><kbd>ArrowUp</kbd> / <kbd>ArrowDown</kbd> (while lifted, vertical list)</td><td>Move one position up / down; at the first/last position, cross into the previous / next connected list.</td></tr>
           <tr><td><kbd>ArrowLeft</kbd> / <kbd>ArrowRight</kbd> (while lifted, vertical list)</td><td>Jump to the previous / next connected list, keeping the closest index.</td></tr>
           <tr><td><kbd>Space</kbd> / <kbd>Enter</kbd> (while lifted)</td><td>Drop the item at the placeholder position — emits <code class="docs-inline">mkDropListDropped</code> with <code class="docs-inline">isPointerEvent: false</code>.</td></tr>
           <tr><td><kbd>Escape</kbd> (while lifted)</td><td>Cancel — the item returns to its starting position.</td></tr>
-          <tr><td>Blur (focus leaves the item while lifted)</td><td>Also cancels, so the drag can never get stuck.</td></tr>
+          <tr><td>Blur (focus leaves the item or handle while lifted)</td><td>Also cancels, so the drag can never get stuck.</td></tr>
         </tbody>
       </table>
       <p>
@@ -274,13 +279,41 @@ interface NestedSection {
         <kbd>ArrowUp</kbd>/<kbd>ArrowDown</kbd> cross between connected lists.
       </p>
 
+      <h3>Roles</h3>
+      <p>
+        The directives keep the ARIA tree valid whatever element you put them
+        on. A <code class="docs-inline">&lt;div mkDropList&gt;</code> is a
+        <code class="docs-inline">group</code> of
+        <code class="docs-inline">role="button"</code> items. A
+        <code class="docs-inline">&lt;ul mkDropList&gt;</code> whose
+        <code class="docs-inline">&lt;li mkDrag&gt;</code> items are the
+        keyboard targets becomes a <code class="docs-inline">listbox</code> of
+        <code class="docs-inline">option</code>s (an
+        <code class="docs-inline">&lt;li&gt;</code> may not be a button) — give
+        it a <code class="docs-inline">mkDropListLabel</code>, a listbox needs a
+        name. With focusable handles the
+        <code class="docs-inline">&lt;ul&gt;</code> stays a plain list.
+        <code class="docs-inline">aria-orientation</code> is only written on
+        roles that allow it. Items carry
+        <code class="docs-inline">aria-roledescription="Draggable item"</code>
+        and <code class="docs-inline">aria-grabbed</code> while lifted.
+      </p>
+
       <!-- ======================== DRAG HANDLE ======================== -->
-      <h2>Drag handle</h2>
+      <h2 id="handle">Drag handle</h2>
       <p>
         Add a <code class="docs-inline">[mkDragHandle]</code> inside an item and
         pointer drags may only start on that grip — the rest of the row stays
-        selectable and clickable. (Keyboard dragging still uses the whole
-        focused item.)
+        selectable and clickable. A decorative grip
+        (<code class="docs-inline">&lt;span mkDragHandle aria-hidden&gt;</code>)
+        leaves the item as the keyboard target. A <em>focusable</em> grip — a
+        <code class="docs-inline">&lt;button mkDragHandle&gt;</code> with an
+        <code class="docs-inline">aria-label</code> — takes the keyboard drag
+        over and the item becomes a plain container: no role, not focusable,
+        free to hold inputs, links and buttons of its own (axe
+        <code class="docs-inline">nested-interactive</code> stays clean) and,
+        for <code class="docs-inline">&lt;li&gt;</code> items, a proper list.
+        <code class="docs-inline">mk-repeater</code> rows work this way.
       </p>
       <docs-example [code]="handleCode" column>
         <ul
@@ -322,6 +355,7 @@ interface NestedSection {
                 mkDropList
                 class="dnd-col__list"
                 [mkDropListId]="col.id"
+                [mkDropListLabel]="col.title"
                 [mkDropListData]="board()[col.id]"
                 [mkDropListConnectedTo]="columnIds"
                 (mkDropListDropped)="onBoardDrop($event)"
@@ -403,7 +437,7 @@ interface NestedSection {
           @for (s of sections(); track s.id) {
             <li mkDrag [mkDragData]="s" class="dnd-section">
               <div class="dnd-section__head">
-                <span class="dnd-grip" mkDragHandle aria-hidden="true">⠿</span>
+                <button type="button" class="dnd-handle" mkDragHandle [attr.aria-label]="'Reorder section ' + s.title">⠿</button>
                 <span class="dnd-section__title">{{ s.title }}</span>
                 <span class="dnd-col__count">{{ s.items.length }}</span>
               </div>
@@ -777,9 +811,10 @@ export class DragDropPage {
     (mkDropListDropped)="onNestedDrop($event)">
   @for (s of sections(); track s.id) {
     <li mkDrag [mkDragData]="s">
-      <span mkDragHandle>⠿</span> {{ s.title }}
+      <!-- a focusable handle keeps the section a plain list item around its inner list -->
+      <button mkDragHandle [attr.aria-label]="'Reorder section ' + s.title">⠿</button> {{ s.title }}
       <ul mkDropList [mkDropListId]="'sec-' + s.id" [mkDropListData]="s.items"
-          [mkDropListConnectedTo]="sectionListIds()"
+          [mkDropListLabel]="s.title" [mkDropListConnectedTo]="sectionListIds()"
           (mkDropListDropped)="onNestedDrop($event)">
         @for (it of s.items; track it.id) {
           <li mkDrag [mkDragData]="it">{{ it.title }}</li>
@@ -796,7 +831,7 @@ onNestedDrop(e: MkDropEvent) {
   else { /* mkTransferArrayItem between sections */ }
 }`;
 
-  protected readonly sortableCode = `<ul mkDropList
+  protected readonly sortableCode = `<ul mkDropList mkDropListLabel="Tasks"
     [mkDropListData]="tasks()"
     (mkDropListDropped)="onReorder($event)">
   @for (t of tasks(); track t.id) {
@@ -823,6 +858,7 @@ onReorder(e: MkDropEvent<Task>) {
 
   protected readonly boardCode = `<ul mkDropList
     [mkDropListId]="col.id"
+    [mkDropListLabel]="col.title"
     [mkDropListData]="board()[col.id]"
     [mkDropListConnectedTo]="columnIds"
     (mkDropListDropped)="onBoardDrop($event)">

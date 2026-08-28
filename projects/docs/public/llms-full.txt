@@ -2708,13 +2708,25 @@ Docs: https://mk-kit.dev/components/drag-drop
 Import: `import { MkDrag } from '@mk-kit/ui/dnd';`
 
 Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /
-pen) **and** by keyboard (WCAG 2.1.1). The item is focusable, exposes
-`role="button"` + `aria-roledescription="Draggable item"`, and every move is
-announced via `MkLiveAnnouncer`.
+pen) **and** by keyboard (WCAG 2.1.1). Every move is announced via
+`MkLiveAnnouncer`. Which element carries the keyboard interaction
+depends on the handle:
 
-Keyboard: focus an item and press **Space/Enter** to pick it up, **Arrow**
-keys to move it (crossing into connected lists at the ends / across the
-perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
+- **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):
+  the item itself is focusable and exposes `aria-roledescription="Draggable
+  item"` with `role="button"` — or `role="option"` when it is an `<li>` of a
+  `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may
+  not take the `button` role).
+- **A focusable handle** (`<button mkDragHandle aria-label="…">`, or any
+  handle with `tabindex`): the handle is the keyboard target and receives
+  the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the
+  item stays a plain container with no role and no `tabindex`, so it can hold
+  inputs, links and buttons of its own (no nested interactive controls) and
+  `<li>` items keep their list semantics.
+
+Keyboard: focus the item (or its handle) and press **Space/Enter** to pick
+it up, **Arrow** keys to move it (crossing into connected lists at the ends /
+across the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
 
 Touch: a swipe scrolls the page as usual — the drag only arms after a
 long-press (`mkDragTouchDelay`, default 300 ms). While armed the item
@@ -2727,9 +2739,9 @@ drag lifts, so a move never forces layout. The pending frame is flushed
 synchronously on release so drops land exactly where the pointer ended.
 
 ```html
-<li mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
+<div mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
   <span mkDragHandle aria-hidden="true">⠿</span> {{ row.title }}
-</li>
+</div>
 ```
 
 Inputs:
@@ -2745,6 +2757,7 @@ Properties:
 | Name | Type | Description |
 | --- | --- | --- |
 | `element` | `HTMLElement` | The item's host element. |
+| `keyboardHandle` | `Signal<MkDragHandle \| null>` | The handle that carries the keyboard drag — the first of this item's handles that is focusable on its own (a `<button mkDragHandle>`, say). `null` when the item itself is the keyboard target. |
 | `disabled` | `Signal<boolean>` | Effective disabled state (item- or list-level). |
 
 ### MkDropList (component)
@@ -2765,10 +2778,25 @@ A drop container for reorderable `[mkDrag]` items.
 The array bound to `mkDropListData` is **not** mutated for you — handle
 `mkDropListDropped` and call `mkMoveItemInArray` / `mkTransferArrayItem`.
 
+Semantics follow the host element and its items, so the tree is always
+valid ARIA:
+
+- any host other than `<ul>`/`<ol>` is a `role="group"` (named by
+  `mkDropListLabel`) of `role="button"` items;
+- a `<ul>`/`<ol>` whose `<li mkDrag>` items all carry a *focusable*
+  `[mkDragHandle]` stays a plain list — the handles are the controls;
+- a `<ul>`/`<ol>` whose items are themselves the keyboard targets becomes a
+  `listbox` of `option`s (an `<li>` may not be a `button`); give it a
+  `mkDropListLabel`, listboxes need a name.
+
+A `role` you set in the template is kept, and `aria-orientation` is only
+exposed on roles that allow it (`listbox`, `toolbar`, `tree`, …) — the
+keyboard model handles both axes regardless.
+
 ```html
-<ul mkDropList [mkDropListData]="todo()"
-    mkDropListId="todo" [mkDropListConnectedTo]="['done']"
-    (mkDropListDropped)="drop($event)">
+<div mkDropList [mkDropListData]="todo()" mkDropListLabel="To do"
+     mkDropListId="todo" [mkDropListConnectedTo]="['done']"
+     (mkDropListDropped)="drop($event)">
 
 Inputs:
 
@@ -2804,6 +2832,7 @@ Properties:
 | `element` | `HTMLElement` | The list's host element (drop target bounds). |
 | `id` | `Signal<string>` | Resolved id (input or generated). |
 | `label` | `Signal<string>` | Announceable name: the label when set, otherwise the resolved id. |
+| `role` | `Signal<string \| null>` | The role the host exposes. One set in the template wins. A `<ul>`/`<ol>` keeps its implicit `list` role (`null` — nothing is written) while every item hands the keyboard drag to a focusable handle, and becomes a `listbox` (its items `option`s) otherwise. Any other element is a `group`. |
 | `connectedTo` | `Signal<readonly string[]>` | Connected-list ids, normalised to a plain array. |
 
 ### MkSortableList (component)
@@ -2862,12 +2891,35 @@ a `<button>`, or another component's host such as `<mk-icon mkDragHandle />`.
 Its look (grab cursor, muted colour, `touch-action: none`) ships as the
 global `.mk-drag-handle` class in the theme stylesheet.
 
+**Decorative grip** — a non-focusable element (`<span>`, `<mk-icon>`): the
+item itself stays the keyboard target (`role="button"`, focusable), so the
+grip should be `aria-hidden`:
+
 ```html
 <div mkDrag [mkDragData]="row">
   <span mkDragHandle aria-hidden="true">⠿</span>
   {{ row.name }}
 </div>
 ```
+
+**Focusable grip** — a `<button>` (or any element with `tabindex`): the
+handle becomes the keyboard target instead. The item is then a plain
+container (no role, not focusable), so rows may hold inputs, links and
+other buttons without nesting interactive controls, and `<li>` items keep
+valid list semantics. Give it an accessible name:
+
+```html
+<li mkDrag [mkDragData]="row">
+  <button type="button" mkDragHandle [attr.aria-label]="'Reorder ' + row.name">⠿</button>
+  <input mkInput [(ngModel)]="row.name" />
+</li>
+```
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `isFocusable(): boolean` | Whether the handle can take keyboard focus itself — a native control (`<button>`, …), a link with `href`, or any element with a `tabindex`. A focusable handle carries the keyboard drag for its `[mkDrag]`. |
 
 Properties:
 
@@ -5672,10 +5724,12 @@ a distinct identity.
 
 With `reorderable`, each row gets a drag handle wired through the dnd
 module's touch-safe handle-based configuration (a swipe on the row body
-still scrolls the page). Reordering also works by keyboard: focus the
-handle (or the row) and press Space/Enter to pick up, arrows to move,
-Space/Enter to drop, Escape to cancel. Each completed reorder is announced
-via `MkLiveAnnouncer`.
+still scrolls the page). The handle button is the only control the dnd
+layer adds — rows stay plain list items, so the inputs and buttons inside
+them are never nested in an interactive role. Reordering also works by
+keyboard: focus the handle and press Space/Enter to pick up, arrows to
+move, Space/Enter to drop, Escape to cancel. Each completed reorder is
+announced via `MkLiveAnnouncer`.
 
 ```html
 <mk-repeater [(items)]="rows" [min]="1" [max]="10" reorderable
@@ -7796,7 +7850,7 @@ type MkWeekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ## @mk-kit/ui/table
 
-30 exports. `import { … } from '@mk-kit/ui/table';`
+32 exports. `import { … } from '@mk-kit/ui/table';`
 
 ### MkSortHeader (component)
 
@@ -7904,7 +7958,8 @@ Methods:
 | `toggleTreeRow(row: T, event?: Event): void` | Show or hide a parent row's children (tree mode). |
 | `expandAllRows(): void` | Expand every parent row (tree mode). |
 | `collapseAllRows(): void` | Collapse every parent row (tree mode). |
-| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. |
+| `getExportRows(options?: MkTableExportRowsOptions): MkTableExportRows<T>` | The rows and columns an export writes — exactly what `exportCsv` serialises, for other formats (XLSX, PDF, the clipboard, …): rows in display order with the current sort applied and tree children (`childrenKey`) flattened under their parent whether or not they are expanded, optionally only the selected ones; columns in the table's current order, restricted to `options.columns` when given, each carrying its header and `format` so what the user saw is what gets written.  ```ts const { rows, columns } = table.getExportRows({ selectedOnly: true }); const sheet = rows.map((row) =>   Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])), ); ``` |
+| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. Built on `getExportRows`. |
 | `collapseAllGroups(): void` | Collapse every group. |
 | `expandAllGroups(): void` | Expand every group. |
 
@@ -8298,7 +8353,7 @@ Members:
 | `editable`? | `boolean \| undefined` | Make this column's cells inline-editable (double-click / Enter). |
 | `pinned`? | `"left" \| "right" \| undefined` | Pin (freeze) this column to a side while the body scrolls horizontally. |
 | `minWidth`? | `number \| undefined` | Minimum width in px when resizing (default 60). |
-| `stack`? | `"title" \| "footer" \| "hide" \| undefined` | What becomes of this column when the table stacks into cards (see `MkTable.stackAt`). Omitted, the column renders as a labelled field: its `header` on one side, its value on the other.  - `'title'` — the card's heading. No label; the value identifies the   record at a glance (an order number, a product name). Mark one, or two   if something short belongs beside it such as a status or a total. - `'footer'` — pinned to the bottom of the card, full width and unlabelled.   Where an actions cell belongs: buttons read as buttons, rather than as   the answer to a label. - `'hide'` — not rendered at all. Not merely invisible: the cell is never   created, so a screen reader does not read it either. For columns that   only earn their place while scanning a grid, and especially for anything   an expandable row detail already repeats. |
+| `stack`? | `"footer" \| "title" \| "hide" \| undefined` | What becomes of this column when the table stacks into cards (see `MkTable.stackAt`). Omitted, the column renders as a labelled field: its `header` on one side, its value on the other.  - `'title'` — the card's heading. No label; the value identifies the   record at a glance (an order number, a product name). Mark one, or two   if something short belongs beside it such as a status or a total. - `'footer'` — pinned to the bottom of the card, full width and unlabelled.   Where an actions cell belongs: buttons read as buttons, rather than as   the answer to a label. - `'hide'` — not rendered at all. Not merely invisible: the cell is never   created, so a screen reader does not read it either. For columns that   only earn their place while scanning a grid, and especially for anything   an expandable row detail already repeats. |
 
 ### MkTableDataSourceOptions (interface)
 
@@ -8319,13 +8374,37 @@ Import: `import { MkTableExportOptions } from '@mk-kit/ui/table';`
 
 Options for `MkTable.exportCsv`.
 
-Members (extends `MkCsvExportOptions`):
+Members (extends `MkCsvExportOptions`, `MkTableExportRowsOptions`):
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `download`? | `boolean \| undefined` | Start the browser download (default `true`); `false` just returns the text. |
+
+### MkTableExportRows (interface)
+
+Import: `import { MkTableExportRows } from '@mk-kit/ui/table';`
+
+What `MkTable.getExportRows` returns: the rows and the columns to write them with.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `rows` | `T[]` | The rows in display order — sorted the way they are shown, tree children flattened under their parent (expanded or not), selection applied when `selectedOnly` was set. |
+| `columns` | `MkCsvColumn<T>[]` | The columns in the table's current (user-reordered) order, restricted to the requested keys, each with its header and formatter. |
+
+### MkTableExportRowsOptions (interface)
+
+Import: `import { MkTableExportRowsOptions } from '@mk-kit/ui/table';`
+
+Options for `MkTable.getExportRows` — which rows and columns to export.
+
+Members:
 
 | Name | Type | Description |
 | --- | --- | --- |
 | `selectedOnly`? | `boolean \| undefined` | Export only the selected rows (default: every row). |
 | `columns`? | `readonly string[] \| undefined` | Restrict to these column keys, in table order (default: every column). |
-| `download`? | `boolean \| undefined` | Start the browser download (default `true`); `false` just returns the text. |
 
 ### MkTableGroup (interface)
 
@@ -8399,7 +8478,7 @@ type MkTableDensity = 'comfortable' | 'compact';
 
 ## @mk-kit/ui/data
 
-113 exports. `import { … } from '@mk-kit/ui/data';`
+122 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -8993,6 +9072,10 @@ Heatmap — a matrix of cells shaded by value intensity, for correlation
 grids, activity-by-time tables and the like. Rendered as a semantic
 `<table>` (so it is inherently screen-reader friendly) with cell colours
 mixed from `accent` over the surface via `color-mix`, so it tracks the theme.
+
+Printed values (`showValues`) pick `--mk-text` or `--mk-text-inverse` per
+cell by contrast against that cell's actual colour, in both themes — see
+`mkHeatmapCellColors`.
 
 ```html
 <mk-heatmap
@@ -9957,6 +10040,16 @@ also carry word-level `segments`.
 function mkComputeDiff(before: string, after: string, options?: MkDiffOptions): MkDiffRow[]
 ```
 
+### mkContrastRatio (function)
+
+Import: `import { mkContrastRatio } from '@mk-kit/ui/data';`
+
+WCAG 2.x contrast ratio (1–21) between two colours.
+
+```ts
+function mkContrastRatio(a: MkRgb, b: MkRgb): number
+```
+
 ### mkDiffStats (function)
 
 Import: `import { mkDiffStats } from '@mk-kit/ui/data';`
@@ -9987,6 +10080,26 @@ Compact number formatting for axes/tooltips (1.2k, 3.4M).
 function mkFormatCompact(value: number): string
 ```
 
+### mkHeatmapCellColors (function)
+
+Import: `import { mkHeatmapCellColors } from '@mk-kit/ui/data';`
+
+Choose the text token for a cell at intensity `t` (0–1) — light text on
+dark cells, dark text on light cells, decided by contrast against the
+actual blend rather than a fixed threshold.
+
+Every accent ramp has a crossover band where neither `--mk-text` nor
+`--mk-text-inverse` reaches 4.5:1 (the cell is mid-luminance). When values
+are printed in the cells, a cell in that band is painted at the nearest
+intensity just outside it, so its value stays readable; the shift is a few
+percent of the ramp and the cell keeps its order relative to its
+neighbours. Without a resolved palette (server rendering, tests) a plain
+threshold is used.
+
+```ts
+function mkHeatmapCellColors(t: number, palette: MkHeatmapPalette | null, showValues: boolean): MkHeatmapCellColors
+```
+
 ### mkLinearScale (function)
 
 Import: `import { mkLinearScale } from '@mk-kit/ui/data';`
@@ -10005,6 +10118,16 @@ Straight-segment SVG path (`M … L …`) through the given points.
 
 ```ts
 function mkLinePath(points: readonly MkPoint[]): string
+```
+
+### mkMixRgb (function)
+
+Import: `import { mkMixRgb } from '@mk-kit/ui/data';`
+
+What `color-mix(in srgb, a t%, b)` yields: a linear blend in gamma-encoded sRGB.
+
+```ts
+function mkMixRgb(a: MkRgb, b: MkRgb, t: number): MkRgb
 ```
 
 ### mkNiceTicks (function)
@@ -10040,6 +10163,28 @@ so the AST never carries a `javascript:` (or other non-allow-listed) URL.
 
 ```ts
 function mkParseMarkdown(src: string, options?: MkMarkdownParseOptions): MkMarkdownBlock[]
+```
+
+### mkParseRgb (function)
+
+Import: `import { mkParseRgb } from '@mk-kit/ui/data';`
+
+Parse a CSS colour as the CSSOM serialises it — `rgb(r, g, b)` /
+`rgba(r, g, b, a)` — or a `#rgb` / `#rrggbb` literal. `null` for anything
+else (an unresolved `var()`, `color(...)`, …).
+
+```ts
+function mkParseRgb(text: string | null | undefined): MkRgb | null
+```
+
+### mkRelativeLuminance (function)
+
+Import: `import { mkRelativeLuminance } from '@mk-kit/ui/data';`
+
+WCAG 2.x relative luminance of an sRGB colour.
+
+```ts
+function mkRelativeLuminance([r, g, b]: MkRgb): number
 ```
 
 ### mkRenderMarkdown (function)
@@ -10102,6 +10247,16 @@ Number of hues in the validated categorical palette (`--mk-chart-1..8`).
 
 ```ts
 const MK_CHART_PALETTE_SIZE: 8;
+```
+
+### MK_HEATMAP_MIN_CONTRAST (const)
+
+Import: `import { MK_HEATMAP_MIN_CONTRAST } from '@mk-kit/ui/data';`
+
+WCAG AA minimum contrast for normal text — what cell values are held to.
+
+```ts
+const MK_HEATMAP_MIN_CONTRAST: 4.5;
 ```
 
 ### MkAnsiSpan (interface)
@@ -10255,6 +10410,35 @@ Members:
 | `label` | `string` | Stage label (e.g. "Visits"). |
 | `value` | `number` | Stage value; drives the band width. |
 | `color`? | `string \| undefined` | Optional explicit colour; defaults to the palette by index. |
+
+### MkHeatmapCellColors (interface)
+
+Import: `import { MkHeatmapCellColors } from '@mk-kit/ui/data';`
+
+Which text token a cell value is drawn with, and the intensity to paint the cell at.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `intensity` | `number` | Accent share of the cell background, 0–1. |
+| `inverse` | `boolean` | `true` → `--mk-text-inverse`, `false` → `--mk-text`. |
+| `contrast` | `number` | Contrast ratio of the chosen text against the cell background (1–21). |
+
+### MkHeatmapPalette (interface)
+
+Import: `import { MkHeatmapPalette } from '@mk-kit/ui/data';`
+
+The resolved colours a heatmap picks its cell text against.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `accent` | `MkRgb` | The `accent` input, resolved to sRGB. |
+| `surface` | `MkRgb` | `--mk-surface-2` — the zero-intensity cell colour. |
+| `text` | `MkRgb` | `--mk-text`. |
+| `textInverse` | `MkRgb` | `--mk-text-inverse`. |
 
 ### MkJsonNode (interface)
 
@@ -10621,6 +10805,16 @@ The single public entry point is `mkEncodeQr`, a pure function.
 
 ```ts
 type MkQrEcc = 'L' | 'M' | 'Q' | 'H';
+```
+
+### MkRgb (type)
+
+Import: `import { MkRgb } from '@mk-kit/ui/data';`
+
+An sRGB colour as 0–255 channels.
+
+```ts
+type MkRgb = readonly [number, number, number];
 ```
 
 ### MkSkeletonPresetKind (type)
