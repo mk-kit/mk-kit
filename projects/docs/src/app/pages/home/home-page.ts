@@ -1394,7 +1394,7 @@ export class HomePage {
   private readonly teamForm = viewChild<ElementRef<HTMLElement>>('teamForm');
 
   protected readonly uiVersion = uiVersion;
-  protected readonly total = 187;
+  protected readonly total = 188;
   protected readonly copied = signal(false);
 
   /* Brand-swap: rewrites the primary token family on the host ------------ */
@@ -1496,7 +1496,7 @@ export class HomePage {
   /* Copy --------------------------------------------------------------- */
   protected readonly groups: Group[] = [
     { title: 'Forms & inputs', count: 54, blurb: 'Dynamic form (JSON schema → form), text, number, phone, IBAN, tax id, OTP, date, time & date-time pickers, selects, multi-select, listbox, cascader, floating labels, sliders, file upload, colour, rating, signature, keypad, split button.' },
-    { title: 'Data display', count: 26, blurb: 'Cards, lists, stat cards, badges & overlay badges, tags, chips, avatars, timeline, description lists, tree, empty states, QR, diff, JSON viewer.' },
+    { title: 'Data display', count: 27, blurb: 'Cards, lists, stat cards, badges & overlay badges, tags, chips, avatars, timeline, description lists, tree, org chart, empty states, QR, diff, JSON viewer.' },
     { title: 'Editors & interactions', count: 31, blurb: 'Chat with streaming replies and a prompt box, block editor, rich text, markdown, log viewer, drag & drop, sortable list, mentions, hotkeys, masks, permissions, formatting pipes.' },
     { title: 'Feedback & overlays', count: 21, blurb: 'Dialogs (draggable & resizable), sheets, drawers, toasts, snackbars, banners, tooltips, popovers, hovercards, tours, block UI, progress, skeletons.' },
     { title: 'Navigation & layout', count: 21, blurb: 'App shell, stack / flex / grid layout primitives with breakpoints, nav lists, tabs, stepper, breadcrumbs, pagination, menus with nested submenus, context menu, command palette, splitter.' },

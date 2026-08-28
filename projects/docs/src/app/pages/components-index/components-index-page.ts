@@ -147,6 +147,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-icon', desc: '420+ built-in stroke icons (hand-made core + Lucide-derived set), sizes, labels, custom SVG.', path: '/components/icon' },
       { name: 'MkIconRegistry', desc: 'Register custom SVG icon sets by name.', path: '/components/icon' },
       { name: 'mk-tree', desc: 'Expandable tree view with selection and keyboard nav.', path: '/components/tree' },
+      { name: 'mk-org-chart', desc: 'Organisation / reporting-line chart with CSS connectors, collapsible branches, selection and keyboard nav.', path: '/components/org-chart' },
       { name: 'mk-empty-state', desc: 'Friendly empty/none-yet placeholder with action slot.', path: '/components/empty-timeline' },
       { name: 'mk-timeline / mk-timeline-item', desc: 'Vertical event history with markers.', path: '/components/empty-timeline' },
     ],

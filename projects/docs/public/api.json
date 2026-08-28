@@ -2003,6 +2003,21 @@
        "description": "Log viewer: soft-wrap toolbar toggle."
       },
       {
+       "name": "orgChartLabel",
+       "type": "string",
+       "description": "Org chart: default accessible label of the tree."
+      },
+      {
+       "name": "orgChartExpand",
+       "type": "string",
+       "description": "Org chart: aria-label of a collapsed node's toggle (`{label}` = node label)."
+      },
+      {
+       "name": "orgChartCollapse",
+       "type": "string",
+       "description": "Org chart: aria-label of an expanded node's toggle (`{label}` = node label)."
+      },
+      {
        "name": "chatLabel",
        "type": "string",
        "description": "Chat: accessible name of the message log."
@@ -14739,6 +14754,113 @@
      "docs": "/components/markdown"
     },
     {
+     "name": "MkOrgChart",
+     "description": "Organisation chart — a reporting-line hierarchy drawn with plain nested\nlists and CSS connectors (no canvas, prints and themes like everything\nelse). Feed it a tree (`nodes`) or convert a flat `parentId` list with\n`mkOrgChartFromFlat`. Nodes render as a default card (avatar /\ninitials, label, `data.title`) or through an `mkOrgChartNodeDef` template.\n\nFollows the ARIA tree pattern (`role=\"tree\"` / `treeitem` / `group`, one\nroving tab stop). Keyboard (top-down; the axes swap for `orientation=\"left\"`\nand in RTL): Down = first child (expands a collapsed node first), Up =\nparent, Left/Right = previous/next sibling, Home/End = first/last visible\nnode, Enter/Space = select (or toggle when not selectable), `*` = expand\nall siblings, `+`/`-` = expand/collapse.\n\n```html\n<mk-org-chart\n  [nodes]=\"company\"\n  selectable\n  [(selected)]=\"personId\"\n  collapsible\n  (nodeClick)=\"open($event)\"\n/>\n```",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "component",
+     "selector": "mk-org-chart",
+     "selectors": [
+      "mk-org-chart"
+     ],
+     "exportAs": "mkOrgChart",
+     "inputs": [
+      {
+       "name": "nodes",
+       "type": "readonly MkOrgChartNode<T>[]",
+       "description": "The hierarchy to render (roots first).",
+       "default": "[]"
+      },
+      {
+       "name": "orientation",
+       "type": "MkOrgChartOrientation",
+       "description": "Root at the top (children below) or at the inline start (children to the side).",
+       "default": "'top'"
+      },
+      {
+       "name": "selectable",
+       "type": "boolean",
+       "description": "Allow choosing a node (adds selection styling + `aria-selected`).",
+       "default": "false"
+      },
+      {
+       "name": "collapsible",
+       "type": "boolean",
+       "description": "Show a toggle on every parent so branches can be hidden.",
+       "default": "false"
+      },
+      {
+       "name": "zoom",
+       "type": "number",
+       "description": "Scale factor applied to the whole chart (clamped to 0.5–2).",
+       "default": "1"
+      },
+      {
+       "name": "aria-label",
+       "type": "string",
+       "description": "Accessible name for the tree.",
+       "default": "this.i18n.orgChartLabel"
+      },
+      {
+       "name": "selected",
+       "type": "string | null",
+       "description": "Two-way selected node id (`null` = nothing selected).",
+       "model": true,
+       "default": "null"
+      },
+      {
+       "name": "expanded",
+       "type": "readonly string[] | undefined",
+       "description": "Two-way ids of the expanded parents. Leave unbound to let the chart\nmanage expansion itself (seeded from each node's `expanded` flag).",
+       "model": true,
+       "default": "undefined"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "selectedChange",
+       "type": "string | null",
+       "description": "Emits when `selected` changes (two-way binding).",
+       "model": true
+      },
+      {
+       "name": "expandedChange",
+       "type": "readonly string[] | undefined",
+       "description": "Emits when `expanded` changes (two-way binding).",
+       "model": true
+      },
+      {
+       "name": "nodeClick",
+       "type": "MkOrgChartNode<T>",
+       "description": "Emits the node whose card was clicked or activated with Enter/Space."
+      },
+      {
+       "name": "nodeToggle",
+       "type": "MkOrgChartToggleEvent<T>",
+       "description": "Emits whenever a node is expanded or collapsed."
+      }
+     ],
+     "methods": [
+      {
+       "name": "toggle",
+       "signature": "(node: MkOrgChartNode<T>): void",
+       "description": "Expand or collapse a parent (no-op for leaves / non-collapsible charts)."
+      },
+      {
+       "name": "setExpanded",
+       "signature": "(node: MkOrgChartNode<T>, expanded: boolean): void",
+       "description": "Expand or collapse a parent explicitly."
+      },
+      {
+       "name": "select",
+       "signature": "(node: MkOrgChartNode<T>): void",
+       "description": "Select a node by reference (no-op unless `selectable`)."
+      }
+     ],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/org-chart"
+    },
+    {
      "name": "MkProfileActions",
      "description": "Profile actions row — buttons projected into the footer area of a\n`MkProfileCard`. Centred in vertical orientation; pinned to the end\nin horizontal orientation.\n\n```html\n<div mkProfileActions>\n  <button mkButton>Follow</button>\n  <button mkButton variant=\"outline\">Message</button>\n</div>\n```",
      "file": "projects/mk-kit/data/profile-card/profile-card.ts",
@@ -15651,6 +15773,28 @@
      "queries": []
     },
     {
+     "name": "MkOrgChartNodeDef",
+     "description": "Custom node card for `mk-org-chart`:\n\n```html\n<mk-org-chart [nodes]=\"nodes\">\n  <ng-template mkOrgChartNodeDef let-node let-selected=\"selected\">\n    <strong>{{ node.label }}</strong> — {{ node.data?.title }}\n  </ng-template>\n</mk-org-chart>\n```\n\nBind the same array you pass to `nodes` to get a typed `node.data` in the\ntemplate: `<ng-template [mkOrgChartNodeDef]=\"nodes\" let-node>`.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "directive",
+     "selector": "ng-template[mkOrgChartNodeDef]",
+     "selectors": [
+      "mkOrgChartNodeDef"
+     ],
+     "inputs": [
+      {
+       "name": "mkOrgChartNodeDef",
+       "type": "\"\" | readonly MkOrgChartNode<T>[] | undefined",
+       "description": "Type-inference hook only (the value is not used at runtime): bind the\n`nodes` array so `let-node` is typed as `MkOrgChartNode<T>`.",
+       "default": "undefined"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
+    },
+    {
      "name": "mkArcPath",
      "description": "SVG arc path for a donut/pie slice between two angles (radians, clockwise\nfrom 12 o'clock). `inner` of 0 yields a pie wedge; > 0 yields a ring segment.",
      "file": "projects/mk-kit/data/charts/chart-utils.ts",
@@ -15774,6 +15918,15 @@
      "kind": "function",
      "signatures": [
       "(min: number, max: number, count?: number): number[]"
+     ]
+    },
+    {
+     "name": "mkOrgChartFromFlat",
+     "description": "Build the nested `nodes` input from a flat `parentId` list (the shape most\nHR / directory APIs return). Row order is preserved among siblings; rows\nwhose `parentId` does not match any row become roots.\n\n```ts\nconst nodes = mkOrgChartFromFlat([\n  { id: 'ceo', label: 'Ada' },\n  { id: 'cto', label: 'Grace', parentId: 'ceo' },\n]);\n```",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "function",
+     "signatures": [
+      "<T = unknown>(list: readonly MkOrgChartFlatNode<T>[]): MkOrgChartNode<T>[]"
      ]
     },
     {
@@ -16372,6 +16525,135 @@
      ]
     },
     {
+     "name": "MkOrgChartFlatNode",
+     "description": "One row of a flat list accepted by `mkOrgChartFromFlat`.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown>",
+     "members": [
+      {
+       "name": "id",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "data",
+       "type": "T | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "parentId",
+       "type": "string | null | undefined",
+       "description": "Id of the parent row; `null` / `undefined` / unknown id = root.",
+       "optional": true
+      },
+      {
+       "name": "expanded",
+       "type": "boolean | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkOrgChartNode",
+     "description": "A node in an `MkOrgChart` tree. `children` makes it a parent.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown>",
+     "members": [
+      {
+       "name": "id",
+       "type": "string",
+       "description": "Unique id — drives selection (`[(selected)]`) and expansion (`[(expanded)]`)."
+      },
+      {
+       "name": "label",
+       "type": "string | undefined",
+       "description": "Primary text of the default card (and the initials fallback).",
+       "optional": true
+      },
+      {
+       "name": "data",
+       "type": "T | undefined",
+       "description": "Arbitrary payload handed to the node template. The default card reads\n`data.title` (sub-label) and `data.avatar` (image URL) when present.",
+       "optional": true
+      },
+      {
+       "name": "children",
+       "type": "MkOrgChartNode<T>[] | undefined",
+       "description": "Direct reports; a non-empty array makes the node collapsible.",
+       "optional": true
+      },
+      {
+       "name": "expanded",
+       "type": "boolean | undefined",
+       "description": "Initial expansion (default `true`). Only consulted when `[(expanded)]` is not bound.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkOrgChartNodeContext",
+     "description": "Template context of `ng-template[mkOrgChartNodeDef]`.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown>",
+     "members": [
+      {
+       "name": "$implicit",
+       "type": "MkOrgChartNode<MkOrgChartTemplateData<T>>",
+       "description": "The node (also available as `let-node`)."
+      },
+      {
+       "name": "node",
+       "type": "MkOrgChartNode<MkOrgChartTemplateData<T>>",
+       "description": ""
+      },
+      {
+       "name": "depth",
+       "type": "number",
+       "description": "1-based depth (roots are 1)."
+      },
+      {
+       "name": "expanded",
+       "type": "boolean",
+       "description": "Whether the node's children are currently shown."
+      },
+      {
+       "name": "selected",
+       "type": "boolean",
+       "description": "Whether the node is the selected one."
+      }
+     ]
+    },
+    {
+     "name": "MkOrgChartToggleEvent",
+     "description": "Payload of `(nodeToggle)`.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown>",
+     "members": [
+      {
+       "name": "node",
+       "type": "MkOrgChartNode<T>",
+       "description": ""
+      },
+      {
+       "name": "expanded",
+       "type": "boolean",
+       "description": ""
+      }
+     ]
+    },
+    {
      "name": "MkPoint",
      "description": "A resolved 2-D point in SVG user space.",
      "file": "projects/mk-kit/data/charts/chart-utils.ts",
@@ -16597,6 +16879,21 @@
      "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
      "kind": "type",
      "definition": "| { kind: 'text'; text: string } | { kind: 'softbreak' } | { kind: 'break' } | { kind: 'code'; code: string } | { kind: 'strong'; children: MkMarkdownInline[] } | { kind: 'em'; children: MkMarkdownInline[] } | { kind: 'del'; children: MkMarkdownInline[] } | { kind: 'link'; href: string; children: MkMarkdownInline[] } | { kind: 'image'; src: string; alt: string }"
+    },
+    {
+     "name": "MkOrgChartOrientation",
+     "description": "Chart direction: `top` = root at the top, `left` = root at the inline start.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "type",
+     "definition": "'top' | 'left'"
+    },
+    {
+     "name": "MkOrgChartTemplateData",
+     "description": "`data` type seen by a node template: `T` when it could be inferred (the\ntemplate binds `[mkOrgChartNodeDef]=\"nodes\"`), otherwise `any` so an\nuntyped `<ng-template mkOrgChartNodeDef>` can still read `node.data?.title`.",
+     "file": "projects/mk-kit/data/org-chart/org-chart.ts",
+     "kind": "type",
+     "typeParams": "<T>",
+     "definition": "keyof T extends never ? any : T"
     },
     {
      "name": "MkProfileCardOrientation",

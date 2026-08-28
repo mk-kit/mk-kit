@@ -62,6 +62,7 @@ import { MkImageGallery } from '@mk-kit/ui/media/image-gallery';
 import { MkImageCropper } from '@mk-kit/ui/media/image-cropper';
 import { MkMediaGallery, type MkMediaItem } from '@mk-kit/ui/media/media-gallery';
 import { MkProfileCard } from '@mk-kit/ui/data/profile-card';
+import { MkOrgChart, type MkOrgChartNode } from '@mk-kit/ui/data/org-chart';
 import { MkTab, MkTabs } from '@mk-kit/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mk-kit/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mk-kit/ui/navigation/breadcrumb';
@@ -113,6 +114,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
     MkImageCropper,
     MkMediaGallery,
     MkProfileCard,
+    MkOrgChart,
     MkTabs,
     MkTab,
     MkAccordion,
@@ -236,6 +238,8 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
 
       <mk-tree [nodes]="nodes" aria-label="Project files" />
 
+      <mk-org-chart [nodes]="org" collapsible selectable aria-label="Team" />
+
       <mk-scroll-area style="height: 8rem">
         <p>Scrollable content</p>
       </mk-scroll-area>
@@ -266,6 +270,9 @@ class SsrSmokeRoot implements AfterViewInit {
   readonly nodes: MkTreeNode[] = [
     { label: 'src', expanded: true, children: [{ label: 'index.ts' }] },
     { label: 'README.md' },
+  ];
+  readonly org: MkOrgChartNode[] = [
+    { id: 'ceo', label: 'Ada', data: { title: 'CEO' }, children: [{ id: 'cto', label: 'Grace' }] },
   ];
   readonly items = Array.from({ length: 200 }, (_, i) => `Row ${i + 1}`);
   readonly jsonData = { user: { name: 'Ada' }, active: true };
@@ -355,6 +362,7 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-pagination',
       'mk-stepper',
       'mk-tree',
+      'mk-org-chart',
       'mk-scroll-area',
       'mk-virtual-scroll',
       'mk-back-to-top',

@@ -482,6 +482,14 @@ export interface MkI18nStrings {
   /** Log viewer: soft-wrap toolbar toggle. */
   logWrapLines: string;
 
+  // --- Org chart --------------------------------------------------------------
+  /** Org chart: default accessible label of the tree. */
+  orgChartLabel: string;
+  /** Org chart: aria-label of a collapsed node's toggle (`{label}` = node label). */
+  orgChartExpand: string;
+  /** Org chart: aria-label of an expanded node's toggle (`{label}` = node label). */
+  orgChartCollapse: string;
+
   // --- Chat -------------------------------------------------------------------
   /** Chat: accessible name of the message log. */
   chatLabel: string;
@@ -921,6 +929,10 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   logFollow: 'Follow',
   logCopyAll: 'Copy log',
   logWrapLines: 'Wrap lines',
+
+  orgChartLabel: 'Organisation chart',
+  orgChartExpand: 'Expand {label}',
+  orgChartCollapse: 'Collapse {label}',
 
   chatLabel: 'Conversation',
   chatComposerLabel: 'Message',

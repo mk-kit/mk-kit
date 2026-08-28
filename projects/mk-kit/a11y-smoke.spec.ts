@@ -51,6 +51,7 @@ import { MkImageGallery } from '@mk-kit/ui/media/image-gallery';
 import { MkImageCropper } from '@mk-kit/ui/media/image-cropper';
 import { MkMediaGallery, type MkMediaItem } from '@mk-kit/ui/media/media-gallery';
 import { MkProfileCard, MkProfileMeta, MkProfileActions } from '@mk-kit/ui/data/profile-card';
+import { MkOrgChart, type MkOrgChartNode } from '@mk-kit/ui/data/org-chart';
 import { MkTab, MkTabs } from '@mk-kit/ui/navigation/tabs';
 import { MkAccordion, MkAccordionItem } from '@mk-kit/ui/navigation/accordion';
 import { MkBreadcrumb, MkBreadcrumbItem } from '@mk-kit/ui/navigation/breadcrumb';
@@ -351,6 +352,24 @@ class MediaGalleryHost {
   `,
 })
 class ProfileCardHost {}
+
+@Component({
+  imports: [MkOrgChart],
+  template: `<mk-org-chart [nodes]="nodes" collapsible selectable aria-label="Team" />`,
+})
+class OrgChartHost {
+  readonly nodes: MkOrgChartNode[] = [
+    {
+      id: 'ceo',
+      label: 'Ada Lovelace',
+      data: { title: 'CEO' },
+      children: [
+        { id: 'cto', label: 'Grace Hopper', data: { title: 'CTO' }, children: [{ id: 'eng', label: 'Linus' }] },
+        { id: 'cfo', label: 'Katherine Johnson', expanded: false, children: [{ id: 'acc', label: 'Accountant' }] },
+      ],
+    },
+  ];
+}
 
 @Component({
   imports: [MkFormField, MkSelect],
@@ -706,6 +725,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'chip', host: ChipHost },
   { name: 'stepper', host: StepperHost },
   { name: 'tree', host: TreeHost },
+  { name: 'org chart', host: OrgChartHost },
   { name: 'nav list with groups', host: NavListHost },
   { name: 'description list', host: DescriptionListHost },
   { name: 'file upload (dropzone)', host: FileUploadHost },

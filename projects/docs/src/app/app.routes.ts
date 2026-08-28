@@ -249,6 +249,12 @@ export const routes: Routes = [
       import('./pages/stepper/stepper-page').then((m) => m.StepperPage),
   },
   {
+    path: 'components/org-chart',
+    title: 'Organisation chart — mk-kit',
+    loadComponent: () =>
+      import('./pages/org-chart/org-chart-page').then((m) => m.OrgChartPage),
+  },
+  {
     path: 'components/tree',
     title: 'Tree — mk-kit',
     loadComponent: () =>

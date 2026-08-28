@@ -280,6 +280,11 @@ export class App {
           keywords: 'tree tree-node hierarchy nested expand collapse',
         },
         {
+          label: 'Organisation chart',
+          path: '/components/org-chart',
+          keywords: 'org chart organisation organization hierarchy tree reporting line',
+        },
+        {
           label: 'Empty & timeline',
           path: '/components/empty-timeline',
           keywords: 'empty-state timeline placeholder no-data activity feed',
