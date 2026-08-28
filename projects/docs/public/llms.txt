@@ -8,6 +8,7 @@ Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/sty
 
 - [mk-kit — Introduction](https://mk-kit.dev/introduction)
 - [Getting started](https://mk-kit.dev/getting-started)
+- [Bundle cost](https://mk-kit.dev/cost)
 - [Theming](https://mk-kit.dev/theming)
 - [Core & services](https://mk-kit.dev/core-services)
 - [Touch & mobile](https://mk-kit.dev/touch)

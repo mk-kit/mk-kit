@@ -4,7 +4,8 @@
   "extends": "../../tsconfig.json",
   "compilerOptions": {
     "outDir": "../../out-tsc/spec",
-    "types": ["vitest/globals"]
+    "types": ["vitest/globals"],
+    "resolveJsonModule": true
   },
   "include": ["src/**/*.d.ts", "src/**/*.spec.ts"]
 }

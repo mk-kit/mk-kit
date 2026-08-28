@@ -87,6 +87,11 @@ export class App {
           keywords: 'api reference inputs outputs methods types signatures llms.txt json generated',
         },
         {
+          label: 'Bundle cost',
+          path: '/cost',
+          keywords: 'bundle size cost brotli tree-shaking budget kb kib payload performance entry points',
+        },
+        {
           label: 'Testing',
           path: '/testing',
           keywords: 'testing harness harnesses testbed spec unit test vitest jest loader MkHarnessLoader',

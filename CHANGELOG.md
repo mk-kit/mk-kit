@@ -52,7 +52,13 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 ### Fixed
 
 - **charts:** `mk-bar-chart` `labelAngle="auto"` now tilts once a label fills more than 80% of its band, so a 12-month axis in a card no longer renders as a cramped run of touching labels; roomy axes stay flat.
-
+- Docs: **Bundle cost page** (`/cost`) — the measured minified + brotli size
+  of every entry point and every component, directive, service and helper,
+  produced by the new `scripts/gen-cost.mjs` (`npm run gen:cost`) from the
+  built package with the same linker + esbuild pipeline an Angular CLI
+  production build uses. Sortable `mk-table`, entry-point bar chart, filter,
+  the CI raw-size budgets, and a methodology note. `cost.json` is committed
+  and CI fails when it is stale (`gen-cost.mjs --check`).
 
 ## [0.41.0] — 2026-08-27
 
