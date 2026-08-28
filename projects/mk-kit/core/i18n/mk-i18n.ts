@@ -231,6 +231,20 @@ export interface MkValidationStrings {
  * strings are functions so translators control word order.
  */
 export interface MkI18nStrings {
+  // --- Locale ---------------------------------------------------------------
+  /**
+   * BCP 47 locale tag (`'pl-PL'`, `'de'`) used by the formatting pipes
+   * (`mkCurrency`, `mkRelativeTime`, `mkFileSize`, `mkPluralize`) and any
+   * other `Intl`-based formatting that has no explicit locale of its own.
+   * Unset → the runtime (browser / Node) default locale.
+   */
+  locale?: string;
+  /**
+   * ISO 4217 currency code the `mkCurrency` pipe falls back to when the
+   * template passes none. Unset → `'USD'`.
+   */
+  currency?: string;
+
   // --- Validation -----------------------------------------------------------
   /** Validation messages (deep-merged by provideMkI18n). */
   validation: MkValidationStrings;

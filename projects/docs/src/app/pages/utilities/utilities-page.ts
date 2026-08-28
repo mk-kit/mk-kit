@@ -1,6 +1,7 @@
 import {
   ChangeDetectionStrategy,
   Component,
+  DestroyRef,
   Injectable,
   type Signal,
   computed,
@@ -16,14 +17,21 @@ import {
   MkCheckbox,
   MkClickOutside,
   MkCopyToClipboard,
+  MkCurrencyPipe,
+  MkFileSizePipe,
   MkHotkey,
   MkInfiniteScroll,
+  MkInitialsPipe,
   MkIntersect,
   MkInput,
   MkMask,
   MkPermissionPolicy,
+  type MkPluralForms,
+  MkPluralizePipe,
+  MkRelativeTimePipe,
   MkRipple,
   MkScrollspy,
+  MkTruncatePipe,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -52,8 +60,9 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
 }
 
 /**
- * Documentation + live demo page for the utility directives of `@mk-kit/ui`:
- * `mkClickOutside` and `mkCopyToClipboard`.
+ * Documentation + live demo page for the utility directives of `@mk-kit/ui`
+ * (`mkClickOutside`, `mkCopyToClipboard`, hotkeys, permissions, …) and the
+ * formatting pipes (`mkCurrency`, `mkRelativeTime`, `mkFileSize`, …).
  */
 @Component({
   selector: 'docs-utilities-page',
@@ -75,6 +84,12 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
     MkCan,
     MkCannot,
     MkCanDisable,
+    MkCurrencyPipe,
+    MkRelativeTimePipe,
+    MkFileSizePipe,
+    MkInitialsPipe,
+    MkTruncatePipe,
+    MkPluralizePipe,
   ],
   providers: [
     DocsPermissionPolicy,
@@ -85,7 +100,8 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
       <h1>Utilities</h1>
       <p class="docs-lead">
         Small standalone directives that compose with any element — the building
-        blocks the components themselves use.
+        blocks the components themselves use — plus a handful of
+        <code class="docs-inline">Intl</code>-based formatting pipes.
       </p>
 
       <!-- clickOutside -->
@@ -542,6 +558,94 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
           <tr><td><code>mkPermissionGranted(policy, permission)</code></td><td><code>boolean</code></td><td>—</td><td>Helper for imperative checks (guards, effects): resolves a policy verdict to a boolean, unwrapping signal results. Call inside a reactive context to stay live; a <code>null</code> policy grants everything.</td></tr>
         </tbody>
       </table>
+
+      <!-- pipes -->
+      <h2>Pipes</h2>
+      <p>
+        Six pure, standalone formatting pipes built on <code class="docs-inline">Intl</code>
+        — no Angular locale data to register. They read the locale (and the
+        default currency) from
+        <code class="docs-inline">provideMkI18n(&#123; locale: 'pl-PL', currency: 'PLN' &#125;)</code>,
+        fall back to the runtime locale, and take a per-call
+        <code class="docs-inline">locale</code> override. Because they are pure,
+        signals work as-is and <code class="docs-inline">null</code> /
+        <code class="docs-inline">undefined</code> render as an empty string.
+      </p>
+      <docs-example [code]="pipesCode" [column]="true">
+        <dl class="pipes-demo">
+          <dt><code class="docs-inline">mkCurrency</code></dt>
+          <dd>
+            {{ amount() | mkCurrency:'EUR' }} ·
+            {{ amount() | mkCurrency:'PLN':{ locale: 'pl-PL' } }} ·
+            {{ amount() | mkCurrency:'JPY':{ locale: 'ja-JP' } }} ·
+            {{ 1234567 | mkCurrency:'USD':{ notation: 'compact' } }}
+          </dd>
+          <dt><code class="docs-inline">mkRelativeTime</code></dt>
+          <dd>
+            {{ pageOpenedAt | mkRelativeTime:now() }} ·
+            {{ tomorrow | mkRelativeTime:now() }} ·
+            {{ lastWeek | mkRelativeTime:now():{ locale: 'de' } }} ·
+            {{ lastWeek | mkRelativeTime:now():{ style: 'short', numeric: 'always' } }}
+          </dd>
+          <dt><code class="docs-inline">mkFileSize</code></dt>
+          <dd>
+            {{ bytes() | mkFileSize }} ·
+            {{ bytes() | mkFileSize:{ base: 'binary' } }} ·
+            {{ bytes() | mkFileSize:{ digits: 2, locale: 'de' } }} ·
+            {{ 512 | mkFileSize }}
+          </dd>
+          <dt><code class="docs-inline">mkInitials</code></dt>
+          <dd>
+            {{ 'Ada Lovelace' | mkInitials }} ·
+            {{ 'Jean Luc Picard' | mkInitials:3 }} ·
+            {{ 'grace' | mkInitials }}
+          </dd>
+          <dt><code class="docs-inline">mkTruncate</code></dt>
+          <dd>
+            {{ lorem | mkTruncate:24 }} ·
+            {{ lorem | mkTruncate:24:{ wordBoundary: true } }} ·
+            {{ lorem | mkTruncate:12:{ ellipsis: '...' } }}
+          </dd>
+          <dt><code class="docs-inline">mkPluralize</code></dt>
+          <dd>
+            {{ count() | mkPluralize:'item' }} ·
+            {{ count() | mkPluralize:'entry':'entries' }} ·
+            {{ count() | mkPluralize:plikForms:null:{ locale: 'pl' } }}
+          </dd>
+        </dl>
+        <div class="pipes-controls">
+          <label>Amount
+            <input mkInput type="number" step="0.5" [value]="amount()" (input)="amount.set(+$any($event.target).value)" />
+          </label>
+          <label>Bytes
+            <input mkInput type="number" [value]="bytes()" (input)="bytes.set(+$any($event.target).value)" />
+          </label>
+          <label>Count
+            <input mkInput type="number" [value]="count()" (input)="count.set(+$any($event.target).value)" />
+          </label>
+        </div>
+      </docs-example>
+      <p>
+        <code class="docs-inline">mkRelativeTime</code> is pure, so it only
+        re-runs when an argument changes: bind a ticking signal as
+        <code class="docs-inline">now</code> (the demo updates every 30 s) to
+        keep "3 minutes ago" honest, and pass a fixed
+        <code class="docs-inline">now</code> in tests for deterministic output.
+      </p>
+
+      <table class="docs-props">
+        <thead>
+          <tr><th>Pipe</th><th>Arguments</th><th>Output</th></tr>
+        </thead>
+        <tbody>
+          <tr><td><code>mkCurrency</code></td><td><code>currency?: string</code> (default <code>i18n.currency</code> → <code>'USD'</code>), <code>options?: MkCurrencyOptions</code> — <code>locale</code>, <code>display</code> (<code>'symbol' | 'narrowSymbol' | 'code' | 'name'</code>), <code>minimumFractionDigits</code>, <code>maximumFractionDigits</code>, <code>signDisplay</code>, <code>notation</code> (<code>'compact'</code>), <code>useGrouping</code></td><td><code>€1,234.50</code>, <code>1234,50 zł</code>, <code>$1.2M</code></td></tr>
+          <tr><td><code>mkRelativeTime</code></td><td><code>now?: Date | number | string</code> (default <code>Date.now()</code>), <code>options?: MkRelativeTimeOptions</code> — <code>locale</code>, <code>numeric</code> (<code>'auto'</code> default → "yesterday"; <code>'always'</code> → "1 day ago"), <code>style</code> (<code>'long' | 'short' | 'narrow'</code>), <code>maxUnit</code></td><td><code>3 minutes ago</code>, <code>in 2 days</code>, <code>last week</code></td></tr>
+          <tr><td><code>mkFileSize</code></td><td><code>options?: MkFileSizeOptions</code> — <code>base</code> (<code>'decimal'</code> default: ÷1000, <code>kB MB GB</code>; <code>'binary'</code>: ÷1024, <code>KiB MiB GiB</code>), <code>digits</code> (default <code>1</code>), <code>locale</code></td><td><code>1.2 MB</code>, <code>1.2 MiB</code>, <code>512 B</code></td></tr>
+          <tr><td><code>mkInitials</code></td><td><code>max?: number</code> (default <code>2</code>) — first + last word; one word → its first <code>max</code> letters; <code>max ≥ words</code> → one per word</td><td><code>AL</code>, <code>JLP</code>, <code>GR</code></td></tr>
+          <tr><td><code>mkTruncate</code></td><td><code>length?: number</code> (default <code>50</code>, ellipsis included), <code>options?: MkTruncateOptions</code> — <code>ellipsis</code> (default <code>'…'</code>), <code>wordBoundary</code></td><td><code>The quick brown…</code></td></tr>
+          <tr><td><code>mkPluralize</code></td><td><code>singular: string | MkPluralForms</code>, <code>plural?: string</code> (default <code>singular + 's'</code>), <code>options?: MkPluralizeOptions</code> — <code>locale</code>, <code>withCount</code> (default <code>true</code>). A forms map is keyed by CLDR categories (<code>one few many other</code>) via <code>Intl.PluralRules</code>.</td><td><code>3 items</code>, <code>5 plików</code></td></tr>
+        </tbody>
+      </table>
     </div>
   `,
   styles: [
@@ -551,6 +655,33 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
       }
       .echo {
         margin: var(--mk-space-2) 0 0;
+        font-size: var(--mk-font-size-sm);
+        color: var(--mk-text-muted);
+      }
+      .pipes-demo {
+        display: grid;
+        grid-template-columns: max-content 1fr;
+        gap: var(--mk-space-2) var(--mk-space-4);
+        margin: 0;
+        width: 100%;
+      }
+      .pipes-demo dt {
+        color: var(--mk-text-muted);
+      }
+      .pipes-demo dd {
+        margin: 0;
+        font-variant-numeric: tabular-nums;
+      }
+      .pipes-controls {
+        display: flex;
+        flex-wrap: wrap;
+        gap: var(--mk-space-3);
+        margin-top: var(--mk-space-4);
+      }
+      .pipes-controls label {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-1);
         font-size: var(--mk-font-size-sm);
         color: var(--mk-text-muted);
       }
@@ -874,4 +1005,53 @@ class AppPermissionPolicy extends MkPermissionPolicy {
 bootstrapApplication(App, {
   providers: [{ provide: MkPermissionPolicy, useClass: AppPermissionPolicy }],
 });`;
+
+  // --- Pipes ----------------------------------------------------------------
+  protected readonly amount = signal(1234.5);
+  protected readonly bytes = signal(1_234_567);
+  protected readonly count = signal(3);
+  protected readonly pageOpenedAt = new Date(Date.now() - 3 * 60_000);
+  protected readonly tomorrow = new Date(Date.now() + 36 * 3_600_000);
+  protected readonly lastWeek = new Date(Date.now() - 8 * 86_400_000);
+  protected readonly lorem = 'The quick brown fox jumps over the lazy dog';
+  protected readonly plikForms: MkPluralForms = {
+    one: 'plik',
+    few: 'pliki',
+    many: 'plików',
+    other: 'pliku',
+  };
+  /** Ticks every 30 s so the pure `mkRelativeTime` pipe re-evaluates. */
+  protected readonly now = signal(Date.now());
+
+  constructor() {
+    if (typeof window === 'undefined') return;
+    const timer = window.setInterval(() => this.now.set(Date.now()), 30_000);
+    inject(DestroyRef).onDestroy(() => window.clearInterval(timer));
+  }
+
+  protected readonly pipesCode = `<!-- locale + default currency once, at bootstrap (optional) -->
+bootstrapApplication(App, { providers: [provideMkI18n({ locale: 'pl-PL', currency: 'PLN' })] });
+
+{{ total() | mkCurrency }}                                <!-- 1234,50 zł (i18n currency) -->
+{{ total() | mkCurrency:'EUR':{ locale: 'de' } }}         <!-- 1.234,50 € -->
+{{ 1234567 | mkCurrency:'USD':{ notation: 'compact' } }}  <!-- $1.2M -->
+
+{{ comment.createdAt | mkRelativeTime }}                  <!-- 3 minutes ago -->
+{{ due | mkRelativeTime:now() }}                          <!-- in 2 days — now() ticks, see below -->
+{{ due | mkRelativeTime:null:{ style: 'short', numeric: 'always' } }}
+
+{{ file.size | mkFileSize }}                              <!-- 1.2 MB -->
+{{ file.size | mkFileSize:{ base: 'binary', digits: 2 } }} <!-- 1.18 MiB -->
+
+{{ user.name | mkInitials }}                              <!-- Ada Lovelace → AL -->
+{{ post.body | mkTruncate:80:{ wordBoundary: true } }}
+{{ count() | mkPluralize:'item' }}                        <!-- 3 items -->
+{{ count() | mkPluralize:{ one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' } }}
+
+// A pure pipe only re-runs when an argument changes — tick "now" yourself:
+readonly now = signal(Date.now());
+constructor() {
+  const timer = setInterval(() => this.now.set(Date.now()), 30_000);
+  inject(DestroyRef).onDestroy(() => clearInterval(timer));
+}`;
 }

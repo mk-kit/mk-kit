@@ -1308,6 +1308,18 @@
      "kind": "interface",
      "members": [
       {
+       "name": "locale",
+       "type": "string | undefined",
+       "description": "BCP 47 locale tag (`'pl-PL'`, `'de'`) used by the formatting pipes\n(`mkCurrency`, `mkRelativeTime`, `mkFileSize`, `mkPluralize`) and any\nother `Intl`-based formatting that has no explicit locale of its own.\nUnset → the runtime (browser / Node) default locale.",
+       "optional": true
+      },
+      {
+       "name": "currency",
+       "type": "string | undefined",
+       "description": "ISO 4217 currency code the `mkCurrency` pipe falls back to when the\ntemplate passes none. Unset → `'USD'`.",
+       "optional": true
+      },
+      {
        "name": "validation",
        "type": "MkValidationStrings",
        "description": "Validation messages (deep-merged by provideMkI18n)."
@@ -3975,6 +3987,54 @@
      "docs": "/components/utilities"
     },
     {
+     "name": "MkCurrencyPipe",
+     "description": "`mkCurrency` — format a number as money with `Intl.NumberFormat`, honouring\nthe locale and default currency from `provideMkI18n({ locale, currency })`.\nNo Angular locale data is needed. Pure: `null`, `undefined`, `''` and\nnon-numeric input render as `''`.\n\n```html\n{{ 1234.5 | mkCurrency }}                                <!-- $1,234.50 (i18n currency, default USD) -->\n{{ 1234.5 | mkCurrency:'EUR' }}                          <!-- €1,234.50 -->\n{{ 1234.5 | mkCurrency:'PLN':{ locale: 'pl-PL' } }}      <!-- 1234,50 zł -->\n{{ 1234567 | mkCurrency:'USD':{ notation: 'compact' } }} <!-- $1.2M -->\n{{ total() | mkCurrency:'GBP':{ signDisplay: 'always' } }} <!-- signals work as-is -->\n```",
+     "file": "projects/mk-kit/directives/pipes/currency.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkCurrency",
+     "signature": "(value: number | string | null | undefined, currency?: string | null, options?: MkCurrencyOptions): string"
+    },
+    {
+     "name": "MkFileSizePipe",
+     "description": "`mkFileSize` — bytes → a human-readable size such as `1.2 MB`, with the\nnumber formatted by `Intl.NumberFormat` in the `provideMkI18n` locale.\nPure: `null`, `undefined`, `''` and non-numeric input render as `''`.\n\n```html\n{{ 1_234_567 | mkFileSize }}                        <!-- 1.2 MB -->\n{{ 1_234_567 | mkFileSize:{ base: 'binary' } }}     <!-- 1.2 MiB -->\n{{ 1_234_567 | mkFileSize:{ digits: 2, locale: 'de' } }} <!-- 1,23 MB -->\n{{ 512 | mkFileSize }}                              <!-- 512 B -->\n```",
+     "file": "projects/mk-kit/directives/pipes/file-size.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkFileSize",
+     "signature": "(value: number | string | null | undefined, options?: MkFileSizeOptions): string"
+    },
+    {
+     "name": "MkInitialsPipe",
+     "description": "`mkInitials` — \"Ada Lovelace\" → \"AL\", the same rule `mk-avatar` uses for\nits fallback: first letter of the first and last word, upper-cased. A\nsingle word yields its first `max` letters (\"Ada\" → \"AD\"); more than two\nwords with `max` > 2 take one letter per word from the start (\"Jean\nLuc Picard\" with `max: 3` → \"JLP\"). Leading/trailing/duplicate whitespace\nis ignored, and grapheme-aware slicing keeps emoji and accents intact.\nPure: `null`, `undefined` and blank input render as `''`.\n\n```html\n{{ user.name | mkInitials }}      <!-- Grace Hopper → GH -->\n{{ user.name | mkInitials:1 }}    <!-- Grace Hopper → G -->\n{{ 'Jean Luc Picard' | mkInitials:3 }} <!-- JLP -->\n```",
+     "file": "projects/mk-kit/directives/pipes/initials.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkInitials",
+     "signature": "(value: string | null | undefined, max?: number): string"
+    },
+    {
+     "name": "MkPluralizePipe",
+     "description": "`mkPluralize` — pick the right word for a count using the locale's plural\nrules (`Intl.PluralRules`), optionally prefixed with the formatted count.\nThe English shorthand takes a singular and an optional plural (default\n`singular + 's'`); other languages pass a `MkPluralForms` map.\nPure: `null`, `undefined`, `''` and non-numeric counts render as `''`.\n\n```html\n{{ count | mkPluralize:'item' }}                 <!-- 1 item / 3 items -->\n{{ count | mkPluralize:'entry':'entries' }}      <!-- 1 entry / 2 entries -->\n{{ count | mkPluralize:'file':null:{ withCount: false } }} <!-- files -->\n{{ n | mkPluralize:{ one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' }:null:{ locale: 'pl' } }}\n```",
+     "file": "projects/mk-kit/directives/pipes/pluralize.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkPluralize",
+     "signature": "(value: number | string | null | undefined, singular: string | MkPluralForms, plural?: string | null, options?: MkPluralizeOptions): string"
+    },
+    {
+     "name": "MkRelativeTimePipe",
+     "description": "`mkRelativeTime` — \"3 minutes ago\" / \"in 2 days\" / \"yesterday\" from a\n`Date`, timestamp or ISO string, via `Intl.RelativeTimeFormat` in the\n`provideMkI18n` locale (no Angular locale data). Pure: `null`, `undefined`\nand unparsable input render as `''`.\n\nThe pipe picks the largest unit whose magnitude is at least 1 (seconds →\nminutes → hours → days → weeks → months → years) and rounds. Pass `now`\nfor deterministic output in tests, or bind a ticking signal to keep a\nlist live — a pure pipe only re-runs when an argument changes:\n\n```html\n{{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->\n{{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->\n{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->\n{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->\n```",
+     "file": "projects/mk-kit/directives/pipes/relative-time.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkRelativeTime",
+     "signature": "(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string"
+    },
+    {
+     "name": "MkTruncatePipe",
+     "description": "`mkTruncate` — shorten text to `length` characters and append an ellipsis.\nThe ellipsis counts toward the limit, so the output never exceeds\n`length` characters; counting is grapheme-aware (emoji and accented\nletters are one character). Text that already fits is returned as-is.\nPure: `null` and `undefined` render as `''`.\n\n```html\n{{ post.body | mkTruncate:80 }}                          <!-- hard cut at 80 -->\n{{ post.body | mkTruncate:80:{ wordBoundary: true } }}   <!-- cut at the last space -->\n{{ hash | mkTruncate:12:{ ellipsis: '...' } }}\n```",
+     "file": "projects/mk-kit/directives/pipes/truncate.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "mkTruncate",
+     "signature": "(value: string | null | undefined, length?: number, options?: MkTruncateOptions): string"
+    },
+    {
      "name": "MkHistoryService",
      "description": "MkHistoryService — the app-wide `MkHistoryStack` singleton. Inject it\nanywhere; call `MkHistoryStack.createScope` for an isolated local\nstack, or wire `mod+z` / `mod+shift+z` / `mod+y` with\n`registerHistoryHotkeys`.\n\n### Recipe — undoable `mk-table` cell edits\nWire the table's `(cellEdit)` output so each saved cell becomes one\nundoable step. Apply the edit yourself first (`push()` records an action\nthat already happened), and match rows by a stable id — the row object is\nreplaced by the immutable update:\n\n```ts\n// <mk-table [rows]=\"rows()\" [columns]=\"columns\" (cellEdit)=\"onCellEdit($event)\" />\nprivate readonly history = inject(MkHistoryService);\nreadonly rows = signal<Order[]>([...]);\n\nonCellEdit(edit: MkCellEdit<Order>): void {\n  const previous = edit.row[edit.key as keyof Order];\n  const apply = (value: unknown) =>\n    this.rows.update((rows) =>\n      rows.map((r) => (r.id === edit.row.id ? { ...r, [edit.key]: value } : r)),\n    );\n  apply(edit.value); // first execution is the caller's job\n  this.history.push({\n    label: `Edit ${edit.key}`,\n    undo: () => apply(previous),\n    redo: () => apply(edit.value),\n  });\n}\n```\n\nUndoing replays the old value through the same `apply` function; if your\nchange pipeline re-emits into `onCellEdit` during that replay, the\nre-entrancy guard drops the spurious `push()` (see `MkHistoryStack`).",
      "file": "projects/mk-kit/directives/history/history.service.ts",
@@ -4158,6 +4218,82 @@
      "type": "Readonly<Record<MkFieldKind, Partial<Record<\"type\" | \"inputmode\" | \"autocomplete\" | \"autocapitalize\" | \"autocorrect\" | \"spellcheck\" | \"enterkeyhint\", string>>>>"
     },
     {
+     "name": "MkCurrencyOptions",
+     "description": "Options accepted by `MkCurrencyPipe`. They map onto\n`Intl.NumberFormat` currency options; `locale` overrides the i18n /\nruntime locale for this call only.",
+     "file": "projects/mk-kit/directives/pipes/currency.pipe.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "locale",
+       "type": "string | undefined",
+       "description": "BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale.",
+       "optional": true
+      },
+      {
+       "name": "display",
+       "type": "\"symbol\" | \"name\" | \"narrowSymbol\" | \"code\" | undefined",
+       "description": "How the currency is shown. Default `'symbol'` (`€`, `$`, `zł`).",
+       "optional": true
+      },
+      {
+       "name": "minimumFractionDigits",
+       "type": "number | undefined",
+       "description": "Fraction digits; both default to the currency's own (2 for EUR, 0 for JPY).",
+       "optional": true
+      },
+      {
+       "name": "maximumFractionDigits",
+       "type": "number | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "signDisplay",
+       "type": "\"auto\" | \"never\" | \"always\" | \"exceptZero\" | undefined",
+       "description": "Sign display, e.g. `'always'` for `+€10.00` or `'exceptZero'`.",
+       "optional": true
+      },
+      {
+       "name": "notation",
+       "type": "\"compact\" | \"standard\" | undefined",
+       "description": "Compact notation for dashboards (`$1.2M`). Default `'standard'`.",
+       "optional": true
+      },
+      {
+       "name": "useGrouping",
+       "type": "boolean | undefined",
+       "description": "Thousands grouping; default `true`.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkFileSizeOptions",
+     "description": "Options accepted by `MkFileSizePipe`.",
+     "file": "projects/mk-kit/directives/pipes/file-size.pipe.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "locale",
+       "type": "string | undefined",
+       "description": "BCP 47 locale for the number part (decimal separator); defaults to the i18n / runtime locale.",
+       "optional": true
+      },
+      {
+       "name": "base",
+       "type": "\"decimal\" | \"binary\" | undefined",
+       "description": "`'decimal'` (default) divides by 1000 and labels `kB MB GB …` (what\noperating systems and file dialogs show); `'binary'` divides by 1024\nand labels `KiB MiB GiB …`.",
+       "optional": true
+      },
+      {
+       "name": "digits",
+       "type": "number | undefined",
+       "description": "Maximum fraction digits. Default `1`; bytes never get fractions.",
+       "optional": true
+      }
+     ]
+    },
+    {
      "name": "MkHistoryEntry",
      "description": "A single undoable step recorded in an `MkHistoryStack`.\n\nThe **first** execution of an action is the caller's job — `push()` records\nan action that has *already happened*. `undo()` reverts it; `redo()` applies\nit again after an undo.",
      "file": "projects/mk-kit/directives/history/history.service.ts",
@@ -4257,6 +4393,78 @@
      ]
     },
     {
+     "name": "MkPluralizeOptions",
+     "description": "Options accepted by `MkPluralizePipe`.",
+     "file": "projects/mk-kit/directives/pipes/pluralize.pipe.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "locale",
+       "type": "string | undefined",
+       "description": "BCP 47 locale for the plural rules and number; defaults to the i18n / runtime locale.",
+       "optional": true
+      },
+      {
+       "name": "withCount",
+       "type": "boolean | undefined",
+       "description": "Prefix the formatted count (`\"3 items\"`); `false` gives just the word. Default `true`.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkRelativeTimeOptions",
+     "description": "Options accepted by `MkRelativeTimePipe`.",
+     "file": "projects/mk-kit/directives/pipes/relative-time.pipe.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "locale",
+       "type": "string | undefined",
+       "description": "BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale.",
+       "optional": true
+      },
+      {
+       "name": "numeric",
+       "type": "\"auto\" | \"always\" | undefined",
+       "description": "`'auto'` (default) uses phrases like \"yesterday\" / \"now\" where the locale\nhas them; `'always'` sticks to \"1 day ago\" / \"in 0 seconds\".",
+       "optional": true
+      },
+      {
+       "name": "style",
+       "type": "\"long\" | \"short\" | \"narrow\" | undefined",
+       "description": "Length of the unit word: `'long'` (default, \"minutes\"), `'short'` (\"min.\"), `'narrow'` (\"m\").",
+       "optional": true
+      },
+      {
+       "name": "maxUnit",
+       "type": "Intl.RelativeTimeFormatUnit | undefined",
+       "description": "Largest unit to use. Default `'year'`; e.g. `'day'` keeps \"45 days ago\"\ninstead of \"1 month ago\".",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkTruncateOptions",
+     "description": "Options accepted by `MkTruncatePipe`.",
+     "file": "projects/mk-kit/directives/pipes/truncate.pipe.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "ellipsis",
+       "type": "string | undefined",
+       "description": "Suffix appended when text is cut. Default `'…'` (a single ellipsis character).",
+       "optional": true
+      },
+      {
+       "name": "wordBoundary",
+       "type": "boolean | undefined",
+       "description": "Cut at the last whitespace before the limit instead of mid-word\n(falls back to a hard cut when the first word alone is longer).\nDefault `false`.",
+       "optional": true
+      }
+     ]
+    },
+    {
      "name": "MkFieldKind",
      "description": "Semantic field kinds understood by `MkField`.",
      "file": "projects/mk-kit/directives/directives/field.ts",
@@ -4269,6 +4477,13 @@
      "file": "projects/mk-kit/directives/directives/field.ts",
      "kind": "type",
      "definition": "Partial<Record<MkFieldAttr, string>>"
+    },
+    {
+     "name": "MkPluralForms",
+     "description": "Per-category word forms for `MkPluralizePipe`, keyed by the CLDR\nplural categories `Intl.PluralRules` returns. `other` is required; the\npipe falls back to it for any category you leave out.\n\n```ts\nconst files: MkPluralForms = { one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' };\n```",
+     "file": "projects/mk-kit/directives/pipes/pluralize.pipe.ts",
+     "kind": "type",
+     "definition": "{ other: string } & Partial<Record<Intl.LDMLPluralRule, string>>"
     }
    ]
   },
@@ -7295,7 +7510,7 @@
       },
       {
        "name": "errorOn",
-       "type": "\"touched\" | \"dirty\" | \"always\"",
+       "type": "\"always\" | \"touched\" | \"dirty\"",
        "description": "When automatic errors become visible. `touched` (the default) matches\nMaterial: after the control is touched or dirty, or the form is submitted.\n`dirty` waits for an actual edit; `always` shows as soon as it is invalid.",
        "default": "'touched'"
       },

@@ -29,6 +29,11 @@ export function detectMkImports(source: string): string[] {
     const cls = MK_SELECTORS[m[1]];
     if (cls) found.add(cls);
   }
+  // Pipes: `{{ value | mkCurrency:'EUR' }}`.
+  for (const m of source.matchAll(/\|\s*(mk[A-Z][A-Za-z0-9]*)/g)) {
+    const cls = MK_SELECTORS[m[1]];
+    if (cls) found.add(cls);
+  }
   return [...found].sort();
 }
 
