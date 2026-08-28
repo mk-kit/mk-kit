@@ -1,0 +1,80 @@
+<div class="mk-org-chart__scroller">
+  <div class="mk-org-chart__canvas" [style.zoom]="zoomLevel()">
+    <ul
+      class="mk-org-chart__level mk-org-chart__level--root"
+      role="tree"
+      [attr.aria-label]="ariaLabel() || null"
+      (keydown)="onKeydown($event)"
+      (focusin)="onFocusIn($event)"
+    >
+      @for (node of nodes(); track node.id) {
+        <ng-container
+          *ngTemplateOutlet="itemTpl; context: { node: node, depth: 1 }"
+        />
+      }
+    </ul>
+  </div>
+</div>
+
+<ng-template #itemTpl let-node="node" let-depth="depth">
+  <li
+    class="mk-org-chart__item"
+    role="treeitem"
+    [attr.data-mk-id]="node.id"
+    [class.mk-org-chart__item--expanded]="isExpanded(node)"
+    [class.mk-org-chart__item--collapsed]="node.children?.length && !isExpanded(node)"
+    [attr.aria-level]="depth"
+    [attr.aria-expanded]="node.children?.length ? isExpanded(node) : null"
+    [attr.aria-selected]="selectable() ? isSelected(node) : null"
+    [attr.tabindex]="tabIndexFor(node)"
+  >
+    <div
+      class="mk-org-chart__node"
+      [class.mk-org-chart__node--selected]="isSelected(node)"
+      [class.mk-org-chart__node--custom]="!!nodeDef()"
+      (click)="onCardClick($event, node)"
+    >
+      @if (nodeDef(); as def) {
+        <ng-container
+          *ngTemplateOutlet="def.template; context: context(node, depth)"
+        />
+      } @else {
+        <mk-avatar
+          class="mk-org-chart__avatar"
+          size="sm"
+          [name]="node.label ?? node.id"
+          [src]="field(node, 'avatar')"
+          alt=""
+          aria-hidden="true"
+        />
+        <span class="mk-org-chart__text">
+          <span class="mk-org-chart__label">{{ node.label ?? node.id }}</span>
+          @if (field(node, 'title'); as title) {
+            <span class="mk-org-chart__title">{{ title }}</span>
+          }
+        </span>
+      }
+      @if (collapsible() && node.children?.length) {
+        <button
+          type="button"
+          class="mk-org-chart__toggle"
+          tabindex="-1"
+          [attr.aria-label]="toggleLabel(node)"
+          [attr.aria-expanded]="isExpanded(node)"
+          (click)="onToggleClick($event, node)"
+        >
+          <span class="mk-org-chart__caret" aria-hidden="true"></span>
+        </button>
+      }
+    </div>
+    @if (isExpanded(node)) {
+      <ul class="mk-org-chart__level mk-org-chart__level--nested" role="group">
+        @for (child of node.children; track child.id) {
+          <ng-container
+            *ngTemplateOutlet="itemTpl; context: { node: child, depth: depth + 1 }"
+          />
+        }
+      </ul>
+    }
+  </li>
+</ng-template>

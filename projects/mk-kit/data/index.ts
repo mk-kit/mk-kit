@@ -12,6 +12,7 @@ export * from './avatar';
 export * from './list';
 export * from './empty-state';
 export * from './timeline';
+export * from './org-chart';
 export * from './stat-card';
 export * from './profile-card';
 export * from './progress-bar';

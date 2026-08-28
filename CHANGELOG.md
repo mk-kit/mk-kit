@@ -6,6 +6,24 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ## [Unreleased]
 
+### Added
+
+- **`mk-org-chart`** (`@mk-kit/ui/data`) — organisation / reporting-line
+  chart drawn with nested lists and token-only CSS connectors (no canvas;
+  themes, prints and mirrors in RTL). Takes a `nodes` tree
+  (`{ id, label?, data?, children?, expanded? }`) or a flat `parentId` list via
+  the new `mkOrgChartFromFlat()` helper; `orientation="top" | "left"`,
+  `selectable` + `[(selected)]` (by id), `collapsible` + `[(expanded)]` (id
+  set, seeded from per-node `expanded`), `zoom` (0.5–2), `(nodeClick)` and
+  `(nodeToggle)`. Default card shows an avatar / initials, the label and
+  `data.title`; `ng-template[mkOrgChartNodeDef]` renders custom cards with
+  `{ node, depth, expanded, selected }`. ARIA tree semantics (`tree` /
+  `treeitem` / `group`, `aria-level` / `-expanded` / `-selected`) with a
+  roving tab stop; arrows navigate the hierarchy (axes swap for `left` and
+  RTL), Home/End, Enter/Space, `*` expands siblings, `+`/`-`. New i18n keys:
+  `orgChartLabel`, `orgChartExpand`, `orgChartCollapse`. Docs page at
+  `/components/org-chart`.
+
 ### Fixed
 
 - **carousel:** slides are projected content, so the component's `flex: 0 0 100%` slide rule never applied under emulated encapsulation — every slide shrank to its content width and all of them rendered inside the first viewport. Fixed with a host-scoped `::ng-deep` rule; the docs demo also lost its slide text to the page's paragraph colour.

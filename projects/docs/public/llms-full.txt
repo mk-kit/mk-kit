@@ -925,6 +925,9 @@ Members:
 | `logFollow` | `string` | Log viewer: re-attach-to-tail button. |
 | `logCopyAll` | `string` | Log viewer: copy-the-whole-buffer toolbar button. |
 | `logWrapLines` | `string` | Log viewer: soft-wrap toolbar toggle. |
+| `orgChartLabel` | `string` | Org chart: default accessible label of the tree. |
+| `orgChartExpand` | `string` | Org chart: aria-label of a collapsed node's toggle (`{label}` = node label). |
+| `orgChartCollapse` | `string` | Org chart: aria-label of an expanded node's toggle (`{label}` = node label). |
 | `chatLabel` | `string` | Chat: accessible name of the message log. |
 | `chatComposerLabel` | `string` | Chat: accessible name of the composer textarea. |
 | `chatPlaceholder` | `string` | Chat: composer placeholder. |
@@ -8463,7 +8466,7 @@ type MkTableDensity = 'comfortable' | 'compact';
 
 ## @mk-kit/ui/data
 
-122 exports. `import { … } from '@mk-kit/ui/data';`
+131 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -9383,6 +9386,67 @@ Inputs:
 | `autolink` | `boolean` | `false` | Turn bare `http(s)://…` URLs into links. Off by default. |
 | `linkTarget` | `"" \| "_blank"` | `''` | Link target; `'_blank'` also adds `rel="noopener noreferrer"`. |
 
+### MkOrgChart (component)
+
+Selector: `mk-org-chart` · exportAs: `mkOrgChart`
+
+Docs: https://mk-kit.dev/components/org-chart
+
+Import: `import { MkOrgChart } from '@mk-kit/ui/data';`
+
+Organisation chart — a reporting-line hierarchy drawn with plain nested
+lists and CSS connectors (no canvas, prints and themes like everything
+else). Feed it a tree (`nodes`) or convert a flat `parentId` list with
+`mkOrgChartFromFlat`. Nodes render as a default card (avatar /
+initials, label, `data.title`) or through an `mkOrgChartNodeDef` template.
+
+Follows the ARIA tree pattern (`role="tree"` / `treeitem` / `group`, one
+roving tab stop). Keyboard (top-down; the axes swap for `orientation="left"`
+and in RTL): Down = first child (expands a collapsed node first), Up =
+parent, Left/Right = previous/next sibling, Home/End = first/last visible
+node, Enter/Space = select (or toggle when not selectable), `*` = expand
+all siblings, `+`/`-` = expand/collapse.
+
+```html
+<mk-org-chart
+  [nodes]="company"
+  selectable
+  [(selected)]="personId"
+  collapsible
+  (nodeClick)="open($event)"
+/>
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `nodes` | `readonly MkOrgChartNode<T>[]` | `[]` | The hierarchy to render (roots first). |
+| `orientation` | `MkOrgChartOrientation` | `'top'` | Root at the top (children below) or at the inline start (children to the side). |
+| `selectable` | `boolean` | `false` | Allow choosing a node (adds selection styling + `aria-selected`). |
+| `collapsible` | `boolean` | `false` | Show a toggle on every parent so branches can be hidden. |
+| `zoom` | `number` | `1` | Scale factor applied to the whole chart (clamped to 0.5–2). |
+| `aria-label` | `string` | `this.i18n.orgChartLabel` | Accessible name for the tree. |
+| `selected` (two-way) | `string \| null` | `null` | Two-way selected node id (`null` = nothing selected). |
+| `expanded` (two-way) | `readonly string[] \| undefined` | `undefined` | Two-way ids of the expanded parents. Leave unbound to let the chart manage expansion itself (seeded from each node's `expanded` flag). |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `selectedChange` | `string \| null` | Emits when `selected` changes (two-way binding). |
+| `expandedChange` | `readonly string[] \| undefined` | Emits when `expanded` changes (two-way binding). |
+| `nodeClick` | `MkOrgChartNode<T>` | Emits the node whose card was clicked or activated with Enter/Space. |
+| `nodeToggle` | `MkOrgChartToggleEvent<T>` | Emits whenever a node is expanded or collapsed. |
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `toggle(node: MkOrgChartNode<T>): void` | Expand or collapse a parent (no-op for leaves / non-collapsible charts). |
+| `setExpanded(node: MkOrgChartNode<T>, expanded: boolean): void` | Expand or collapse a parent explicitly. |
+| `select(node: MkOrgChartNode<T>): void` | Select a node by reference (no-op unless `selectable`). |
+
 ### MkProfileActions (component)
 
 Selector: `[mkProfileActions]`
@@ -9969,6 +10033,31 @@ Import: `import { MkCarouselSlide } from '@mk-kit/ui/data';`
 A single slide inside `MkCarousel`. Mark each slide element with
 `mkCarouselSlide`; the carousel wires ARIA + visibility.
 
+### MkOrgChartNodeDef (directive)
+
+Selector: `ng-template[mkOrgChartNodeDef]`
+
+Import: `import { MkOrgChartNodeDef } from '@mk-kit/ui/data';`
+
+Custom node card for `mk-org-chart`:
+
+```html
+<mk-org-chart [nodes]="nodes">
+  <ng-template mkOrgChartNodeDef let-node let-selected="selected">
+    <strong>{{ node.label }}</strong> — {{ node.data?.title }}
+  </ng-template>
+</mk-org-chart>
+```
+
+Bind the same array you pass to `nodes` to get a typed `node.data` in the
+template: `<ng-template [mkOrgChartNodeDef]="nodes" let-node>`.
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mkOrgChartNodeDef` | `"" \| readonly MkOrgChartNode<T>[] \| undefined` | `undefined` | Type-inference hook only (the value is not used at runtime): bind the `nodes` array so `let-node` is typed as `MkOrgChartNode<T>`. |
+
 ### mkArcPath (function)
 
 Import: `import { mkArcPath } from '@mk-kit/ui/data';`
@@ -10124,6 +10213,25 @@ used for value axes so gridlines land on human numbers.
 
 ```ts
 function mkNiceTicks(min: number, max: number, count?: number): number[]
+```
+
+### mkOrgChartFromFlat (function)
+
+Import: `import { mkOrgChartFromFlat } from '@mk-kit/ui/data';`
+
+Build the nested `nodes` input from a flat `parentId` list (the shape most
+HR / directory APIs return). Row order is preserved among siblings; rows
+whose `parentId` does not match any row become roots.
+
+```ts
+const nodes = mkOrgChartFromFlat([
+  { id: 'ceo', label: 'Ada' },
+  { id: 'cto', label: 'Grace', parentId: 'ceo' },
+]);
+```
+
+```ts
+function mkOrgChartFromFlat<T = unknown>(list: readonly MkOrgChartFlatNode<T>[]): MkOrgChartNode<T>[]
 ```
 
 ### mkParseAnsi (function)
@@ -10548,6 +10656,67 @@ Members:
 | --- | --- | --- |
 | `linkTarget`? | `"" \| "_blank" \| undefined` | `'_blank'` renders `target="_blank" rel="noopener noreferrer"` on links. |
 
+### MkOrgChartFlatNode (interface)
+
+Import: `import { MkOrgChartFlatNode } from '@mk-kit/ui/data';`
+
+One row of a flat list accepted by `mkOrgChartFromFlat`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` |  |
+| `label`? | `string \| undefined` |  |
+| `data`? | `T \| undefined` |  |
+| `parentId`? | `string \| null \| undefined` | Id of the parent row; `null` / `undefined` / unknown id = root. |
+| `expanded`? | `boolean \| undefined` |  |
+
+### MkOrgChartNode (interface)
+
+Import: `import { MkOrgChartNode } from '@mk-kit/ui/data';`
+
+A node in an `MkOrgChart` tree. `children` makes it a parent.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Unique id — drives selection (`[(selected)]`) and expansion (`[(expanded)]`). |
+| `label`? | `string \| undefined` | Primary text of the default card (and the initials fallback). |
+| `data`? | `T \| undefined` | Arbitrary payload handed to the node template. The default card reads `data.title` (sub-label) and `data.avatar` (image URL) when present. |
+| `children`? | `MkOrgChartNode<T>[] \| undefined` | Direct reports; a non-empty array makes the node collapsible. |
+| `expanded`? | `boolean \| undefined` | Initial expansion (default `true`). Only consulted when `[(expanded)]` is not bound. |
+
+### MkOrgChartNodeContext (interface)
+
+Import: `import { MkOrgChartNodeContext } from '@mk-kit/ui/data';`
+
+Template context of `ng-template[mkOrgChartNodeDef]`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `$implicit` | `MkOrgChartNode<MkOrgChartTemplateData<T>>` | The node (also available as `let-node`). |
+| `node` | `MkOrgChartNode<MkOrgChartTemplateData<T>>` |  |
+| `depth` | `number` | 1-based depth (roots are 1). |
+| `expanded` | `boolean` | Whether the node's children are currently shown. |
+| `selected` | `boolean` | Whether the node is the selected one. |
+
+### MkOrgChartToggleEvent (interface)
+
+Import: `import { MkOrgChartToggleEvent } from '@mk-kit/ui/data';`
+
+Payload of `(nodeToggle)`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `node` | `MkOrgChartNode<T>` |  |
+| `expanded` | `boolean` |  |
+
 ### MkPoint (interface)
 
 Import: `import { MkPoint } from '@mk-kit/ui/data';`
@@ -10758,6 +10927,28 @@ Inline (phrasing) node of the markdown AST.
 
 ```ts
 type MkMarkdownInline = | { kind: 'text'; text: string } | { kind: 'softbreak' } | { kind: 'break' } | { kind: 'code'; code: string } | { kind: 'strong'; children: MkMarkdownInline[] } | { kind: 'em'; children: MkMarkdownInline[] } | { kind: 'del'; children: MkMarkdownInline[] } | { kind: 'link'; href: string; children: MkMarkdownInline[] } | { kind: 'image'; src: string; alt: string };
+```
+
+### MkOrgChartOrientation (type)
+
+Import: `import { MkOrgChartOrientation } from '@mk-kit/ui/data';`
+
+Chart direction: `top` = root at the top, `left` = root at the inline start.
+
+```ts
+type MkOrgChartOrientation = 'top' | 'left';
+```
+
+### MkOrgChartTemplateData (type)
+
+Import: `import { MkOrgChartTemplateData } from '@mk-kit/ui/data';`
+
+`data` type seen by a node template: `T` when it could be inferred (the
+template binds `[mkOrgChartNodeDef]="nodes"`), otherwise `any` so an
+untyped `<ng-template mkOrgChartNodeDef>` can still read `node.data?.title`.
+
+```ts
+type MkOrgChartTemplateData<T> = keyof T extends never ? any : T;
 ```
 
 ### MkProfileCardOrientation (type)

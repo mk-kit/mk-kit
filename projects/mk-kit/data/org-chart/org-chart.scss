@@ -1,0 +1,332 @@
+@use '../../src/styles/mixins' as mk;
+
+:host {
+  /* Connector geometry — overridable per instance. */
+  --_line: var(--mk-border-strong);
+  --_line-w: var(--mk-border-width);
+  /* Distance between a parent and its children (along the tree axis). */
+  --_gap-main: var(--mk-space-8);
+  /* Distance between siblings (across the tree axis; half on each side). */
+  --_gap-cross: var(--mk-space-4);
+  --_card-w: 11rem;
+
+  display: block;
+  font-family: var(--mk-font-sans);
+  color: var(--mk-text);
+}
+
+.mk-org-chart__scroller {
+  overflow: auto;
+  max-width: 100%;
+}
+
+.mk-org-chart__canvas {
+  display: inline-block;
+  min-width: 100%;
+  padding: var(--mk-space-2);
+  box-sizing: border-box;
+}
+
+/* ---- lists ------------------------------------------------------------- */
+
+.mk-org-chart__level {
+  display: flex;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  position: relative;
+}
+.mk-org-chart__level--root {
+  justify-content: center;
+}
+
+.mk-org-chart__item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  outline: none;
+}
+
+/* ---- connectors: top-down ---------------------------------------------- */
+
+:host(.mk-org-chart--top) .mk-org-chart__level {
+  flex-direction: row;
+}
+:host(.mk-org-chart--top) .mk-org-chart__level--nested {
+  padding-block-start: var(--_gap-main);
+}
+/* Parent card → sibling rail. */
+:host(.mk-org-chart--top) .mk-org-chart__level--nested::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  inset-inline-start: 50%;
+  width: 0;
+  height: var(--_gap-main);
+  border-inline-start: var(--_line-w) solid var(--_line);
+}
+:host(.mk-org-chart--top) .mk-org-chart__item {
+  flex-direction: column;
+  padding: var(--_gap-main) calc(var(--_gap-cross) / 2) 0;
+}
+/* Each child draws its half of the rail; ::after also drops down to its card. */
+:host(.mk-org-chart--top) .mk-org-chart__item::before,
+:host(.mk-org-chart--top) .mk-org-chart__item::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  width: 50%;
+  height: var(--_gap-main);
+  border-block-start: var(--_line-w) solid var(--_line);
+  pointer-events: none;
+}
+:host(.mk-org-chart--top) .mk-org-chart__item::before {
+  inset-inline-end: 50%;
+}
+:host(.mk-org-chart--top) .mk-org-chart__item::after {
+  inset-inline-start: 50%;
+  border-inline-start: var(--_line-w) solid var(--_line);
+}
+:host(.mk-org-chart--top) .mk-org-chart__item:first-child::before {
+  display: none;
+}
+:host(.mk-org-chart--top) .mk-org-chart__item:last-child::after {
+  border-block-start-color: transparent;
+}
+:host(.mk-org-chart--top) .mk-org-chart__level--root > .mk-org-chart__item {
+  padding-block-start: 0;
+}
+:host(.mk-org-chart--top) .mk-org-chart__level--root > .mk-org-chart__item::before,
+:host(.mk-org-chart--top) .mk-org-chart__level--root > .mk-org-chart__item::after {
+  display: none;
+}
+
+/* ---- connectors: left-to-right (mirrors in RTL via logical props) ------ */
+
+:host(.mk-org-chart--left) .mk-org-chart__level {
+  flex-direction: column;
+}
+:host(.mk-org-chart--left) .mk-org-chart__level--root {
+  align-items: flex-start;
+}
+:host(.mk-org-chart--left) .mk-org-chart__level--nested {
+  padding-inline-start: var(--_gap-main);
+}
+:host(.mk-org-chart--left) .mk-org-chart__level--nested::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  inset-inline-start: 0;
+  width: var(--_gap-main);
+  height: 0;
+  border-block-start: var(--_line-w) solid var(--_line);
+}
+:host(.mk-org-chart--left) .mk-org-chart__item {
+  flex-direction: row;
+  padding-block: calc(var(--_gap-cross) / 2);
+  padding-inline: var(--_gap-main) 0;
+}
+:host(.mk-org-chart--left) .mk-org-chart__item::before,
+:host(.mk-org-chart--left) .mk-org-chart__item::after {
+  content: '';
+  position: absolute;
+  inset-inline-start: 0;
+  width: var(--_gap-main);
+  height: 50%;
+  border-inline-start: var(--_line-w) solid var(--_line);
+  pointer-events: none;
+}
+:host(.mk-org-chart--left) .mk-org-chart__item::before {
+  top: 0;
+}
+:host(.mk-org-chart--left) .mk-org-chart__item::after {
+  top: 50%;
+  border-block-start: var(--_line-w) solid var(--_line);
+}
+:host(.mk-org-chart--left) .mk-org-chart__item:first-child::before {
+  display: none;
+}
+:host(.mk-org-chart--left) .mk-org-chart__item:last-child::after {
+  border-inline-start-color: transparent;
+}
+:host(.mk-org-chart--left) .mk-org-chart__level--root > .mk-org-chart__item {
+  padding-inline-start: 0;
+}
+:host(.mk-org-chart--left) .mk-org-chart__level--root > .mk-org-chart__item::before,
+:host(.mk-org-chart--left) .mk-org-chart__level--root > .mk-org-chart__item::after {
+  display: none;
+}
+
+/* ---- card ---------------------------------------------------------------- */
+
+.mk-org-chart__node {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-3);
+  box-sizing: border-box;
+  min-width: var(--_card-w);
+  max-width: calc(var(--_card-w) * 2);
+  min-height: 2.75rem;
+  padding: var(--mk-space-2) var(--mk-space-3);
+  border: var(--mk-border-width) solid var(--mk-border);
+  border-radius: var(--mk-radius-md);
+  background: var(--mk-surface);
+  box-shadow: var(--mk-shadow-xs);
+  text-align: start;
+  transition:
+    border-color var(--mk-duration-fast) var(--mk-ease-standard),
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    box-shadow var(--mk-duration-fast) var(--mk-ease-standard);
+}
+.mk-org-chart__node--custom {
+  display: block;
+  min-width: 0;
+  max-width: none;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+:host(.mk-org-chart--selectable) .mk-org-chart__node {
+  cursor: pointer;
+  user-select: none;
+}
+:host(.mk-org-chart--selectable) .mk-org-chart__node:not(.mk-org-chart__node--custom):hover {
+  border-color: var(--mk-border-strong);
+  background-color: color-mix(in srgb, var(--mk-surface), var(--mk-hover-overlay));
+}
+.mk-org-chart__node--selected:not(.mk-org-chart__node--custom),
+:host(.mk-org-chart--selectable) .mk-org-chart__node--selected:not(.mk-org-chart__node--custom):hover {
+  border-color: var(--mk-primary);
+  background-color: var(--mk-primary-subtle);
+  box-shadow: 0 0 0 1px var(--mk-primary);
+}
+
+/* Focus ring on the card, not the whole subtree. */
+.mk-org-chart__item:focus-visible > .mk-org-chart__node {
+  @include mk.focus-ring;
+  border-radius: var(--mk-radius-md);
+}
+
+.mk-org-chart__avatar {
+  flex: none;
+}
+
+.mk-org-chart__text {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  line-height: var(--mk-line-height-snug);
+}
+.mk-org-chart__label {
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-semibold);
+  color: var(--mk-text);
+  overflow-wrap: anywhere;
+}
+.mk-org-chart__title {
+  font-size: var(--mk-font-size-xs);
+  color: var(--mk-text-muted);
+  overflow-wrap: anywhere;
+}
+.mk-org-chart__node--selected .mk-org-chart__label {
+  color: var(--mk-primary-subtle-text);
+}
+
+/* ---- toggle ------------------------------------------------------------ */
+
+.mk-org-chart__toggle {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  width: 1.25rem;
+  height: 1.25rem;
+  padding: 0;
+  margin: 0;
+  border: var(--mk-border-width) solid var(--mk-border-strong);
+  border-radius: var(--mk-radius-circle);
+  background: var(--mk-surface);
+  color: var(--mk-text-muted);
+  cursor: pointer;
+  transition:
+    background-color var(--mk-duration-fast) var(--mk-ease-standard),
+    color var(--mk-duration-fast) var(--mk-ease-standard);
+  @include mk.touch-target(24px, null, after);
+}
+.mk-org-chart__toggle:hover {
+  background: var(--mk-surface-2);
+  color: var(--mk-text);
+}
+.mk-org-chart__toggle:focus-visible {
+  @include mk.focus-ring;
+}
+:host(.mk-org-chart--top) .mk-org-chart__toggle {
+  bottom: 0;
+  left: 50%;
+  transform: translate(-50%, 50%);
+}
+:host(.mk-org-chart--left) .mk-org-chart__toggle {
+  top: 50%;
+  inset-inline-end: 0;
+  transform: translateY(-50%);
+  margin-inline-end: -0.625rem;
+}
+
+.mk-org-chart__caret {
+  width: 0.35rem;
+  height: 0.35rem;
+  border-inline-end: 2px solid currentColor;
+  border-block-end: 2px solid currentColor;
+  transition: transform var(--mk-duration-fast) var(--mk-ease-standard);
+}
+/* Points away from the card when collapsed (down / inline-end), towards it when expanded. */
+:host(.mk-org-chart--top) .mk-org-chart__caret {
+  transform: translateY(-1px) rotate(45deg);
+}
+:host(.mk-org-chart--top) .mk-org-chart__item--expanded > .mk-org-chart__node > .mk-org-chart__toggle .mk-org-chart__caret {
+  transform: translateY(1px) rotate(-135deg);
+}
+:host(.mk-org-chart--left) .mk-org-chart__caret {
+  transform: translateX(-1px) rotate(-45deg);
+}
+:host(.mk-org-chart--left) .mk-org-chart__item--expanded > .mk-org-chart__node > .mk-org-chart__toggle .mk-org-chart__caret {
+  transform: translateX(1px) rotate(135deg);
+}
+:host(.mk-org-chart--left:dir(rtl)) .mk-org-chart__caret {
+  transform: translateX(1px) rotate(135deg);
+}
+:host(.mk-org-chart--left:dir(rtl)) .mk-org-chart__item--expanded > .mk-org-chart__node > .mk-org-chart__toggle .mk-org-chart__caret {
+  transform: translateX(-1px) rotate(-45deg);
+}
+
+/* ---- motion / print ------------------------------------------------------ */
+
+@media (prefers-reduced-motion: reduce) {
+  .mk-org-chart__node,
+  .mk-org-chart__toggle,
+  .mk-org-chart__caret {
+    transition: none;
+  }
+}
+
+@media print {
+  .mk-org-chart__scroller {
+    overflow: visible;
+  }
+  .mk-org-chart__canvas {
+    display: block;
+    zoom: 1 !important;
+  }
+  .mk-org-chart__node {
+    box-shadow: none;
+    break-inside: avoid;
+  }
+  .mk-org-chart__toggle {
+    display: none;
+  }
+}
