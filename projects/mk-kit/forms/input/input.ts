@@ -10,6 +10,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkInputGroup } from '../input-group/input-group';
 
@@ -65,6 +66,8 @@ import { MkInputGroup } from '../input-group/input-group';
 })
 export class MkInput implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly group = inject(MkInputGroup, { optional: true });
   private readonly host =
     inject<ElementRef<HTMLInputElement | HTMLTextAreaElement>>(ElementRef);
@@ -85,7 +88,7 @@ export class MkInput implements ControlValueAccessor {
   );
   protected readonly isInvalid = computed(
     () =>
-      this.invalid() ||
+      (this.invalid() && this.fieldTouched()) ||
       (this.field?.hasError() ?? false) ||
       (this.group?.isInvalid() ?? false),
   );

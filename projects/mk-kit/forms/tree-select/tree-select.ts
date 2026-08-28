@@ -18,6 +18,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation';
 
@@ -59,6 +60,8 @@ import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation';
 })
 export class MkTreeSelect implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
@@ -98,7 +101,7 @@ export class MkTreeSelect implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);

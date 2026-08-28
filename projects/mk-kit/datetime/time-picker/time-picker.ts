@@ -29,6 +29,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '@mk-kit/ui/forms';
 
 /** A selectable time option. */
@@ -102,6 +103,8 @@ function pad2(n: number): string {
 export class MkTimePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly inputRef = viewChild<ElementRef<HTMLInputElement>>('textInput');
@@ -120,9 +123,15 @@ export class MkTimePicker implements ControlValueAccessor, Validator {
   protected readonly ariaLabelAttr = computed(() => (this.field ? null : this.ariaLabel() || null));
   readonly valueFormat = input<'string' | 'date'>('string');
   /** Earliest selectable time `HH:mm` (inclusive). */
-  readonly min = input<string | null>(null);
+  readonly min = input<string | null, string | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Latest selectable time `HH:mm` (inclusive). */
-  readonly max = input<string | null>(null);
+  readonly max = input<string | null, string | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Interval between generated options, in minutes. */
   readonly step = input(30, { transform: numberAttribute });
   /** Display 12-hour time with AM/PM (the model stays 24h). */
@@ -135,6 +144,8 @@ export class MkTimePicker implements ControlValueAccessor, Validator {
   readonly clearable = input(false, { transform: booleanAttribute });
   /** Force invalid styling + `aria-invalid`. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema. */
+  readonly required = input(false, { transform: booleanAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
   readonly size = input<MkSize>('md');
 
@@ -160,9 +171,11 @@ export class MkTimePicker implements ControlValueAccessor, Validator {
   );
   protected readonly isDisabled = computed(() => this.disabled() || this.cvaDisabled());
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() || (this.field?.isRequired() ?? false),
+  );
   protected readonly describedBy = computed(() => this.field?.describedBy() ?? null);
   protected readonly showClear = computed(
     () => this.clearable() && !!this.time() && !this.isDisabled(),

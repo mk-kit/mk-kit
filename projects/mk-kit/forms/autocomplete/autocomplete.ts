@@ -20,6 +20,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single suggestion for {@link MkAutocomplete}. */
@@ -88,6 +89,8 @@ export type MkAutocompleteFilterMode = 'contains' | 'startsWith' | 'none';
 })
 export class MkAutocomplete implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
   private readonly announcer = inject(MkLiveAnnouncer);
@@ -125,6 +128,8 @@ export class MkAutocomplete implements ControlValueAccessor {
   readonly size = input<MkSize>('md');
   /** Force invalid styling + `aria-invalid` when used standalone. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema. */
+  readonly required = input(false, { transform: booleanAttribute });
   /** Disable the control. */
   readonly disabled = input(false, { transform: booleanAttribute });
   /** How the option list is filtered against the typed text. */
@@ -163,9 +168,11 @@ export class MkAutocomplete implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() || (this.field?.isRequired() ?? false),
+  );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,

@@ -16,6 +16,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
 import { MK_I18N, MkAnchoredPanel, mkUniqueId } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkMask, mkApplyMask } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 import {
@@ -89,6 +90,8 @@ interface CountryOption {
 })
 export class MkPhoneInput implements ControlValueAccessor {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
 
@@ -148,7 +151,7 @@ export class MkPhoneInput implements ControlValueAccessor {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(
     () => this.field?.isRequired() ?? false,

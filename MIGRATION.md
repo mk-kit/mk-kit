@@ -227,6 +227,14 @@ on a date picker report `mkMinDate`/`mkMaxDate` (Material's
 For a submit-time list, point `mk-form-error-summary` at the `FormGroup`
 (`[form]` + `[labels]`) instead of building the entries by hand.
 
+Moving to Angular 22 **Signal Forms** at the same time? Bind the same controls
+with `[formField]="f.email"` (from `@angular/forms/signals`) instead of
+`formControlName`; `mk-form-field` then reads the field's `touched()` /
+`errors()` / `required()` and the summary takes the root field via
+`[field]="f"`. Material has no Signal Forms wrappers yet, so this is one place
+where the migration can shed the `FormGroup` entirely — see the docs page
+*Signal Forms*.
+
 ## 9. Honest gaps & differences
 
 - **No `MatTableDataSource`** — see §6.

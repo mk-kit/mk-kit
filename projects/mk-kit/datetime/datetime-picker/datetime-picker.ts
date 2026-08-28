@@ -28,6 +28,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '@mk-kit/ui/forms';
 import { MkCalendar } from '../calendar/calendar';
 import {
@@ -149,6 +150,8 @@ function parseTime(text: string): number | null {
 export class MkDateTimePicker implements ControlValueAccessor, Validator {
   protected readonly i18n = inject(MK_I18N);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly injector = inject(Injector);
   private readonly inputRef =
@@ -160,9 +163,15 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
   /** Two-way selected date-time (local; seconds and ms are zero). */
   readonly value = model<Date | null>(null);
   /** Earliest selectable instant (inclusive, minute precision). */
-  readonly min = input<Date | null>(null);
+  readonly min = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Latest selectable instant (inclusive, minute precision). */
-  readonly max = input<Date | null>(null);
+  readonly max = input<Date | null, Date | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Predicate marking individual days as disabled (threaded to the calendar). */
   readonly disabledDate = input<((d: Date) => boolean) | null>(null);
   /** Placeholder shown when empty. */
@@ -182,6 +191,8 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
   readonly clearable = input(false, { transform: booleanAttribute });
   /** Force invalid styling + `aria-invalid`. */
   readonly invalid = input(false, { transform: booleanAttribute });
+  /** Mark required (adds `aria-required`). Set by Signal Forms' `[formField]` from the schema. */
+  readonly required = input(false, { transform: booleanAttribute });
   /** First column of the calendar week (0 = Sunday). */
   readonly firstDayOfWeek = input(0, { transform: numberAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
@@ -209,9 +220,11 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
-  protected readonly isRequired = computed(() => this.field?.isRequired() ?? false);
+  protected readonly isRequired = computed(
+    () => this.required() || (this.field?.isRequired() ?? false),
+  );
   protected readonly describedBy = computed(
     () => this.field?.describedBy() ?? null,
   );

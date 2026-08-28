@@ -22,6 +22,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MK_I18N } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 
 /**
  * Rating — a star rating input (and read-only display). Implements the ARIA
@@ -76,6 +77,8 @@ import { MK_I18N } from '@mk-kit/ui/core';
 })
 export class MkRating implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   protected readonly i18n = inject(MK_I18N);
 
   /** Number of stars. */
@@ -102,7 +105,7 @@ export class MkRating implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   /** The surrounding field's label labels this control (`aria-labelledby`). */
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);

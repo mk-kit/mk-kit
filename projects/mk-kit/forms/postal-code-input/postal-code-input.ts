@@ -21,6 +21,7 @@ import {
 import type { MkSize } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { mkApplyMask, mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 import {
@@ -101,6 +102,8 @@ export function mkPostalCodeValidator(
 })
 export class MkPostalCodeInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
 
@@ -159,7 +162,7 @@ export class MkPostalCodeInput implements ControlValueAccessor, Validator {
 
   protected readonly isInvalid = computed(
     () =>
-      this.invalid() ||
+      (this.invalid() && this.fieldTouched()) ||
       (this.field?.hasError() ?? false) ||
       (this.touched() && this.valid() === false),
   );

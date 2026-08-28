@@ -22,6 +22,7 @@ import {
 import type { MkSize } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 
@@ -87,6 +88,8 @@ interface LocaleInfo {
 })
 export class MkCurrencyInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
 
@@ -99,9 +102,15 @@ export class MkCurrencyInput implements ControlValueAccessor, Validator {
   /** Max fraction digits; defaults to the currency's convention (else 2). */
   readonly decimals = input<number | null>(null);
   /** Clamp the value to at least this on blur. */
-  readonly min = input<number | null>(null);
+  readonly min = input<number | null, number | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Clamp the value to at most this on blur. */
-  readonly max = input<number | null>(null);
+  readonly max = input<number | null, number | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Allow a leading minus sign. */
   readonly allowNegative = input(true, { transform: booleanAttribute });
   /** Control size. Ignored when nested in an `mk-form-field`. */
@@ -132,7 +141,7 @@ export class MkCurrencyInput implements ControlValueAccessor, Validator {
     () => this.disabled() || this.cvaDisabled(),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly isRequired = computed(
     () => this.field?.isRequired() ?? false,

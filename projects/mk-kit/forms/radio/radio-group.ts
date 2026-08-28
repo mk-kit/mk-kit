@@ -22,6 +22,7 @@ import {
 import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import type { MkRadio } from './radio';
 
@@ -74,6 +75,8 @@ import type { MkRadio } from './radio';
 export class MkRadioGroup implements ControlValueAccessor, Validator {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
 
   /** Two-way selected value. */
   readonly value = model<unknown>(null);
@@ -102,7 +105,7 @@ export class MkRadioGroup implements ControlValueAccessor, Validator {
     () => this.required() || (this.field?.isRequired() ?? false),
   );
   protected readonly isInvalid = computed(
-    () => this.invalid() || (this.field?.hasError() ?? false),
+    () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),
   );
   protected readonly labelledBy = computed(() => this.field?.labelId ?? null);
   protected readonly describedBy = computed(

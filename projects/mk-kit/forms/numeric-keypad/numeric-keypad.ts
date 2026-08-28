@@ -86,9 +86,15 @@ export class MkNumericKeypad implements ControlValueAccessor, Validator {
   /** PIN length (`pin` mode only). Reaching it emits `submit`. */
   readonly length = input(4, { transform: numberAttribute });
   /** Lower bound reported through the validator (`quantity`/`amount`). */
-  readonly min = input<number | null>(null);
+  readonly min = input<number | null, number | null | undefined>(null, {
+    // Signal Forms binds the schema's `min()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Upper bound reported through the validator (`quantity`/`amount`). */
-  readonly max = input<number | null>(null);
+  readonly max = input<number | null, number | null | undefined>(null, {
+    // Signal Forms binds the schema's `max()` limit here, `undefined` when unset.
+    transform: (v) => v ?? null,
+  });
   /** Mask the echo row in `pin` mode. Default `true`. */
   readonly mask = input(true, { transform: booleanAttribute });
   /** Show the echo row above the keys. Default `true`. */

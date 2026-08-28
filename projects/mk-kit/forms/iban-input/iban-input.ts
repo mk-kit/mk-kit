@@ -20,6 +20,7 @@ import {
 } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 
@@ -131,6 +132,8 @@ export function mkIbanValidator(): ValidatorFn {
 })
 export class MkIbanInput implements ControlValueAccessor, Validator {
   private readonly field = inject(MkFormField, { optional: true });
+  /** Signal Forms: gates `invalid` until the bound field is touched or dirty. */
+  private readonly fieldTouched = mkInjectFieldTouched();
   /** Localised strings (override globally via `provideMkI18n`). */
   protected readonly i18n = inject(MK_I18N);
 
@@ -193,7 +196,7 @@ export class MkIbanInput implements ControlValueAccessor, Validator {
 
   protected readonly isInvalid = computed(
     () =>
-      this.invalid() ||
+      (this.invalid() && this.fieldTouched()) ||
       (this.field?.hasError() ?? false) ||
       (this.touched() && this.valid() === false),
   );

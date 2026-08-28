@@ -65,6 +65,41 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 - Docs: the Icon page explains default vs extended vs subsets vs lazy with
   measured sizes; the gallery filters by set and badges each icon with its set
   / subset. The bundle-cost tooling understands nested entry points.
+- **Signal Forms** (Angular 22, `@angular/forms/signals`) — first-class
+  support across the form controls:
+  - every control binds with the `[formField]` directive. Controls keep their
+    `ControlValueAccessor` (Angular routes the value through it) and expose the
+    `FormValueControl` / `FormCheckboxControl` surface — the typed `value` /
+    `checked` model plus `disabled` / `required` / `invalid` (and `readonly`,
+    `min` / `max` / `minLength` where they exist) inputs that `[formField]`
+    writes from the field state. `required` is new on select, multi-select,
+    autocomplete, number-input, slider, tag-input, switch and the date / time /
+    datetime pickers; the `min` / `max` inputs of the numeric and date / time
+    controls now also accept `undefined` (normalised to `null`) so the schema's
+    `min()` / `maxDate()` limits type-check. A field-bound control paints its
+    invalid state only once the field is touched or dirty
+    (`mkInjectFieldTouched()` in `@mk-kit/ui/core`), matching when
+    `mk-form-field` reveals the message.
+  - `mk-form-field` reads the projected control's `[formField]` binding (or an
+    explicit `[field]` input) — `touched` / `dirty` / `invalid` / `errors` /
+    `required` / `disabled` drive the same label marker, error text and
+    `errorOn` gating as the `NgControl` path; built-in error kinds are worded
+    through the `validation` i18n table, a rule's `message` wins over it, and
+    `errorMessages` overrides apply. `mkSignalErrorMessage` /
+    `mkSignalErrorsToValidationErrors` (`@mk-kit/ui/core`) do the mapping.
+  - `mk-form-error-summary` accepts a root field via `[field]`: one entry per
+    invalid field from `errorSummary()`, labelled by dotted path, linking to
+    the bound control; `showOn="submit"` lists touched fields (`submit()`
+    touches them all) and focus moves to the summary on the form's `submit`
+    event.
+  - `mkDynamicFormToSignalSchema(definition)` (`@mk-kit/ui/dynamic-form`) maps
+    a dynamic-form schema to a Signal Forms `schema()`: `required`,
+    `min` / `max` / `minLength` / `maxLength` / `pattern` / `email`, `custom`
+    validator functions, `disabled` / `disabledWhen` → `disabled()`,
+    `showWhen` → `hidden()`, groups, arrays (`applyEach` + `minItems` /
+    `maxItems`). Hidden fields keep their value in the model (documented).
+  - docs: new *Signal Forms* page with a login form, form-field errors on
+    touch, the error summary and the schema conversion.
 
 ### Fixed
 
