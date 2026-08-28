@@ -96,10 +96,14 @@ deleted rather than migrated.
 ## 4. Icons
 
 Material Symbols ligatures (`<mat-icon>delete</mat-icon>`) become named SVGs
-(`<mk-icon name="delete" />`). The built-in set is ~95 Feather-style glyphs,
-and `provideMkMaterialIcons()` installs ~185 Material-name aliases
+(`<mk-icon name="delete" />`). The default set is 121 Feather-style glyphs
+(always registered); a further 305 Lucide-derived glyphs are opt-in via
+`provideMkExtendedIcons()` from `@mk-kit/ui/icon/extended` — whole (≈13 KiB
+brotli), by themed subset (`provideMkIcons(MK_EXTENDED_ICONS_FILES)`) or lazily
+loaded. `provideMkMaterialIcons()` installs ~185 Material-name aliases
 (`delete→trash`, `expand_more→chevron-down`, `visibility_off→eye-off`,
-all `calendar_*→calendar`, …) so **your existing icon names keep working**:
+all `calendar_*→calendar`, …), every one targeting a default glyph, so **your
+existing icon names keep working** without the extended set:
 
 ```ts
 bootstrapApplication(App, {

@@ -23,6 +23,48 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   RTL), Home/End, Enter/Space, `*` expands siblings, `+`/`-`. New i18n keys:
   `orgChartLabel`, `orgChartExpand`, `orgChartCollapse`. Docs page at
   `/components/org-chart`.
+### Changed
+
+- **Extended icons are opt-in.** `MkIconRegistry` registers only the default
+  set on construction; the Lucide-derived extended set moved to its own,
+  tree-shakeable entry point `@mk-kit/ui/icon/extended`. Any import from
+  `@mk-kit/ui/icon` cost ≈17 KiB (brotli) before — the whole `icon` entry is
+  now ≈6.7 KiB and `MkIcon` with the default set ≈5.3 KiB; the extended set
+  costs ≈13 KiB only where it is registered. Seven Lucide glyphs that mk-kit's
+  own components render (`circle-alert`, `file`, `layers`, `loader`,
+  `message-circle`, `paperclip`, `refresh-cw`) joined the default set (114 →
+  121) so every component works out of the box. **Migration:** apps that use
+  extended names (`layout-dashboard`, `receipt`, `file-spreadsheet`, …) add
+  `provideMkExtendedIcons()` (from `@mk-kit/ui/icon/extended`) to their
+  providers — or a themed subset via `provideMkIcons(MK_EXTENDED_ICONS_FILES)`,
+  or the lazy form
+  `provideMkIcons(() => import('@mk-kit/ui/icon/extended').then((m) => m.MK_EXTENDED_ICONS))`.
+  Apps that only use default names change nothing.
+
+### Added
+
+- **`provideMkIcons(map | loader)`** (`@mk-kit/ui/icon`) — registers a partial
+  icon map at bootstrap (a themed subset, your own SVGs, a hand-picked few)
+  or an async loader that fills icons in without blocking bootstrap; SSR waits
+  for it (`PendingTasks`). `MkIconRegistry` gained `load(loader)`, a `changes`
+  signal (`<mk-icon>` re-reads it, so late registrations render in place) and
+  `pending`.
+- **`provideMkExtendedIcons()`**, **`MK_EXTENDED_ICONS_<GROUP>`** (16 themed
+  subsets: navigation, layout, data, files, communication, people, commerce,
+  status, time, developer, devices, media, editing, security, travel,
+  lifestyle — 0.5–2.9 KiB each) and **`MK_EXTENDED_ICON_GROUPS`** in
+  `@mk-kit/ui/icon/extended`. `scripts/icons.json` now carries `defaults` +
+  `groups`; `scripts/gen-icons.mjs` emits both files with pure-call
+  annotations so bundlers drop unused maps.
+- **Dev-mode missing-icon warning** — `<mk-icon name="…">` with an unknown
+  name warns once per name (silent in production and while a lazy load is
+  pending) and points at `provideMkExtendedIcons()`.
+- **`ng add @mk-kit/ui --extended-icons`** inserts `provideMkExtendedIcons()`
+  into the app config (off by default; the summary says how to opt in). The
+  PrimeNG migration report's icon step mentions it as well.
+- Docs: the Icon page explains default vs extended vs subsets vs lazy with
+  measured sizes; the gallery filters by set and badges each icon with its set
+  / subset. The bundle-cost tooling understands nested entry points.
 
 ### Fixed
 

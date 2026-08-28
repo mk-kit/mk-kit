@@ -345,7 +345,10 @@ export function renderReport(files: FileReport[], options: { dryRun: boolean; sc
   lines.push(
     '1. Run `ng build` and fix the remaining template errors — most are the `<!-- mk-kit -->` notes above.',
     '2. Replace `MessageService.add(...)` calls with `MkToastService` and `ConfirmationService.confirm(...)` with `await MkDialogService.confirm(...)`.',
-    '3. Icons: `pi pi-*` classes → `<mk-icon name="…" />` (see https://mk-kit.dev/components/icon).',
+    '3. Icons: `pi pi-*` classes → `<mk-icon name="…" />` (see https://mk-kit.dev/components/icon). ' +
+      'Most PrimeIcons names live in the opt-in extended set — add `provideMkExtendedIcons()` ' +
+      "(from '@mk-kit/ui/icon/extended', ≈13 KiB) or a themed subset via `provideMkIcons()` to your providers; " +
+      'only the default set ships otherwise.',
     `4. Theme: \`--mk-*\` tokens replace the PrimeNG preset — https://mk-kit.dev/theming.`,
     '',
   );

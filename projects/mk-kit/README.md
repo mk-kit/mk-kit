@@ -88,7 +88,7 @@ export class AppRoot {
 | **Feedback & overlays** (21) | dialogs (+ `confirm()` / `alert()` / `prompt()`), bottom sheet, drawer, popover, popconfirm, hovercard, tooltip, toast, snackbar, alert, banner, result page, notification center, product tour, progress bar, loading bar, spinner, skeletons, block UI (region / page overlay), draggable & resizable dialogs |
 | **Editors & interactions** (31) | block editor (Notion-style, HTML round-trip), rich text, markdown renderer, code editor, log viewer, drag & drop, sortable list, @mentions, hotkeys, undo/redo history, permissions (`*mkCan`), clipboard, intersect, infinite scroll, ripple, scrollspy, chat (streaming message log, tool cards, prompt box), `Intl` formatting pipes (currency, relative time, file size, initials, truncate, pluralize) |
 | **Media** (6) | image with states, gallery, lightbox, cropper, media manager |
-| **Core services** | theme (light/dark/system + density + high contrast), breakpoints, overlay & anchored panels, focus trap, live announcer, icon registry (426 built-in icons), i18n |
+| **Core services** | theme (light/dark/system + density + high contrast), breakpoints, overlay & anchored panels, focus trap, live announcer, icon registry (121 default icons always on + 305 opt-in Lucide-derived, tree-shakeable by themed subset or lazy-loaded via `provideMkIcons()`), i18n |
 
 The full, searchable index lives in the docs (`/components-index`).
 

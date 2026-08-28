@@ -60,8 +60,17 @@ export class MkIcon {
     return s === 'sm' ? '1rem' : s === 'lg' ? '1.5rem' : '1.25rem';
   });
 
-  /** Sanitized SVG for the named icon, or `null` (falls back to projection). */
-  protected readonly svg = computed(() =>
-    this.name() ? this.registry.get(this.name()) : null,
-  );
+  /**
+   * Sanitized SVG for the named icon, or `null` (falls back to projection).
+   * Tracks the registry's `changes` so a late registration (lazy-loaded set,
+   * runtime `register()`) fills the icon in without re-binding `name`.
+   */
+  protected readonly svg = computed(() => {
+    this.registry.changes();
+    const name = this.name();
+    if (!name) return null;
+    const svg = this.registry.get(name);
+    if (svg === null) this.registry.warnMissing(name);
+    return svg;
+  });
 }

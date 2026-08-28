@@ -12,9 +12,13 @@ import { MkIconRegistry } from './icon-registry';
  * glyph once {@link provideMkMaterialIcons} is installed.
  *
  * Several Material names intentionally collapse onto one mk glyph (all the
- * calendar variants → `calendar`, the delete variants → `trash`, …). Names
- * not listed here have no sensible built-in equivalent — register your own
- * SVG under the Material name via `MkIconRegistry.register`.
+ * calendar variants → `calendar`, the delete variants → `trash`, …). Every
+ * target is a default icon, so the aliases work without the opt-in extended
+ * set. Names not listed here have no sensible built-in equivalent — register
+ * your own SVG under the Material name via `MkIconRegistry.register`, or
+ * alias it onto an extended glyph with `registerAliases` once
+ * `provideMkExtendedIcons()` is installed (an alias whose target is missing
+ * renders nothing and warns once in dev mode).
  */
 export const MK_MATERIAL_ICON_ALIASES: Readonly<Record<string, string>> = {
   account_balance: 'briefcase',

@@ -32,7 +32,10 @@ describe('MkIcon', () => {
     };
   }
 
-  afterEach(() => TestBed.resetTestingModule());
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    vi.restoreAllMocks();
+  });
 
   it('is decorative by default — hidden from assistive tech', () => {
     const { icon } = mount();
@@ -106,6 +109,45 @@ describe('MkIcon', () => {
     fixture.detectChanges();
 
     expect(el.querySelector('.mk-icon__svg')?.innerHTML).toContain('<circle');
+  });
+
+  it('fills in when the icon is registered after first render', () => {
+    const { fixture, el, host, registry } = mount();
+    host.name.set('late');
+    fixture.detectChanges();
+    expect(el.querySelector('.mk-icon__svg')).toBeNull();
+
+    registry.register('late', '<svg viewBox="0 0 24 24"><rect width="4" height="4"/></svg>');
+    fixture.detectChanges();
+    expect(el.querySelector('.mk-icon__svg')?.innerHTML).toContain('<rect');
+  });
+
+  it('warns once per unknown name in dev mode and hints at the extended set', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { fixture, host } = mount();
+    host.name.set('layout-dashboard');
+    fixture.detectChanges();
+    host.size.set('lg');
+    fixture.detectChanges();
+    host.name.set('receipt');
+    fixture.detectChanges();
+    host.name.set('layout-dashboard');
+    fixture.detectChanges();
+
+    const messages = warn.mock.calls.map((c) => String(c[0]));
+    expect(messages.filter((m) => m.includes('"layout-dashboard"'))).toHaveLength(1);
+    expect(messages.filter((m) => m.includes('"receipt"'))).toHaveLength(1);
+    expect(messages[0]).toContain('provideMkExtendedIcons()');
+  });
+
+  it('does not warn for a registered name or an empty one', () => {
+    const warn = vi.spyOn(console, 'warn').mockImplementation(() => {});
+    const { fixture, host } = mount();
+    host.name.set('');
+    fixture.detectChanges();
+    host.name.set('trash');
+    fixture.detectChanges();
+    expect(warn).not.toHaveBeenCalled();
   });
 
   it('resolves an alias to the aliased icon', () => {

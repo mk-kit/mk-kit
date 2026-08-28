@@ -6,4 +6,6 @@ export interface Schema {
   project?: string;
   /** Insert a `provideMkI18n({})` override block into the application config. */
   i18n?: boolean;
+  /** Insert `provideMkExtendedIcons()` so the opt-in Lucide-derived icon set resolves. */
+  extendedIcons?: boolean;
 }
