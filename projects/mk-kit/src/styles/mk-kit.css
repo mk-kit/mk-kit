@@ -970,6 +970,13 @@ body.mk-app {
   cursor: grabbing;
 }
 
+/* A focusable handle (<button mkDragHandle>) is the keyboard target of its
+ * item, so it needs the library focus ring like any other control. */
+.mk-drag-handle:focus-visible {
+  outline: var(--mk-focus-ring-width) solid var(--mk-focus-ring);
+  outline-offset: var(--mk-focus-ring-offset);
+}
+
 /* Themed scrollbars (progressive enhancement) */
 .mk-app * {
   scrollbar-color: var(--mk-scrollbar-thumb) transparent;

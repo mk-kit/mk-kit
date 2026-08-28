@@ -59,6 +59,55 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   production build uses. Sortable `mk-table`, entry-point bar chart, filter,
   the CI raw-size budgets, and a methodology note. `cost.json` is committed
   and CI fails when it is stale (`gen-cost.mjs --check`).
+- **`MkTable.getExportRows(options?)`** — the public plumbing behind
+  `exportCsv()`: returns the `rows` (display order, current sort, tree
+  children under their parent whether or not they are expanded, `selectedOnly`
+  applied) and the ordered `columns` (current user order, restricted to
+  `options.columns`, each with its `header` and `format`). Other formats —
+  XLSX, PDF, the clipboard, the Pro export package — no longer need private
+  members. `exportCsv()` is unchanged and now built on it. New types
+  `MkTableExportRowsOptions`, `MkTableExportRows`.
+- **`mkHeatmapCellColors()`, `mkContrastRatio()`, `mkRelativeLuminance()`,
+  `mkMixRgb()`, `mkParseRgb()`** from `@mk-kit/ui/data/charts` — the contrast
+  maths the heatmap uses, exported for tests and custom palettes.
+
+### Fixed
+
+- **Drag & drop ARIA** (`@mk-kit/ui/dnd`) — `[mkDropList]` no longer writes
+  `aria-orientation` on a role that does not allow it (axe
+  `aria-allowed-attr`): a `<div>` list is now a `role="group"` named by
+  `mkDropListLabel`, a `<ul>` whose `<li mkDrag>` items are the keyboard
+  targets becomes a labelled `listbox` of `option`s (an `<li>` may not be a
+  `button`), a role set in the template is kept, and `aria-orientation` is
+  only exposed on roles that permit it. A *focusable* `[mkDragHandle]`
+  (`<button mkDragHandle aria-label="…">`) now carries the keyboard drag —
+  `aria-roledescription`, `aria-pressed`, `aria-grabbed`, focus ring — and
+  its item becomes a plain container with no role or `tabindex`, so rows may
+  hold inputs, links and buttons without axe `nested-interactive`, and
+  `<ul>`/`<li>` lists keep their list semantics. Decorative grips
+  (`<span mkDragHandle aria-hidden>`) behave as before. Docs: "Roles" section
+  and labelled lists on the drag & drop page.
+- **`mk-repeater`** reorderable rows are plain list items again — only the
+  handle button is focusable and interactive, so the inputs and buttons
+  inside a row are no longer nested in a `role="button"` (axe
+  `nested-interactive`). Keyboard reorder works from the handle as before.
+- **`mk-heatmap`** cell values pick `--mk-text` or `--mk-text-inverse` per
+  cell from the contrast against that cell's actual blend (accent and tokens
+  resolved through the CSSOM, re-resolved when the theme flips) instead of a
+  fixed 55 % threshold, so low- and mid-intensity cells no longer fall under
+  4.5:1 in either theme; where a ramp's crossover band leaves neither token
+  readable, the cell is painted at the nearest passing intensity (a few
+  percent) while values are shown. Legend swatches get a subtle inset border
+  so the zero-intensity stop stays visible in dark mode.
+- **`mk-calendar`** outside-month day numbers use `--mk-text-subtle`
+  (5.3:1 light / 5.8:1 dark on the surface) instead of `--mk-text-disabled`.
+- **Docs** sidebar active link uses `--mk-primary-subtle-text` on
+  `--mk-primary-subtle` (the `--mk-primary` pair only reached 3.3:1 in dark
+  mode).
+- **Tests** — a11y smoke cases for drop lists (all three shapes), the
+  sortable list, reorderable repeater rows, the heatmap and the calendar;
+  `contrast-smoke.spec.ts` reads the compiled theme and holds the token pairs
+  the components rely on to WCAG AA in both themes.
 
 ## [0.41.0] — 2026-08-27
 

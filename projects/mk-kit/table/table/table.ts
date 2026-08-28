@@ -26,7 +26,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { MkCheckbox } from '@mk-kit/ui/checkbox';
 import { MkTableRowDetail } from './table-row-detail';
 import { MkTableCell } from './table-cell';
-import { mkDownloadText, mkToCsv, type MkCsvExportOptions } from '../export';
+import { mkDownloadText, mkToCsv, type MkCsvColumn, type MkCsvExportOptions } from '../export';
 
 /** Horizontal text alignment for a table column. */
 export type MkTableAlign = 'start' | 'center' | 'end';
@@ -128,12 +128,31 @@ export interface MkGroupToggle {
   collapsed: boolean;
 }
 
-/** Options for {@link MkTable.exportCsv}. */
-export interface MkTableExportOptions extends MkCsvExportOptions {
+/** Options for {@link MkTable.getExportRows} — which rows and columns to export. */
+export interface MkTableExportRowsOptions {
   /** Export only the selected rows (default: every row). */
   selectedOnly?: boolean;
   /** Restrict to these column keys, in table order (default: every column). */
   columns?: readonly string[];
+}
+
+/** What {@link MkTable.getExportRows} returns: the rows and the columns to write them with. */
+export interface MkTableExportRows<T> {
+  /**
+   * The rows in display order — sorted the way they are shown, tree children
+   * flattened under their parent (expanded or not), selection applied when
+   * `selectedOnly` was set.
+   */
+  rows: T[];
+  /**
+   * The columns in the table's current (user-reordered) order, restricted to
+   * the requested keys, each with its header and formatter.
+   */
+  columns: MkCsvColumn<T>[];
+}
+
+/** Options for {@link MkTable.exportCsv}. */
+export interface MkTableExportOptions extends MkCsvExportOptions, MkTableExportRowsOptions {
   /** Start the browser download (default `true`); `false` just returns the text. */
   download?: boolean;
 }
@@ -1049,12 +1068,22 @@ export class MkTable<T = Record<string, unknown>> {
 
   // --- Export -----------------------------------------------------------------
   /**
-   * The table's rows as CSV: current column order, column formatters applied,
-   * sorted the way they are shown, tree children flattened under their parent
-   * whether or not they are expanded. Downloads the file (default name
-   * `table.csv`) and returns the text.
+   * The rows and columns an export writes — exactly what {@link exportCsv}
+   * serialises, for other formats (XLSX, PDF, the clipboard, …): rows in
+   * display order with the current sort applied and tree children
+   * (`childrenKey`) flattened under their parent whether or not they are
+   * expanded, optionally only the selected ones; columns in the table's
+   * current order, restricted to `options.columns` when given, each carrying
+   * its header and `format` so what the user saw is what gets written.
+   *
+   * ```ts
+   * const { rows, columns } = table.getExportRows({ selectedOnly: true });
+   * const sheet = rows.map((row) =>
+   *   Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])),
+   * );
+   * ```
    */
-  exportCsv(options: MkTableExportOptions = {}): string {
+  getExportRows(options: MkTableExportRowsOptions = {}): MkTableExportRows<T> {
     let rows = this.allRows();
     if (options.selectedOnly) {
       const keys = this.selectedKeys();
@@ -1064,7 +1093,18 @@ export class MkTable<T = Record<string, unknown>> {
     const columns = this.orderedColumns()
       .filter((c) => !only || only.has(c.key))
       .map((c) => ({ key: c.key, header: c.header, format: c.format }));
-    // `allRows` is already flat, so no childrenKey is passed through.
+    return { rows, columns };
+  }
+
+  /**
+   * The table's rows as CSV: current column order, column formatters applied,
+   * sorted the way they are shown, tree children flattened under their parent
+   * whether or not they are expanded. Downloads the file (default name
+   * `table.csv`) and returns the text. Built on {@link getExportRows}.
+   */
+  exportCsv(options: MkTableExportOptions = {}): string {
+    const { rows, columns } = this.getExportRows(options);
+    // The rows are already flat, so no childrenKey is passed through.
     const csv = mkToCsv(rows, columns, { ...options, childrenKey: undefined });
     if (options.download !== false) {
       let filename = options.filename ?? 'table.csv';

@@ -22,7 +22,7 @@
           @for (cell of row.cells; track $index) {
             <td
               class="mk-heatmap__cell"
-              [class.mk-heatmap__cell--strong]="cell.strong"
+              [class.mk-heatmap__cell--inverse]="cell.inverse"
               [class.mk-heatmap__cell--empty]="cell.value === null"
               [style.background]="cell.bg"
               [attr.title]="

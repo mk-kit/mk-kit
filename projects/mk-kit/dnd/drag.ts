@@ -8,6 +8,7 @@ import {
   booleanAttribute,
   computed,
   contentChildren,
+  effect,
   inject,
   input,
   numberAttribute,
@@ -31,13 +32,25 @@ const SETTLE_MS = 180;
 
 /**
  * Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /
- * pen) **and** by keyboard (WCAG 2.1.1). The item is focusable, exposes
- * `role="button"` + `aria-roledescription="Draggable item"`, and every move is
- * announced via {@link MkLiveAnnouncer}.
+ * pen) **and** by keyboard (WCAG 2.1.1). Every move is announced via
+ * {@link MkLiveAnnouncer}. Which element carries the keyboard interaction
+ * depends on the handle:
  *
- * Keyboard: focus an item and press **Space/Enter** to pick it up, **Arrow**
- * keys to move it (crossing into connected lists at the ends / across the
- * perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
+ * - **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):
+ *   the item itself is focusable and exposes `aria-roledescription="Draggable
+ *   item"` with `role="button"` — or `role="option"` when it is an `<li>` of a
+ *   `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may
+ *   not take the `button` role).
+ * - **A focusable handle** (`<button mkDragHandle aria-label="…">`, or any
+ *   handle with `tabindex`): the handle is the keyboard target and receives
+ *   the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the
+ *   item stays a plain container with no role and no `tabindex`, so it can hold
+ *   inputs, links and buttons of its own (no nested interactive controls) and
+ *   `<li>` items keep their list semantics.
+ *
+ * Keyboard: focus the item (or its handle) and press **Space/Enter** to pick
+ * it up, **Arrow** keys to move it (crossing into connected lists at the ends /
+ * across the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
  *
  * Touch: a swipe scrolls the page as usual — the drag only arms after a
  * long-press ({@link mkDragTouchDelay}, default 300 ms). While armed the item
@@ -50,9 +63,9 @@ const SETTLE_MS = 180;
  * synchronously on release so drops land exactly where the pointer ended.
  *
  * ```html
- * <li mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
+ * <div mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
  *   <span mkDragHandle aria-hidden="true">⠿</span> {{ row.title }}
- * </li>
+ * </div>
  * ```
  *
  * @typeParam T item data type.
@@ -65,13 +78,16 @@ const SETTLE_MS = 180;
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-drag',
-    role: 'button',
-    'aria-roledescription': 'Draggable item',
     draggable: 'false',
-    '[attr.tabindex]': 'disabled() ? -1 : 0',
-    '[attr.aria-disabled]': 'disabled() || null',
-    '[attr.aria-pressed]': 'lifted() || null',
-    '[attr.aria-grabbed]': 'dragging() || lifted()',
+    // Widget semantics live on the item only while no focusable handle takes
+    // them over (see `keyboardHandle`); otherwise the item is a plain container.
+    '[attr.role]': 'itemRole()',
+    '[attr.aria-roledescription]': "itemRole() ? 'Draggable item' : null",
+    '[attr.tabindex]': 'itemRole() ? (disabled() ? -1 : 0) : null',
+    '[attr.aria-disabled]': 'itemRole() ? disabled() || null : null',
+    '[attr.aria-pressed]': "itemRole() === 'button' ? lifted() || null : null",
+    '[attr.aria-selected]': "itemRole() === 'option' ? lifted() : null",
+    '[attr.aria-grabbed]': 'itemRole() ? dragging() || lifted() : null',
     '[class.mk-drag--disabled]': 'disabled()',
     '[class.mk-drag--dragging]': 'dragging()',
     '[class.mk-drag--lifted]': 'lifted()',
@@ -80,7 +96,7 @@ const SETTLE_MS = 180;
     '[class.mk-drag--horizontal]': 'inHorizontalList()',
     '(pointerdown)': 'onPointerDown($event)',
     '(keydown)': 'onKeyDown($event)',
-    '(blur)': 'onBlur()',
+    '(focusout)': 'onFocusOut($event)',
   },
 })
 export class MkDrag<T = unknown> {
@@ -123,6 +139,30 @@ export class MkDrag<T = unknown> {
     this.handles().filter((h) => h.element.closest('[mkDrag]') === this.element),
   );
 
+  /**
+   * The handle that carries the keyboard drag — the first of this item's
+   * handles that is focusable on its own (a `<button mkDragHandle>`, say).
+   * `null` when the item itself is the keyboard target.
+   */
+  readonly keyboardHandle = computed<MkDragHandle | null>(
+    () => this.ownHandles().find((h) => h.isFocusable()) ?? null,
+  );
+
+  /**
+   * The role the item itself exposes: `null` when a focusable handle carries
+   * the interaction; `option` inside a list that resolved to a `listbox`
+   * (`<ul mkDropList>` / `<li mkDrag>`); `button` otherwise.
+   */
+  protected readonly itemRole = computed<'button' | 'option' | null>(() => {
+    if (this.keyboardHandle()) return null;
+    return this.home?.role() === 'listbox' ? 'option' : 'button';
+  });
+
+  /** The element keyboard events act on: the focusable handle, else the item. */
+  private keyboardTarget(): HTMLElement {
+    return this.keyboardHandle()?.element ?? this.element;
+  }
+
   /** True while a pointer drag is in progress. */
   protected readonly dragging = signal(false);
   /** True while the item is "picked up" for keyboard movement. */
@@ -156,6 +196,27 @@ export class MkDrag<T = unknown> {
   private originLeft = 0;
   private originTop = 0;
   private preview: HTMLElement | null = null;
+
+  constructor() {
+    // Mirror the button state onto a focusable handle. Host bindings cannot
+    // reach a projected element, so the attributes are written directly; the
+    // effect re-runs whenever the handle or the lift/drag state changes.
+    effect(() => {
+      const handle = this.keyboardHandle();
+      if (!handle) return;
+      const el = handle.element;
+      if (el.tagName !== 'BUTTON') el.setAttribute('role', 'button');
+      el.setAttribute('aria-roledescription', 'Draggable item');
+      el.setAttribute('aria-grabbed', String(this.dragging() || this.lifted()));
+      this.toggleAttr(el, 'aria-pressed', this.lifted() ? 'true' : null);
+      this.toggleAttr(el, 'aria-disabled', this.disabled() ? 'true' : null);
+    });
+  }
+
+  private toggleAttr(el: HTMLElement, name: string, value: string | null): void {
+    if (value === null) el.removeAttribute(name);
+    else el.setAttribute(name, value);
+  }
   private readonly moveHandler = (e: PointerEvent) => this.onPointerMove(e);
   private readonly upHandler = (e: PointerEvent) => this.onPointerUp(e);
   private readonly cancelHandler = () => this.finishPointer(true);
@@ -489,9 +550,10 @@ export class MkDrag<T = unknown> {
   protected onKeyDown(event: Event): void {
     const e = event as KeyboardEvent;
     const key = e.key;
-    // Keys act on the focused item only — a nested item's keydown bubbles up
-    // through outer items, which must not pick themselves up.
-    if (e.target !== this.element) return;
+    // Keys act on the focused item (or its focusable handle) only — a nested
+    // item's keydown bubbles up through outer items, which must not pick
+    // themselves up, and keys typed into a row's inputs are not drag keys.
+    if (e.target !== this.keyboardTarget()) return;
 
     if (!this.lifted()) {
       if ((key === ' ' || key === 'Enter') && !this.disabled() && this.home && !this.dragging()) {
@@ -534,8 +596,11 @@ export class MkDrag<T = unknown> {
     }
   }
 
-  protected onBlur(): void {
+  protected onFocusOut(event: Event): void {
     // Losing focus mid-lift cancels the keyboard drag to avoid a stuck state.
+    // `focusout` bubbles, so only the keyboard target's own blur counts — a
+    // nested control losing focus must not cancel the outer item's lift.
+    if (event.target !== this.keyboardTarget()) return;
     if (this.lifted()) this.cancelKeyboard();
   }
 

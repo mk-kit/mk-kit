@@ -39,6 +39,9 @@
   text-align: end;
 }
 
+/* Cell text: `--mk-text` on light cells, `--mk-text-inverse` on dark ones —
+ * decided per cell from the resolved blend (heatmap.ts), not by theme, so a
+ * light accent on a dark surface flips the other way round. */
 .mk-heatmap__cell {
   width: 2.25rem;
   height: 2.25rem;
@@ -46,7 +49,7 @@
   text-align: center;
   vertical-align: middle;
   border-radius: var(--mk-radius-sm);
-  color: var(--mk-text-muted);
+  color: var(--mk-text);
   transition: outline-color var(--mk-duration-fast) var(--mk-ease-standard);
   outline: 2px solid transparent;
   outline-offset: -2px;
@@ -54,8 +57,8 @@
 .mk-heatmap__cell:hover {
   outline-color: var(--mk-border-strong);
 }
-.mk-heatmap__cell--strong {
-  color: var(--mk-primary-contrast);
+.mk-heatmap__cell--inverse {
+  color: var(--mk-text-inverse);
 }
 .mk-heatmap__cell--empty {
   outline: none;
@@ -85,4 +88,7 @@
   width: 1.1rem;
   height: 0.75rem;
   border-radius: 2px;
+  /* Keep the zero-intensity swatch visible against the page in dark mode,
+     where `--mk-surface-2` sits close to `--mk-bg`. */
+  box-shadow: inset 0 0 0 1px var(--mk-border-subtle);
 }

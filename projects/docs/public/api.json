@@ -4535,7 +4535,7 @@
    "exports": [
     {
      "name": "MkDrag",
-     "description": "Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /\npen) **and** by keyboard (WCAG 2.1.1). The item is focusable, exposes\n`role=\"button\"` + `aria-roledescription=\"Draggable item\"`, and every move is\nannounced via `MkLiveAnnouncer`.\n\nKeyboard: focus an item and press **Space/Enter** to pick it up, **Arrow**\nkeys to move it (crossing into connected lists at the ends / across the\nperpendicular axis), **Space/Enter** to drop, **Escape** to cancel.\n\nTouch: a swipe scrolls the page as usual — the drag only arms after a\nlong-press (`mkDragTouchDelay`, default 300 ms). While armed the item\ngets the `mk-drag--armed` class so consumers can style the lift moment.\nMouse and pen drags start immediately, as before.\n\nPerformance: pointer moves are rAF-coalesced (one hit-test + one set of\nstyle/DOM writes per frame) against list/item rects snapshotted when the\ndrag lifts, so a move never forces layout. The pending frame is flushed\nsynchronously on release so drops land exactly where the pointer ended.\n\n```html\n<li mkDrag [mkDragData]=\"row\" [mkDragDisabled]=\"row.locked\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ row.title }}\n</li>\n```",
+     "description": "Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /\npen) **and** by keyboard (WCAG 2.1.1). Every move is announced via\n`MkLiveAnnouncer`. Which element carries the keyboard interaction\ndepends on the handle:\n\n- **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):\n  the item itself is focusable and exposes `aria-roledescription=\"Draggable\n  item\"` with `role=\"button\"` — or `role=\"option\"` when it is an `<li>` of a\n  `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may\n  not take the `button` role).\n- **A focusable handle** (`<button mkDragHandle aria-label=\"…\">`, or any\n  handle with `tabindex`): the handle is the keyboard target and receives\n  the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the\n  item stays a plain container with no role and no `tabindex`, so it can hold\n  inputs, links and buttons of its own (no nested interactive controls) and\n  `<li>` items keep their list semantics.\n\nKeyboard: focus the item (or its handle) and press **Space/Enter** to pick\nit up, **Arrow** keys to move it (crossing into connected lists at the ends /\nacross the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.\n\nTouch: a swipe scrolls the page as usual — the drag only arms after a\nlong-press (`mkDragTouchDelay`, default 300 ms). While armed the item\ngets the `mk-drag--armed` class so consumers can style the lift moment.\nMouse and pen drags start immediately, as before.\n\nPerformance: pointer moves are rAF-coalesced (one hit-test + one set of\nstyle/DOM writes per frame) against list/item rects snapshotted when the\ndrag lifts, so a move never forces layout. The pending frame is flushed\nsynchronously on release so drops land exactly where the pointer ended.\n\n```html\n<div mkDrag [mkDragData]=\"row\" [mkDragDisabled]=\"row.locked\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ row.title }}\n</div>\n```",
      "file": "projects/mk-kit/dnd/drag.ts",
      "kind": "component",
      "selector": "[mkDrag]",
@@ -4572,6 +4572,12 @@
        "readonly": true
       },
       {
+       "name": "keyboardHandle",
+       "type": "Signal<MkDragHandle | null>",
+       "description": "The handle that carries the keyboard drag — the first of this item's\nhandles that is focusable on its own (a `<button mkDragHandle>`, say).\n`null` when the item itself is the keyboard target.",
+       "readonly": true
+      },
+      {
        "name": "disabled",
        "type": "Signal<boolean>",
        "description": "Effective disabled state (item- or list-level).",
@@ -4583,7 +4589,7 @@
     },
     {
      "name": "MkDropList",
-     "description": "A drop container for reorderable `[mkDrag]` items.\n\n- **Sort list:** a single `[mkDropList]` over an array — items reorder within it.\n- **Buckets / kanban:** several `[mkDropList]`s wired together with\n  `mkDropListConnectedTo` so items transfer between them (both by pointer and\n  by keyboard at the ends of a list).\n\nThe array bound to `mkDropListData` is **not** mutated for you — handle\n`mkDropListDropped` and call `mkMoveItemInArray` / `mkTransferArrayItem`.\n\n```html\n<ul mkDropList [mkDropListData]=\"todo()\"\n    mkDropListId=\"todo\" [mkDropListConnectedTo]=\"['done']\"\n    (mkDropListDropped)=\"drop($event)\">",
+     "description": "A drop container for reorderable `[mkDrag]` items.\n\n- **Sort list:** a single `[mkDropList]` over an array — items reorder within it.\n- **Buckets / kanban:** several `[mkDropList]`s wired together with\n  `mkDropListConnectedTo` so items transfer between them (both by pointer and\n  by keyboard at the ends of a list).\n\nThe array bound to `mkDropListData` is **not** mutated for you — handle\n`mkDropListDropped` and call `mkMoveItemInArray` / `mkTransferArrayItem`.\n\nSemantics follow the host element and its items, so the tree is always\nvalid ARIA:\n\n- any host other than `<ul>`/`<ol>` is a `role=\"group\"` (named by\n  `mkDropListLabel`) of `role=\"button\"` items;\n- a `<ul>`/`<ol>` whose `<li mkDrag>` items all carry a *focusable*\n  `[mkDragHandle]` stays a plain list — the handles are the controls;\n- a `<ul>`/`<ol>` whose items are themselves the keyboard targets becomes a\n  `listbox` of `option`s (an `<li>` may not be a `button`); give it a\n  `mkDropListLabel`, listboxes need a name.\n\nA `role` you set in the template is kept, and `aria-orientation` is only\nexposed on roles that allow it (`listbox`, `toolbar`, `tree`, …) — the\nkeyboard model handles both axes regardless.\n\n```html\n<div mkDropList [mkDropListData]=\"todo()\" mkDropListLabel=\"To do\"\n     mkDropListId=\"todo\" [mkDropListConnectedTo]=\"['done']\"\n     (mkDropListDropped)=\"drop($event)\">",
      "file": "projects/mk-kit/dnd/drop-list.ts",
      "kind": "component",
      "selector": "[mkDropList]",
@@ -4682,6 +4688,12 @@
        "readonly": true
       },
       {
+       "name": "role",
+       "type": "Signal<string | null>",
+       "description": "The role the host exposes. One set in the template wins. A `<ul>`/`<ol>`\nkeeps its implicit `list` role (`null` — nothing is written) while every\nitem hands the keyboard drag to a focusable handle, and becomes a\n`listbox` (its items `option`s) otherwise. Any other element is a `group`.",
+       "readonly": true
+      },
+      {
        "name": "connectedTo",
        "type": "Signal<readonly string[]>",
        "description": "Connected-list ids, normalised to a plain array.",
@@ -4747,7 +4759,7 @@
     },
     {
      "name": "MkDragHandle",
-     "description": "Optional grip that restricts where a pointer drag of the enclosing\n`[mkDrag]` may begin. Place it on the element the user should press to drag;\nwithout any handle the whole item is draggable.\n\nA directive (not a component), so it composes onto anything — a `<span>`,\na `<button>`, or another component's host such as `<mk-icon mkDragHandle />`.\nIts look (grab cursor, muted colour, `touch-action: none`) ships as the\nglobal `.mk-drag-handle` class in the theme stylesheet.\n\n```html\n<div mkDrag [mkDragData]=\"row\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span>\n  {{ row.name }}\n</div>\n```",
+     "description": "Optional grip that restricts where a pointer drag of the enclosing\n`[mkDrag]` may begin. Place it on the element the user should press to drag;\nwithout any handle the whole item is draggable.\n\nA directive (not a component), so it composes onto anything — a `<span>`,\na `<button>`, or another component's host such as `<mk-icon mkDragHandle />`.\nIts look (grab cursor, muted colour, `touch-action: none`) ships as the\nglobal `.mk-drag-handle` class in the theme stylesheet.\n\n**Decorative grip** — a non-focusable element (`<span>`, `<mk-icon>`): the\nitem itself stays the keyboard target (`role=\"button\"`, focusable), so the\ngrip should be `aria-hidden`:\n\n```html\n<div mkDrag [mkDragData]=\"row\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span>\n  {{ row.name }}\n</div>\n```\n\n**Focusable grip** — a `<button>` (or any element with `tabindex`): the\nhandle becomes the keyboard target instead. The item is then a plain\ncontainer (no role, not focusable), so rows may hold inputs, links and\nother buttons without nesting interactive controls, and `<li>` items keep\nvalid list semantics. Give it an accessible name:\n\n```html\n<li mkDrag [mkDragData]=\"row\">\n  <button type=\"button\" mkDragHandle [attr.aria-label]=\"'Reorder ' + row.name\">⠿</button>\n  <input mkInput [(ngModel)]=\"row.name\" />\n</li>\n```",
      "file": "projects/mk-kit/dnd/drag-handle.ts",
      "kind": "directive",
      "selector": "[mkDragHandle]",
@@ -4757,7 +4769,13 @@
      "exportAs": "mkDragHandle",
      "inputs": [],
      "outputs": [],
-     "methods": [],
+     "methods": [
+      {
+       "name": "isFocusable",
+       "signature": "(): boolean",
+       "description": "Whether the handle can take keyboard focus itself — a native control\n(`<button>`, …), a link with `href`, or any element with a `tabindex`.\nA focusable handle carries the keyboard drag for its `[mkDrag]`."
+      }
+     ],
      "properties": [
       {
        "name": "element",
@@ -9044,7 +9062,7 @@
     },
     {
      "name": "MkRepeater",
-     "description": "Repeater — the schema-friendly editable list: renders one instance of a\nconsumer-projected row template per item, with add / remove / (optional)\ndrag-and-drop + keyboard reorder built in.\n\n`items` is a two-way model and the component also implements\n`ControlValueAccessor` over `T[]`, so it drops into template-driven and\nreactive forms alike. **Every mutation produces a new array** — the\nconsumer's array is never mutated in place.\n\nRows are tracked by **item object identity** (stable across the repeater's\nimmutable array copies), so removing a middle row keeps the following rows'\nDOM — and any in-progress input state — intact. Consequently, arrays of\nprimitives with duplicate values (e.g. `['a', 'a']`) are not supported\ndirectly: wrap each value in an object (`{ value: 'a' }`) so every row has\na distinct identity.\n\nWith `reorderable`, each row gets a drag handle wired through the dnd\nmodule's touch-safe handle-based configuration (a swipe on the row body\nstill scrolls the page). Reordering also works by keyboard: focus the\nhandle (or the row) and press Space/Enter to pick up, arrows to move,\nSpace/Enter to drop, Escape to cancel. Each completed reorder is announced\nvia `MkLiveAnnouncer`.\n\n```html\n<mk-repeater [(items)]=\"rows\" [min]=\"1\" [max]=\"10\" reorderable\n             [factory]=\"newRow\" addLabel=\"Add row\">\n  <ng-template mkRepeaterRow let-item let-i=\"index\">\n    <input mkInput [(ngModel)]=\"item.name\" />\n  </ng-template>\n  <ng-template mkRepeaterEmpty>No rows yet.</ng-template>\n</mk-repeater>\n```",
+     "description": "Repeater — the schema-friendly editable list: renders one instance of a\nconsumer-projected row template per item, with add / remove / (optional)\ndrag-and-drop + keyboard reorder built in.\n\n`items` is a two-way model and the component also implements\n`ControlValueAccessor` over `T[]`, so it drops into template-driven and\nreactive forms alike. **Every mutation produces a new array** — the\nconsumer's array is never mutated in place.\n\nRows are tracked by **item object identity** (stable across the repeater's\nimmutable array copies), so removing a middle row keeps the following rows'\nDOM — and any in-progress input state — intact. Consequently, arrays of\nprimitives with duplicate values (e.g. `['a', 'a']`) are not supported\ndirectly: wrap each value in an object (`{ value: 'a' }`) so every row has\na distinct identity.\n\nWith `reorderable`, each row gets a drag handle wired through the dnd\nmodule's touch-safe handle-based configuration (a swipe on the row body\nstill scrolls the page). The handle button is the only control the dnd\nlayer adds — rows stay plain list items, so the inputs and buttons inside\nthem are never nested in an interactive role. Reordering also works by\nkeyboard: focus the handle and press Space/Enter to pick up, arrows to\nmove, Space/Enter to drop, Escape to cancel. Each completed reorder is\nannounced via `MkLiveAnnouncer`.\n\n```html\n<mk-repeater [(items)]=\"rows\" [min]=\"1\" [max]=\"10\" reorderable\n             [factory]=\"newRow\" addLabel=\"Add row\">\n  <ng-template mkRepeaterRow let-item let-i=\"index\">\n    <input mkInput [(ngModel)]=\"item.name\" />\n  </ng-template>\n  <ng-template mkRepeaterEmpty>No rows yet.</ng-template>\n</mk-repeater>\n```",
      "file": "projects/mk-kit/forms/repeater/repeater.ts",
      "kind": "component",
      "selector": "mk-repeater",
@@ -12414,9 +12432,14 @@
        "description": "Collapse every parent row (tree mode)."
       },
       {
+       "name": "getExportRows",
+       "signature": "(options?: MkTableExportRowsOptions): MkTableExportRows<T>",
+       "description": "The rows and columns an export writes — exactly what `exportCsv`\nserialises, for other formats (XLSX, PDF, the clipboard, …): rows in\ndisplay order with the current sort applied and tree children\n(`childrenKey`) flattened under their parent whether or not they are\nexpanded, optionally only the selected ones; columns in the table's\ncurrent order, restricted to `options.columns` when given, each carrying\nits header and `format` so what the user saw is what gets written.\n\n```ts\nconst { rows, columns } = table.getExportRows({ selectedOnly: true });\nconst sheet = rows.map((row) =>\n  Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])),\n);\n```"
+      },
+      {
        "name": "exportCsv",
        "signature": "(options?: MkTableExportOptions): string",
-       "description": "The table's rows as CSV: current column order, column formatters applied,\nsorted the way they are shown, tree children flattened under their parent\nwhether or not they are expanded. Downloads the file (default name\n`table.csv`) and returns the text."
+       "description": "The table's rows as CSV: current column order, column formatters applied,\nsorted the way they are shown, tree children flattened under their parent\nwhether or not they are expanded. Downloads the file (default name\n`table.csv`) and returns the text. Built on `getExportRows`."
       },
       {
        "name": "collapseAllGroups",
@@ -13053,7 +13076,7 @@
       },
       {
        "name": "stack",
-       "type": "\"title\" | \"footer\" | \"hide\" | undefined",
+       "type": "\"footer\" | \"title\" | \"hide\" | undefined",
        "description": "What becomes of this column when the table stacks into cards\n(see `MkTable.stackAt`). Omitted, the column renders as a labelled\nfield: its `header` on one side, its value on the other.\n\n- `'title'` — the card's heading. No label; the value identifies the\n  record at a glance (an order number, a product name). Mark one, or two\n  if something short belongs beside it such as a status or a total.\n- `'footer'` — pinned to the bottom of the card, full width and unlabelled.\n  Where an actions cell belongs: buttons read as buttons, rather than as\n  the answer to a label.\n- `'hide'` — not rendered at all. Not merely invisible: the cell is never\n  created, so a screen reader does not read it either. For columns that\n  only earn their place while scanning a grid, and especially for anything\n  an expandable row detail already repeats.",
        "optional": true
       }
@@ -13085,8 +13108,42 @@
      "file": "projects/mk-kit/table/table/table.ts",
      "kind": "interface",
      "extends": [
-      "MkCsvExportOptions"
+      "MkCsvExportOptions",
+      "MkTableExportRowsOptions"
      ],
+     "members": [
+      {
+       "name": "download",
+       "type": "boolean | undefined",
+       "description": "Start the browser download (default `true`); `false` just returns the text.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkTableExportRows",
+     "description": "What `MkTable.getExportRows` returns: the rows and the columns to write them with.",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "interface",
+     "typeParams": "<T>",
+     "members": [
+      {
+       "name": "rows",
+       "type": "T[]",
+       "description": "The rows in display order — sorted the way they are shown, tree children\nflattened under their parent (expanded or not), selection applied when\n`selectedOnly` was set."
+      },
+      {
+       "name": "columns",
+       "type": "MkCsvColumn<T>[]",
+       "description": "The columns in the table's current (user-reordered) order, restricted to\nthe requested keys, each with its header and formatter."
+      }
+     ]
+    },
+    {
+     "name": "MkTableExportRowsOptions",
+     "description": "Options for `MkTable.getExportRows` — which rows and columns to export.",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "interface",
      "members": [
       {
        "name": "selectedOnly",
@@ -13098,12 +13155,6 @@
        "name": "columns",
        "type": "readonly string[] | undefined",
        "description": "Restrict to these column keys, in table order (default: every column).",
-       "optional": true
-      },
-      {
-       "name": "download",
-       "type": "boolean | undefined",
-       "description": "Start the browser download (default `true`); `false` just returns the text.",
        "optional": true
       }
      ]
@@ -14146,7 +14197,7 @@
     },
     {
      "name": "MkHeatmap",
-     "description": "Heatmap — a matrix of cells shaded by value intensity, for correlation\ngrids, activity-by-time tables and the like. Rendered as a semantic\n`<table>` (so it is inherently screen-reader friendly) with cell colours\nmixed from `accent` over the surface via `color-mix`, so it tracks the theme.\n\n```html\n<mk-heatmap\n  [xLabels]=\"hours\" [yLabels]=\"days\" [data]=\"matrix()\" showValues />\n```",
+     "description": "Heatmap — a matrix of cells shaded by value intensity, for correlation\ngrids, activity-by-time tables and the like. Rendered as a semantic\n`<table>` (so it is inherently screen-reader friendly) with cell colours\nmixed from `accent` over the surface via `color-mix`, so it tracks the theme.\n\nPrinted values (`showValues`) pick `--mk-text` or `--mk-text-inverse` per\ncell by contrast against that cell's actual colour, in both themes — see\n`mkHeatmapCellColors`.\n\n```html\n<mk-heatmap\n  [xLabels]=\"hours\" [yLabels]=\"days\" [data]=\"matrix()\" showValues />\n```",
      "file": "projects/mk-kit/data/charts/heatmap.ts",
      "kind": "component",
      "selector": "mk-heatmap",
@@ -15645,6 +15696,15 @@
      ]
     },
     {
+     "name": "mkContrastRatio",
+     "description": "WCAG 2.x contrast ratio (1–21) between two colours.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "function",
+     "signatures": [
+      "(a: MkRgb, b: MkRgb): number"
+     ]
+    },
+    {
      "name": "mkDiffStats",
      "description": "Summary counts (added / removed / unchanged lines) for a diff.",
      "file": "projects/mk-kit/data/diff/diff-util.ts",
@@ -15672,6 +15732,15 @@
      ]
     },
     {
+     "name": "mkHeatmapCellColors",
+     "description": "Choose the text token for a cell at intensity `t` (0–1) — light text on\ndark cells, dark text on light cells, decided by contrast against the\nactual blend rather than a fixed threshold.\n\nEvery accent ramp has a crossover band where neither `--mk-text` nor\n`--mk-text-inverse` reaches 4.5:1 (the cell is mid-luminance). When values\nare printed in the cells, a cell in that band is painted at the nearest\nintensity just outside it, so its value stays readable; the shift is a few\npercent of the ramp and the cell keeps its order relative to its\nneighbours. Without a resolved palette (server rendering, tests) a plain\nthreshold is used.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "function",
+     "signatures": [
+      "(t: number, palette: MkHeatmapPalette | null, showValues: boolean): MkHeatmapCellColors"
+     ]
+    },
+    {
      "name": "mkLinearScale",
      "description": "Build a linear scale mapping `[d0,d1]` (domain) onto `[r0,r1]` (range).",
      "file": "projects/mk-kit/data/charts/chart-utils.ts",
@@ -15687,6 +15756,15 @@
      "kind": "function",
      "signatures": [
       "(points: readonly MkPoint[]): string"
+     ]
+    },
+    {
+     "name": "mkMixRgb",
+     "description": "What `color-mix(in srgb, a t%, b)` yields: a linear blend in gamma-encoded sRGB.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "function",
+     "signatures": [
+      "(a: MkRgb, b: MkRgb, t: number): MkRgb"
      ]
     },
     {
@@ -15714,6 +15792,24 @@
      "kind": "function",
      "signatures": [
       "(src: string, options?: MkMarkdownParseOptions): MkMarkdownBlock[]"
+     ]
+    },
+    {
+     "name": "mkParseRgb",
+     "description": "Parse a CSS colour as the CSSOM serialises it — `rgb(r, g, b)` /\n`rgba(r, g, b, a)` — or a `#rgb` / `#rrggbb` literal. `null` for anything\nelse (an unresolved `var()`, `color(...)`, …).",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "function",
+     "signatures": [
+      "(text: string | null | undefined): MkRgb | null"
+     ]
+    },
+    {
+     "name": "mkRelativeLuminance",
+     "description": "WCAG 2.x relative luminance of an sRGB colour.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "function",
+     "signatures": [
+      "([r, g, b]: MkRgb): number"
      ]
     },
     {
@@ -15758,6 +15854,13 @@
      "file": "projects/mk-kit/data/charts/chart-utils.ts",
      "kind": "const",
      "type": "8"
+    },
+    {
+     "name": "MK_HEATMAP_MIN_CONTRAST",
+     "description": "WCAG AA minimum contrast for normal text — what cell values are held to.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "const",
+     "type": "4.5"
     },
     {
      "name": "MkAnsiSpan",
@@ -16005,6 +16108,57 @@
        "type": "string | undefined",
        "description": "Optional explicit colour; defaults to the palette by index.",
        "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkHeatmapCellColors",
+     "description": "Which text token a cell value is drawn with, and the intensity to paint the cell at.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "intensity",
+       "type": "number",
+       "description": "Accent share of the cell background, 0–1."
+      },
+      {
+       "name": "inverse",
+       "type": "boolean",
+       "description": "`true` → `--mk-text-inverse`, `false` → `--mk-text`."
+      },
+      {
+       "name": "contrast",
+       "type": "number",
+       "description": "Contrast ratio of the chosen text against the cell background (1–21)."
+      }
+     ]
+    },
+    {
+     "name": "MkHeatmapPalette",
+     "description": "The resolved colours a heatmap picks its cell text against.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "accent",
+       "type": "MkRgb",
+       "description": "The `accent` input, resolved to sRGB."
+      },
+      {
+       "name": "surface",
+       "type": "MkRgb",
+       "description": "`--mk-surface-2` — the zero-intensity cell colour."
+      },
+      {
+       "name": "text",
+       "type": "MkRgb",
+       "description": "`--mk-text`."
+      },
+      {
+       "name": "textInverse",
+       "type": "MkRgb",
+       "description": "`--mk-text-inverse`."
       }
      ]
     },
@@ -16457,6 +16611,13 @@
      "file": "projects/mk-kit/data/qr-code/qr-encode.ts",
      "kind": "type",
      "definition": "'L' | 'M' | 'Q' | 'H'"
+    },
+    {
+     "name": "MkRgb",
+     "description": "An sRGB colour as 0–255 channels.",
+     "file": "projects/mk-kit/data/charts/heatmap.ts",
+     "kind": "type",
+     "definition": "readonly [number, number, number]"
     },
     {
      "name": "MkSkeletonPresetKind",

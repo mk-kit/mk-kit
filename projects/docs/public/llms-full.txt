@@ -12,7 +12,7 @@ Every component and directive below is standalone — import the class from its 
 
 ## @mk-kit/ui/core
 
-70 exports. `import { … } from '@mk-kit/ui/core';`
+68 exports. `import { … } from '@mk-kit/ui/core';`
 
 ### MkAnchoredPanel (directive)
 
@@ -160,8 +160,6 @@ Methods:
 | --- | --- |
 | `setDensity(density: MkDensity): void` | Set the global density mode. |
 | `toggleDensity(): void` | Toggle between comfortable and compact — the two modes a density switch in a UI offers. `touch` is a deliberate choice for a specific screen, not something to land on by toggling, so from `touch` this returns to comfortable rather than cycling. |
-| `setContrast(contrast: MkContrastPreference): void` | Set the contrast preference explicitly. |
-| `toggleContrast(): void` | Toggle between normal and high contrast (resolving `system` first). |
 | `setTheme(preference: MkThemePreference): void` | Set the theme preference explicitly. |
 | `toggle(): void` | Toggle between light and dark (resolving `system` first). |
 
@@ -173,9 +171,6 @@ Properties:
 | `resolvedTheme` | `Signal<MkResolvedTheme>` | The concrete theme in effect (`light` or `dark`). |
 | `isDark` | `Signal<boolean>` | Convenience boolean for template bindings. |
 | `density` | `Signal<MkDensity>` | The global density mode. `compact` tightens control heights and the core spacing steps via the `data-mk-density` attribute, `touch` enlarges them — every component follows automatically because they read the same tokens.  This signal is the GLOBAL mode only. To make one screen or dialog touch- sized inside an otherwise comfortable app, put `data-mk-density="touch"` on that element instead; the tokens inherit and this service stays out of it. |
-| `contrast` | `Signal<MkContrastPreference>` | The user's contrast preference: `normal`, `high` or `system` (follow the OS `prefers-contrast` setting — the default). Written as `data-mk-contrast` on `<html>` and persisted; `system` removes the attribute so the pure-CSS `prefers-contrast: more` mapping takes over.  Like density, the attribute also works per subtree: put `data-mk-contrast="high"` on any element to raise contrast there only. |
-| `resolvedContrast` | `Signal<MkResolvedContrast>` | The concrete contrast in effect (`normal` or `high`). |
-| `isHighContrast` | `Signal<boolean>` | Convenience boolean for template bindings. |
 
 ### MkFieldContext (class)
 
@@ -792,8 +787,6 @@ Members:
 
 | Name | Type | Description |
 | --- | --- | --- |
-| `locale`? | `string \| undefined` | BCP 47 locale tag (`'pl-PL'`, `'de'`) used by the formatting pipes (`mkCurrency`, `mkRelativeTime`, `mkFileSize`, `mkPluralize`) and any other `Intl`-based formatting that has no explicit locale of its own. Unset → the runtime (browser / Node) default locale. |
-| `currency`? | `string \| undefined` | ISO 4217 currency code the `mkCurrency` pipe falls back to when the template passes none. Unset → `'USD'`. |
 | `validation` | `MkValidationStrings` | Validation messages (deep-merged by provideMkI18n). |
 | `close` | `string` | Generic "Close" control (dialog, drawer, bottom-sheet). |
 | `dismiss` | `string` | Generic "Dismiss" control (alert, banner, toast, snackbar). |
@@ -1229,22 +1222,6 @@ Languages with built-in highlighting. Unknown values render plain text.
 type MkCodeLanguage = 'json' | 'plaintext';
 ```
 
-### MkContrastPreference (type)
-
-Import: `import { MkContrastPreference } from '@mk-kit/ui/core';`
-
-Contrast preference.
-
-`high` applies the high-contrast token preset (`data-mk-contrast="high"`):
-pure text colours, line-like borders, opaque interaction washes, a thicker
-focus ring. `system` (the default) writes no attribute and lets the
-stylesheet follow the OS `prefers-contrast: more` setting; `normal` opts
-out of that even when the OS asks for more contrast.
-
-```ts
-type MkContrastPreference = 'normal' | 'high' | 'system';
-```
-
 ### MkDensity (type)
 
 Import: `import { MkDensity } from '@mk-kit/ui/core';`
@@ -1319,16 +1296,6 @@ Value kind of a filterable field; decides the editor and the operators offered.
 
 ```ts
 type MkQueryValueType = 'string' | 'number' | 'boolean' | 'date' | 'select';
-```
-
-### MkResolvedContrast (type)
-
-Import: `import { MkResolvedContrast } from '@mk-kit/ui/core';`
-
-Concrete resolved contrast (never `system`).
-
-```ts
-type MkResolvedContrast = 'normal' | 'high';
 ```
 
 ### MkResolvedTheme (type)
@@ -1664,7 +1631,7 @@ Inputs:
 
 ## @mk-kit/ui/directives
 
-43 exports. `import { … } from '@mk-kit/ui/directives';`
+31 exports. `import { … } from '@mk-kit/ui/directives';`
 
 ### MkAutofocus (directive)
 
@@ -2135,122 +2102,6 @@ Properties:
 | --- | --- | --- |
 | `activeId` | `WritableSignal<string \| null>` | The id of the currently active section (`null` before the first one). |
 
-### MkCurrencyPipe (pipe)
-
-Pipe name: `mkCurrency` · `transform(value: number | string | null | undefined, currency?: string | null, options?: MkCurrencyOptions): string`
-
-Import: `import { MkCurrencyPipe } from '@mk-kit/ui/directives';`
-
-`mkCurrency` — format a number as money with `Intl.NumberFormat`, honouring
-the locale and default currency from `provideMkI18n({ locale, currency })`.
-No Angular locale data is needed. Pure: `null`, `undefined`, `''` and
-non-numeric input render as `''`.
-
-```html
-{{ 1234.5 | mkCurrency }}                                <!-- $1,234.50 (i18n currency, default USD) -->
-{{ 1234.5 | mkCurrency:'EUR' }}                          <!-- €1,234.50 -->
-{{ 1234.5 | mkCurrency:'PLN':{ locale: 'pl-PL' } }}      <!-- 1234,50 zł -->
-{{ 1234567 | mkCurrency:'USD':{ notation: 'compact' } }} <!-- $1.2M -->
-{{ total() | mkCurrency:'GBP':{ signDisplay: 'always' } }} <!-- signals work as-is -->
-```
-
-### MkFileSizePipe (pipe)
-
-Pipe name: `mkFileSize` · `transform(value: number | string | null | undefined, options?: MkFileSizeOptions): string`
-
-Import: `import { MkFileSizePipe } from '@mk-kit/ui/directives';`
-
-`mkFileSize` — bytes → a human-readable size such as `1.2 MB`, with the
-number formatted by `Intl.NumberFormat` in the `provideMkI18n` locale.
-Pure: `null`, `undefined`, `''` and non-numeric input render as `''`.
-
-```html
-{{ 1_234_567 | mkFileSize }}                        <!-- 1.2 MB -->
-{{ 1_234_567 | mkFileSize:{ base: 'binary' } }}     <!-- 1.2 MiB -->
-{{ 1_234_567 | mkFileSize:{ digits: 2, locale: 'de' } }} <!-- 1,23 MB -->
-{{ 512 | mkFileSize }}                              <!-- 512 B -->
-```
-
-### MkInitialsPipe (pipe)
-
-Pipe name: `mkInitials` · `transform(value: string | null | undefined, max?: number): string`
-
-Import: `import { MkInitialsPipe } from '@mk-kit/ui/directives';`
-
-`mkInitials` — "Ada Lovelace" → "AL", the same rule `mk-avatar` uses for
-its fallback: first letter of the first and last word, upper-cased. A
-single word yields its first `max` letters ("Ada" → "AD"); more than two
-words with `max` > 2 take one letter per word from the start ("Jean
-Luc Picard" with `max: 3` → "JLP"). Leading/trailing/duplicate whitespace
-is ignored, and grapheme-aware slicing keeps emoji and accents intact.
-Pure: `null`, `undefined` and blank input render as `''`.
-
-```html
-{{ user.name | mkInitials }}      <!-- Grace Hopper → GH -->
-{{ user.name | mkInitials:1 }}    <!-- Grace Hopper → G -->
-{{ 'Jean Luc Picard' | mkInitials:3 }} <!-- JLP -->
-```
-
-### MkPluralizePipe (pipe)
-
-Pipe name: `mkPluralize` · `transform(value: number | string | null | undefined, singular: string | MkPluralForms, plural?: string | null, options?: MkPluralizeOptions): string`
-
-Import: `import { MkPluralizePipe } from '@mk-kit/ui/directives';`
-
-`mkPluralize` — pick the right word for a count using the locale's plural
-rules (`Intl.PluralRules`), optionally prefixed with the formatted count.
-The English shorthand takes a singular and an optional plural (default
-`singular + 's'`); other languages pass a `MkPluralForms` map.
-Pure: `null`, `undefined`, `''` and non-numeric counts render as `''`.
-
-```html
-{{ count | mkPluralize:'item' }}                 <!-- 1 item / 3 items -->
-{{ count | mkPluralize:'entry':'entries' }}      <!-- 1 entry / 2 entries -->
-{{ count | mkPluralize:'file':null:{ withCount: false } }} <!-- files -->
-{{ n | mkPluralize:{ one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' }:null:{ locale: 'pl' } }}
-```
-
-### MkRelativeTimePipe (pipe)
-
-Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string`
-
-Import: `import { MkRelativeTimePipe } from '@mk-kit/ui/directives';`
-
-`mkRelativeTime` — "3 minutes ago" / "in 2 days" / "yesterday" from a
-`Date`, timestamp or ISO string, via `Intl.RelativeTimeFormat` in the
-`provideMkI18n` locale (no Angular locale data). Pure: `null`, `undefined`
-and unparsable input render as `''`.
-
-The pipe picks the largest unit whose magnitude is at least 1 (seconds →
-minutes → hours → days → weeks → months → years) and rounds. Pass `now`
-for deterministic output in tests, or bind a ticking signal to keep a
-list live — a pure pipe only re-runs when an argument changes:
-
-```html
-{{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->
-{{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->
-{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->
-{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
-```
-
-### MkTruncatePipe (pipe)
-
-Pipe name: `mkTruncate` · `transform(value: string | null | undefined, length?: number, options?: MkTruncateOptions): string`
-
-Import: `import { MkTruncatePipe } from '@mk-kit/ui/directives';`
-
-`mkTruncate` — shorten text to `length` characters and append an ellipsis.
-The ellipsis counts toward the limit, so the output never exceeds
-`length` characters; counting is grapheme-aware (emoji and accented
-letters are one character). Text that already fits is returned as-is.
-Pure: `null` and `undefined` render as `''`.
-
-```html
-{{ post.body | mkTruncate:80 }}                          <!-- hard cut at 80 -->
-{{ post.body | mkTruncate:80:{ wordBoundary: true } }}   <!-- cut at the last space -->
-{{ hash | mkTruncate:12:{ ellipsis: '...' } }}
-```
-
 ### MkHistoryService (service)
 
 Docs: https://mk-kit.dev/core-services
@@ -2522,40 +2373,6 @@ wherever `spellcheck` is `false`.
 const MK_FIELD_PRESETS: Readonly<Record<MkFieldKind, Partial<Record<"type" | "inputmode" | "autocomplete" | "autocapitalize" | "autocorrect" | "spellcheck" | "enterkeyhint", string>>>>;
 ```
 
-### MkCurrencyOptions (interface)
-
-Import: `import { MkCurrencyOptions } from '@mk-kit/ui/directives';`
-
-Options accepted by `MkCurrencyPipe`. They map onto
-`Intl.NumberFormat` currency options; `locale` overrides the i18n /
-runtime locale for this call only.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `locale`? | `string \| undefined` | BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale. |
-| `display`? | `"symbol" \| "name" \| "narrowSymbol" \| "code" \| undefined` | How the currency is shown. Default `'symbol'` (`€`, `$`, `zł`). |
-| `minimumFractionDigits`? | `number \| undefined` | Fraction digits; both default to the currency's own (2 for EUR, 0 for JPY). |
-| `maximumFractionDigits`? | `number \| undefined` |  |
-| `signDisplay`? | `"auto" \| "never" \| "always" \| "exceptZero" \| undefined` | Sign display, e.g. `'always'` for `+€10.00` or `'exceptZero'`. |
-| `notation`? | `"compact" \| "standard" \| undefined` | Compact notation for dashboards (`$1.2M`). Default `'standard'`. |
-| `useGrouping`? | `boolean \| undefined` | Thousands grouping; default `true`. |
-
-### MkFileSizeOptions (interface)
-
-Import: `import { MkFileSizeOptions } from '@mk-kit/ui/directives';`
-
-Options accepted by `MkFileSizePipe`.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `locale`? | `string \| undefined` | BCP 47 locale for the number part (decimal separator); defaults to the i18n / runtime locale. |
-| `base`? | `"decimal" \| "binary" \| undefined` | `'decimal'` (default) divides by 1000 and labels `kB MB GB …` (what operating systems and file dialogs show); `'binary'` divides by 1024 and labels `KiB MiB GiB …`. |
-| `digits`? | `number \| undefined` | Maximum fraction digits. Default `1`; bytes never get fractions. |
-
 ### MkHistoryEntry (interface)
 
 Import: `import { MkHistoryEntry } from '@mk-kit/ui/directives';`
@@ -2618,47 +2435,6 @@ Members:
 | `alt` | `boolean` | The Alt / Option key. |
 | `shift` | `boolean` | The Shift key. |
 
-### MkPluralizeOptions (interface)
-
-Import: `import { MkPluralizeOptions } from '@mk-kit/ui/directives';`
-
-Options accepted by `MkPluralizePipe`.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `locale`? | `string \| undefined` | BCP 47 locale for the plural rules and number; defaults to the i18n / runtime locale. |
-| `withCount`? | `boolean \| undefined` | Prefix the formatted count (`"3 items"`); `false` gives just the word. Default `true`. |
-
-### MkRelativeTimeOptions (interface)
-
-Import: `import { MkRelativeTimeOptions } from '@mk-kit/ui/directives';`
-
-Options accepted by `MkRelativeTimePipe`.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `locale`? | `string \| undefined` | BCP 47 locale for this call; defaults to `provideMkI18n({ locale })`, then the runtime locale. |
-| `numeric`? | `"auto" \| "always" \| undefined` | `'auto'` (default) uses phrases like "yesterday" / "now" where the locale has them; `'always'` sticks to "1 day ago" / "in 0 seconds". |
-| `style`? | `"long" \| "short" \| "narrow" \| undefined` | Length of the unit word: `'long'` (default, "minutes"), `'short'` ("min."), `'narrow'` ("m"). |
-| `maxUnit`? | `Intl.RelativeTimeFormatUnit \| undefined` | Largest unit to use. Default `'year'`; e.g. `'day'` keeps "45 days ago" instead of "1 month ago". |
-
-### MkTruncateOptions (interface)
-
-Import: `import { MkTruncateOptions } from '@mk-kit/ui/directives';`
-
-Options accepted by `MkTruncatePipe`.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `ellipsis`? | `string \| undefined` | Suffix appended when text is cut. Default `'…'` (a single ellipsis character). |
-| `wordBoundary`? | `boolean \| undefined` | Cut at the last whitespace before the limit instead of mid-word (falls back to a hard cut when the first word alone is longer). Default `false`. |
-
 ### MkFieldKind (type)
 
 Import: `import { MkFieldKind } from '@mk-kit/ui/directives';`
@@ -2679,22 +2455,6 @@ The attribute bundle applied for one `MkFieldKind`. Omitted = not set.
 type MkFieldPreset = Partial<Record<MkFieldAttr, string>>;
 ```
 
-### MkPluralForms (type)
-
-Import: `import { MkPluralForms } from '@mk-kit/ui/directives';`
-
-Per-category word forms for `MkPluralizePipe`, keyed by the CLDR
-plural categories `Intl.PluralRules` returns. `other` is required; the
-pipe falls back to it for any category you leave out.
-
-```ts
-const files: MkPluralForms = { one: 'plik', few: 'pliki', many: 'plików', other: 'pliku' };
-```
-
-```ts
-type MkPluralForms = { other: string } & Partial<Record<Intl.LDMLPluralRule, string>>;
-```
-
 ## @mk-kit/ui/dnd
 
 9 exports. `import { … } from '@mk-kit/ui/dnd';`
@@ -2708,13 +2468,25 @@ Docs: https://mk-kit.dev/components/drag-drop
 Import: `import { MkDrag } from '@mk-kit/ui/dnd';`
 
 Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /
-pen) **and** by keyboard (WCAG 2.1.1). The item is focusable, exposes
-`role="button"` + `aria-roledescription="Draggable item"`, and every move is
-announced via `MkLiveAnnouncer`.
+pen) **and** by keyboard (WCAG 2.1.1). Every move is announced via
+`MkLiveAnnouncer`. Which element carries the keyboard interaction
+depends on the handle:
 
-Keyboard: focus an item and press **Space/Enter** to pick it up, **Arrow**
-keys to move it (crossing into connected lists at the ends / across the
-perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
+- **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):
+  the item itself is focusable and exposes `aria-roledescription="Draggable
+  item"` with `role="button"` — or `role="option"` when it is an `<li>` of a
+  `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may
+  not take the `button` role).
+- **A focusable handle** (`<button mkDragHandle aria-label="…">`, or any
+  handle with `tabindex`): the handle is the keyboard target and receives
+  the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the
+  item stays a plain container with no role and no `tabindex`, so it can hold
+  inputs, links and buttons of its own (no nested interactive controls) and
+  `<li>` items keep their list semantics.
+
+Keyboard: focus the item (or its handle) and press **Space/Enter** to pick
+it up, **Arrow** keys to move it (crossing into connected lists at the ends /
+across the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
 
 Touch: a swipe scrolls the page as usual — the drag only arms after a
 long-press (`mkDragTouchDelay`, default 300 ms). While armed the item
@@ -2727,9 +2499,9 @@ drag lifts, so a move never forces layout. The pending frame is flushed
 synchronously on release so drops land exactly where the pointer ended.
 
 ```html
-<li mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
+<div mkDrag [mkDragData]="row" [mkDragDisabled]="row.locked">
   <span mkDragHandle aria-hidden="true">⠿</span> {{ row.title }}
-</li>
+</div>
 ```
 
 Inputs:
@@ -2745,6 +2517,7 @@ Properties:
 | Name | Type | Description |
 | --- | --- | --- |
 | `element` | `HTMLElement` | The item's host element. |
+| `keyboardHandle` | `Signal<MkDragHandle \| null>` | The handle that carries the keyboard drag — the first of this item's handles that is focusable on its own (a `<button mkDragHandle>`, say). `null` when the item itself is the keyboard target. |
 | `disabled` | `Signal<boolean>` | Effective disabled state (item- or list-level). |
 
 ### MkDropList (component)
@@ -2765,10 +2538,25 @@ A drop container for reorderable `[mkDrag]` items.
 The array bound to `mkDropListData` is **not** mutated for you — handle
 `mkDropListDropped` and call `mkMoveItemInArray` / `mkTransferArrayItem`.
 
+Semantics follow the host element and its items, so the tree is always
+valid ARIA:
+
+- any host other than `<ul>`/`<ol>` is a `role="group"` (named by
+  `mkDropListLabel`) of `role="button"` items;
+- a `<ul>`/`<ol>` whose `<li mkDrag>` items all carry a *focusable*
+  `[mkDragHandle]` stays a plain list — the handles are the controls;
+- a `<ul>`/`<ol>` whose items are themselves the keyboard targets becomes a
+  `listbox` of `option`s (an `<li>` may not be a `button`); give it a
+  `mkDropListLabel`, listboxes need a name.
+
+A `role` you set in the template is kept, and `aria-orientation` is only
+exposed on roles that allow it (`listbox`, `toolbar`, `tree`, …) — the
+keyboard model handles both axes regardless.
+
 ```html
-<ul mkDropList [mkDropListData]="todo()"
-    mkDropListId="todo" [mkDropListConnectedTo]="['done']"
-    (mkDropListDropped)="drop($event)">
+<div mkDropList [mkDropListData]="todo()" mkDropListLabel="To do"
+     mkDropListId="todo" [mkDropListConnectedTo]="['done']"
+     (mkDropListDropped)="drop($event)">
 
 Inputs:
 
@@ -2804,6 +2592,7 @@ Properties:
 | `element` | `HTMLElement` | The list's host element (drop target bounds). |
 | `id` | `Signal<string>` | Resolved id (input or generated). |
 | `label` | `Signal<string>` | Announceable name: the label when set, otherwise the resolved id. |
+| `role` | `Signal<string \| null>` | The role the host exposes. One set in the template wins. A `<ul>`/`<ol>` keeps its implicit `list` role (`null` — nothing is written) while every item hands the keyboard drag to a focusable handle, and becomes a `listbox` (its items `option`s) otherwise. Any other element is a `group`. |
 | `connectedTo` | `Signal<readonly string[]>` | Connected-list ids, normalised to a plain array. |
 
 ### MkSortableList (component)
@@ -2862,12 +2651,35 @@ a `<button>`, or another component's host such as `<mk-icon mkDragHandle />`.
 Its look (grab cursor, muted colour, `touch-action: none`) ships as the
 global `.mk-drag-handle` class in the theme stylesheet.
 
+**Decorative grip** — a non-focusable element (`<span>`, `<mk-icon>`): the
+item itself stays the keyboard target (`role="button"`, focusable), so the
+grip should be `aria-hidden`:
+
 ```html
 <div mkDrag [mkDragData]="row">
   <span mkDragHandle aria-hidden="true">⠿</span>
   {{ row.name }}
 </div>
 ```
+
+**Focusable grip** — a `<button>` (or any element with `tabindex`): the
+handle becomes the keyboard target instead. The item is then a plain
+container (no role, not focusable), so rows may hold inputs, links and
+other buttons without nesting interactive controls, and `<li>` items keep
+valid list semantics. Give it an accessible name:
+
+```html
+<li mkDrag [mkDragData]="row">
+  <button type="button" mkDragHandle [attr.aria-label]="'Reorder ' + row.name">⠿</button>
+  <input mkInput [(ngModel)]="row.name" />
+</li>
+```
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `isFocusable(): boolean` | Whether the handle can take keyboard focus itself — a native control (`<button>`, …), a link with `href`, or any element with a `tabindex`. A focusable handle carries the keyboard drag for its `[mkDrag]`. |
 
 Properties:
 
@@ -4769,7 +4581,7 @@ Inputs:
 | `hint` | `string` | `''` | Optional helper text shown below the control (hidden while an error shows). |
 | `error` | `string \| null` | `null` | Explicit error message. When non-null it overrides the automatic message derived from the projected control; `''` suppresses errors entirely. |
 | `errorMessages` | `Readonly<Record<string, string \| ((err: any) => string)>> \| null` | `null` | Per-field wording for automatic errors, keyed by `ValidationErrors` key. Each value is either a fixed string or a function of the error payload. |
-| `errorOn` | `"always" \| "touched" \| "dirty"` | `'touched'` | When automatic errors become visible. `touched` (the default) matches Material: after the control is touched or dirty, or the form is submitted. `dirty` waits for an actual edit; `always` shows as soon as it is invalid. |
+| `errorOn` | `"touched" \| "dirty" \| "always"` | `'touched'` | When automatic errors become visible. `touched` (the default) matches Material: after the control is touched or dirty, or the form is submitted. `dirty` waits for an actual edit; `always` shows as soon as it is invalid. |
 | `required` | `boolean` | `false` | Marks the field required (adds an indicator + `aria-required`). Derived from the projected control's validators when it is bound to a form. |
 | `disabled` | `boolean` | `false` | Visually reflect a disabled control. Derived from the projected control when it is bound to a form. |
 | `size` | `MkSize` | `'md'` | Control size; nested controls inherit it. |
@@ -5672,10 +5484,12 @@ a distinct identity.
 
 With `reorderable`, each row gets a drag handle wired through the dnd
 module's touch-safe handle-based configuration (a swipe on the row body
-still scrolls the page). Reordering also works by keyboard: focus the
-handle (or the row) and press Space/Enter to pick up, arrows to move,
-Space/Enter to drop, Escape to cancel. Each completed reorder is announced
-via `MkLiveAnnouncer`.
+still scrolls the page). The handle button is the only control the dnd
+layer adds — rows stay plain list items, so the inputs and buttons inside
+them are never nested in an interactive role. Reordering also works by
+keyboard: focus the handle and press Space/Enter to pick up, arrows to
+move, Space/Enter to drop, Escape to cancel. Each completed reorder is
+announced via `MkLiveAnnouncer`.
 
 ```html
 <mk-repeater [(items)]="rows" [min]="1" [max]="10" reorderable
@@ -7796,7 +7610,7 @@ type MkWeekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ## @mk-kit/ui/table
 
-30 exports. `import { … } from '@mk-kit/ui/table';`
+32 exports. `import { … } from '@mk-kit/ui/table';`
 
 ### MkSortHeader (component)
 
@@ -7904,7 +7718,8 @@ Methods:
 | `toggleTreeRow(row: T, event?: Event): void` | Show or hide a parent row's children (tree mode). |
 | `expandAllRows(): void` | Expand every parent row (tree mode). |
 | `collapseAllRows(): void` | Collapse every parent row (tree mode). |
-| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. |
+| `getExportRows(options?: MkTableExportRowsOptions): MkTableExportRows<T>` | The rows and columns an export writes — exactly what `exportCsv` serialises, for other formats (XLSX, PDF, the clipboard, …): rows in display order with the current sort applied and tree children (`childrenKey`) flattened under their parent whether or not they are expanded, optionally only the selected ones; columns in the table's current order, restricted to `options.columns` when given, each carrying its header and `format` so what the user saw is what gets written.  ```ts const { rows, columns } = table.getExportRows({ selectedOnly: true }); const sheet = rows.map((row) =>   Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])), ); ``` |
+| `exportCsv(options?: MkTableExportOptions): string` | The table's rows as CSV: current column order, column formatters applied, sorted the way they are shown, tree children flattened under their parent whether or not they are expanded. Downloads the file (default name `table.csv`) and returns the text. Built on `getExportRows`. |
 | `collapseAllGroups(): void` | Collapse every group. |
 | `expandAllGroups(): void` | Expand every group. |
 
@@ -8298,7 +8113,7 @@ Members:
 | `editable`? | `boolean \| undefined` | Make this column's cells inline-editable (double-click / Enter). |
 | `pinned`? | `"left" \| "right" \| undefined` | Pin (freeze) this column to a side while the body scrolls horizontally. |
 | `minWidth`? | `number \| undefined` | Minimum width in px when resizing (default 60). |
-| `stack`? | `"title" \| "footer" \| "hide" \| undefined` | What becomes of this column when the table stacks into cards (see `MkTable.stackAt`). Omitted, the column renders as a labelled field: its `header` on one side, its value on the other.  - `'title'` — the card's heading. No label; the value identifies the   record at a glance (an order number, a product name). Mark one, or two   if something short belongs beside it such as a status or a total. - `'footer'` — pinned to the bottom of the card, full width and unlabelled.   Where an actions cell belongs: buttons read as buttons, rather than as   the answer to a label. - `'hide'` — not rendered at all. Not merely invisible: the cell is never   created, so a screen reader does not read it either. For columns that   only earn their place while scanning a grid, and especially for anything   an expandable row detail already repeats. |
+| `stack`? | `"footer" \| "title" \| "hide" \| undefined` | What becomes of this column when the table stacks into cards (see `MkTable.stackAt`). Omitted, the column renders as a labelled field: its `header` on one side, its value on the other.  - `'title'` — the card's heading. No label; the value identifies the   record at a glance (an order number, a product name). Mark one, or two   if something short belongs beside it such as a status or a total. - `'footer'` — pinned to the bottom of the card, full width and unlabelled.   Where an actions cell belongs: buttons read as buttons, rather than as   the answer to a label. - `'hide'` — not rendered at all. Not merely invisible: the cell is never   created, so a screen reader does not read it either. For columns that   only earn their place while scanning a grid, and especially for anything   an expandable row detail already repeats. |
 
 ### MkTableDataSourceOptions (interface)
 
@@ -8319,13 +8134,37 @@ Import: `import { MkTableExportOptions } from '@mk-kit/ui/table';`
 
 Options for `MkTable.exportCsv`.
 
-Members (extends `MkCsvExportOptions`):
+Members (extends `MkCsvExportOptions`, `MkTableExportRowsOptions`):
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `download`? | `boolean \| undefined` | Start the browser download (default `true`); `false` just returns the text. |
+
+### MkTableExportRows (interface)
+
+Import: `import { MkTableExportRows } from '@mk-kit/ui/table';`
+
+What `MkTable.getExportRows` returns: the rows and the columns to write them with.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `rows` | `T[]` | The rows in display order — sorted the way they are shown, tree children flattened under their parent (expanded or not), selection applied when `selectedOnly` was set. |
+| `columns` | `MkCsvColumn<T>[]` | The columns in the table's current (user-reordered) order, restricted to the requested keys, each with its header and formatter. |
+
+### MkTableExportRowsOptions (interface)
+
+Import: `import { MkTableExportRowsOptions } from '@mk-kit/ui/table';`
+
+Options for `MkTable.getExportRows` — which rows and columns to export.
+
+Members:
 
 | Name | Type | Description |
 | --- | --- | --- |
 | `selectedOnly`? | `boolean \| undefined` | Export only the selected rows (default: every row). |
 | `columns`? | `readonly string[] \| undefined` | Restrict to these column keys, in table order (default: every column). |
-| `download`? | `boolean \| undefined` | Start the browser download (default `true`); `false` just returns the text. |
 
 ### MkTableGroup (interface)
 
@@ -8399,7 +8238,7 @@ type MkTableDensity = 'comfortable' | 'compact';
 
 ## @mk-kit/ui/data
 
-113 exports. `import { … } from '@mk-kit/ui/data';`
+120 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -8993,6 +8832,10 @@ Heatmap — a matrix of cells shaded by value intensity, for correlation
 grids, activity-by-time tables and the like. Rendered as a semantic
 `<table>` (so it is inherently screen-reader friendly) with cell colours
 mixed from `accent` over the surface via `color-mix`, so it tracks the theme.
+
+Printed values (`showValues`) pick `--mk-text` or `--mk-text-inverse` per
+cell by contrast against that cell's actual colour, in both themes — see
+`mkHeatmapCellColors`.
 
 ```html
 <mk-heatmap
@@ -9837,61 +9680,6 @@ Inputs:
 | `itemHeight` | `number` | `40` | Fixed height of each row in px. |
 | `overscan` | `number` | `4` | Extra rows rendered above/below the viewport to smooth fast scrolls. |
 
-### MkBadgeOverlay (directive)
-
-Selector: `[mkBadgeOverlay]`
-
-Docs: https://mk-kit.dev/components/badges-avatars
-
-Import: `import { MkBadgeOverlay } from '@mk-kit/ui/data';`
-
-Badge overlay — anchors a small badge (count, dot or short text) to a corner
-of ANY element: an icon button, an avatar, a tab label. The host stays a
-single tab stop; the badge is a decorative, non-focusable child.
-
-- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.
-- `mkBadgeOverlayDot` renders a textless dot ("something is new").
-- `mkBadgeOverlayAriaLabel` is the screen-reader text ("3 unread"). It is
-  rendered in a visually hidden span and wired to the host with
-  `aria-describedby`, so it is announced after the host's own name even
-  when the host has an `aria-label`. When it is given, the visible badge is
-  `aria-hidden` so the count is not read twice.
-- Positions use logical insets, so `top-end` sits at the top-right in LTR
-  and the top-left in RTL.
-
-The badge is painted with the global `.mk-badge-overlay` styles from
-`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.
-
-```html
-<button mkButton iconOnly aria-label="Notifications"
-        [mkBadgeOverlay]="unread()" mkBadgeOverlayTone="danger"
-        [mkBadgeOverlayAriaLabel]="unread() + ' unread'">
-  <mk-icon name="bell" />
-</button>
-
-<mk-avatar name="Ada Lovelace" mkBadgeOverlay mkBadgeOverlayDot
-           mkBadgeOverlayTone="success" mkBadgeOverlayPosition="bottom-end" />
-```
-
-Inputs:
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| `mkBadgeOverlay` | `string \| number \| null \| undefined` | `null` | Badge content — a count or a short label. `null` / empty hides the badge unless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers so `mkBadgeOverlay="120"` also collapses to `99+`. |
-| `mkBadgeOverlayPosition` | `MkBadgeOverlayPosition` | `'top-end'` | Corner the badge is anchored to (logical: `end` flips in RTL). |
-| `mkBadgeOverlayTone` | `MkTone` | `'primary'` | Semantic color tone (same scale as `mk-badge`). |
-| `mkBadgeOverlayDot` | `boolean` | `false` | Render a textless dot instead of the content. |
-| `mkBadgeOverlayMax` | `number` | `99` | Numbers above this render as `<max>+`. `0` disables the cap. |
-| `mkBadgeOverlayHidden` | `boolean` | `false` | Hide the badge while keeping the directive (and its aria wiring) in place. |
-| `mkBadgeOverlayAriaLabel` | `string` | `''` | Screen-reader text for the badge, e.g. `"3 unread"`. Announced as the host's description; the visible badge becomes `aria-hidden`. |
-
-Properties:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `label` | `Signal<string>` | The text painted in the badge (`''` in dot mode). |
-| `visible` | `Signal<boolean>` | Whether the badge is currently rendered. |
-
 ### MkCarouselSlide (directive)
 
 Selector: `[mkCarouselSlide]`
@@ -9957,6 +9745,16 @@ also carry word-level `segments`.
 function mkComputeDiff(before: string, after: string, options?: MkDiffOptions): MkDiffRow[]
 ```
 
+### mkContrastRatio (function)
+
+Import: `import { mkContrastRatio } from '@mk-kit/ui/data';`
+
+WCAG 2.x contrast ratio (1–21) between two colours.
+
+```ts
+function mkContrastRatio(a: MkRgb, b: MkRgb): number
+```
+
 ### mkDiffStats (function)
 
 Import: `import { mkDiffStats } from '@mk-kit/ui/data';`
@@ -9987,6 +9785,26 @@ Compact number formatting for axes/tooltips (1.2k, 3.4M).
 function mkFormatCompact(value: number): string
 ```
 
+### mkHeatmapCellColors (function)
+
+Import: `import { mkHeatmapCellColors } from '@mk-kit/ui/data';`
+
+Choose the text token for a cell at intensity `t` (0–1) — light text on
+dark cells, dark text on light cells, decided by contrast against the
+actual blend rather than a fixed threshold.
+
+Every accent ramp has a crossover band where neither `--mk-text` nor
+`--mk-text-inverse` reaches 4.5:1 (the cell is mid-luminance). When values
+are printed in the cells, a cell in that band is painted at the nearest
+intensity just outside it, so its value stays readable; the shift is a few
+percent of the ramp and the cell keeps its order relative to its
+neighbours. Without a resolved palette (server rendering, tests) a plain
+threshold is used.
+
+```ts
+function mkHeatmapCellColors(t: number, palette: MkHeatmapPalette | null, showValues: boolean): MkHeatmapCellColors
+```
+
 ### mkLinearScale (function)
 
 Import: `import { mkLinearScale } from '@mk-kit/ui/data';`
@@ -10005,6 +9823,16 @@ Straight-segment SVG path (`M … L …`) through the given points.
 
 ```ts
 function mkLinePath(points: readonly MkPoint[]): string
+```
+
+### mkMixRgb (function)
+
+Import: `import { mkMixRgb } from '@mk-kit/ui/data';`
+
+What `color-mix(in srgb, a t%, b)` yields: a linear blend in gamma-encoded sRGB.
+
+```ts
+function mkMixRgb(a: MkRgb, b: MkRgb, t: number): MkRgb
 ```
 
 ### mkNiceTicks (function)
@@ -10040,6 +9868,28 @@ so the AST never carries a `javascript:` (or other non-allow-listed) URL.
 
 ```ts
 function mkParseMarkdown(src: string, options?: MkMarkdownParseOptions): MkMarkdownBlock[]
+```
+
+### mkParseRgb (function)
+
+Import: `import { mkParseRgb } from '@mk-kit/ui/data';`
+
+Parse a CSS colour as the CSSOM serialises it — `rgb(r, g, b)` /
+`rgba(r, g, b, a)` — or a `#rgb` / `#rrggbb` literal. `null` for anything
+else (an unresolved `var()`, `color(...)`, …).
+
+```ts
+function mkParseRgb(text: string | null | undefined): MkRgb | null
+```
+
+### mkRelativeLuminance (function)
+
+Import: `import { mkRelativeLuminance } from '@mk-kit/ui/data';`
+
+WCAG 2.x relative luminance of an sRGB colour.
+
+```ts
+function mkRelativeLuminance([r, g, b]: MkRgb): number
 ```
 
 ### mkRenderMarkdown (function)
@@ -10102,6 +9952,16 @@ Number of hues in the validated categorical palette (`--mk-chart-1..8`).
 
 ```ts
 const MK_CHART_PALETTE_SIZE: 8;
+```
+
+### MK_HEATMAP_MIN_CONTRAST (const)
+
+Import: `import { MK_HEATMAP_MIN_CONTRAST } from '@mk-kit/ui/data';`
+
+WCAG AA minimum contrast for normal text — what cell values are held to.
+
+```ts
+const MK_HEATMAP_MIN_CONTRAST: 4.5;
 ```
 
 ### MkAnsiSpan (interface)
@@ -10255,6 +10115,35 @@ Members:
 | `label` | `string` | Stage label (e.g. "Visits"). |
 | `value` | `number` | Stage value; drives the band width. |
 | `color`? | `string \| undefined` | Optional explicit colour; defaults to the palette by index. |
+
+### MkHeatmapCellColors (interface)
+
+Import: `import { MkHeatmapCellColors } from '@mk-kit/ui/data';`
+
+Which text token a cell value is drawn with, and the intensity to paint the cell at.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `intensity` | `number` | Accent share of the cell background, 0–1. |
+| `inverse` | `boolean` | `true` → `--mk-text-inverse`, `false` → `--mk-text`. |
+| `contrast` | `number` | Contrast ratio of the chosen text against the cell background (1–21). |
+
+### MkHeatmapPalette (interface)
+
+Import: `import { MkHeatmapPalette } from '@mk-kit/ui/data';`
+
+The resolved colours a heatmap picks its cell text against.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `accent` | `MkRgb` | The `accent` input, resolved to sRGB. |
+| `surface` | `MkRgb` | `--mk-surface-2` — the zero-intensity cell colour. |
+| `text` | `MkRgb` | `--mk-text`. |
+| `textInverse` | `MkRgb` | `--mk-text-inverse`. |
 
 ### MkJsonNode (interface)
 
@@ -10471,16 +10360,6 @@ Presence status shown as a corner dot on an `MkAvatar`.
 type MkAvatarStatus = 'online' | 'offline' | 'away' | 'busy';
 ```
 
-### MkBadgeOverlayPosition (type)
-
-Import: `import { MkBadgeOverlayPosition } from '@mk-kit/ui/data';`
-
-Corner of the host an `MkBadgeOverlay` is anchored to.
-
-```ts
-type MkBadgeOverlayPosition = | 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
-```
-
 ### MkBadgeVariant (type)
 
 Import: `import { MkBadgeVariant } from '@mk-kit/ui/data';`
@@ -10621,6 +10500,16 @@ The single public entry point is `mkEncodeQr`, a pure function.
 
 ```ts
 type MkQrEcc = 'L' | 'M' | 'Q' | 'H';
+```
+
+### MkRgb (type)
+
+Import: `import { MkRgb } from '@mk-kit/ui/data';`
+
+An sRGB colour as 0–255 channels.
+
+```ts
+type MkRgb = readonly [number, number, number];
 ```
 
 ### MkSkeletonPresetKind (type)

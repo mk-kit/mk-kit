@@ -191,6 +191,54 @@ describe('MkRepeater', () => {
     expect(inputs[1].value).toBe('edited-c');
   });
 
+  it('keeps reorderable rows as plain list items — only the handle carries the drag semantics', async () => {
+    fixture.componentInstance.reorderable.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const list = el().querySelector('.mk-repeater__rows') as HTMLElement;
+    const row = el().querySelector('.mk-repeater__row') as HTMLElement;
+    const handle = row.querySelector('.mk-repeater__handle') as HTMLButtonElement;
+    const input = row.querySelector('.row-input') as HTMLInputElement;
+
+    // The list stays a list and the row a listitem: no widget role, not
+    // focusable, no aria state — so the inputs and buttons inside it are not
+    // nested in an interactive role (axe `nested-interactive`).
+    expect(list.hasAttribute('role')).toBe(false);
+    expect(list.hasAttribute('aria-orientation')).toBe(false);
+    expect(row.hasAttribute('role')).toBe(false);
+    expect(row.hasAttribute('tabindex')).toBe(false);
+    expect(row.hasAttribute('aria-grabbed')).toBe(false);
+    // The handle is the keyboard target and says what it is.
+    expect(handle.getAttribute('aria-roledescription')).toBe('Draggable item');
+    expect(handle.getAttribute('aria-grabbed')).toBe('false');
+    expect(input.closest('[role], [tabindex]')).toBeNull();
+  });
+
+  it('picks a row up from its handle and drops it one down by keyboard', async () => {
+    fixture.componentInstance.reorderable.set(true);
+    fixture.detectChanges();
+    await fixture.whenStable();
+
+    const key = (target: Element, k: string): void => {
+      target.dispatchEvent(new KeyboardEvent('keydown', { key: k, bubbles: true, cancelable: true }));
+      fixture.detectChanges();
+    };
+    const handle = el().querySelector('.mk-repeater__handle') as HTMLButtonElement;
+    const row = handle.closest('.mk-repeater__row') as HTMLElement;
+
+    key(handle, ' ');
+    expect(row.classList.contains('mk-drag--lifted')).toBe(true);
+    expect(handle.getAttribute('aria-pressed')).toBe('true');
+    key(handle, 'ArrowDown');
+    key(handle, ' ');
+    await fixture.whenStable();
+
+    expect(row.classList.contains('mk-drag--lifted')).toBe(false);
+    expect(fixture.componentInstance.rows().map((r) => r.name)).toEqual(['b', 'a', 'c']);
+    expect(fixture.componentInstance.movedEvents).toEqual([{ from: 0, to: 1 }]);
+  });
+
   it('disables add, remove and handles when disabled (input or CVA)', async () => {
     host.reorderable.set(true);
     host.disabled.set(true);
