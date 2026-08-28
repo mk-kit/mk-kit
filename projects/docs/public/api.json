@@ -2710,6 +2710,26 @@
        "description": "Default accessible name of `mk-sortable-list` when no `label` is given."
       },
       {
+       "name": "filterColumn",
+       "type": "(column: string) => string",
+       "description": "Table filter row: accessible name of a column's filter control."
+      },
+      {
+       "name": "clearFilter",
+       "type": "(column: string) => string",
+       "description": "Table filter row: the per-control clear (×) button."
+      },
+      {
+       "name": "filterAny",
+       "type": "string",
+       "description": "Table filter row: the \"no filter\" option of a select filter."
+      },
+      {
+       "name": "filterMin",
+       "type": "string",
+       "description": "Table filter row: placeholder of a number / date filter (matches values ≥ the entry)."
+      },
+      {
        "name": "blockEditor",
        "type": "MkBlockEditorStrings",
        "description": "Block editor chrome (deep-merged by provideMkI18n)."
@@ -12709,6 +12729,56 @@
        "default": "null"
       },
       {
+       "name": "virtual",
+       "type": "boolean",
+       "description": "Render only the rows in view (plus `overscan`) — for tables of\nthousands of rows. The `<table>` scrolls inside its own box sized by\n`height` / `maxHeight` (`max-height: 60vh` when neither is\nset) with the header pinned; spacer rows keep the scrollbar honest.\n\nWorks with sorting, selection (select-all still covers every row), tree\nrows, grouping (group headers are rows too), expandable detail rows (their\nheight is measured once rendered; an unmeasured detail counts as one row)\nand the header filter row. Falls back to the full render while stacked\ninto cards. Export and select-all always see every row, not the window.",
+       "default": "false"
+      },
+      {
+       "name": "rowHeight",
+       "type": "number | null",
+       "description": "Height (px) of one row in virtual mode. Leave unset to have it measured\nfrom the first rendered row — which follows `density` and\n`data-mk-density` automatically — starting from 44 (comfortable).",
+       "default": "null",
+       "transform": "(v) => (v == null || v === '' ? null : numberAttribute(v))"
+      },
+      {
+       "name": "overscan",
+       "type": "number",
+       "description": "Rows rendered beyond each edge of the viewport in virtual mode.",
+       "default": "6"
+      },
+      {
+       "name": "height",
+       "type": "string | number | null",
+       "description": "Fixed height of the scroll box (CSS length, or px as a number).",
+       "default": "null"
+      },
+      {
+       "name": "maxHeight",
+       "type": "string | number | null",
+       "description": "Maximum height of the scroll box (CSS length, or px as a number).",
+       "default": "null"
+      },
+      {
+       "name": "filterable",
+       "type": "boolean",
+       "description": "Render a second header row with a filter control per column — a text\nbox, a select, a number or a date field as the column's\n`MkTableColumn.filter` says. Values live in `filters`.",
+       "default": "false"
+      },
+      {
+       "name": "filters",
+       "type": "MkTableFilters",
+       "description": "The active filters, keyed by column key (`[(filters)]`; `filtersChange`\nemits the whole map on every edit). Text filters hold the typed string,\nselect filters the chosen option value, number / date filters the lower\nbound or a `{ min, max }` range. Set programmatically to pre-filter.",
+       "model": true,
+       "default": "{}"
+      },
+      {
+       "name": "clientFilter",
+       "type": "boolean",
+       "description": "Filter rows in the browser (default). Turn off when the server applies\nthe filters — `MkTableDataSource.setFilters($event)` on `filtersChange` —\nso the page it returns is shown as-is.",
+       "default": "true"
+      },
+      {
        "name": "childrenKey",
        "type": "string | null",
        "description": "Tree rows: the property on each row holding its child rows (`T[]`). When\nset, the table renders a tree grid — child rows are indented under their\nparent behind an expand toggle in the first column, sorting applies per\nsibling group, and ArrowRight / ArrowLeft on a row open / close it.",
@@ -12720,6 +12790,12 @@
        "name": "selectedChange",
        "type": "T[]",
        "description": "Emits when `selected` changes (two-way binding).",
+       "model": true
+      },
+      {
+       "name": "filtersChange",
+       "type": "MkTableFilters",
+       "description": "Emits when `filters` changes (two-way binding).",
        "model": true
       },
       {
@@ -12770,6 +12846,26 @@
      ],
      "methods": [
       {
+       "name": "setFilter",
+       "signature": "(key: string, value: unknown): void",
+       "description": "Set one column's filter (`null` / `''` clears it). Updates\n`filters` and emits `filtersChange`; a no-op when unchanged."
+      },
+      {
+       "name": "clearFilter",
+       "signature": "(key: string): void",
+       "description": "Clear one column's filter."
+      },
+      {
+       "name": "clearFilters",
+       "signature": "(): void",
+       "description": "Clear every filter."
+      },
+      {
+       "name": "scrollToRow",
+       "signature": "(target: unknown, by?: \"index\" | \"key\"): boolean",
+       "description": "Scroll a row into view. A number is the row's **display index** — its\nposition among the rendered rows, group headers included, after sorting,\nfiltering and tree expansion; anything else is a row key (the `trackKey`\nvalue, or the row object when there is none). Pass `'key'` to look a\nnumeric key up. Returns `false` when the row is not currently displayed\n(filtered out, under a collapsed parent or group).\n\nIn virtual mode the row lands at the top of the viewport, just under the\nheader; otherwise it is scrolled to the nearest edge."
+      },
+      {
        "name": "isTreeExpanded",
        "signature": "(row: T): boolean",
        "description": "Whether a parent row's children are currently shown (tree mode)."
@@ -12792,12 +12888,12 @@
       {
        "name": "getExportRows",
        "signature": "(options?: MkTableExportRowsOptions): MkTableExportRows<T>",
-       "description": "The rows and columns an export writes — exactly what `exportCsv`\nserialises, for other formats (XLSX, PDF, the clipboard, …): rows in\ndisplay order with the current sort applied and tree children\n(`childrenKey`) flattened under their parent whether or not they are\nexpanded, optionally only the selected ones; columns in the table's\ncurrent order, restricted to `options.columns` when given, each carrying\nits header and `format` so what the user saw is what gets written.\n\n```ts\nconst { rows, columns } = table.getExportRows({ selectedOnly: true });\nconst sheet = rows.map((row) =>\n  Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])),\n);\n```"
+       "description": "The rows and columns an export writes — exactly what `exportCsv`\nserialises, for other formats (XLSX, PDF, the clipboard, …): rows in\ndisplay order with the current sort and header `filters` applied\n(every matching row, never just the virtual window) and tree children\n(`childrenKey`) flattened under their parent whether or not they are\nexpanded, optionally only the selected ones; columns in the table's\ncurrent order, restricted to `options.columns` when given, each carrying\nits header and `format` so what the user saw is what gets written.\n\n```ts\nconst { rows, columns } = table.getExportRows({ selectedOnly: true });\nconst sheet = rows.map((row) =>\n  Object.fromEntries(columns.map((c) => [c.header ?? c.key, c.format ? c.format(row[c.key], row) : row[c.key]])),\n);\n```"
       },
       {
        "name": "exportCsv",
        "signature": "(options?: MkTableExportOptions): string",
-       "description": "The table's rows as CSV: current column order, column formatters applied,\nsorted the way they are shown, tree children flattened under their parent\nwhether or not they are expanded. Downloads the file (default name\n`table.csv`) and returns the text. Built on `getExportRows`."
+       "description": "The table's rows as CSV: current column order, column formatters applied,\nsorted and filtered the way they are shown, tree children flattened under\ntheir parent whether or not they are expanded. Downloads the file (default name\n`table.csv`) and returns the text. Built on `getExportRows`."
       },
       {
        "name": "collapseAllGroups",
@@ -12979,6 +13075,11 @@
        "description": "Set (or clear with `null`) the structured query from `mk-query-builder`.\nEmpty groups and unfinished rules are dropped before the request; a query\nwith nothing left is sent as `null`. Resets to page 1 and loads at once."
       },
       {
+       "name": "setFilters",
+       "signature": "(filters: MkTableFilters | null): void",
+       "description": "Set (or clear with `null` / `{}`) the per-column filters from `mk-table`'s\nheader filter row — bind `(filtersChange)=\"ds.setFilters($event)\"` and\nturn the table's `clientFilter` off. Empty entries are dropped before the\nrequest; nothing left is sent as `null`. Resets to page 1 and loads at\nonce (the table already debounces nothing, so debounce the fetcher if\nyour API needs it). A no-op when unchanged."
+      },
+      {
        "name": "refresh",
        "signature": "(): void",
        "description": "Re-run the current request immediately (e.g. after a mutation). Flushes a\npending debounced filter, since the request reads the live filter value."
@@ -13050,6 +13151,12 @@
        "readonly": true
       },
       {
+       "name": "filters",
+       "type": "Signal<MkTableFilters | null>",
+       "description": "Current per-column filters, or `null`.",
+       "readonly": true
+      },
+      {
        "name": "empty",
        "type": "Signal<boolean>",
        "description": "True when a settled load reported no rows at all.",
@@ -13057,6 +13164,15 @@
       }
      ],
      "docs": "/components/table#data-source"
+    },
+    {
+     "name": "mkCompactFilters",
+     "description": "Drop the empty entries of a filter map (`null` when nothing is left).",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "function",
+     "signatures": [
+      "(filters: MkTableFilters | null | undefined): MkTableFilters | null"
+     ]
     },
     {
      "name": "mkDownloadText",
@@ -13263,6 +13379,11 @@
        "name": "query",
        "type": "MkQueryGroup | null",
        "description": "Structured filter from `mk-query-builder` (`null` = none). Compacted: no empty groups or unfinished rules."
+      },
+      {
+       "name": "filters",
+       "type": "MkTableFilters | null",
+       "description": "Per-column filters from `mk-table`'s header filter row (`null` = none),\nkeyed by column key with empty entries dropped — see\n`MkTableDataSource.setFilters`."
       }
      ]
     },
@@ -13437,6 +13558,24 @@
        "type": "\"footer\" | \"title\" | \"hide\" | undefined",
        "description": "What becomes of this column when the table stacks into cards\n(see `MkTable.stackAt`). Omitted, the column renders as a labelled\nfield: its `header` on one side, its value on the other.\n\n- `'title'` — the card's heading. No label; the value identifies the\n  record at a glance (an order number, a product name). Mark one, or two\n  if something short belongs beside it such as a status or a total.\n- `'footer'` — pinned to the bottom of the card, full width and unlabelled.\n  Where an actions cell belongs: buttons read as buttons, rather than as\n  the answer to a label.\n- `'hide'` — not rendered at all. Not merely invisible: the cell is never\n  created, so a screen reader does not read it either. For columns that\n  only earn their place while scanning a grid, and especially for anything\n  an expandable row detail already repeats.",
        "optional": true
+      },
+      {
+       "name": "filter",
+       "type": "false | MkTableFilterKind | undefined",
+       "description": "The header-row filter control for this column (rendered when the table is\n`MkTable.filterable`). Omitted, a filterable table gives the column a\ntext filter; `false` leaves its filter cell empty.\n\n- `'text'` — case-insensitive *contains* on the displayed (formatted) text.\n- `'select'` — equality against one of `filterOptions`; without\n  options, the distinct values found in `data`.\n- `'number'` / `'date'` — the control keeps rows whose value is **≥** the\n  entry. Set `{ min, max }` through `MkTable.filters` for an\n  inclusive range. Dates compare by local calendar day.",
+       "optional": true
+      },
+      {
+       "name": "filterOptions",
+       "type": "readonly (string | number | MkTableFilterOption)[] | undefined",
+       "description": "Options of a `select` filter — strings / numbers, or `{ value, label }`.\nOmitted: every distinct value of the column in `data`, sorted.",
+       "optional": true
+      },
+      {
+       "name": "filterPlaceholder",
+       "type": "string | undefined",
+       "description": "Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`).",
+       "optional": true
       }
      ]
     },
@@ -13518,6 +13657,45 @@
      ]
     },
     {
+     "name": "MkTableFilterOption",
+     "description": "One option of a `select` header filter.",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "value",
+       "type": "unknown",
+       "description": "The value compared against the cell (by `String()` equality)."
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "description": "Visible option text."
+      }
+     ]
+    },
+    {
+     "name": "MkTableFilterRange",
+     "description": "An inclusive range accepted as the value of a `number` or `date` filter\n(dates as `YYYY-MM-DD`, `Date` or a timestamp). Either bound may be omitted.",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "interface",
+     "typeParams": "<V = number | string | Date>",
+     "members": [
+      {
+       "name": "min",
+       "type": "V | null | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "max",
+       "type": "V | null | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
      "name": "MkTableGroup",
      "description": "A group of rows produced by `MkTable.groupBy`.",
      "file": "projects/mk-kit/table/table/table.ts",
@@ -13588,6 +13766,20 @@
      "file": "projects/mk-kit/table/table/table.ts",
      "kind": "type",
      "definition": "'comfortable' | 'compact'"
+    },
+    {
+     "name": "MkTableFilterKind",
+     "description": "Which control a column's header filter renders (see `MkTableColumn.filter`).",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "type",
+     "definition": "'text' | 'select' | 'number' | 'date'"
+    },
+    {
+     "name": "MkTableFilters",
+     "description": "Active header filters keyed by column key: a string for `text`, an option\nvalue for `select`, a number / date (`>=`) or a `MkTableFilterRange`\nfor `number` and `date`. Empty strings and `null` mean \"no filter\".",
+     "file": "projects/mk-kit/table/table/table.ts",
+     "kind": "type",
+     "definition": "Record<string, unknown>"
     }
    ]
   },
@@ -22848,6 +23040,26 @@
        "name": "isEmpty",
        "signature": "(): boolean",
        "description": ""
+      },
+      {
+       "name": "setFilter",
+       "signature": "(key: string, value: string): Promise<void>",
+       "description": "Set a header-row filter (table is `filterable`). `value` is typed into\na text / number / date box, or picked from a select by option label or\nvalue; `''` clears that filter."
+      },
+      {
+       "name": "filterValue",
+       "signature": "(key: string): string",
+       "description": "The current value of a header-row filter control (`''` when unset)."
+      },
+      {
+       "name": "clearFilters",
+       "signature": "(): Promise<void>",
+       "description": "Clear every header-row filter."
+      },
+      {
+       "name": "scrollToRow",
+       "signature": "(index: number): Promise<void>",
+       "description": "Scroll a `virtual` table so the row at display `index` is at the top of\nthe viewport (drives the scroll box, so only the rows around it render)."
       }
      ],
      "properties": []

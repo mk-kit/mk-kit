@@ -30,6 +30,40 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   options object, so `{{ d | mkRelativeTime:{ style: 'short' } }}` works
   without the `null` placeholder. The three-argument form
   (`value:now:options`) and `:null:options` keep working.
+- **`mk-table` virtual rows** — `virtual` renders only the rows in view
+  (plus `overscan`, default 6) inside the table's own scroll box
+  (`height` / `maxHeight`; `max-height: 60vh` when neither is set) with the
+  header pinned and spacer rows keeping the scrollbar honest. `rowHeight`
+  pins the row height; unset, it is measured from the first rendered row so
+  `density` and `data-mk-density` are picked up automatically (44px
+  comfortable). Sorting, selection (select-all covers every row), tree rows,
+  grouping (group headers are rows in the window), expandable detail rows
+  (measured once rendered; one row's worth until then), the filter row, CSV
+  export and `getExportRows()` (every row, never the window) all keep
+  working; cards (`stackAt`) render in full. New `scrollToRow(index | key,
+  by?)` method; the table carries `aria-rowcount` and rows `aria-rowindex`.
+  Own windowing inside the table entry — `mk-virtual-scroll` from `data` was
+  not reused (rows must stay `<tr>`s in the one `<table>`, and the entry must
+  not depend on `@mk-kit/ui/data`).
+- **`mk-table` header filter row** — `filterable` renders a second header
+  row with a control per column: `MkTableColumn.filter` picks `'text'`
+  (default; case-insensitive contains on the displayed text), `'select'`
+  (equality; `filterOptions`, or the column's distinct values), `'number'`
+  and `'date'` (`>=` the entry; a `{ min, max }` set through `filters` is an
+  inclusive range, dates by local calendar day) or `false` for none;
+  `filterPlaceholder`. `[(filters)]` model (`Record<key, value>`),
+  `(filtersChange)`, `setFilter()` / `clearFilter()` / `clearFilters()`,
+  `clientFilter` (off for server-side filtering). Composes with sorting,
+  grouping, tree rows (a matching child keeps its parents) and select-all;
+  export writes the filtered rows. Each active control shows an × (Escape
+  clears too); changes announce the matching row count. Native inputs styled
+  with tokens, so the table entry stays free of the forms / datetime bundles.
+  New i18n keys: `filterColumn`, `clearFilter`, `filterAny`, `filterMin`.
+- **`MkTableDataSource.setFilters(filters)`** puts the compacted map on each
+  request as `req.filters` (`null` when empty) next to `filter` and `query`;
+  resets to page 1, no-op when unchanged. `mkCompactFilters()` exported.
+- **Testing:** `MkTableHarness.setFilter(key, value)`, `filterValue(key)`,
+  `clearFilters()` and `scrollToRow(index)`.
 
 ## [0.43.0] — 2026-08-28
 

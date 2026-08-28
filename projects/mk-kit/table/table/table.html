@@ -1,4 +1,11 @@
-<div class="mk-table__scroll">
+<div
+  #scroller
+  class="mk-table__scroll"
+  [style.height]="scrollHeight()"
+  [style.max-height]="scrollMaxHeight()"
+  [attr.data-row-height]="isVirtual() ? effectiveRowHeight() : null"
+  (scroll)="onScroll($event)"
+>
   <!-- Explicit roles ONLY while stacked: `display: block` strips a table
        element of its implicit role, so without these a card layout stops
        being announced as tabular data at all. Redundant in the grid, so
@@ -7,6 +14,7 @@
   <table
     class="mk-table__table"
     [attr.role]="childrenKey() ? 'treegrid' : stacked() ? 'table' : null"
+    [attr.aria-rowcount]="isVirtual() ? displayItems().length + headerRows() : null"
   >
     <thead class="mk-table__head" [attr.role]="stacked() ? 'rowgroup' : null">
       <tr>
@@ -80,11 +88,88 @@
           </th>
         }
       </tr>
+      @if (filterable() && !stacked()) {
+        <!-- Filter row: native controls styled with tokens, so the table entry
+             point stays free of the forms / datetime entries. -->
+        <tr class="mk-table__filter-row">
+          @if (expandable()) {
+            <td class="mk-table__filter-cell mk-table__th--expand"></td>
+          }
+          @if (selectable()) {
+            <td class="mk-table__filter-cell mk-table__th--select"></td>
+          }
+          @for (col of orderedColumns(); track col.key) {
+            @let kind = filterKind(col);
+            <td
+              class="mk-table__filter-cell"
+              [class.mk-table__th--pinned]="col.pinned"
+              [class.mk-table__th--pinned-right]="col.pinned === 'right'"
+              [style.width]="colStyleWidth(col)"
+              [style.inset-inline-start.px]="col.pinned === 'left' ? pinnedOffset(col) : null"
+              [style.inset-inline-end.px]="col.pinned === 'right' ? pinnedOffset(col) : null"
+            >
+              @if (kind === 'select') {
+                <select
+                  class="mk-table__filter-control mk-table__filter-select"
+                  [class.mk-table__filter-control--active]="hasFilter(col.key)"
+                  [attr.data-filter-key]="col.key"
+                  [attr.aria-label]="filterLabel(col)"
+                  (change)="onFilterSelect(col, $event)"
+                >
+                  <option value="" [selected]="!hasFilter(col.key)">
+                    {{ col.filterPlaceholder ?? i18n.filterAny }}
+                  </option>
+                  @for (option of filterOptionsFor(col); track $index) {
+                    <option [value]="option.value" [selected]="isFilterOption(col, option)">
+                      {{ option.label }}
+                    </option>
+                  }
+                </select>
+              } @else if (kind) {
+                <span class="mk-table__filter" [class.mk-table__filter--active]="hasFilter(col.key)">
+                  <input
+                    class="mk-table__filter-control mk-table__filter-input"
+                    [type]="kind === 'text' ? 'search' : kind"
+                    [attr.inputmode]="kind === 'number' ? 'decimal' : null"
+                    [attr.data-filter-key]="col.key"
+                    [attr.aria-label]="filterLabel(col)"
+                    [attr.placeholder]="filterPlaceholder(col)"
+                    [value]="filterText(col.key)"
+                    (input)="onFilterInput(col, $event)"
+                    (keydown)="onFilterKeydown(col, $event)"
+                  />
+                  @if (hasFilter(col.key)) {
+                    <button
+                      type="button"
+                      class="mk-table__filter-clear"
+                      [attr.aria-label]="i18n.clearFilter(col.header || col.key)"
+                      (click)="clearFilter(col.key)"
+                    >
+                      <span aria-hidden="true">×</span>
+                    </button>
+                  }
+                </span>
+              }
+            </td>
+          }
+        </tr>
+      }
     </thead>
     <tbody class="mk-table__body" [attr.role]="stacked() ? 'rowgroup' : null">
-      @for (item of displayItems(); track trackItem(item); let i = $index) {
+      @if (isVirtual() && topSpace() > 0) {
+        <tr class="mk-table__spacer" aria-hidden="true">
+          <td [attr.colspan]="totalColumns()" [style.height.px]="topSpace()"></td>
+        </tr>
+      }
+      @for (item of renderedItems(); track trackItem(item); let i = $index) {
+        @let idx = windowStart() + i;
         @if (item.kind === 'group') {
-          <tr class="mk-table__group-row" [attr.role]="stacked() ? 'row' : null">
+          <tr
+            class="mk-table__group-row"
+            [attr.role]="stacked() ? 'row' : null"
+            [attr.data-index]="idx"
+            [attr.aria-rowindex]="isVirtual() ? idx + headerRows() + 1 : null"
+          >
             <th
               class="mk-table__group"
               scope="colgroup"
@@ -122,8 +207,11 @@
           [class.mk-table__row--selected]="selectable() && isSelected(item.row)"
           [class.mk-table__row--expanded]="expandable() && isExpanded(item.row)"
           [class.mk-table__row--parent]="item.hasChildren"
+          [class.mk-table__row--even]="isVirtual() && idx % 2 === 1"
           [style.--mk-tree-depth]="childrenKey() ? item.depth : null"
           [style.margin-inline-start.px]="stacked() && item.depth ? item.depth * 16 : null"
+          [attr.data-index]="idx"
+          [attr.aria-rowindex]="isVirtual() ? idx + headerRows() + 1 : null"
           [attr.aria-level]="childrenKey() ? item.depth + 1 : null"
           [attr.aria-expanded]="item.hasChildren ? item.expanded : null"
           [attr.tabindex]="clickableRows() ? 0 : null"
@@ -141,7 +229,7 @@
                 class="mk-table__expander"
                 [class.mk-table__expander--open]="isExpanded(item.row)"
                 [attr.aria-expanded]="isExpanded(item.row)"
-                [attr.aria-controls]="detailId(i)"
+                [attr.aria-controls]="detailId(idx)"
                 [attr.aria-label]="isExpanded(item.row) ? i18n.collapseRow : i18n.expandRow"
                 (click)="toggleExpand(item.row, $event)"
               >
@@ -166,7 +254,7 @@
             @for (col of orderedColumns(); track col.key; let first = $first) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: null, tree: first ? item : null }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i: idx, slot: null, tree: first ? item : null }"
               />
             }
           } @else {
@@ -176,28 +264,32 @@
             @for (col of stackTitleColumns(); track col.key; let first = $first) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'title', tree: first ? item : null }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i: idx, slot: 'title', tree: first ? item : null }"
               />
             }
             @for (col of stackFieldColumns(); track col.key) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'field' }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i: idx, slot: 'field' }"
               />
             }
             @for (col of stackFooterColumns(); track col.key) {
               <ng-container
                 [ngTemplateOutlet]="cellTpl"
-                [ngTemplateOutletContext]="{ col, row: item.row, i, slot: 'footer' }"
+                [ngTemplateOutletContext]="{ col, row: item.row, i: idx, slot: 'footer' }"
               />
             }
           }
         </tr>
         @if (expandable() && isExpanded(item.row) && rowDetail()) {
-          <tr class="mk-table__detail-row" [attr.role]="stacked() ? 'row' : null">
+          <tr
+            class="mk-table__detail-row"
+            [attr.role]="stacked() ? 'row' : null"
+            [attr.data-index]="idx"
+          >
             <td
               class="mk-table__detail"
-              [id]="detailId(i)"
+              [id]="detailId(idx)"
               [attr.role]="stacked() ? 'cell' : null"
               [attr.colspan]="totalColumns()"
             >
@@ -221,6 +313,11 @@
           >
             <ng-content select="[mkTableEmpty]">{{ emptyMessage() }}</ng-content>
           </td>
+        </tr>
+      }
+      @if (isVirtual() && bottomSpace() > 0) {
+        <tr class="mk-table__spacer" aria-hidden="true">
+          <td [attr.colspan]="totalColumns()" [style.height.px]="bottomSpace()"></td>
         </tr>
       }
     </tbody>

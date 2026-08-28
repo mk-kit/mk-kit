@@ -6,6 +6,7 @@ import {
   Injector,
   PLATFORM_ID,
   afterNextRender,
+  afterRenderEffect,
   booleanAttribute,
   computed,
   contentChild,
@@ -17,6 +18,7 @@ import {
   numberAttribute,
   output,
   signal,
+  untracked,
   viewChild,
 } from '@angular/core';
 import { DOCUMENT, NgTemplateOutlet, isPlatformBrowser } from '@angular/common';
@@ -34,6 +36,33 @@ export type MkTableAlign = 'start' | 'center' | 'end';
 export type MkSortDirection = 'asc' | 'desc' | 'none';
 /** Row vertical density. */
 export type MkTableDensity = 'comfortable' | 'compact';
+
+/** Which control a column's header filter renders (see {@link MkTableColumn.filter}). */
+export type MkTableFilterKind = 'text' | 'select' | 'number' | 'date';
+
+/** One option of a `select` header filter. */
+export interface MkTableFilterOption {
+  /** The value compared against the cell (by `String()` equality). */
+  value: unknown;
+  /** Visible option text. */
+  label: string;
+}
+
+/**
+ * An inclusive range accepted as the value of a `number` or `date` filter
+ * (dates as `YYYY-MM-DD`, `Date` or a timestamp). Either bound may be omitted.
+ */
+export interface MkTableFilterRange<V = number | string | Date> {
+  min?: V | null;
+  max?: V | null;
+}
+
+/**
+ * Active header filters keyed by column key: a string for `text`, an option
+ * value for `select`, a number / date (`>=`) or a {@link MkTableFilterRange}
+ * for `number` and `date`. Empty strings and `null` mean "no filter".
+ */
+export type MkTableFilters = Record<string, unknown>;
 
 /** Column definition for {@link MkTable}. */
 export interface MkTableColumn<T = Record<string, unknown>> {
@@ -74,6 +103,26 @@ export interface MkTableColumn<T = Record<string, unknown>> {
    *   an expandable row detail already repeats.
    */
   stack?: 'title' | 'footer' | 'hide';
+  /**
+   * The header-row filter control for this column (rendered when the table is
+   * {@link MkTable.filterable}). Omitted, a filterable table gives the column a
+   * text filter; `false` leaves its filter cell empty.
+   *
+   * - `'text'` — case-insensitive *contains* on the displayed (formatted) text.
+   * - `'select'` — equality against one of {@link filterOptions}; without
+   *   options, the distinct values found in `data`.
+   * - `'number'` / `'date'` — the control keeps rows whose value is **≥** the
+   *   entry. Set `{ min, max }` through {@link MkTable.filters} for an
+   *   inclusive range. Dates compare by local calendar day.
+   */
+  filter?: MkTableFilterKind | false;
+  /**
+   * Options of a `select` filter — strings / numbers, or `{ value, label }`.
+   * Omitted: every distinct value of the column in `data`, sorted.
+   */
+  filterOptions?: readonly (string | number | MkTableFilterOption)[];
+  /** Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`). */
+  filterPlaceholder?: string;
 }
 
 /** Payload emitted by {@link MkTable.sortChange}. */
@@ -159,6 +208,55 @@ export interface MkTableExportOptions extends MkCsvExportOptions, MkTableExportR
 
 /** Hard floor (px) for column resize when a column sets no `minWidth`. */
 const MIN_COL_WIDTH = 60;
+/**
+ * Row height (px) assumed by `virtual` until the first row is measured: the
+ * comfortable density row — `--mk-space-3` padding twice around a
+ * `--mk-font-size-sm` line, plus the 1px row border.
+ */
+const DEFAULT_ROW_HEIGHT = 44;
+/** Rows rendered before the viewport has been measured (SSR, first paint). */
+const UNMEASURED_VIEWPORT_ROWS = 20;
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}/;
+
+/** Local calendar day (`YYYY-MM-DD`) of a Date, ISO string or timestamp. */
+function dayKey(value: unknown): string | null {
+  if (value == null || value === '') return null;
+  if (typeof value === 'string' && ISO_DAY.test(value)) return value.slice(0, 10);
+  const d = value instanceof Date ? value : new Date(value as string | number);
+  if (Number.isNaN(d.getTime())) return null;
+  const pad = (n: number): string => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+}
+
+/** Whether a filter value is a `{ min, max }` range rather than a single bound. */
+function isFilterRange(v: unknown): v is MkTableFilterRange<unknown> {
+  return (
+    typeof v === 'object' && v !== null && !(v instanceof Date) && ('min' in v || 'max' in v)
+  );
+}
+
+/** `null`, `''` and empty ranges all mean "no filter on this column". */
+function isEmptyFilter(v: unknown): boolean {
+  if (v == null || v === '') return true;
+  if (isFilterRange(v)) return isEmptyFilter(v.min) && isEmptyFilter(v.max);
+  return false;
+}
+
+/** Drop the empty entries of a filter map (`null` when nothing is left). */
+export function mkCompactFilters(
+  filters: MkTableFilters | null | undefined,
+): MkTableFilters | null {
+  if (!filters) return null;
+  const out: MkTableFilters = {};
+  let any = false;
+  for (const key of Object.keys(filters)) {
+    if (isEmptyFilter(filters[key])) continue;
+    out[key] = filters[key];
+    any = true;
+  }
+  return any ? out : null;
+}
 /** Upper bound advertised on resize separators (`aria-valuemax`). */
 const MAX_COL_WIDTH = 2000;
 
@@ -181,6 +279,8 @@ type MkTableItem<T> =
  * Supply `columns` and `data`; opt into sortable columns, sticky header,
  * zebra striping, hover and density. Sorting is fully keyboard operable
  * (Enter/Space on a header) and announces changes via {@link MkLiveAnnouncer}.
+ * `virtual` windows the rows of very large tables; `filterable` adds a
+ * per-column filter row (`[(filters)]`).
  *
  * ```html
  * <mk-table
@@ -210,7 +310,9 @@ const sortCollator = (): Intl.Collator => (collator ??= new Intl.Collator());
   imports: [MkCheckbox, NgTemplateOutlet],
   host: {
     class: 'mk-table',
-    '[class.mk-table--sticky]': 'stickyHeader()',
+    '[class.mk-table--sticky]': 'stickyHeader() || isVirtual()',
+    '[class.mk-table--virtual]': 'isVirtual()',
+    '[class.mk-table--filterable]': 'filterable() && !stacked()',
     '[class.mk-table--zebra]': 'zebra()',
     '[class.mk-table--hover]': 'hover()',
     '[class.mk-table--compact]': "density() === 'compact'",
@@ -241,16 +343,47 @@ export class MkTable<T = Record<string, unknown>> {
   protected readonly stacked = signal(false);
 
   constructor() {
-    // Keep the sticky group-header offset in sync with the rendered thead
-    // height (it shifts with density, sticky mode and grouping itself).
+    // Keep the sticky offsets (filter row under the header row, group headers
+    // under the thead) in sync with the rendered heights — they shift with
+    // density, sticky mode, the filter row and grouping itself.
     effect(() => {
       this.stickyHeader();
       this.density();
       this.groupBy();
+      this.filterable();
+      this.virtual();
       afterNextRender(
-        { read: () => this.applyGroupTop() },
+        { read: () => this.applyStickyOffsets() },
         { injector: this.injector },
       );
+    });
+
+    // Virtual mode: after every render that could change what is on screen,
+    // read back the real row / detail heights and the viewport, so the
+    // spacers and the window stay honest for whatever density is in force.
+    afterRenderEffect({
+      read: () => {
+        if (!this.isVirtual()) return;
+        this.windowRange();
+        this.density();
+        this.expandedKeys();
+        const el = this.scroller()?.nativeElement;
+        if (el) untracked(() => this.measureViewport(el));
+      },
+    });
+
+    // Announce how many rows a change of filters left (the visible count).
+    let firstFilters = true;
+    effect(() => {
+      this.filters();
+      if (firstFilters) {
+        firstFilters = false;
+        return;
+      }
+      untracked(() => {
+        if (!this.clientFilter()) return;
+        this.announcer.announce(this.i18n.resultsCount(this.allRows().length));
+      });
     });
 
     // Watch the host's width against `stackAt`. ResizeObserver rather than
@@ -268,23 +401,43 @@ export class MkTable<T = Record<string, unknown>> {
             this.stacked.set(limit > 0 && entry.contentRect.width < limit);
           });
           observer.observe(el);
-          this.destroyRef.onDestroy(() => observer.disconnect());
+          // The scroller's height is the virtual viewport; the table grows or
+          // shrinks when a density change re-sizes its rows.
+          const scroller = this.scroller()?.nativeElement;
+          const viewport = new ResizeObserver(() => {
+            if (scroller && this.isVirtual()) this.measureViewport(scroller);
+          });
+          if (scroller) {
+            viewport.observe(scroller);
+            const table = scroller.querySelector('table');
+            if (table) viewport.observe(table);
+          }
+          this.destroyRef.onDestroy(() => {
+            observer.disconnect();
+            viewport.disconnect();
+          });
         },
       },
       { injector: this.injector },
     );
   }
 
-  /** Measures the thead and exposes it as the group rows' sticky offset. */
-  private applyGroupTop(): void {
+  /**
+   * Measures the header row and the thead and exposes them as the sticky
+   * offsets of the filter row and of the group rows.
+   */
+  private applyStickyOffsets(): void {
+    const host = this.host.nativeElement;
+    const sticky = this.stickyHeader() || this.isVirtual();
+    if (this.filterable()) {
+      const headRow = host.querySelector('thead > tr');
+      const h = sticky && headRow ? headRow.getBoundingClientRect().height : 0;
+      host.style.setProperty('--_filter-top', `${Math.round(h)}px`);
+    }
     if (this.groupBy() == null) return;
-    const thead = this.host.nativeElement.querySelector('thead');
-    const h =
-      this.stickyHeader() && thead ? thead.getBoundingClientRect().height : 0;
-    this.host.nativeElement.style.setProperty(
-      '--_group-top',
-      `${Math.round(h)}px`,
-    );
+    const thead = host.querySelector('thead');
+    const h = sticky && thead ? thead.getBoundingClientRect().height : 0;
+    host.style.setProperty('--_group-top', `${Math.round(h)}px`);
   }
 
   /** Column definitions (order = display order). */
@@ -366,6 +519,56 @@ export class MkTable<T = Record<string, unknown>> {
   readonly groupLabel = input<
     ((value: unknown, rows: T[]) => string) | null
   >(null);
+
+  // --- Virtualisation inputs -------------------------------------------------
+  /**
+   * Render only the rows in view (plus {@link overscan}) — for tables of
+   * thousands of rows. The `<table>` scrolls inside its own box sized by
+   * {@link height} / {@link maxHeight} (`max-height: 60vh` when neither is
+   * set) with the header pinned; spacer rows keep the scrollbar honest.
+   *
+   * Works with sorting, selection (select-all still covers every row), tree
+   * rows, grouping (group headers are rows too), expandable detail rows (their
+   * height is measured once rendered; an unmeasured detail counts as one row)
+   * and the header filter row. Falls back to the full render while stacked
+   * into cards. Export and select-all always see every row, not the window.
+   */
+  readonly virtual = input(false, { transform: booleanAttribute });
+  /**
+   * Height (px) of one row in virtual mode. Leave unset to have it measured
+   * from the first rendered row — which follows `density` and
+   * `data-mk-density` automatically — starting from 44 (comfortable).
+   */
+  readonly rowHeight = input<number | null, unknown>(null, {
+    transform: (v) => (v == null || v === '' ? null : numberAttribute(v)),
+  });
+  /** Rows rendered beyond each edge of the viewport in virtual mode. */
+  readonly overscan = input(6, { transform: numberAttribute });
+  /** Fixed height of the scroll box (CSS length, or px as a number). */
+  readonly height = input<string | number | null>(null);
+  /** Maximum height of the scroll box (CSS length, or px as a number). */
+  readonly maxHeight = input<string | number | null>(null);
+
+  // --- Filter row inputs -----------------------------------------------------
+  /**
+   * Render a second header row with a filter control per column — a text
+   * box, a select, a number or a date field as the column's
+   * {@link MkTableColumn.filter} says. Values live in {@link filters}.
+   */
+  readonly filterable = input(false, { transform: booleanAttribute });
+  /**
+   * The active filters, keyed by column key (`[(filters)]`; `filtersChange`
+   * emits the whole map on every edit). Text filters hold the typed string,
+   * select filters the chosen option value, number / date filters the lower
+   * bound or a `{ min, max }` range. Set programmatically to pre-filter.
+   */
+  readonly filters = model<MkTableFilters>({});
+  /**
+   * Filter rows in the browser (default). Turn off when the server applies
+   * the filters — `MkTableDataSource.setFilters($event)` on `filtersChange` —
+   * so the page it returns is shown as-is.
+   */
+  readonly clientFilter = input(true, { transform: booleanAttribute });
 
   /** Emitted when the sort column/direction changes. */
   readonly sortChange = output<MkSortChange>();
@@ -792,7 +995,227 @@ export class MkTable<T = Record<string, unknown>> {
    * large-table sorts several-fold faster with the same default-locale order.
    */
   /** Data sorted by the active column, or the input order when unsorted. */
-  protected readonly sortedData = computed<T[]>(() => this.sortRows(this.data()));
+  protected readonly sortedData = computed<T[]>(() =>
+    this.sortRows(this.filteredData()),
+  );
+
+  // --- Filtering ---------------------------------------------------------------
+  /** The filter control a column renders, or `null` for none. */
+  protected filterKind(col: MkTableColumn<T>): MkTableFilterKind | null {
+    if (col.filter === false) return null;
+    return col.filter ?? 'text';
+  }
+
+  /** One predicate per active filter, or `null` when nothing is filtered. */
+  private readonly rowPredicate = computed<((row: T) => boolean) | null>(() => {
+    if (!this.clientFilter()) return null;
+    const filters = this.filters();
+    const tests: ((row: T) => boolean)[] = [];
+    for (const col of this.columns()) {
+      const value = filters[col.key];
+      if (col.filter === false || isEmptyFilter(value)) continue;
+      tests.push(this.columnTest(col, value));
+    }
+    if (!tests.length) return null;
+    return (row) => tests.every((test) => test(row));
+  });
+
+  /** Build the predicate for one column's filter value. */
+  private columnTest(col: MkTableColumn<T>, value: unknown): (row: T) => boolean {
+    const raw = (row: T): unknown => (row as Record<string, unknown>)[col.key];
+    switch (col.filter) {
+      case 'select': {
+        const wanted = String(value);
+        return (row) => String(raw(row) ?? '') === wanted;
+      }
+      case 'number': {
+        const [lo, hi] = isFilterRange(value) ? [value.min, value.max] : [value, null];
+        const min = isEmptyFilter(lo) ? null : Number(lo);
+        const max = isEmptyFilter(hi) ? null : Number(hi);
+        return (row) => {
+          const v = raw(row);
+          const n = typeof v === 'number' ? v : Number(v);
+          if (v == null || v === '' || Number.isNaN(n)) return false;
+          return (min == null || n >= min) && (max == null || n <= max);
+        };
+      }
+      case 'date': {
+        const [lo, hi] = isFilterRange(value) ? [value.min, value.max] : [value, null];
+        const min = dayKey(lo);
+        const max = dayKey(hi);
+        return (row) => {
+          const day = dayKey(raw(row));
+          if (!day) return false;
+          return (!min || day >= min) && (!max || day <= max);
+        };
+      }
+      default: {
+        const needle = String(value).trim().toLowerCase();
+        if (!needle) return () => true;
+        return (row) => this.cellText(row, col).toLowerCase().includes(needle);
+      }
+    }
+  }
+
+  /**
+   * Tree mode: which rows survive the filters — a row is kept when it matches
+   * or any descendant does, so a matching child keeps its parents.
+   */
+  private readonly treeKeep = computed<Map<T, boolean>>(() => {
+    const keep = this.rowPredicate();
+    const map = new Map<T, boolean>();
+    if (!keep || !this.childrenKey()) return map;
+    const walk = (row: T): boolean => {
+      let any = keep(row);
+      for (const child of this.childrenOf(row)) if (walk(child)) any = true;
+      map.set(row, any);
+      return any;
+    };
+    for (const row of this.data()) walk(row);
+    return map;
+  });
+
+  /** The input rows with the active filters applied (input order). */
+  private readonly filteredData = computed<T[]>(() => {
+    const keep = this.rowPredicate();
+    const data = this.data();
+    if (!keep) return data;
+    if (!this.childrenKey()) return data.filter(keep);
+    const kept = this.treeKeep();
+    return data.filter((row) => kept.get(row) === true);
+  });
+
+  /** The child rows of `row` that survive the filters (tree mode). */
+  private visibleChildrenOf(row: T): T[] {
+    const children = this.childrenOf(row);
+    if (!children.length || !this.rowPredicate()) return children;
+    const kept = this.treeKeep();
+    return children.filter((child) => kept.get(child) === true);
+  }
+
+  /** Options of every `select` filter, keyed by column (derived when unset). */
+  private readonly selectOptions = computed<Map<string, MkTableFilterOption[]>>(() => {
+    const map = new Map<string, MkTableFilterOption[]>();
+    for (const col of this.columns()) {
+      if (col.filter !== 'select') continue;
+      if (col.filterOptions) {
+        map.set(
+          col.key,
+          col.filterOptions.map((o) =>
+            typeof o === 'object' ? o : { value: o, label: String(o) },
+          ),
+        );
+        continue;
+      }
+      const seen = new Map<string, unknown>();
+      const walk = (rows: T[]): void => {
+        for (const row of rows) {
+          const v = (row as Record<string, unknown>)[col.key];
+          if (v != null && v !== '') seen.set(String(v), v);
+          walk(this.childrenOf(row));
+        }
+      };
+      walk(this.data());
+      map.set(
+        col.key,
+        [...seen.entries()]
+          .sort(([a], [b]) => sortCollator().compare(a, b))
+          .map(([label, value]) => ({ value, label })),
+      );
+    }
+    return map;
+  });
+
+  /** The options a column's select filter offers. */
+  protected filterOptionsFor(col: MkTableColumn<T>): MkTableFilterOption[] {
+    return this.selectOptions().get(col.key) ?? [];
+  }
+
+  /** Whether `option` is the column's current select-filter value. */
+  protected isFilterOption(col: MkTableColumn<T>, option: MkTableFilterOption): boolean {
+    const v = this.filters()[col.key];
+    return !isEmptyFilter(v) && String(v) === String(option.value);
+  }
+
+  /** Whether a column has an active filter. */
+  protected hasFilter(key: string): boolean {
+    return !isEmptyFilter(this.filters()[key]);
+  }
+
+  /** The text a column's filter box shows (a range shows its lower bound). */
+  protected filterText(key: string): string {
+    const v = this.filters()[key];
+    if (isEmptyFilter(v)) return '';
+    const shown = isFilterRange(v) ? v.min : v;
+    if (shown instanceof Date) return dayKey(shown) ?? '';
+    return shown == null ? '' : String(shown);
+  }
+
+  /** Accessible name of a column's filter control. */
+  protected filterLabel(col: MkTableColumn<T>): string {
+    return this.i18n.filterColumn(col.header || col.key);
+  }
+
+  /** Placeholder of a column's filter control. */
+  protected filterPlaceholder(col: MkTableColumn<T>): string {
+    if (col.filterPlaceholder != null) return col.filterPlaceholder;
+    return this.filterKind(col) === 'text' ? this.i18n.filter : this.i18n.filterMin;
+  }
+
+  /**
+   * Set one column's filter (`null` / `''` clears it). Updates
+   * {@link filters} and emits `filtersChange`; a no-op when unchanged.
+   */
+  setFilter(key: string, value: unknown): void {
+    const current = this.filters();
+    const empty = isEmptyFilter(value);
+    if (empty ? !(key in current) : Object.is(current[key], value)) return;
+    const next = { ...current };
+    if (empty) delete next[key];
+    else next[key] = value;
+    this.filters.set(next);
+  }
+
+  /** Clear one column's filter. */
+  clearFilter(key: string): void {
+    this.setFilter(key, null);
+  }
+
+  /** Clear every filter. */
+  clearFilters(): void {
+    if (Object.keys(this.filters()).length) this.filters.set({});
+  }
+
+  /** Text / number / date filter box input. */
+  protected onFilterInput(col: MkTableColumn<T>, event: Event): void {
+    const text = (event.target as HTMLInputElement).value;
+    if (col.filter === 'number') {
+      const n = text === '' ? NaN : Number(text);
+      this.setFilter(col.key, Number.isNaN(n) ? null : n);
+    } else {
+      this.setFilter(col.key, text);
+    }
+  }
+
+  /** Select filter change: map the option string back to its original value. */
+  protected onFilterSelect(col: MkTableColumn<T>, event: Event): void {
+    const chosen = (event.target as HTMLSelectElement).value;
+    const option = this.filterOptionsFor(col).find((o) => String(o.value) === chosen);
+    this.setFilter(col.key, chosen === '' || !option ? null : option.value);
+  }
+
+  /** Escape in a filter box clears that filter (and stays in the box). */
+  protected onFilterKeydown(col: MkTableColumn<T>, event: KeyboardEvent): void {
+    if (event.key !== 'Escape' || !this.hasFilter(col.key)) return;
+    event.preventDefault();
+    event.stopPropagation();
+    this.clearFilter(col.key);
+  }
+
+  /** Header rows above the body (for `aria-rowindex`). */
+  protected readonly headerRows = computed(
+    () => 1 + (this.filterable() && !this.stacked() ? 1 : 0),
+  );
 
   /** Sort one sibling group by the active column (input order when unsorted). */
   private sortRows(rows: T[]): T[] {
@@ -913,10 +1336,10 @@ export class MkTable<T = Record<string, unknown>> {
     const walk = (rows: T[]): void => {
       for (const row of this.sortRows(rows)) {
         out.push(row);
-        walk(this.childrenOf(row));
+        walk(this.visibleChildrenOf(row));
       }
     };
-    walk(this.data());
+    walk(this.filteredData());
     return out;
   });
 
@@ -1021,7 +1444,7 @@ export class MkTable<T = Record<string, unknown>> {
     const tree = !!this.childrenKey();
     const expandedKeys = this.treeExpanded();
     for (const row of rows) {
-      const children = tree ? this.childrenOf(row) : [];
+      const children = tree ? this.visibleChildrenOf(row) : [];
       const hasChildren = children.length > 0;
       const expanded = hasChildren && expandedKeys.has(this.rowKey(row));
       items.push({ kind: 'row', row, depth, hasChildren, expanded });
@@ -1035,6 +1458,229 @@ export class MkTable<T = Record<string, unknown>> {
     if (!key) return [];
     const value = (row as Record<string, unknown>)[key];
     return Array.isArray(value) ? (value as T[]) : [];
+  }
+
+  // --- Row virtualisation -------------------------------------------------------
+  // Own windowing rather than `mk-virtual-scroll` from `@mk-kit/ui/data`: the
+  // rows must stay real `<tr>`s inside the one `<table>` (column widths,
+  // sticky header, selection, a11y), the window has to know about group and
+  // detail rows, and importing the data entry point would drag ~680 KiB of
+  // unrelated components into every table consumer's dependency graph.
+
+  /** The scroll box around the table. */
+  private readonly scroller = viewChild<ElementRef<HTMLElement>>('scroller');
+
+  /** Virtual mode in force (cards always render in full). */
+  protected readonly isVirtual = computed(() => this.virtual() && !this.stacked());
+
+  /** Current scroll offset of the scroll box (virtual mode). */
+  private readonly scrollTop = signal(0);
+  /** Measured height of the scroll box (0 until measured / on the server). */
+  private readonly viewportHeight = signal(0);
+  /** Measured height of the thead — the sticky header hides that much of the top. */
+  private readonly headHeight = signal(0);
+  /** Row height read back from the first rendered row. */
+  private readonly measuredRowHeight = signal<number | null>(null);
+  /** Measured heights of expanded detail rows, by row key. */
+  private readonly detailHeights = signal<Map<unknown, number>>(new Map());
+
+  /** The row height virtual mode lays rows out with. */
+  protected readonly effectiveRowHeight = computed(
+    () => this.rowHeight() ?? this.measuredRowHeight() ?? DEFAULT_ROW_HEIGHT,
+  );
+
+  private cssLength(v: string | number | null): string | null {
+    if (v == null || v === '') return null;
+    return typeof v === 'number' ? `${v}px` : v;
+  }
+
+  /** `height` of the scroll box. */
+  protected readonly scrollHeight = computed(() => this.cssLength(this.height()));
+  /** `max-height` of the scroll box (60vh in virtual mode with no size given). */
+  protected readonly scrollMaxHeight = computed(() => {
+    const max = this.cssLength(this.maxHeight());
+    if (max) return max;
+    return this.isVirtual() && this.height() == null ? '60vh' : null;
+  });
+
+  /**
+   * Top offset of every display item, or `null` while every item is exactly
+   * one row tall (the common case — then offsets are plain multiplication).
+   * Only expanded detail rows make heights vary.
+   */
+  private readonly itemOffsets = computed<Float64Array | null>(() => {
+    if (!this.isVirtual() || !this.expandable() || !this.rowDetail()) return null;
+    const expanded = this.expandedKeys();
+    if (!expanded.size) return null;
+    const items = this.displayItems();
+    const rh = this.effectiveRowHeight();
+    const details = this.detailHeights();
+    const offsets = new Float64Array(items.length + 1);
+    let y = 0;
+    for (let i = 0; i < items.length; i++) {
+      offsets[i] = y;
+      y += rh;
+      const item = items[i];
+      if (item.kind === 'row') {
+        const key = this.rowKey(item.row);
+        if (expanded.has(key)) y += details.get(key) ?? rh;
+      }
+    }
+    offsets[items.length] = y;
+    return offsets;
+  });
+
+  /** Full height of the body, spacers included. */
+  private readonly totalHeight = computed(() => {
+    const offsets = this.itemOffsets();
+    if (offsets) return offsets[offsets.length - 1];
+    return this.displayItems().length * this.effectiveRowHeight();
+  });
+
+  /** Top offset (px) of display item `index`. */
+  private offsetOf(index: number): number {
+    const offsets = this.itemOffsets();
+    return offsets
+      ? offsets[Math.min(index, offsets.length - 1)]
+      : index * this.effectiveRowHeight();
+  }
+
+  /** Index of the display item covering the body offset `y`. */
+  private indexAt(y: number): number {
+    const count = this.displayItems().length;
+    if (count === 0) return 0;
+    const offsets = this.itemOffsets();
+    if (!offsets) {
+      return Math.min(count - 1, Math.max(0, Math.floor(y / this.effectiveRowHeight())));
+    }
+    let lo = 0;
+    let hi = count - 1;
+    while (lo < hi) {
+      const mid = (lo + hi + 1) >> 1;
+      if (offsets[mid] <= y) lo = mid;
+      else hi = mid - 1;
+    }
+    return lo;
+  }
+
+  /** The `[start, end)` slice of display items currently rendered. */
+  protected readonly windowRange = computed<{ start: number; end: number }>(
+    () => {
+      const count = this.displayItems().length;
+      if (!this.isVirtual()) return { start: 0, end: count };
+      const over = Math.max(0, this.overscan());
+      const vh = this.viewportHeight();
+      const top = Math.max(0, this.scrollTop() - this.headHeight());
+      const first = this.indexAt(top);
+      const last = vh > 0 ? this.indexAt(top + vh) : first + UNMEASURED_VIEWPORT_ROWS;
+      return {
+        start: Math.max(0, first - over),
+        end: Math.min(count, last + 1 + over),
+      };
+    },
+    { equal: (a, b) => a.start === b.start && a.end === b.end },
+  );
+
+  /** Display index of the first rendered item. */
+  protected readonly windowStart = computed(() => this.windowRange().start);
+
+  /** The items the tbody renders: the window in virtual mode, else all. */
+  protected readonly renderedItems = computed<MkTableItem<T>[]>(() => {
+    const items = this.displayItems();
+    if (!this.isVirtual()) return items;
+    const { start, end } = this.windowRange();
+    return items.slice(start, end);
+  });
+
+  /** Height (px) of the spacer above the window. */
+  protected readonly topSpace = computed(() =>
+    this.isVirtual() ? this.offsetOf(this.windowRange().start) : 0,
+  );
+  /** Height (px) of the spacer below the window. */
+  protected readonly bottomSpace = computed(() =>
+    this.isVirtual()
+      ? Math.max(0, this.totalHeight() - this.offsetOf(this.windowRange().end))
+      : 0,
+  );
+
+  /** Scroll box scrolled: move the window. */
+  protected onScroll(event: Event): void {
+    if (!this.isVirtual()) return;
+    this.scrollTop.set((event.target as HTMLElement).scrollTop);
+  }
+
+  /**
+   * Read the viewport, thead, first-row and detail-row heights back from the
+   * DOM. Heights are accepted only when they move by more than a pixel:
+   * collapsed table borders make the same row measure 44 or 44.5 depending
+   * on where it sits, and letting that flip the row height would shift a
+   * 10,000-row body by thousands of pixels on every window change. A density
+   * change (44 → 36 or 52) still gets through.
+   */
+  private measureViewport(el: HTMLElement): void {
+    const settled = (next: number, current: number | null): boolean =>
+      current != null && Math.abs(next - current) <= 1;
+    const vh = el.clientHeight;
+    if (vh > 0 && vh !== this.viewportHeight()) this.viewportHeight.set(vh);
+    const thead = el.querySelector('thead');
+    const hh = thead ? thead.getBoundingClientRect().height : 0;
+    if (!settled(hh, this.headHeight())) this.headHeight.set(hh);
+    if (this.rowHeight() == null) {
+      const row = el.querySelector('tr.mk-table__row:not(.mk-table__row--empty)');
+      const rh = row ? row.getBoundingClientRect().height : 0;
+      if (rh > 0 && !settled(rh, this.measuredRowHeight())) this.measuredRowHeight.set(rh);
+    }
+    if (!this.expandable()) return;
+    const items = this.displayItems();
+    let next: Map<unknown, number> | null = null;
+    for (const detail of el.querySelectorAll<HTMLElement>('tr.mk-table__detail-row')) {
+      const index = Number(detail.dataset['index']);
+      const item = items[index];
+      if (!item || item.kind !== 'row') continue;
+      const h = detail.getBoundingClientRect().height;
+      if (!(h > 0)) continue;
+      const key = this.rowKey(item.row);
+      if (settled(h, this.detailHeights().get(key) ?? null)) continue;
+      next ??= new Map(this.detailHeights());
+      next.set(key, h);
+    }
+    if (next) this.detailHeights.set(next);
+  }
+
+  /**
+   * Scroll a row into view. A number is the row's **display index** — its
+   * position among the rendered rows, group headers included, after sorting,
+   * filtering and tree expansion; anything else is a row key (the `trackKey`
+   * value, or the row object when there is none). Pass `'key'` to look a
+   * numeric key up. Returns `false` when the row is not currently displayed
+   * (filtered out, under a collapsed parent or group).
+   *
+   * In virtual mode the row lands at the top of the viewport, just under the
+   * header; otherwise it is scrolled to the nearest edge.
+   */
+  scrollToRow(
+    target: unknown,
+    by: 'index' | 'key' = typeof target === 'number' ? 'index' : 'key',
+  ): boolean {
+    const items = this.displayItems();
+    const index =
+      by === 'index'
+        ? (target as number)
+        : items.findIndex((it) => it.kind === 'row' && this.rowKey(it.row) === target);
+    if (!Number.isInteger(index) || index < 0 || index >= items.length) return false;
+    const el = this.scroller()?.nativeElement;
+    if (!el) return false;
+    if (this.isVirtual()) {
+      const vh = this.viewportHeight();
+      const max = vh > 0 ? Math.max(0, this.totalHeight() + this.headHeight() - vh) : Infinity;
+      const top = Math.min(this.offsetOf(index), max);
+      el.scrollTop = top;
+      this.scrollTop.set(top);
+    } else {
+      const row = el.querySelector<HTMLElement>(`tbody > tr[data-index="${index}"]`);
+      row?.scrollIntoView?.({ block: 'nearest' });
+    }
+    return true;
   }
 
   // --- Tree rows ------------------------------------------------------------
@@ -1078,7 +1724,8 @@ export class MkTable<T = Record<string, unknown>> {
   /**
    * The rows and columns an export writes — exactly what {@link exportCsv}
    * serialises, for other formats (XLSX, PDF, the clipboard, …): rows in
-   * display order with the current sort applied and tree children
+   * display order with the current sort and header {@link filters} applied
+   * (every matching row, never just the virtual window) and tree children
    * (`childrenKey`) flattened under their parent whether or not they are
    * expanded, optionally only the selected ones; columns in the table's
    * current order, restricted to `options.columns` when given, each carrying
@@ -1106,8 +1753,8 @@ export class MkTable<T = Record<string, unknown>> {
 
   /**
    * The table's rows as CSV: current column order, column formatters applied,
-   * sorted the way they are shown, tree children flattened under their parent
-   * whether or not they are expanded. Downloads the file (default name
+   * sorted and filtered the way they are shown, tree children flattened under
+   * their parent whether or not they are expanded. Downloads the file (default name
    * `table.csv`) and returns the text. Built on {@link getExportRows}.
    */
   exportCsv(options: MkTableExportOptions = {}): string {

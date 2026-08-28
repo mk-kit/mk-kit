@@ -88,6 +88,16 @@ interface Row {
     </mk-menu>
 
     <mk-table [columns]="columns" [data]="rows()" [selectable]="true" (sortChange)="sorted.set($event)" />
+    <mk-table
+      class="big"
+      [columns]="bigColumns"
+      [data]="bigRows"
+      filterable
+      virtual
+      [rowHeight]="40"
+      [maxHeight]="200"
+      [(filters)]="filters"
+    />
   `,
 })
 class Host {
@@ -112,6 +122,16 @@ class Host {
     { id: 1, name: 'Zoe', age: 31 },
     { id: 2, name: 'Adam', age: 45 },
   ]);
+  readonly bigColumns: MkTableColumn<Row>[] = [
+    { key: 'name', header: 'Name' },
+    { key: 'age', header: 'Age', filter: 'select' },
+  ];
+  readonly bigRows: Row[] = Array.from({ length: 50 }, (_, i) => ({
+    id: i + 1,
+    name: `Row ${i + 1}`,
+    age: 20 + (i % 3),
+  }));
+  readonly filters = signal<Record<string, unknown>>({});
 }
 
 describe('@mk-kit/ui/testing harnesses', () => {
@@ -304,6 +324,32 @@ describe('@mk-kit/ui/testing harnesses', () => {
       await table.toggleAll();
       expect(await table.selectedRowCount()).toBe(0);
       expect(table.isEmpty()).toBe(false);
+    });
+
+    it('drives the filter row and the virtual window', async () => {
+      const table = (await loader.getAll(MkTableHarness))[1];
+      // jsdom never measures the viewport, so the window is the unmeasured
+      // default (20 rows) plus overscan — but never all 50.
+      expect(await table.rowCount()).toBeLessThan(50);
+      expect((await table.rows())[0].cell(0)).toBe('Row 1');
+
+      await table.setFilter('name', 'Row 4');
+      expect(host.filters()).toEqual({ name: 'Row 4' });
+      expect(await table.rowCount()).toBe(11); // Row 4, Row 40–49
+      await table.setFilter('age', '21');
+      expect(host.filters()).toEqual({ name: 'Row 4', age: 21 });
+      expect(table.filterValue('age')).toBe('21');
+      expect(await table.rowCount()).toBe(3); // Row 41, 44, 47
+
+      await table.clearFilters();
+      expect(host.filters()).toEqual({});
+      expect(table.filterValue('name')).toBe('');
+      expect(await table.rowCount()).toBeLessThan(50);
+
+      await table.scrollToRow(30);
+      const rows = await table.rows();
+      expect(rows[0].cell(0)).not.toBe('Row 1');
+      expect(rows.some((r) => r.cell(0) === 'Row 31')).toBe(true);
     });
   });
 
