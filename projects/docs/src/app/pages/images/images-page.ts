@@ -159,11 +159,11 @@ import { DocsExample } from '../../shared/docs-example';
       </p>
       <docs-example [code]="carouselCode" [column]="true">
         <div style="max-width: 30rem; width: 100%;">
-          <mk-carousel ariaLabel="Highlights">
+          <mk-carousel ariaLabel="Highlights" autoplay [interval]="6000">
             @for (c of slides; track c.title) {
-              <div mkCarouselSlide [style.background]="c.bg" style="padding: var(--mk-space-8) var(--mk-space-4); text-align: center; color: #fff;">
-                <h3 style="margin: 0 0 var(--mk-space-1);">{{ c.title }}</h3>
-                <p style="margin: 0; opacity: 0.85;">{{ c.body }}</p>
+              <div mkCarouselSlide [style.background]="c.bg" style="padding: var(--mk-space-8) var(--mk-space-4); text-align: center; color: var(--mk-primary-contrast);">
+                <h3 style="margin: 0 0 var(--mk-space-1); color: inherit;">{{ c.title }}</h3>
+                <p style="margin: 0; opacity: 0.85; color: inherit;">{{ c.body }}</p>
               </div>
             }
           </mk-carousel>
@@ -255,7 +255,11 @@ open(): void {
   ];
 
   protected readonly carouselCode = `<mk-carousel ariaLabel="Highlights" autoplay [interval]="6000">
-  <div mkCarouselSlide>…</div>
-  <div mkCarouselSlide>…</div>
+  @for (c of slides; track c.title) {
+    <div mkCarouselSlide [style.background]="c.bg">
+      <h3>{{ c.title }}</h3>
+      <p>{{ c.body }}</p>
+    </div>
+  }
 </mk-carousel>`;
 }

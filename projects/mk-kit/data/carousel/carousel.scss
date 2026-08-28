@@ -25,9 +25,17 @@
   transition: none;
 }
 
-.mk-carousel__slide {
+/*
+ * Slides are projected content, so a plain `.mk-carousel__slide` rule never
+ * matches them under emulated encapsulation (they carry the consumer's
+ * `_ngcontent` attribute, not ours) — every slide shrank to its content width
+ * and all of them showed inside the first viewport. Reach through with
+ * `::ng-deep`, scoped to this host.
+ */
+:host ::ng-deep .mk-carousel__slide {
   flex: 0 0 100%;
   min-width: 0;
+  box-sizing: border-box;
 }
 
 .mk-carousel__playpause {

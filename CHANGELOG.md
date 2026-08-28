@@ -8,6 +8,7 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Fixed
 
+- **carousel:** slides are projected content, so the component's `flex: 0 0 100%` slide rule never applied under emulated encapsulation — every slide shrank to its content width and all of them rendered inside the first viewport. Fixed with a host-scoped `::ng-deep` rule; the docs demo also lost its slide text to the page's paragraph colour.
 - **table:** every export of `@mk-kit/ui/table` cost ~10 KiB (brotli) even when
   only `mkToCsv` or `MkSortHeader` was imported — `MkTable`'s
   `static sortCollator = new Intl.Collator()` kept Angular's build optimizer
