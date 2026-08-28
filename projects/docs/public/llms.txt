@@ -12,7 +12,7 @@ Install with `ng add @mk-kit/ui` (or `npm i @mk-kit/ui` + import `@mk-kit/ui/sty
 - [Core & services](https://mk-kit.dev/core-services)
 - [Touch & mobile](https://mk-kit.dev/touch)
 - [Material migration](https://mk-kit.dev/migration)
-- [Blog — migration guides and licensing notes](https://mk-kit.dev/blog)
+- [Blog](https://mk-kit.dev/blog)
 - [All components](https://mk-kit.dev/components-index)
 - [Changelog](https://mk-kit.dev/changelog)
 
