@@ -475,6 +475,7 @@ interface Mapping {
               A schematic rewrites the imports, selectors and inputs that map
               1:1 and leaves a note everywhere else:
               <code>ng g &#64;mk-kit/ui:migrate-primeng --dry-run</code>
+              <a routerLink="/components-index">Full component index →</a>
             </p>
           </div>
           <div class="mapwrap">
@@ -1036,6 +1037,11 @@ interface Mapping {
         margin-top: var(--mk-space-4);
         color: var(--mk-text-muted);
         font-size: var(--mk-font-size-sm);
+      }
+      .migrate__note a {
+        display: block;
+        margin-top: var(--mk-space-2);
+        color: var(--mk-primary);
       }
       .migrate__note code {
         font-family: var(--mk-font-mono);
