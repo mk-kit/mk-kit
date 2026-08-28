@@ -4,7 +4,7 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.44.0] — 2026-08-28
 
 ### Added
 
@@ -22,14 +22,6 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   names it by a visible heading instead. `[mkDropList]` gained the matching
   `mkDropListLabelledBy` input (`aria-labelledby`; `aria-label` is dropped
   while it is set). Spec + two a11y-smoke fixtures.
-
-### Changed
-
-- **`mkRelativeTime`** (`@mk-kit/ui/directives`) — the second argument now
-  accepts either the reference `now` (`Date | number | string`) or the
-  options object, so `{{ d | mkRelativeTime:{ style: 'short' } }}` works
-  without the `null` placeholder. The three-argument form
-  (`value:now:options`) and `:null:options` keep working.
 - **`mk-table` virtual rows** — `virtual` renders only the rows in view
   (plus `overscan`, default 6) inside the table's own scroll box
   (`height` / `maxHeight`; `max-height: 60vh` when neither is set) with the
@@ -59,11 +51,20 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   clears too); changes announce the matching row count. Native inputs styled
   with tokens, so the table entry stays free of the forms / datetime bundles.
   New i18n keys: `filterColumn`, `clearFilter`, `filterAny`, `filterMin`.
+- **Testing:** `MkTableHarness.setFilter(key, value)`, `filterValue(key)`,
+  `clearFilters()` and `scrollToRow(index)`.
+
+### Changed
+
+- **`mkRelativeTime`** (`@mk-kit/ui/directives`) — the second argument now
+  accepts either the reference `now` (`Date | number | string`) or the
+  options object, so `{{ d | mkRelativeTime:{ style: 'short' } }}` works
+  without the `null` placeholder. The three-argument form
+  (`value:now:options`) and `:null:options` keep working.
 - **`MkTableDataSource.setFilters(filters)`** puts the compacted map on each
   request as `req.filters` (`null` when empty) next to `filter` and `query`;
   resets to page 1, no-op when unchanged. `mkCompactFilters()` exported.
-- **Testing:** `MkTableHarness.setFilter(key, value)`, `filterValue(key)`,
-  `clearFilters()` and `scrollToRow(index)`.
+
 
 ## [0.43.0] — 2026-08-28
 
@@ -2158,7 +2159,7 @@ Initial private release as `@mk-kit/ui` on GitHub Packages.
   bottom-sheet), block editor and drag-and-drop — themed via `--mk-*` tokens
   (light/dark), WCAG 2.1 AA.
 
-[Unreleased]: https://github.com/mk-kit/mk-kit/compare/v0.43.0...HEAD
+[0.44.0]: https://github.com/mk-kit/mk-kit/compare/v0.43.0...v0.44.0
 [0.43.0]: https://github.com/mk-kit/mk-kit/compare/v0.42.0...v0.43.0
 [0.42.0]: https://github.com/mk-kit/mk-kit/compare/v0.41.0...v0.42.0
 [0.41.0]: https://github.com/mk-kit/mk-kit/compare/v0.40.0...v0.41.0
