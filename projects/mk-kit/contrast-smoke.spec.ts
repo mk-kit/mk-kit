@@ -14,9 +14,20 @@ import { type MkRgb, mkContrastRatio, mkParseRgb } from '@mk-kit/ui/data/charts'
 
 const AA = 4.5;
 
+/**
+ * The base theme only: everything before the high-contrast preset and the
+ * `prefers-contrast` / `forced-colors` blocks, which re-declare the same
+ * tokens with deliberately stronger values and would otherwise be read as
+ * the "dark" (last) declaration.
+ */
+const baseCss = (() => {
+  const cut = css.search(/\[data-mk-contrast|prefers-contrast|forced-colors/);
+  return cut > 0 ? css.slice(0, cut) : css;
+})();
+
 /** `--mk-<name>` for the light theme (first declaration) or dark (last). */
 function token(name: string, theme: 'light' | 'dark'): MkRgb {
-  const matches = [...css.matchAll(new RegExp(`--mk-${name}:\\s*(#[0-9a-fA-F]{3,6})\\s*;`, 'g'))];
+  const matches = [...baseCss.matchAll(new RegExp(`--mk-${name}:\\s*(#[0-9a-fA-F]{3,6})\\s*;`, 'g'))];
   expect(matches.length, `token --mk-${name} declared in mk-kit.css`).toBeGreaterThan(0);
   const raw = theme === 'light' ? matches[0][1] : matches[matches.length - 1][1];
   const rgb = mkParseRgb(raw);
