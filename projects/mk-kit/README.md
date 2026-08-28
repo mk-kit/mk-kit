@@ -176,6 +176,8 @@ modals, an Escape that closes only the topmost overlay, live-region
 announcements for async state, contrast-checked tokens in both themes,
 `prefers-reduced-motion` and `forced-colors` support. Axe runs over rendered
 fixtures in the test suite; information is never conveyed by colour alone.
+The [accessibility statement](https://mk-kit.dev/accessibility) lists what is
+verified automatically and the known gaps.
 
 ## SSR & zoneless
 

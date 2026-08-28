@@ -45,13 +45,17 @@ const formatters = new MkIntlCache<Intl.RelativeTimeFormat>(
  * The pipe picks the largest unit whose magnitude is at least 1 (seconds →
  * minutes → hours → days → weeks → months → years) and rounds. Pass `now`
  * for deterministic output in tests, or bind a ticking signal to keep a
- * list live — a pure pipe only re-runs when an argument changes:
+ * list live — a pure pipe only re-runs when an argument changes. The second
+ * argument is either that `now` or the options object, so options alone
+ * need no `null` placeholder; the three-argument form (`now`, then options)
+ * works too:
  *
  * ```html
  * {{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->
  * {{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->
- * {{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->
- * {{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
+ * {{ due | mkRelativeTime:{ style: 'short' } }}               <!-- in 2 days -->
+ * {{ ts | mkRelativeTime:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
+ * {{ due | mkRelativeTime:now():{ style: 'short' } }}         <!-- in 2 days (ticking) -->
  * ```
  */
 @Pipe({ name: 'mkRelativeTime', pure: true })
@@ -60,20 +64,23 @@ export class MkRelativeTimePipe implements PipeTransform {
 
   /**
    * @param value The instant to describe.
-   * @param now Reference instant; defaults to `Date.now()` at call time.
-   * @param options Locale, numeric mode, style and unit cap.
+   * @param nowOrOptions Reference instant (defaults to `Date.now()` at call
+   *   time), or — when only options are wanted — the options object itself.
+   * @param options Locale, numeric mode, style and unit cap (three-argument
+   *   form, after an explicit `now`).
    */
   transform(
     value: Date | number | string | null | undefined,
-    now?: Date | number | string | null,
-    options: MkRelativeTimeOptions = {},
+    nowOrOptions?: Date | number | string | MkRelativeTimeOptions | null,
+    options?: MkRelativeTimeOptions,
   ): string {
     const target = mkToTimestamp(value);
     if (target === null) return '';
+    const [now, opts] = splitArgs(nowOrOptions, options);
     const reference = mkToTimestamp(now) ?? Date.now();
     const diff = target - reference;
-    const [unit, amount] = pickUnit(diff, options.maxUnit ?? 'year');
-    const { locale, maxUnit: _maxUnit, ...rest } = options;
+    const [unit, amount] = pickUnit(diff, opts.maxUnit ?? 'year');
+    const { locale, maxUnit: _maxUnit, ...rest } = opts;
     return formatters
       .get(mkResolveLocale(this.i18n, locale), {
         numeric: 'auto',
@@ -82,6 +89,24 @@ export class MkRelativeTimePipe implements PipeTransform {
       })
       .format(amount, unit);
   }
+}
+
+/**
+ * Resolve the overloaded second argument: a plain object (not a `Date`) is
+ * the options and `now` is left to default; anything else is `now`.
+ */
+function splitArgs(
+  nowOrOptions: Date | number | string | MkRelativeTimeOptions | null | undefined,
+  options: MkRelativeTimeOptions | undefined,
+): [Date | number | string | null | undefined, MkRelativeTimeOptions] {
+  if (
+    nowOrOptions !== null &&
+    typeof nowOrOptions === 'object' &&
+    !(nowOrOptions instanceof Date)
+  ) {
+    return [undefined, { ...nowOrOptions, ...options }];
+  }
+  return [nowOrOptions, options ?? {}];
 }
 
 /** Choose the largest unit (≤ `maxUnit`) whose rounded magnitude is ≥ 1; seconds otherwise. */

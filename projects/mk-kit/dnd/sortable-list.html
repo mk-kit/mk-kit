@@ -2,6 +2,8 @@
   mkDropList
   class="mk-sortable-list__list"
   [mkDropListData]="items()"
+  [mkDropListLabel]="resolvedLabel()"
+  [mkDropListLabelledBy]="labelledBy() ?? ''"
   [mkDropListOrientation]="orientation()"
   [mkDropListDisabled]="disabled()"
   (mkDropListDropped)="onDrop($event)"

@@ -1122,6 +1122,7 @@ Members:
 | `chartShare` | `string` |  |
 | `chartLabel` | `string` |  |
 | `qrCodeLabel` | `(text: string) => string` | Default accessible label of a QR code, carrying its encoded content. |
+| `sortableListLabel` | `string` | Default accessible name of `mk-sortable-list` when no `label` is given. |
 | `blockEditor` | `MkBlockEditorStrings` | Block editor chrome (deep-merged by provideMkI18n). |
 
 ### MkOverlayConfig (interface)
@@ -2573,7 +2574,7 @@ Pure: `null`, `undefined`, `''` and non-numeric counts render as `''`.
 
 ### MkRelativeTimePipe (pipe)
 
-Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, now?: Date | number | string | null, options?: MkRelativeTimeOptions): string`
+Pipe name: `mkRelativeTime` · `transform(value: Date | number | string | null | undefined, nowOrOptions?: Date | number | string | MkRelativeTimeOptions | null, options?: MkRelativeTimeOptions): string`
 
 Import: `import { MkRelativeTimePipe } from '@mk-kit/ui/directives';`
 
@@ -2585,13 +2586,17 @@ and unparsable input render as `''`.
 The pipe picks the largest unit whose magnitude is at least 1 (seconds →
 minutes → hours → days → weeks → months → years) and rounds. Pass `now`
 for deterministic output in tests, or bind a ticking signal to keep a
-list live — a pure pipe only re-runs when an argument changes:
+list live — a pure pipe only re-runs when an argument changes. The second
+argument is either that `now` or the options object, so options alone
+need no `null` placeholder; the three-argument form (`now`, then options)
+works too:
 
 ```html
 {{ comment.createdAt | mkRelativeTime }}                    <!-- 3 minutes ago -->
 {{ due | mkRelativeTime:now() }}                            <!-- in 2 days (now() ticks) -->
-{{ due | mkRelativeTime:null:{ style: 'short' } }}          <!-- in 2 days -->
-{{ ts | mkRelativeTime:null:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
+{{ due | mkRelativeTime:{ style: 'short' } }}               <!-- in 2 days -->
+{{ ts | mkRelativeTime:{ locale: 'pl', numeric: 'always' } }} <!-- 3 minuty temu -->
+{{ due | mkRelativeTime:now():{ style: 'short' } }}         <!-- in 2 days (ticking) -->
 ```
 
 ### MkTruncatePipe (pipe)
@@ -3167,6 +3172,7 @@ Inputs:
 | `mkDropListId` | `string \| undefined` |  | Stable id used to connect lists. Auto-generated when omitted. |
 | `mkDropListConnectedTo` | `readonly string[]` | `[]` | Ids of other lists items may be transferred into. |
 | `mkDropListLabel` | `string` | `''` | Human-readable name used in screen-reader announcements when an item is moved into this list (e.g. `"In progress"`). Falls back to the list `id` — which may be auto-generated gibberish — so set it wherever users can move items across lists by keyboard. |
+| `mkDropListLabelledBy` | `string` | `''` | Id of the element that names the list (`aria-labelledby`), e.g. a visible heading. Takes precedence over `mkDropListLabel` as the accessible name; the label is still used in announcements. |
 | `mkDropListOrientation` | `MkDropListOrientation` | `'vertical'` | Layout axis; controls pointer hit-testing and arrow-key direction. |
 | `mkDropListDisabled` | `boolean` | `false` | Disable dropping into (and dragging out of) this list. |
 
@@ -3211,8 +3217,13 @@ to render each row; drops are applied to the model for you (via
 
 For connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.
 
+The list renders as a named `group` of `button` items: pass `label` (or
+`labelledBy` pointing at a visible heading) so screen readers say what is
+being reordered — the i18n `sortableListLabel` ("Sortable list") is the
+fallback.
+
 ```html
-<mk-sortable-list [(items)]="rows">
+<mk-sortable-list [(items)]="rows" label="Steps">
   <ng-template let-row let-i="index">
     <span mkDragHandle aria-hidden="true">⠿</span> {{ i + 1 }}. {{ row.name }}
   </ng-template>
@@ -3224,6 +3235,8 @@ Inputs:
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `items` (two-way) | `T[]` | `[]` | The ordered items (two-way). Reordered in place on drop. |
+| `label` | `string \| undefined` |  | Accessible name of the list (`aria-label`), also used in the "moved into …" announcements. Defaults to the i18n `sortableListLabel`. |
+| `labelledBy` | `string \| undefined` |  | Id of an element that names the list (`aria-labelledby`), e.g. a visible heading. Wins over `label` as the accessible name. |
 | `orientation` | `MkDropListOrientation` | `'vertical'` | Layout axis of the list. |
 | `disabled` | `boolean` | `false` | Disable reordering. |
 | `trackBy` | `(index: number, item: T) => unknown` | `(_, item) => item` | `@for` tracking function. Defaults to identity (track by item). |
