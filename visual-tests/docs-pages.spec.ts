@@ -65,6 +65,7 @@ const ROUTES: ReadonlyArray<{
   { path: '/testing', slug: 'testing' },
   { path: '/pro', slug: 'pro' },
   { path: '/cost', slug: 'cost', waitFor: '.mk-table tbody tr' },
+  { path: '/accessibility', slug: 'accessibility' },
   { path: '/blog', slug: 'blog' },
   {
     path: '/blog/switching-from-primeng',
