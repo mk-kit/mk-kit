@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.44.0",
+ "version": "0.45.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,10 +9,10 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3642489,
-  "min": 1593281,
-  "brotli": 281541,
-  "budgetKiB": 3560
+  "raw": 3663945,
+  "min": 1608533,
+  "brotli": 287302,
+  "budgetKiB": 3600
  },
  "entries": [
   {
@@ -263,9 +263,9 @@
    "name": "core",
    "import": "@mk-kit/ui/core",
    "file": "mk-kit-ui-core.mjs",
-   "raw": 97682,
-   "min": 38748,
-   "brotli": 12268,
+   "raw": 98215,
+   "min": 38813,
+   "brotli": 12269,
    "budgetKiB": 100,
    "items": [
     {
@@ -278,8 +278,8 @@
      "name": "provideMkI18n",
      "kind": "function",
      "docs": "/core-services",
-     "own": 4790,
-     "size": 4790
+     "own": 4804,
+     "size": 4804
     },
     {
      "name": "mkQueryOperatorLabel",
@@ -459,6 +459,12 @@
     {
      "name": "MK_BREAKPOINTS",
      "kind": "token",
+     "own": 390,
+     "size": 390
+    },
+    {
+     "name": "mkMergeI18n",
+     "kind": "function",
      "own": 390,
      "size": 390
     },
@@ -2675,6 +2681,53 @@
    ]
   },
   {
+   "name": "locales/pl",
+   "import": "@mk-kit/ui/locales/pl",
+   "file": "mk-kit-ui-locales-pl.mjs",
+   "raw": 20923,
+   "min": 15187,
+   "brotli": 5760,
+   "budgetKiB": 32,
+   "items": [
+    {
+     "name": "provideMkI18nPl",
+     "kind": "function",
+     "own": 5699,
+     "size": 8810
+    },
+    {
+     "name": "MK_PL_I18N",
+     "kind": "const",
+     "own": 5667,
+     "size": 5932
+    },
+    {
+     "name": "MK_PL_BLOCK_EDITOR",
+     "kind": "const",
+     "own": 1697,
+     "size": 1980
+    },
+    {
+     "name": "MK_PL_VALIDATION",
+     "kind": "const",
+     "own": 659,
+     "size": 927
+    },
+    {
+     "name": "MK_PL_DATE_NAMES",
+     "kind": "const",
+     "own": 274,
+     "size": 542
+    },
+    {
+     "name": "mkPluralPl",
+     "kind": "function",
+     "own": 127,
+     "size": 400
+    }
+   ]
+  },
+  {
    "name": "media",
    "import": "@mk-kit/ui/media",
    "file": "mk-kit-ui-media.mjs",
@@ -3041,7 +3094,7 @@
      "selector": "mk-rich-text-engine",
      "docs": "/components/rich-text",
      "own": 3549,
-     "size": 8167
+     "size": 8168
     },
     {
      "name": "sanitizeInlineHtml",
