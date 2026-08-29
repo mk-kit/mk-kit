@@ -4,6 +4,7 @@
  * between its own `## [x.y.z] — date` heading and the next `## ` heading.
  *
  *   node scripts/changelog-section.mjs 0.7.0
+ *   node scripts/changelog-section.mjs 0.1.0 projects/validators/CHANGELOG.md
  *
  * Exits non-zero when the version has no section, so a release job fails loudly
  * rather than publishing with empty notes.
@@ -14,13 +15,15 @@ import { fileURLToPath } from 'node:url';
 
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const version = (process.argv[2] ?? '').replace(/^v/, '');
+// Optional second argument: a changelog other than the root one (a package's own).
+const file = process.argv[3] ?? 'CHANGELOG.md';
 
 if (!version) {
-  console.error('usage: node scripts/changelog-section.mjs <version>');
+  console.error('usage: node scripts/changelog-section.mjs <version> [path/to/CHANGELOG.md]');
   process.exit(2);
 }
 
-const changelog = await readFile(join(root, 'CHANGELOG.md'), 'utf8');
+const changelog = await readFile(join(root, file), 'utf8');
 const lines = changelog.split('\n');
 
 // Match `## [0.7.0]` or `## 0.7.0`, with or without a trailing date.

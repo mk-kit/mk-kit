@@ -18,6 +18,8 @@
     "test:lib": "ng test mk-kit --no-watch",
     "test:docs": "ng test docs --no-watch",
     "test:mcp": "vitest run --root projects/mcp",
+    "build:validators": "tsc -p projects/validators/tsconfig.json && node scripts/build-validators.mjs",
+    "test:validators": "vitest run --root projects/validators",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots"
   },

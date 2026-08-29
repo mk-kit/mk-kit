@@ -6,8 +6,10 @@ site, live at **<https://mk-kit.dev>**.
 
 ```
 projects/
-  mk-kit/   → the publishable library (@mk-kit/ui)
-  docs/     → the documentation & live-demo site
+  mk-kit/      → the publishable library (@mk-kit/ui)
+  docs/        → the documentation & live-demo site
+  mcp/         → @mk-kit/mcp — MCP server over the generated API reference
+  validators/  → @mk-kit/validators — zero-dependency PESEL / NIP / REGON / IBAN / VAT … checks
 ```
 
 ## Requirements
