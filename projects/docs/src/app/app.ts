@@ -11,9 +11,17 @@ import { filter, map } from 'rxjs/operators';
 import {
   MkAppShell,
   MkButton,
+  MkButtonToggle,
+  MkButtonToggleGroup,
   MkCommandPalette,
   type MkCommand,
+  type MkContrastPreference,
+  type MkDensity,
+  MkIcon,
+  MkPopover,
+  MkPopoverTrigger,
   MkThemeService,
+  type MkThemePreference,
 } from '@mk-kit/ui';
 import { DocsToc } from './shared/docs-toc';
 import { version as uiVersion } from '../../../mk-kit/package.json';
@@ -38,7 +46,12 @@ interface NavSection {
     RouterLinkActive,
     MkAppShell,
     MkButton,
+    MkButtonToggle,
+    MkButtonToggleGroup,
     MkCommandPalette,
+    MkIcon,
+    MkPopover,
+    MkPopoverTrigger,
     DocsToc,
   ],
   templateUrl: './app.html',
@@ -475,41 +488,20 @@ export class App {
       })),
   );
 
-  protected cycleDensity(): void {
-    const order = ['comfortable', 'compact', 'touch'] as const;
-    const next = order[(order.indexOf(this.theme.density()) + 1) % 3];
-    this.theme.setDensity(next);
+  /** Appearance popover: the toggle groups emit `unknown`, the service wants the union. */
+  protected setTheme(value: unknown): void {
+    this.theme.setTheme(value as MkThemePreference);
+  }
+  protected setContrast(value: unknown): void {
+    this.theme.setContrast(value as MkContrastPreference);
+  }
+  protected setDensity(value: unknown): void {
+    this.theme.setDensity(value as MkDensity);
   }
 
-  protected densityIcon(): string {
-    const d = this.theme.density();
-    return d === 'compact' ? '▤' : d === 'touch' ? '◉' : '☰';
-  }
-
-  protected contrastLabel(): string {
-    const c = this.theme.contrast();
-    return c === 'system' ? 'System' : c === 'high' ? 'High' : 'Normal';
-  }
-
-  protected cycleContrast(): void {
-    const order = ['system', 'high', 'normal'] as const;
-    const next = order[(order.indexOf(this.theme.contrast()) + 1) % 3];
-    this.theme.setContrast(next);
-  }
-
-  protected cycleTheme(): void {
-    const order = ['light', 'dark', 'system'] as const;
-    const next = order[(order.indexOf(this.theme.preference()) + 1) % 3];
-    this.theme.setTheme(next);
-  }
-
-  protected themeLabel(): string {
-    const p = this.theme.preference();
-    return p === 'system' ? 'System' : p === 'dark' ? 'Dark' : 'Light';
-  }
-
-  protected themeIcon(): string {
-    const p = this.theme.preference();
-    return p === 'system' ? '◐' : p === 'dark' ? '☾' : '☀';
+  /** Read out on the trigger, e.g. "dark theme, high contrast, touch density". */
+  protected appearanceSummary(): string {
+    const density = this.theme.density() === 'comfortable' ? 'default' : this.theme.density();
+    return `${this.theme.preference()} theme, ${this.theme.contrast()} contrast, ${density} density`;
   }
 }

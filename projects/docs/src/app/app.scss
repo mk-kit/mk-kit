@@ -3,21 +3,36 @@
 }
 
 /* Header ----------------------------------------------------------------- */
+/* The shell already pads the header (--mk-space-4 + safe-area); the docs add
+   a little more on wide screens only. Both halves are shrink-safe so the row
+   can never overflow the viewport, whatever the density or phone width. */
 .docs-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: var(--mk-space-4);
+  gap: var(--mk-space-3);
   width: 100%;
   height: 100%;
-  padding: 0 var(--mk-space-6);
+  min-width: 0;
+  padding: 0 var(--mk-space-2);
 }
 
 .docs-header__left,
 .docs-header__right {
   display: flex;
   align-items: center;
-  gap: var(--mk-space-2);
+  gap: var(--mk-space-1);
+  min-width: 0;
+}
+.docs-header__left {
+  flex: 1 1 auto;
+}
+.docs-header__right {
+  flex: 0 0 auto;
+}
+/* Space between the hamburger and the brand */
+.docs-header__menu {
+  margin-inline-end: var(--mk-space-1);
 }
 
 .docs-brand {
@@ -45,11 +60,14 @@
   letter-spacing: var(--mk-letter-spacing-tight);
 }
 .docs-brand__ver {
+  margin-inline-start: var(--mk-space-1);
   font-size: var(--mk-font-size-xs);
   color: var(--mk-text-subtle);
+  text-decoration: none;
   border: 1px solid var(--mk-border);
   border-radius: var(--mk-radius-pill);
   padding: 1px var(--mk-space-2);
+  white-space: nowrap;
 }
 
 /* Header site nav (Docs / Blog) */
@@ -57,25 +75,30 @@
   display: flex;
   align-items: center;
   gap: var(--mk-space-1);
-  margin-right: var(--mk-space-2);
 }
 .docs-header__nav-link--active {
   color: var(--mk-primary);
   background: color-mix(in srgb, var(--mk-primary) 10%, transparent);
 }
-
-@media (max-width: 560px) {
-  .docs-header__nav,
-  .docs-brand__ver,
-  .docs-github,
-  .docs-search-btn .docs-kbd {
-    display: none;
-  }
+/* Hairline between the site nav and the tools */
+.docs-header__sep {
+  width: var(--mk-border-width);
+  height: 1.25rem;
+  margin: 0 var(--mk-space-2);
+  background: var(--mk-border);
 }
 
-/* Header search button + kbd hint */
+/* Every header control uses the same 1rem icon, so the ghost buttons sit on a
+   common rhythm regardless of density. */
+.docs-header mk-icon {
+  flex: none;
+}
+
+/* Search button + kbd hint */
+.docs-search-btn {
+  gap: var(--mk-space-2);
+}
 .docs-search-btn .docs-kbd {
-  margin-left: var(--mk-space-2);
   padding: 1px 5px;
   font-family: var(--mk-font-mono);
   font-size: 10px;
@@ -83,6 +106,65 @@
   background: var(--mk-surface-2);
   border: var(--mk-border-width) solid var(--mk-border);
   border-radius: var(--mk-radius-sm);
+}
+.docs-appearance-btn {
+  gap: var(--mk-space-2);
+}
+
+/* Appearance popover: three labelled segmented controls */
+.docs-appearance {
+  display: grid;
+  gap: var(--mk-space-3);
+  padding: var(--mk-space-1) 0;
+}
+.docs-appearance__row {
+  display: grid;
+  grid-template-columns: 4.5rem 1fr;
+  align-items: center;
+  gap: var(--mk-space-3);
+}
+.docs-appearance__label {
+  font-size: var(--mk-font-size-sm);
+  font-weight: var(--mk-font-weight-medium);
+  color: var(--mk-text-muted);
+}
+.docs-appearance__hint {
+  margin: var(--mk-space-1) 0 0;
+  max-width: 22rem;
+  font-size: var(--mk-font-size-xs);
+  line-height: var(--mk-line-height-normal);
+  color: var(--mk-text-subtle);
+}
+
+/* Progressive collapse: text labels go first, then the secondary links. */
+@media (max-width: 900px) {
+  .docs-appearance-btn__label {
+    display: none;
+  }
+}
+@media (max-width: 640px) {
+  .docs-header {
+    padding: 0;
+  }
+  .docs-header__nav,
+  .docs-header__sep,
+  .docs-brand__ver,
+  .docs-github,
+  .docs-search-btn__label,
+  .docs-search-btn .docs-kbd {
+    display: none;
+  }
+  /* Search and appearance collapse to square icon buttons */
+  .docs-search-btn,
+  .docs-appearance-btn {
+    width: var(--mk-control-height-sm);
+    padding-inline: 0;
+    justify-content: center;
+  }
+  .docs-appearance__row {
+    grid-template-columns: 1fr;
+    gap: var(--mk-space-1);
+  }
 }
 
 /* Sidebar ----------------------------------------------------------------- */

@@ -7,11 +7,14 @@
           mkButton
           variant="ghost"
           tone="neutral"
+          size="sm"
           iconOnly
+          class="docs-header__menu"
           aria-label="Toggle navigation"
+          [attr.aria-expanded]="shell.sidebarOpen()"
           (click)="shell.toggleSidebar()"
         >
-          ☰
+          <mk-icon name="menu" size="sm" />
         </button>
       }
       <a class="docs-brand" routerLink="/">
@@ -21,7 +24,6 @@
       <a
         class="docs-brand__ver"
         routerLink="/changelog"
-        style="text-decoration: none"
         [attr.aria-label]="'Version ' + uiVersion + ' — view changelog'"
         >v{{ uiVersion }}</a
       >
@@ -50,16 +52,19 @@
           >Blog</a
         >
       </nav>
+      <span class="docs-header__sep" aria-hidden="true"></span>
       <button
         mkButton
         variant="outline"
         tone="neutral"
         size="sm"
         class="docs-search-btn"
+        aria-label="Search the docs"
+        aria-keyshortcuts="Meta+K Control+K"
         (click)="searchOpen.set(true)"
       >
-        <span aria-hidden="true">⌕</span>
-        Search
+        <mk-icon name="search" size="sm" />
+        <span class="docs-search-btn__label">Search</span>
         <kbd class="docs-kbd" aria-hidden="true">⌘K</kbd>
       </button>
       <button
@@ -67,34 +72,62 @@
         variant="ghost"
         tone="neutral"
         size="sm"
-        iconOnly
-        (click)="cycleDensity()"
-        [attr.aria-label]="'Density: ' + theme.density() + '. Click to change.'"
+        class="docs-appearance-btn"
+        [mkPopoverTriggerFor]="appearance"
+        [attr.aria-label]="'Appearance: ' + appearanceSummary()"
       >
-        {{ densityIcon() }}
+        <mk-icon [name]="theme.isDark() ? 'moon' : 'sun'" size="sm" />
+        <span class="docs-appearance-btn__label">Appearance</span>
       </button>
-      <button
-        mkButton
-        variant="ghost"
-        tone="neutral"
-        size="sm"
-        iconOnly
-        (click)="cycleContrast()"
-        [attr.aria-label]="'Contrast: ' + contrastLabel() + '. Click to change.'"
-      >
-        ◧
-      </button>
-      <button
-        mkButton
-        variant="ghost"
-        tone="neutral"
-        size="sm"
-        iconOnly
-        (click)="cycleTheme()"
-        [attr.aria-label]="'Theme: ' + themeLabel() + '. Click to change.'"
-      >
-        {{ themeIcon() }}
-      </button>
+      <mk-popover #appearance ariaLabel="Appearance" placement="bottom-end">
+        <div class="docs-appearance">
+          <div class="docs-appearance__row">
+            <span class="docs-appearance__label" id="docs-appearance-theme">Theme</span>
+            <mk-button-toggle-group
+              size="sm"
+              tone="neutral"
+              aria-label="Theme"
+              [value]="theme.preference()"
+              (valueChange)="setTheme($event)"
+            >
+              <mk-button-toggle value="light">Light</mk-button-toggle>
+              <mk-button-toggle value="dark">Dark</mk-button-toggle>
+              <mk-button-toggle value="system">System</mk-button-toggle>
+            </mk-button-toggle-group>
+          </div>
+          <div class="docs-appearance__row">
+            <span class="docs-appearance__label">Contrast</span>
+            <mk-button-toggle-group
+              size="sm"
+              tone="neutral"
+              aria-label="Contrast"
+              [value]="theme.contrast()"
+              (valueChange)="setContrast($event)"
+            >
+              <mk-button-toggle value="normal">Normal</mk-button-toggle>
+              <mk-button-toggle value="high">High</mk-button-toggle>
+              <mk-button-toggle value="system">System</mk-button-toggle>
+            </mk-button-toggle-group>
+          </div>
+          <div class="docs-appearance__row">
+            <span class="docs-appearance__label">Density</span>
+            <mk-button-toggle-group
+              size="sm"
+              tone="neutral"
+              aria-label="Density"
+              [value]="theme.density()"
+              (valueChange)="setDensity($event)"
+            >
+              <mk-button-toggle value="compact">Compact</mk-button-toggle>
+              <mk-button-toggle value="comfortable">Default</mk-button-toggle>
+              <mk-button-toggle value="touch">Touch</mk-button-toggle>
+            </mk-button-toggle-group>
+          </div>
+          <p class="docs-appearance__hint">
+            "System" follows your OS setting. Choices are remembered in this browser.
+          </p>
+        </div>
+      </mk-popover>
       <a
         mkButton
         variant="ghost"
