@@ -2,7 +2,7 @@
 
 **Themable, accessible Angular component library for admin dashboards, back-offices and internal tools.**
 
-175+ standalone components, directives and services — data tables, charts,
+185+ components (225+ selectors with directives and pipes) and 16 services — data tables, charts,
 date & time pickers, editors, kanban, overlays, an app shell — written for
 Angular 22 with signals and `OnPush` from day one. Every visual value is a
 `--mk-*` CSS custom property; light and dark ship out of the box; WCAG 2.1 AA
@@ -103,10 +103,12 @@ import { MkDatePicker } from '@mk-kit/ui/datetime';
 ```
 
 Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
-`feedback`, `directives`, `dnd`, `media`, `icon`, `button`, `checkbox`, `chip`,
-`context-menu`, `layout`, `chat`, `query-builder`, `dynamic-form`, `rich-text`, `block-editor`,
-plus `testing` (component harnesses for specs — never re-exported from the
-umbrella). `sideEffects: false` throughout.
+`feedback`, `directives`, `dnd`, `media`, `icon`, `icon/extended` (the opt-in
+305-icon set), `button`, `checkbox`, `chip`, `context-menu`, `layout`, `chat`,
+`query-builder`, `dynamic-form`, `rich-text`, `block-editor`, plus `testing`
+(component harnesses for specs) and `locales/pl` (the Polish string pack) —
+the last two are never re-exported from the umbrella. `sideEffects: false`
+throughout.
 
 ## Theming
 
