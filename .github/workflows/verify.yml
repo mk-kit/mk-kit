@@ -41,6 +41,9 @@ jobs:
       - name: Build + test MCP server
         run: npm run build:mcp && npm run test:mcp
 
+      - name: Build + test validators package
+        run: npm run build:validators && npm run test:validators
+
       - name: Build docs
         run: npm run build
 

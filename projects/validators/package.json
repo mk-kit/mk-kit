@@ -1,0 +1,24 @@
+{
+  "name": "@mk-kit/validators",
+  "version": "0.1.0",
+  "description": "Zero-dependency validators for Polish and European identifiers — PESEL, NIP, REGON, KRS, ID card, IBAN, EU VAT numbers, Luhn / card brands, postal codes, E.164 phones. Pure functions, plus adapters for Angular reactive forms and Signal Forms (Standard Schema).",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    "./forms": { "types": "./forms.d.ts", "default": "./forms.js" },
+    "./signals": { "types": "./signals.d.ts", "default": "./signals.js" }
+  },
+  "files": ["*.js", "*.d.ts", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "peerDependencies": { "@angular/forms": ">=17" },
+  "peerDependenciesMeta": { "@angular/forms": { "optional": true } },
+  "keywords": ["validators", "validation", "pesel", "nip", "regon", "krs", "iban", "vat", "vies", "luhn", "postal-code", "e164", "poland", "angular", "signal-forms", "standard-schema", "mk-kit"],
+  "homepage": "https://mk-kit.dev",
+  "repository": { "type": "git", "url": "git+https://github.com/mk-kit/mk-kit.git", "directory": "projects/validators" },
+  "bugs": "https://github.com/mk-kit/mk-kit/issues",
+  "publishConfig": { "access": "public" }
+}
