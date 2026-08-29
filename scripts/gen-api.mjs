@@ -59,7 +59,12 @@ const parsed = ts.parseJsonConfigFileContent(configFile.config, ts.sys, LIB);
 const options = {
   ...parsed.options,
   baseUrl: ROOT,
-  paths: { '@mk-kit/ui': ['projects/mk-kit/src/public-api.ts'], '@mk-kit/ui/*': ['projects/mk-kit/*/index.ts'] },
+  paths: {
+    '@mk-kit/ui': ['projects/mk-kit/src/public-api.ts'],
+    '@mk-kit/ui/*': ['projects/mk-kit/*/index.ts'],
+    // Built first (npm run build:validators) — a real dependency, resolved from dist/.
+    '@mk-kit/validators': ['dist/validators/index.d.ts'],
+  },
   noEmit: true,
   skipLibCheck: true,
 };

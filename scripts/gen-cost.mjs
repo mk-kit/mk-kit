@@ -176,7 +176,7 @@ function mkPlugin(mode, entry) {
         if (mode === 'own' && e !== entry) return { path: args.path, external: true, sideEffects: false };
         return { path: fesmOf(e) };
       });
-      b.onResolve({ filter: /^(@angular\/|rxjs(\/|$)|tslib$)/ }, (args) => ({ path: args.path, external: true }));
+      b.onResolve({ filter: /^(@angular\/|rxjs(\/|$)|tslib$|@mk-kit\/validators(\/|$))/ }, (args) => ({ path: args.path, external: true }));
       b.onLoad({ filter: /fesm2022[\\/][\w-]+\.mjs$/ }, async (args) => {
         let contents = await link(args.path);
         if (mode === 'own') contents = contents.replace(/^export \* from '@mk-kit\/ui\/[\w/-]+';$/gm, '');

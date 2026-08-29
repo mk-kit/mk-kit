@@ -23,45 +23,29 @@ import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
 import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
-
-/** IBAN length per ISO 13616 country code (SEPA + common others). */
-export const MK_IBAN_LENGTHS: Readonly<Record<string, number>> = {
-  AD: 24, AE: 23, AL: 28, AT: 20, AZ: 28, BA: 20, BE: 16, BG: 22, BH: 22,
-  BR: 29, CH: 21, CR: 22, CY: 28, CZ: 24, DE: 22, DK: 18, DO: 28, EE: 20,
-  EG: 29, ES: 24, FI: 18, FO: 18, FR: 27, GB: 22, GE: 22, GI: 23, GL: 18,
-  GR: 27, HR: 21, HU: 28, IE: 22, IL: 23, IS: 26, IT: 27, JO: 30, KW: 30,
-  KZ: 20, LB: 28, LI: 21, LT: 20, LU: 20, LV: 21, MC: 27, MD: 24, ME: 22,
-  MK: 19, MT: 31, NL: 18, NO: 15, PK: 24, PL: 28, PT: 25, QA: 29, RO: 24,
-  RS: 22, SA: 24, SE: 24, SI: 19, SK: 24, SM: 27, TN: 24, TR: 26, UA: 29,
-  VA: 22, XK: 20,
-};
-
-/** The maximum IBAN length the standard allows. */
-const IBAN_MAX = 34;
+import { IBAN_LENGTHS, ibanMod97, isIban } from '@mk-kit/validators';
 
 /**
- * ISO 13616 mod-97 check over a compact (no spaces, uppercase) IBAN.
- * Assumes the shape `CC00…` has already been length-checked by the caller.
+ * IBAN lengths per country — re-exported from `@mk-kit/validators`
+ * (`IBAN_LENGTHS`, the SWIFT registry).
  */
+export const MK_IBAN_LENGTHS: Readonly<Record<string, number>> = IBAN_LENGTHS;
+
+/** Longest IBAN in the registry (Malta, 31) rounded up to the ISO 13616 maximum. */
+const IBAN_MAX = 34;
+
+/** ISO 7064 MOD 97-10 over a compact (uppercase, no separators) IBAN. */
 export function mkIbanChecksum(compact: string): boolean {
-  if (!/^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(compact)) return false;
-  const rearranged = compact.slice(4) + compact.slice(0, 4);
-  let rem = 0;
-  for (const ch of rearranged) {
-    const code = ch.charCodeAt(0);
-    // A→10 … Z→35 contribute two digits; plain digits contribute one.
-    if (code >= 65) rem = (rem * 100 + (code - 55)) % 97;
-    else rem = (rem * 10 + (code - 48)) % 97;
-  }
-  return rem === 1;
+  return /^[A-Z]{2}\d{2}[A-Z0-9]+$/.test(compact) && ibanMod97(compact) === 1;
 }
 
-/** Full IBAN validity: known country, exact length, mod-97 check. */
+/**
+ * Shape, the registry length for the country and the checksum — delegates
+ * to `isIban` from `@mk-kit/validators`. Unlike that function this one keeps
+ * the input kit's stricter rule that the country must be in the table.
+ */
 export function mkIbanIsValid(compact: string): boolean {
-  const length = MK_IBAN_LENGTHS[compact.slice(0, 2)];
-  return (
-    length !== undefined && compact.length === length && mkIbanChecksum(compact)
-  );
+  return MK_IBAN_LENGTHS[compact.slice(0, 2)] !== undefined && isIban(compact);
 }
 
 /**

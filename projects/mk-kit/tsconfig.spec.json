@@ -7,7 +7,9 @@
     "types": ["vitest/globals"],
     "paths": {
       "@mk-kit/ui": ["./src/public-api.ts"],
-      "@mk-kit/ui/*": ["./*"]
+      "@mk-kit/ui/*": ["./*"],
+      "@mk-kit/validators": ["../../dist/validators"],
+      "@mk-kit/validators/*": ["../../dist/validators/*"]
     }
   },
   "include": ["**/*.d.ts", "**/*.spec.ts"]
