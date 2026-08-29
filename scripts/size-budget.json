@@ -1,6 +1,6 @@
 {
-  "comment": "Raw (uncompressed) size budgets in KiB for the built FESM2022 bundles. `total` covers the whole fesm2022 directory. Raise a budget deliberately (with the reason in the commit) \u2014 never to silence a surprise regression.",
-  "total": 3560,
+  "comment": "Raw (uncompressed) size budgets in KiB for the built FESM2022 bundles. `total` covers the whole fesm2022 directory. Raise a budget deliberately (with the reason in the commit) — never to silence a surprise regression.",
+  "total": 3600,
   "bundles": {
     "mk-kit-ui-forms.mjs": 870,
     "mk-kit-ui-data.mjs": 680,
@@ -20,6 +20,7 @@
     "mk-kit-ui-query-builder.mjs": 64,
     "mk-kit-ui-checkbox.mjs": 40,
     "mk-kit-ui-testing.mjs": 40,
-    "mk-kit-ui-dynamic-form.mjs": 64
+    "mk-kit-ui-dynamic-form.mjs": 64,
+    "mk-kit-ui-locales-pl.mjs": 32
   }
 }

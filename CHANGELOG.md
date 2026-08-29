@@ -4,6 +4,32 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Polish locale pack** — new entry point `@mk-kit/ui/locales/pl`: the
+  complete `MkI18nStrings` map in Polish (`MK_PL_I18N`, with `locale:
+  'pl-PL'` and `currency: 'PLN'` for the formatting pipes), its
+  `MK_PL_DATE_NAMES` / `MK_PL_VALIDATION` / `MK_PL_BLOCK_EDITOR` tables,
+  `provideMkI18nPl(overrides?)` (overrides merge over the pack, not over
+  English) and `mkPluralPl(count, one, few, many)` — the CLDR plural picker
+  the pack's counts use. Locale packs are separate entry points so an app
+  ships only the languages it provides. A conformance spec fails when a
+  key is missing, has a different shape than the English default or is left
+  untranslated, so a contributed pack cannot silently drift.
+- **`provideMkI18n(overrides, base?)`** (`@mk-kit/ui/core`) — optional
+  second argument: the complete map the overrides merge over (English
+  defaults when omitted). New exports `MkI18nOverrides` (the partial shape
+  it accepts) and `mkMergeI18n(base, overrides)` (the merge without the
+  provider).
+
+### Changed
+
+- Docs: the getting-started i18n demo and snippet use the Polish pack;
+  core-services gains a "Locale packs" section. `api.json` / `llms.txt`
+  now cover nested entry points that the root barrel does not re-export.
+
 ## [0.44.0] — 2026-08-28
 
 ### Added

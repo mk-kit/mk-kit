@@ -165,6 +165,15 @@ bootstrapApplication(AppRoot, {
 });
 ```
 
+Complete translations are their own entry points, so an app carries only the
+locales it provides — today Polish:
+
+```ts
+import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';
+
+providers: [provideMkI18nPl({ noData: 'Nic tu nie ma' })]; // overrides merge over the pack
+```
+
 Overrides can be scoped to a component subtree for mixed-locale screens.
 Layout and arrow keys flip under `dir="rtl"`.
 

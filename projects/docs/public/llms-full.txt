@@ -12,7 +12,7 @@ Every component and directive below is standalone — import the class from its 
 
 ## @mk-kit/ui/core
 
-74 exports. `import { … } from '@mk-kit/ui/core';`
+76 exports. `import { … } from '@mk-kit/ui/core';`
 
 ### MkAnchoredPanel (directive)
 
@@ -386,6 +386,18 @@ True when `value` is a per-breakpoint map rather than a plain value.
 function mkIsResponsive<T>(value: MkResponsive<T>): value is Partial<Record<MkBreakpoint, T>>
 ```
 
+### mkMergeI18n (function)
+
+Import: `import { mkMergeI18n } from '@mk-kit/ui/core';`
+
+Merges `overrides` over a complete string map — shallow for the top level,
+deep for the `dateNames`, `blockEditor` and `validation` groups. Exported
+so locale packs and tests can build a map without providing it.
+
+```ts
+function mkMergeI18n(base: MkI18nStrings, overrides: MkI18nOverrides): MkI18nStrings
+```
+
 ### mkQueryCompact (function)
 
 Import: `import { mkQueryCompact } from '@mk-kit/ui/core';`
@@ -555,9 +567,10 @@ Docs: https://mk-kit.dev/core-services
 
 Import: `import { provideMkI18n } from '@mk-kit/ui/core';`
 
-Provide localised strings (merged over the English defaults) — pass any
-subset. The nested `dateNames`, `blockEditor` and `validation` groups are
-merged deeply, so partial overrides of those work too.
+Provide localised strings — pass any subset, merged over `base` (the
+English defaults unless given). The nested `dateNames`, `blockEditor` and
+`validation` groups are merged deeply, so partial overrides of those work
+too.
 
 ```ts
 bootstrapApplication(App, {
@@ -565,8 +578,12 @@ bootstrapApplication(App, {
 });
 ```
 
+A locale pack is a complete map that serves as the base — either through
+its own helper (`provideMkI18nPl(overrides)` from `@mk-kit/ui/locales/pl`)
+or explicitly: `provideMkI18n(overrides, MK_PL_I18N)`.
+
 ```ts
-function provideMkI18n(overrides: Partial<Omit<MkI18nStrings, "dateNames" | "blockEditor" | "validation">> & { dateNames?: Partial<MkDateNames>; blockEditor?: Partial<MkBlockEditorStrings>; validation?: Partial<MkValidationStrings>; }): Provider
+function provideMkI18n(overrides: MkI18nOverrides, base?: MkI18nStrings): Provider
 ```
 
 ### MK_BREAKPOINTS (token)
@@ -1360,6 +1377,17 @@ to a function receiving that key's error payload.
 
 ```ts
 type MkErrorMessages = Readonly<Record<string, string | ((err: any) => string)>>;
+```
+
+### MkI18nOverrides (type)
+
+Import: `import { MkI18nOverrides } from '@mk-kit/ui/core';`
+
+Any subset of `MkI18nStrings`; the nested `dateNames`, `blockEditor`
+and `validation` groups may be partial too (they are merged deeply).
+
+```ts
+type MkI18nOverrides = Partial< Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'> > & { dateNames?: Partial<MkDateNames>; blockEditor?: Partial<MkBlockEditorStrings>; validation?: Partial<MkValidationStrings>; };
 ```
 
 ### MkPlacement (type)
@@ -14970,6 +14998,89 @@ Load lifecycle of an `MkImage`.
 
 ```ts
 type MkImageState = 'loading' | 'loaded' | 'error';
+```
+
+## @mk-kit/ui/locales/pl
+
+6 exports. `import { … } from '@mk-kit/ui/locales/pl';`
+
+### mkPluralPl (function)
+
+Import: `import { mkPluralPl } from '@mk-kit/ui/locales/pl';`
+
+Picks the Polish plural form for a count: `one` for 1, `few` for 2–4
+(except 12–14), `many` otherwise — CLDR's `pl` rules for integers, which is
+all the library's counts ever are.
+
+```ts
+mkPluralPl(1, 'wynik', 'wyniki', 'wyników');  // 'wynik'
+mkPluralPl(3, 'wynik', 'wyniki', 'wyników');  // 'wyniki'
+mkPluralPl(12, 'wynik', 'wyniki', 'wyników'); // 'wyników'
+```
+
+```ts
+function mkPluralPl(count: number, one: string, few: string, many: string): string
+```
+
+### provideMkI18nPl (function)
+
+Import: `import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';`
+
+Provides the Polish strings — `MK_PL_I18N` with any `overrides`
+merged on top (deep for `dateNames`, `blockEditor` and `validation`, like
+`provideMkI18n`).
+
+```ts
+bootstrapApplication(App, {
+  providers: [provideMkI18nPl({ noData: 'Nic tu nie ma' })],
+});
+```
+
+```ts
+function provideMkI18nPl(overrides?: MkI18nOverrides): Provider
+```
+
+### MK_PL_BLOCK_EDITOR (const)
+
+Import: `import { MK_PL_BLOCK_EDITOR } from '@mk-kit/ui/locales/pl';`
+
+Polish strings of the block editor's chrome.
+
+```ts
+const MK_PL_BLOCK_EDITOR: MkBlockEditorStrings;
+```
+
+### MK_PL_DATE_NAMES (const)
+
+Import: `import { MK_PL_DATE_NAMES } from '@mk-kit/ui/locales/pl';`
+
+Polish month and weekday names (Sunday-first, lowercase as in `Intl`).
+
+```ts
+const MK_PL_DATE_NAMES: MkDateNames;
+```
+
+### MK_PL_I18N (const)
+
+Import: `import { MK_PL_I18N } from '@mk-kit/ui/locales/pl';`
+
+The complete Polish string map — every key of `MkI18nStrings`,
+`locale: 'pl-PL'` and `currency: 'PLN'` for the formatting pipes.
+Provide it whole with `provideMkI18nPl`, or pass it as the base of
+`provideMkI18n(overrides, MK_PL_I18N)`.
+
+```ts
+const MK_PL_I18N: MkI18nStrings;
+```
+
+### MK_PL_VALIDATION (const)
+
+Import: `import { MK_PL_VALIDATION } from '@mk-kit/ui/locales/pl';`
+
+Polish validation messages rendered by `mk-form-field`.
+
+```ts
+const MK_PL_VALIDATION: MkValidationStrings;
 ```
 
 ## @mk-kit/ui/testing

@@ -6,22 +6,15 @@ import {
   MkButton,
   MkSelect,
   MkThemeService,
-  provideMkI18n,
 } from '@mk-kit/ui';
+import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';
 
-/** A subtree with Polish strings, to show `provideMkI18n` scoping. */
+/** A subtree on the Polish locale pack, to show `provideMkI18n` scoping. */
 @Component({
   selector: 'docs-i18n-demo',
   imports: [MkSelect, MkAutocomplete],
   changeDetection: ChangeDetectionStrategy.OnPush,
-  providers: [
-    provideMkI18n({
-      noOptions: 'Brak opcji',
-      noResults: 'Brak wyników',
-      clear: 'Wyczyść',
-      loading: 'Ładowanie…',
-    }),
-  ],
+  providers: [provideMkI18nPl()],
   template: `
     <div style="display: flex; gap: var(--mk-space-3); flex-wrap: wrap;">
       <mk-select placeholder="Wybierz…" [options]="[]" style="max-width: 14rem;" />
@@ -129,7 +122,9 @@ export class I18nDemo {}
         Every string the library renders itself — empty-state text, aria-labels
         and screen-reader announcements — comes from an injectable map. Override
         any subset with <code class="docs-inline">provideMkI18n</code> at bootstrap
-        (or scoped to a subtree). The demo below is scoped to Polish:
+        (or scoped to a subtree), or provide a complete locale pack from
+        <code class="docs-inline">&#64;mk-kit/ui/locales/*</code>. The demo
+        below is a subtree on the Polish pack:
       </p>
       <div class="gs-theme-demo">
         <docs-i18n-demo />
@@ -175,16 +170,14 @@ export class GettingStartedPage {
 
   protected readonly i18nSnippet = `import { bootstrapApplication } from '@angular/platform-browser';
 import { provideMkI18n } from '@mk-kit/ui';
+import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';
 
 bootstrapApplication(App, {
   providers: [
-    provideMkI18n({
-      noResults: 'Brak wyników',
-      noOptions: 'Brak opcji',
-      close: 'Zamknij',
-      sortedBy: (col, dir) =>
-        \`Posortowano wg \${col} \${dir === 'asc' ? 'rosnąco' : 'malejąco'}\`,
-    }),
+    // A complete locale pack (own entry point — only what you provide ships)…
+    provideMkI18nPl(),
+    // …or any subset over the English defaults; the rest falls back.
+    // provideMkI18n({ noResults: 'Brak wyników', close: 'Zamknij' }),
   ],
 });`;
 

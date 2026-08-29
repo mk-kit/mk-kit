@@ -279,12 +279,33 @@ const CHIP_TONES: readonly MkTone[] = ['primary', 'success', 'warning', 'danger'
         groups are merged deeply — partial overrides of those work too.
       </p>
       <pre class="core-code"><code>{{ i18nCode }}</code></pre>
+
+      <h3>Locale packs</h3>
+      <p>
+        Complete translations ship as their own entry points under
+        <code class="docs-inline">&#64;mk-kit/ui/locales/*</code>, so an app
+        carries only the languages it provides. Each pack exports the full
+        map, its date-name / validation / block-editor tables and a
+        <code class="docs-inline">provideMkI18n&lt;Xx&gt;(overrides?)</code>
+        helper that merges your overrides over the pack instead of over
+        English. Available today: <strong>Polish</strong>
+        (<code class="docs-inline">&#64;mk-kit/ui/locales/pl</code>, also sets
+        <code class="docs-inline">locale: 'pl-PL'</code> and
+        <code class="docs-inline">currency: 'PLN'</code> for the formatting
+        pipes). A pack is a single TypeScript file checked by a spec that
+        fails when a key is missing or left in English — the easiest
+        contribution to send.
+      </p>
+      <pre class="core-code"><code>{{ localeCode }}</code></pre>
       <table class="docs-props">
         <thead>
           <tr><th>Export</th><th>Type</th><th>Description</th></tr>
         </thead>
         <tbody>
-          <tr><td><code>provideMkI18n(overrides)</code></td><td><code>Provider</code></td><td>Merge a partial <code>MkI18nStrings</code> over the English defaults (deep for <code>dateNames</code> / <code>blockEditor</code> / <code>validation</code>).</td></tr>
+          <tr><td><code>provideMkI18n(overrides, base?)</code></td><td><code>Provider</code></td><td>Merge a partial <code>MkI18nStrings</code> over <code>base</code> — the English defaults unless given (deep for <code>dateNames</code> / <code>blockEditor</code> / <code>validation</code>).</td></tr>
+          <tr><td><code>mkMergeI18n(base, overrides)</code></td><td><code>MkI18nStrings</code></td><td>The same merge without the provider, for building a map by hand.</td></tr>
+          <tr><td><code>MkI18nOverrides</code></td><td><code>type</code></td><td>The partial shape <code>provideMkI18n</code> and the locale-pack helpers accept.</td></tr>
+          <tr><td><code>provideMkI18nPl(overrides?)</code> / <code>MK_PL_I18N</code> / <code>MK_PL_DATE_NAMES</code> / <code>MK_PL_VALIDATION</code> / <code>MK_PL_BLOCK_EDITOR</code> / <code>mkPluralPl</code></td><td><code>@mk-kit/ui/locales/pl</code></td><td>The Polish pack: provider helper, the complete map, its tables and the CLDR plural picker the pack's counts use.</td></tr>
           <tr><td><code>MK_I18N</code></td><td><code>InjectionToken&lt;MkI18nStrings&gt;</code></td><td>The active string map — inject it to render library strings yourself.</td></tr>
           <tr><td><code>MkI18nStrings</code></td><td><code>interface</code></td><td>All user-facing strings; interpolations are functions like <code>removeItem(name)</code>.</td></tr>
           <tr><td><code>dateNames</code></td><td><code>MkDateNames</code></td><td>Full-length name tables: <code>months</code>, <code>monthsShort</code>, <code>weekdays</code> (Sunday-first), <code>weekdaysShort</code>, <code>weekdaysNarrow</code>.</td></tr>
@@ -656,6 +677,15 @@ readonly columns = computed(() => this.bp.resolve({ xs: 1, md: 2, xl: 4 }));
         weekdaysNarrow: ['N', 'P', 'W', 'Ś', 'C', 'P', 'S'],
       },
     }),
+  ],
+});`;
+
+  protected readonly localeCode = `import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';
+
+bootstrapApplication(App, {
+  providers: [
+    // Every string in Polish; overrides merge over the pack, not over English.
+    provideMkI18nPl({ noData: 'Nic tu jeszcze nie ma' }),
   ],
 });`;
 

@@ -1245,31 +1245,54 @@ export const MK_I18N = new InjectionToken<MkI18nStrings>('MK_I18N', {
 });
 
 /**
- * Provide localised strings (merged over the English defaults) — pass any
- * subset. The nested `dateNames`, `blockEditor` and `validation` groups are
- * merged deeply, so partial overrides of those work too.
+ * Any subset of {@link MkI18nStrings}; the nested `dateNames`, `blockEditor`
+ * and `validation` groups may be partial too (they are merged deeply).
+ */
+export type MkI18nOverrides = Partial<
+  Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'>
+> & {
+  dateNames?: Partial<MkDateNames>;
+  blockEditor?: Partial<MkBlockEditorStrings>;
+  validation?: Partial<MkValidationStrings>;
+};
+
+/**
+ * Merges `overrides` over a complete string map — shallow for the top level,
+ * deep for the `dateNames`, `blockEditor` and `validation` groups. Exported
+ * so locale packs and tests can build a map without providing it.
+ */
+export function mkMergeI18n(
+  base: MkI18nStrings,
+  overrides: MkI18nOverrides,
+): MkI18nStrings {
+  return {
+    ...base,
+    ...overrides,
+    dateNames: { ...base.dateNames, ...overrides.dateNames },
+    blockEditor: { ...base.blockEditor, ...overrides.blockEditor },
+    validation: { ...base.validation, ...overrides.validation },
+  };
+}
+
+/**
+ * Provide localised strings — pass any subset, merged over `base` (the
+ * English defaults unless given). The nested `dateNames`, `blockEditor` and
+ * `validation` groups are merged deeply, so partial overrides of those work
+ * too.
  *
  * ```ts
  * bootstrapApplication(App, {
  *   providers: [provideMkI18n({ noResults: 'Brak wyników', close: 'Zamknij' })],
  * });
  * ```
+ *
+ * A locale pack is a complete map that serves as the base — either through
+ * its own helper (`provideMkI18nPl(overrides)` from `@mk-kit/ui/locales/pl`)
+ * or explicitly: `provideMkI18n(overrides, MK_PL_I18N)`.
  */
 export function provideMkI18n(
-  overrides: Partial<
-    Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'>
-  > & {
-    dateNames?: Partial<MkDateNames>;
-    blockEditor?: Partial<MkBlockEditorStrings>;
-    validation?: Partial<MkValidationStrings>;
-  },
+  overrides: MkI18nOverrides,
+  base: MkI18nStrings = MK_DEFAULT_I18N,
 ): Provider {
-  const value: MkI18nStrings = {
-    ...MK_DEFAULT_I18N,
-    ...overrides,
-    dateNames: { ...MK_DEFAULT_DATE_NAMES, ...overrides.dateNames },
-    blockEditor: { ...MK_DEFAULT_I18N.blockEditor, ...overrides.blockEditor },
-    validation: { ...MK_DEFAULT_VALIDATION, ...overrides.validation },
-  };
-  return { provide: MK_I18N, useValue: value };
+  return { provide: MK_I18N, useValue: mkMergeI18n(base, overrides) };
 }
