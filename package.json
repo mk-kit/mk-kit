@@ -9,7 +9,7 @@
     "gen:api": "node scripts/gen-api.mjs",
     "gen:cost": "node scripts/gen-cost.mjs",
     "build:theme": "sass projects/mk-kit/src/styles/mk-kit.scss projects/mk-kit/src/styles/mk-kit.css --no-source-map --style expanded --no-charset",
-    "build:lib": "npm run build:theme && ng build mk-kit && npm run build:schematics",
+    "build:lib": "npm run build:validators && npm run build:theme && ng build mk-kit && npm run build:schematics",
     "build:mcp": "tsc -p projects/mcp/tsconfig.json && node scripts/build-mcp.mjs",
     "build:schematics": "tsc -p projects/mk-kit/schematics/tsconfig.schematics.json && cp projects/mk-kit/schematics/collection.json projects/mk-kit/schematics/package.json dist/mk-kit/schematics/ && cp projects/mk-kit/schematics/ng-add/schema.json dist/mk-kit/schematics/ng-add/schema.json && cp projects/mk-kit/schematics/migrate-primeng/schema.json dist/mk-kit/schematics/migrate-primeng/schema.json",
     "watch:lib": "ng build mk-kit --watch --configuration development",
