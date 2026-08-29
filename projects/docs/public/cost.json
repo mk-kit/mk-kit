@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.45.0",
+ "version": "0.46.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,9 +9,9 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3663945,
-  "min": 1608533,
-  "brotli": 287302,
+  "raw": 3662224,
+  "min": 1607690,
+  "brotli": 286889,
   "budgetKiB": 3600
  },
  "entries": [
@@ -1107,7 +1107,7 @@
      "selector": "mk-datetime-picker",
      "docs": "/components/date-time",
      "own": 8042,
-     "size": 17360
+     "size": 17410
     },
     {
      "name": "MkEventCalendar",
@@ -1115,7 +1115,7 @@
      "selector": "mk-event-calendar",
      "docs": "/components/date-time",
      "own": 7792,
-     "size": 13365
+     "size": 13415
     },
     {
      "name": "MkDatePicker",
@@ -1123,7 +1123,7 @@
      "selector": "mk-date-picker",
      "docs": "/components/date-time",
      "own": 6486,
-     "size": 15840
+     "size": 15870
     },
     {
      "name": "MkDateRangePicker",
@@ -1131,7 +1131,7 @@
      "selector": "mk-date-range-picker",
      "docs": "/components/date-time",
      "own": 6452,
-     "size": 15771
+     "size": 15852
     },
     {
      "name": "MkWeekPicker",
@@ -1139,7 +1139,7 @@
      "selector": "mk-week-picker",
      "docs": "/components/date-time",
      "own": 6398,
-     "size": 15759
+     "size": 15811
     },
     {
      "name": "MkCalendar",
@@ -1147,7 +1147,7 @@
      "selector": "mk-calendar",
      "docs": "/components/date-time",
      "own": 4468,
-     "size": 10235
+     "size": 10321
     },
     {
      "name": "MkTimePicker",
@@ -1155,7 +1155,7 @@
      "selector": "mk-time-picker",
      "docs": "/components/date-time",
      "own": 4332,
-     "size": 13649
+     "size": 13695
     },
     {
      "name": "MkMonthPicker",
@@ -1163,7 +1163,7 @@
      "selector": "mk-month-picker",
      "docs": "/components/date-time",
      "own": 4198,
-     "size": 13412
+     "size": 13458
     },
     {
      "name": "MkMiniDate",
@@ -1171,127 +1171,127 @@
      "selector": "mk-mini-date",
      "docs": "/components/date-time",
      "own": 3162,
-     "size": 10868
+     "size": 10932
     },
     {
      "name": "formatDate",
      "kind": "function",
      "own": 601,
-     "size": 1573
+     "size": 1654
     },
     {
      "name": "buildMonthMatrix",
      "kind": "function",
      "own": 383,
-     "size": 1364
+     "size": 1436
     },
     {
      "name": "getWeekdayNames",
      "kind": "function",
      "own": 370,
-     "size": 1353
+     "size": 1426
     },
     {
      "name": "parseISODate",
      "kind": "function",
      "own": 353,
-     "size": 1321
+     "size": 1395
     },
     {
      "name": "getISOWeek",
      "kind": "function",
      "own": 339,
-     "size": 1320
+     "size": 1388
     },
     {
      "name": "endOfWeek",
      "kind": "function",
      "own": 334,
-     "size": 1308
+     "size": 1381
     },
     {
      "name": "startOfWeek",
      "kind": "function",
      "own": 324,
-     "size": 1301
+     "size": 1371
     },
     {
      "name": "addMonths",
      "kind": "function",
      "own": 323,
-     "size": 1302
+     "size": 1371
     },
     {
      "name": "formatISODate",
      "kind": "function",
      "own": 299,
-     "size": 1283
+     "size": 1353
     },
     {
      "name": "getWeekdayFullName",
      "kind": "function",
      "own": 296,
-     "size": 1273
+     "size": 1345
     },
     {
      "name": "getMonthNames",
      "kind": "function",
      "own": 292,
-     "size": 1284
+     "size": 1352
     },
     {
      "name": "isSameDay",
      "kind": "function",
      "own": 281,
-     "size": 1249
+     "size": 1321
     },
     {
      "name": "clampDate",
      "kind": "function",
      "own": 277,
-     "size": 1261
+     "size": 1335
     },
     {
      "name": "endOfMonth",
      "kind": "function",
      "own": 271,
-     "size": 1235
+     "size": 1307
     },
     {
      "name": "startOfDay",
      "kind": "function",
      "own": 268,
-     "size": 1241
+     "size": 1311
     },
     {
      "name": "isSameMonth",
      "kind": "function",
      "own": 267,
-     "size": 1237
+     "size": 1312
     },
     {
      "name": "addDays",
      "kind": "function",
      "own": 260,
-     "size": 1241
+     "size": 1311
     },
     {
      "name": "isBefore",
      "kind": "function",
      "own": 257,
-     "size": 1226
+     "size": 1297
     },
     {
      "name": "isAfter",
      "kind": "function",
      "own": 255,
-     "size": 1229
+     "size": 1296
     },
     {
      "name": "startOfMonth",
      "kind": "function",
      "own": 255,
-     "size": 1238
+     "size": 1307
     }
    ]
   },
@@ -1597,106 +1597,106 @@
      "selector": "mk-dynamic-form",
      "docs": "/components/dynamic-form",
      "own": 6130,
-     "size": 48697
+     "size": 48780
     },
     {
      "name": "MkDynamicFields",
      "kind": "component",
      "selector": "mk-dynamic-fields",
      "own": 6126,
-     "size": 48749
+     "size": 48786
     },
     {
      "name": "mkDynamicFormToSignalSchema",
      "kind": "function",
      "docs": "/components/signal-forms",
      "own": 1109,
-     "size": 2171
+     "size": 2250
     },
     {
      "name": "mkDynamicControl",
      "kind": "function",
      "own": 831,
-     "size": 1866
+     "size": 1940
     },
     {
      "name": "mkDynamicForm",
      "kind": "function",
      "own": 831,
-     "size": 1876
+     "size": 1951
     },
     {
      "name": "mkDynamicGroup",
      "kind": "function",
      "own": 827,
-     "size": 1892
+     "size": 1945
     },
     {
      "name": "mkDynamicCondition",
      "kind": "function",
      "own": 576,
-     "size": 1658
+     "size": 1718
     },
     {
      "name": "mkDynamicDefaults",
      "kind": "function",
      "own": 562,
-     "size": 1625
+     "size": 1697
     },
     {
      "name": "mkDynamicValidators",
      "kind": "function",
      "own": 484,
-     "size": 1528
+     "size": 1601
     },
     {
      "name": "MkDynamicFieldDef",
      "kind": "directive",
      "selector": "ng-template[mkDynamicField]",
      "own": 476,
-     "size": 1535
+     "size": 1614
     },
     {
      "name": "mkDynamicFlatten",
      "kind": "function",
      "own": 470,
-     "size": 1506
+     "size": 1588
     },
     {
      "name": "mkDynamicEmptyValue",
      "kind": "function",
      "own": 440,
-     "size": 1509
+     "size": 1585
     },
     {
      "name": "mkDynamicSpan",
      "kind": "function",
      "own": 436,
-     "size": 1487
+     "size": 1563
     },
     {
      "name": "mkIsValueField",
      "kind": "function",
      "own": 367,
-     "size": 1415
+     "size": 1497
     },
     {
      "name": "mkIsSection",
      "kind": "function",
      "own": 348,
-     "size": 1405
+     "size": 1485
     },
     {
      "name": "mkIsArray",
      "kind": "function",
      "own": 347,
-     "size": 1401
+     "size": 1481
     },
     {
      "name": "mkIsGroup",
      "kind": "function",
      "own": 347,
-     "size": 1401
+     "size": 1481
     }
    ]
   },
@@ -1714,7 +1714,7 @@
      "kind": "service",
      "docs": "/components/dialogs",
      "own": 4595,
-     "size": 21694
+     "size": 21777
     },
     {
      "name": "MkPromptDialog",
@@ -1722,7 +1722,7 @@
      "selector": "mk-prompt-dialog",
      "docs": "/components/dialogs",
      "own": 4035,
-     "size": 14609
+     "size": 14701
     },
     {
      "name": "MkConfirmDialog",
@@ -1730,7 +1730,7 @@
      "selector": "mk-confirm-dialog",
      "docs": "/components/dialogs",
      "own": 3875,
-     "size": 16357
+     "size": 16433
     },
     {
      "name": "MkDialog",
@@ -1738,14 +1738,14 @@
      "selector": "mk-dialog",
      "docs": "/components/dialogs",
      "own": 3332,
-     "size": 9457
+     "size": 9538
     },
     {
      "name": "MkTourService",
      "kind": "service",
      "docs": "/components/status",
      "own": 3097,
-     "size": 10702
+     "size": 10775
     },
     {
      "name": "MkNotificationCenter",
@@ -1753,49 +1753,49 @@
      "selector": "mk-notification-center",
      "docs": "/components/status",
      "own": 3056,
-     "size": 16853
+     "size": 16992
     },
     {
      "name": "MkToastContainer",
      "kind": "component",
      "selector": "mk-toast-container",
      "own": 2540,
-     "size": 9763
+     "size": 9809
     },
     {
      "name": "MkToast",
      "kind": "component",
      "selector": "mk-toast",
      "own": 2538,
-     "size": 9770
+     "size": 9811
     },
     {
      "name": "MkToastService",
      "kind": "service",
      "docs": "/components/snackbar",
      "own": 2534,
-     "size": 9757
+     "size": 9841
     },
     {
      "name": "MkSnackbarContainer",
      "kind": "component",
      "selector": "mk-snackbar-container",
      "own": 2498,
-     "size": 8428
+     "size": 8515
     },
     {
      "name": "MkSnackbarService",
      "kind": "service",
      "docs": "/components/snackbar",
      "own": 2494,
-     "size": 8433
+     "size": 8514
     },
     {
      "name": "MkSnackbar",
      "kind": "component",
      "selector": "mk-snackbar",
      "own": 2491,
-     "size": 8415
+     "size": 8510
     },
     {
      "name": "MkPopconfirm",
@@ -1803,7 +1803,7 @@
      "selector": "mk-popconfirm",
      "docs": "/components/popovers",
      "own": 2170,
-     "size": 11215
+     "size": 11264
     },
     {
      "name": "MkBottomSheet",
@@ -1811,7 +1811,7 @@
      "selector": "mk-bottom-sheet",
      "docs": "/components/bottom-sheet",
      "own": 2129,
-     "size": 8286
+     "size": 8341
     },
     {
      "name": "MkTooltip",
@@ -1819,14 +1819,14 @@
      "selector": "[mkTooltip]",
      "docs": "/components/popovers",
      "own": 1943,
-     "size": 3854
+     "size": 3912
     },
     {
      "name": "MkTourPopup",
      "kind": "component",
      "selector": "mk-tour-popup",
      "own": 1934,
-     "size": 9636
+     "size": 9693
     },
     {
      "name": "MkAlert",
@@ -1834,7 +1834,7 @@
      "selector": "mk-alert",
      "docs": "/components/feedback",
      "own": 1840,
-     "size": 7806
+     "size": 7888
     },
     {
      "name": "MkBanner",
@@ -1842,7 +1842,7 @@
      "selector": "mk-banner",
      "docs": "/components/feedback",
      "own": 1750,
-     "size": 7711
+     "size": 7803
     },
     {
      "name": "MkBlockUi",
@@ -1850,7 +1850,7 @@
      "selector": "[mkBlockUi]",
      "docs": "/components/loading",
      "own": 1686,
-     "size": 8112
+     "size": 8173
     },
     {
      "name": "MkHovercard",
@@ -1858,7 +1858,7 @@
      "selector": "mk-hovercard",
      "docs": "/components/popovers",
      "own": 1684,
-     "size": 4752
+     "size": 4845
     },
     {
      "name": "MkResult",
@@ -1866,14 +1866,14 @@
      "selector": "mk-result",
      "docs": "/components/status",
      "own": 1641,
-     "size": 3195
+     "size": 3250
     },
     {
      "name": "MkBlockUiService",
      "kind": "service",
      "docs": "/components/loading",
      "own": 1592,
-     "size": 8019
+     "size": 8102
     },
     {
      "name": "MkPopover",
@@ -1881,7 +1881,7 @@
      "selector": "mk-popover",
      "docs": "/components/popovers",
      "own": 1511,
-     "size": 4681
+     "size": 4758
     },
     {
      "name": "MkLoadingBar",
@@ -1889,28 +1889,28 @@
      "selector": "mk-loading-bar",
      "docs": "/components/feedback",
      "own": 1410,
-     "size": 7339
+     "size": 7404
     },
     {
      "name": "MkBlockUiOverlay",
      "kind": "component",
      "selector": "mk-block-ui-overlay",
      "own": 1086,
-     "size": 7522
+     "size": 7581
     },
     {
      "name": "MkTooltipPanel",
      "kind": "component",
      "selector": "mk-tooltip",
      "own": 806,
-     "size": 2321
+     "size": 2403
     },
     {
      "name": "MkLoadingBarService",
      "kind": "service",
      "docs": "/components/feedback",
      "own": 711,
-     "size": 2231
+     "size": 2317
     },
     {
      "name": "MkHovercardTrigger",
@@ -1918,7 +1918,7 @@
      "selector": "[mkHovercardFor]",
      "docs": "/components/popovers",
      "own": 709,
-     "size": 2251
+     "size": 2305
     },
     {
      "name": "MkDialogTitle",
@@ -1926,7 +1926,7 @@
      "selector": "mk-dialog-title",
      "docs": "/components/dialogs",
      "own": 579,
-     "size": 2032
+     "size": 2116
     },
     {
      "name": "MkPopconfirmTrigger",
@@ -1934,7 +1934,7 @@
      "selector": "[mkPopconfirmFor]",
      "docs": "/components/popovers",
      "own": 565,
-     "size": 2079
+     "size": 2148
     },
     {
      "name": "MkPopoverTrigger",
@@ -1942,26 +1942,26 @@
      "selector": "[mkPopoverTriggerFor]",
      "docs": "/components/popovers",
      "own": 565,
-     "size": 2101
+     "size": 2164
     },
     {
      "name": "MkBottomSheetService",
      "kind": "service",
      "docs": "/components/bottom-sheet",
      "own": 546,
-     "size": 3838
+     "size": 3916
     },
     {
      "name": "MkSnackbarRef",
      "kind": "class",
      "own": 374,
-     "size": 1897
+     "size": 1953
     },
     {
      "name": "MK_TOUR_DATA",
      "kind": "token",
      "own": 260,
-     "size": 1784
+     "size": 1844
     }
    ]
   },
@@ -1969,9 +1969,9 @@
    "name": "forms",
    "import": "@mk-kit/ui/forms",
    "file": "mk-kit-ui-forms.mjs",
-   "raw": 876624,
-   "min": 358723,
-   "brotli": 49565,
+   "raw": 874903,
+   "min": 357880,
+   "brotli": 49152,
    "budgetKiB": 870,
    "items": [
     {
@@ -1979,450 +1979,450 @@
      "kind": "component",
      "selector": "mk-phone-input",
      "docs": "/components/phone-postal",
-     "own": 6807,
-     "size": 14554
+     "own": 6894,
+     "size": 14595
     },
     {
      "name": "MkI18nInput",
      "kind": "component",
      "selector": "mk-i18n-input",
      "docs": "/components/text-inputs",
-     "own": 6401,
-     "size": 12098
-    },
-    {
-     "name": "MkCascader",
-     "kind": "component",
-     "selector": "mk-cascader",
-     "docs": "/components/selection",
-     "own": 6372,
-     "size": 13624
+     "own": 6472,
+     "size": 12136
     },
     {
      "name": "MkMultiSelect",
      "kind": "component",
      "selector": "mk-multi-select",
      "docs": "/components/selection",
-     "own": 6368,
-     "size": 15132
+     "own": 6442,
+     "size": 15196
+    },
+    {
+     "name": "MkCascader",
+     "kind": "component",
+     "selector": "mk-cascader",
+     "docs": "/components/selection",
+     "own": 6427,
+     "size": 13702
     },
     {
      "name": "MkListbox",
      "kind": "component",
      "selector": "mk-listbox",
      "docs": "/components/selection",
-     "own": 6125,
-     "size": 11769
-    },
-    {
-     "name": "MkTransferList",
-     "kind": "component",
-     "selector": "mk-transfer-list",
-     "docs": "/components/selection",
-     "own": 5788,
-     "size": 12882
+     "own": 6183,
+     "size": 11827
     },
     {
      "name": "MkAutocomplete",
      "kind": "component",
      "selector": "mk-autocomplete",
      "docs": "/components/selection",
-     "own": 5774,
-     "size": 13279
+     "own": 5869,
+     "size": 13360
+    },
+    {
+     "name": "MkTransferList",
+     "kind": "component",
+     "selector": "mk-transfer-list",
+     "docs": "/components/selection",
+     "own": 5850,
+     "size": 12952
     },
     {
      "name": "MkCodeEditor",
      "kind": "component",
      "selector": "mk-code-editor",
      "docs": "/components/forms",
-     "own": 5134,
-     "size": 11019
+     "own": 5200,
+     "size": 11069
     },
     {
      "name": "MkSelect",
      "kind": "component",
      "selector": "mk-select",
      "docs": "/components/forms",
-     "own": 5095,
-     "size": 12372
+     "own": 5161,
+     "size": 12441
     },
     {
      "name": "MkPasswordInput",
      "kind": "component",
      "selector": "mk-password-input",
      "docs": "/components/text-inputs",
-     "own": 5020,
-     "size": 10735
+     "own": 5091,
+     "size": 10790
     },
     {
      "name": "MkFileUpload",
      "kind": "component",
      "selector": "mk-file-upload",
      "docs": "/components/forms",
-     "own": 5004,
-     "size": 10189
+     "own": 5075,
+     "size": 10241
     },
     {
      "name": "MkSignaturePad",
      "kind": "component",
      "selector": "mk-signature-pad",
      "docs": "/components/signature",
-     "own": 4993,
-     "size": 10633
+     "own": 5050,
+     "size": 10722
     },
     {
      "name": "MkRangeSlider",
      "kind": "component",
      "selector": "mk-range-slider",
      "docs": "/components/sliders",
-     "own": 4893,
-     "size": 10601
+     "own": 4962,
+     "size": 10667
     },
     {
      "name": "MkCurrencyInput",
      "kind": "component",
      "selector": "mk-currency-input",
      "docs": "/components/payment",
-     "own": 4884,
-     "size": 10684
+     "own": 4948,
+     "size": 10709
     },
     {
      "name": "MkTreeSelect",
      "kind": "component",
      "selector": "mk-tree-select",
      "docs": "/components/selection",
-     "own": 4726,
-     "size": 13612
+     "own": 4801,
+     "size": 13667
     },
     {
      "name": "MkSubmitInput",
      "kind": "component",
      "selector": "mk-submit-input",
      "docs": "/components/forms",
-     "own": 4709,
-     "size": 16554
+     "own": 4785,
+     "size": 16632
     },
     {
      "name": "MkSlider",
      "kind": "component",
      "selector": "mk-slider",
      "docs": "/components/sliders",
-     "own": 4642,
-     "size": 10340
+     "own": 4718,
+     "size": 10409
     },
     {
      "name": "MkTagInput",
      "kind": "component",
      "selector": "mk-tag-input",
      "docs": "/components/selection",
-     "own": 4634,
-     "size": 11890
+     "own": 4711,
+     "size": 11956
     },
     {
      "name": "MkButtonToggleGroup",
      "kind": "component",
      "selector": "mk-button-toggle-group",
      "docs": "/components/selection",
-     "own": 4623,
-     "size": 10275
+     "own": 4691,
+     "size": 10353
     },
     {
      "name": "MkButtonToggle",
      "kind": "component",
      "selector": "mk-button-toggle",
-     "own": 4606,
-     "size": 10272
+     "own": 4677,
+     "size": 10344
     },
     {
      "name": "MkPostalCodeInput",
      "kind": "component",
      "selector": "mk-postal-code-input",
      "docs": "/components/phone-postal",
-     "own": 4568,
-     "size": 10446
+     "own": 4628,
+     "size": 10500
     },
     {
      "name": "MkOtp",
      "kind": "component",
      "selector": "mk-otp",
      "docs": "/components/text-inputs",
-     "own": 4392,
-     "size": 10063
-    },
-    {
-     "name": "MkCardNumberInput",
-     "kind": "component",
-     "selector": "mk-card-number-input",
-     "docs": "/components/payment",
-     "own": 4389,
-     "size": 10529
+     "own": 4467,
+     "size": 10133
     },
     {
      "name": "MkColorPicker",
      "kind": "component",
      "selector": "mk-color-picker",
      "docs": "/components/sliders",
-     "own": 4332,
-     "size": 10012
-    },
-    {
-     "name": "MkTaxIdInput",
-     "kind": "component",
-     "selector": "mk-tax-id-input",
-     "docs": "/components/payment",
-     "own": 4331,
-     "size": 10198
+     "own": 4412,
+     "size": 10083
     },
     {
      "name": "MkNumberInput",
      "kind": "component",
      "selector": "mk-number-input",
      "docs": "/components/text-inputs",
-     "own": 4302,
-     "size": 10015
+     "own": 4368,
+     "size": 10068
     },
     {
-     "name": "MkIbanInput",
+     "name": "MkTaxIdInput",
      "kind": "component",
-     "selector": "mk-iban-input",
+     "selector": "mk-tax-id-input",
      "docs": "/components/payment",
-     "own": 4296,
-     "size": 10059
+     "own": 4320,
+     "size": 10235
+    },
+    {
+     "name": "MkCardNumberInput",
+     "kind": "component",
+     "selector": "mk-card-number-input",
+     "docs": "/components/payment",
+     "own": 4271,
+     "size": 10461
     },
     {
      "name": "MkRadio",
      "kind": "component",
      "selector": "mk-radio",
      "docs": "/components/toggles",
-     "own": 4183,
-     "size": 9926
+     "own": 4253,
+     "size": 10000
     },
     {
      "name": "MkRating",
      "kind": "component",
      "selector": "mk-rating",
      "docs": "/components/sliders",
-     "own": 4168,
-     "size": 9872
+     "own": 4231,
+     "size": 9927
+    },
+    {
+     "name": "MkIbanInput",
+     "kind": "component",
+     "selector": "mk-iban-input",
+     "docs": "/components/payment",
+     "own": 4058,
+     "size": 9794
     },
     {
      "name": "MkInput",
      "kind": "component",
      "selector": "input[mkInput], textarea[mkInput]",
      "docs": "/components/text-inputs",
-     "own": 3858,
-     "size": 9540
+     "own": 3933,
+     "size": 9609
     },
     {
      "name": "MkSwitch",
      "kind": "component",
      "selector": "mk-switch",
      "docs": "/components/toggles",
-     "own": 3816,
-     "size": 9496
+     "own": 3875,
+     "size": 9585
     },
     {
      "name": "MkMention",
      "kind": "directive",
      "selector": "textarea[mkMention], input[mkMention]",
      "docs": "/components/selection#mention",
-     "own": 3715,
-     "size": 10358
+     "own": 3791,
+     "size": 10427
     },
     {
      "name": "MkRadioGroup",
      "kind": "component",
      "selector": "mk-radio-group",
      "docs": "/components/toggles",
-     "own": 3525,
-     "size": 9244
+     "own": 3592,
+     "size": 9301
     },
     {
      "name": "MkNumericKeypad",
      "kind": "component",
      "selector": "mk-numeric-keypad",
      "docs": "/components/touch-keys",
-     "own": 3459,
-     "size": 14062
+     "own": 3534,
+     "size": 14127
     },
     {
      "name": "MkInputGroup",
      "kind": "component",
      "selector": "mk-input-group",
      "docs": "/components/text-inputs",
-     "own": 3204,
-     "size": 8819
+     "own": 3269,
+     "size": 8881
     },
     {
      "name": "MkOnScreenKeyboard",
      "kind": "component",
      "selector": "mk-on-screen-keyboard",
      "docs": "/components/touch-keys",
-     "own": 2963,
-     "size": 14785
+     "own": 3030,
+     "size": 14872
     },
     {
      "name": "MkRepeater",
      "kind": "component",
      "selector": "mk-repeater",
      "docs": "/components/forms#repeater",
-     "own": 2758,
-     "size": 14081
+     "own": 2826,
+     "size": 14135
     },
     {
      "name": "MkFormField",
      "kind": "component",
      "selector": "mk-form-field",
      "docs": "/components/forms",
-     "own": 2723,
-     "size": 8331
+     "own": 2789,
+     "size": 8399
     },
     {
      "name": "MkFormErrorSummary",
      "kind": "component",
      "selector": "mk-form-error-summary",
      "docs": "/components/forms",
-     "own": 2596,
-     "size": 8137
+     "own": 2657,
+     "size": 8212
     },
     {
      "name": "MkMentionPanel",
      "kind": "component",
      "selector": "mk-mention-panel",
-     "own": 1865,
-     "size": 8637
+     "own": 1935,
+     "size": 8692
     },
     {
      "name": "mkPostalCodeValidator",
      "kind": "function",
-     "own": 909,
-     "size": 1667
+     "own": 964,
+     "size": 1731
     },
     {
      "name": "mkPostalFormat",
      "kind": "function",
-     "own": 844,
-     "size": 1601
-    },
-    {
-     "name": "mkIbanValidator",
-     "kind": "function",
-     "own": 843,
-     "size": 1618
-    },
-    {
-     "name": "mkTaxIdValidator",
-     "kind": "function",
-     "own": 822,
-     "size": 1577
+     "own": 903,
+     "size": 1674
     },
     {
      "name": "MK_PHONE_COUNTRIES",
      "kind": "const",
-     "own": 794,
-     "size": 1560
+     "own": 876,
+     "size": 1626
     },
     {
      "name": "MK_POSTAL_FORMATS",
      "kind": "const",
-     "own": 783,
-     "size": 1554
+     "own": 853,
+     "size": 1625
     },
     {
-     "name": "mkTaxIdIsValid",
+     "name": "mkTaxIdValidator",
      "kind": "function",
-     "own": 770,
-     "size": 1543
-    },
-    {
-     "name": "mkIbanIsValid",
-     "kind": "function",
-     "own": 738,
-     "size": 1509
+     "own": 814,
+     "size": 1580
     },
     {
      "name": "MkOnScreenKeyboardTrigger",
      "kind": "directive",
      "selector": "input[mkOnScreenKeyboardFor], textarea[mkOnScreenKeyboardFor]",
      "docs": "/components/touch-keys",
-     "own": 715,
-     "size": 1482
+     "own": 782,
+     "size": 1549
+    },
+    {
+     "name": "mkTaxIdIsValid",
+     "kind": "function",
+     "own": 752,
+     "size": 1523
     },
     {
      "name": "mkTaxIdFormat",
      "kind": "function",
-     "own": 683,
-     "size": 1455
-    },
-    {
-     "name": "MK_TAX_ID_FORMATS",
-     "kind": "const",
-     "own": 651,
-     "size": 1431
+     "own": 672,
+     "size": 1463
     },
     {
      "name": "MK_KEYBOARD_LAYOUT_QWERTY_PL",
      "kind": "const",
-     "own": 598,
-     "size": 1368
+     "own": 663,
+     "size": 1446
     },
     {
-     "name": "MK_IBAN_LENGTHS",
+     "name": "MK_TAX_ID_FORMATS",
      "kind": "const",
-     "own": 575,
-     "size": 1343
+     "own": 635,
+     "size": 1418
     },
     {
-     "name": "mkIbanChecksum",
+     "name": "mkIbanValidator",
      "kind": "function",
-     "own": 498,
-     "size": 1259
-    },
-    {
-     "name": "mkDetectCardBrand",
-     "kind": "function",
-     "own": 492,
-     "size": 1262
-    },
-    {
-     "name": "MkRepeaterEmpty",
-     "kind": "directive",
-     "selector": "[mkRepeaterEmpty]",
-     "docs": "/components/forms#repeater",
-     "own": 486,
-     "size": 1225
+     "own": 570,
+     "size": 1332
     },
     {
      "name": "MkRepeaterRow",
      "kind": "directive",
      "selector": "[mkRepeaterRow]",
      "docs": "/components/forms#repeater",
-     "own": 485,
-     "size": 1248
-    },
-    {
-     "name": "mkLuhnCheck",
-     "kind": "function",
-     "own": 478,
-     "size": 1237
-    },
-    {
-     "name": "mkNipChecksum",
-     "kind": "function",
-     "own": 474,
-     "size": 1230
+     "own": 557,
+     "size": 1318
     },
     {
      "name": "mkCountryFlag",
      "kind": "function",
-     "own": 464,
-     "size": 1219
+     "own": 547,
+     "size": 1288
+    },
+    {
+     "name": "MkRepeaterEmpty",
+     "kind": "directive",
+     "selector": "[mkRepeaterEmpty]",
+     "docs": "/components/forms#repeater",
+     "own": 538,
+     "size": 1300
     },
     {
      "name": "MK_CARD_BRAND_NAMES",
      "kind": "const",
-     "own": 431,
-     "size": 1204
+     "own": 511,
+     "size": 1273
+    },
+    {
+     "name": "mkIbanIsValid",
+     "kind": "function",
+     "own": 493,
+     "size": 1236
+    },
+    {
+     "name": "mkIbanChecksum",
+     "kind": "function",
+     "own": 482,
+     "size": 1245
+    },
+    {
+     "name": "mkNipChecksum",
+     "kind": "function",
+     "own": 472,
+     "size": 1228
+    },
+    {
+     "name": "mkLuhnCheck",
+     "kind": "function",
+     "own": 456,
+     "size": 1222
+    },
+    {
+     "name": "MK_IBAN_LENGTHS",
+     "kind": "const",
+     "own": 443,
+     "size": 1200
+    },
+    {
+     "name": "mkDetectCardBrand",
+     "kind": "function",
+     "own": 439,
+     "size": 1206
     }
    ]
   },
@@ -3060,14 +3060,14 @@
      "selector": "mk-query-builder",
      "docs": "/components/query-builder",
      "own": 3874,
-     "size": 31051
+     "size": 31107
     },
     {
      "name": "MkQueryGroupComponent",
      "kind": "component",
      "selector": "mk-query-group",
      "own": 3684,
-     "size": 30885
+     "size": 30976
     }
    ]
   },
