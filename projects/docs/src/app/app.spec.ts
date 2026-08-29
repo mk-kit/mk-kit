@@ -55,4 +55,29 @@ describe('App', () => {
     expect(links.length).toBeGreaterThan(0);
     expect([...links].every((a) => !!a.getAttribute('href'))).toBe(true);
   });
+
+  it('opens the appearance popover with theme, contrast and density groups', async () => {
+    const fixture = TestBed.createComponent(App);
+    await fixture.whenStable();
+    const trigger = fixture.nativeElement.querySelector('.docs-appearance-btn') as HTMLButtonElement;
+    expect(trigger.getAttribute('aria-haspopup')).toBe('dialog');
+    expect(trigger.getAttribute('aria-label')).toMatch(/^Appearance: /);
+
+    trigger.click();
+    await fixture.whenStable();
+    const panel = document.querySelector('.mk-popover__panel') as HTMLElement;
+    expect(panel).not.toBeNull();
+    const groups = [...panel.querySelectorAll('mk-button-toggle-group')].map((g) =>
+      g.getAttribute('aria-label'),
+    );
+    expect(groups).toEqual(['Theme', 'Contrast', 'Density']);
+
+    // Picking a value applies it through the theme service.
+    const dark = [...panel.querySelectorAll('mk-button-toggle button')].find(
+      (b) => b.textContent?.trim() === 'Dark',
+    ) as HTMLButtonElement;
+    dark.click();
+    await fixture.whenStable();
+    expect(document.documentElement.getAttribute('data-mk-theme')).toBe('dark');
+  });
 });

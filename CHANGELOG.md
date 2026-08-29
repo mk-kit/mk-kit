@@ -29,6 +29,16 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 - Docs: the getting-started i18n demo and snippet use the Polish pack;
   core-services gains a "Locale packs" section. `api.json` / `llms.txt`
   now cover nested entry points that the root barrel does not re-export.
+- **Docs header** — the three cycling glyph buttons (density / contrast /
+  theme) are one **Appearance** popover with labelled Theme, Contrast and
+  Density segmented controls (and a note that "System" follows the OS and
+  choices persist). Icons come from the icon registry at one size, so the
+  controls sit on a common rhythm at every density. The header is
+  shrink-safe: no horizontal overflow on a 320 px phone at touch density,
+  with the drawer open, or on the landing page; on narrow screens Search and
+  Appearance collapse to square icon buttons and the site nav / version /
+  GitHub links step out progressively.
+
 
 ## [0.44.0] — 2026-08-28
 
