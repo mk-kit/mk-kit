@@ -35,9 +35,17 @@ const pkg = JSON.parse(readFileSync(join(LIB, 'package.json'), 'utf8'));
 /** Secondary entry points in the order the root barrel re-exports them. */
 const rootBarrel = readFileSync(join(LIB, 'src/public-api.ts'), 'utf8');
 const ENTRIES = [...rootBarrel.matchAll(/from '@mk-kit\/ui\/([\w/-]+)'/g)].map((m) => m[1]);
+// Any directory carrying an ng-package.json is an entry point, one level of
+// nesting allowed (`icon/extended`, `locales/pl`). Entries the root barrel does
+// not re-export (locale packs) are still documented.
 for (const dir of readdirSync(LIB)) {
-  if (statSync(join(LIB, dir)).isDirectory() && existsSync(join(LIB, dir, 'ng-package.json')) && !ENTRIES.includes(dir)) {
-    ENTRIES.push(dir);
+  if (!statSync(join(LIB, dir)).isDirectory()) continue;
+  if (existsSync(join(LIB, dir, 'ng-package.json')) && !ENTRIES.includes(dir)) ENTRIES.push(dir);
+  for (const sub of readdirSync(join(LIB, dir))) {
+    const nested = `${dir}/${sub}`;
+    if (statSync(join(LIB, dir, sub)).isDirectory() && existsSync(join(LIB, dir, sub, 'ng-package.json')) && !ENTRIES.includes(nested)) {
+      ENTRIES.push(nested);
+    }
   }
 }
 

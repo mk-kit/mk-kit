@@ -464,6 +464,15 @@
      ]
     },
     {
+     "name": "mkMergeI18n",
+     "description": "Merges `overrides` over a complete string map — shallow for the top level,\ndeep for the `dateNames`, `blockEditor` and `validation` groups. Exported\nso locale packs and tests can build a map without providing it.",
+     "file": "projects/mk-kit/core/i18n/mk-i18n.ts",
+     "kind": "function",
+     "signatures": [
+      "(base: MkI18nStrings, overrides: MkI18nOverrides): MkI18nStrings"
+     ]
+    },
+    {
      "name": "mkQueryCompact",
      "description": "Drop empty groups and rules that still need a value, so the API gets only complete conditions.",
      "file": "projects/mk-kit/core/query/query.ts",
@@ -582,11 +591,11 @@
     },
     {
      "name": "provideMkI18n",
-     "description": "Provide localised strings (merged over the English defaults) — pass any\nsubset. The nested `dateNames`, `blockEditor` and `validation` groups are\nmerged deeply, so partial overrides of those work too.\n\n```ts\nbootstrapApplication(App, {\n  providers: [provideMkI18n({ noResults: 'Brak wyników', close: 'Zamknij' })],\n});\n```",
+     "description": "Provide localised strings — pass any subset, merged over `base` (the\nEnglish defaults unless given). The nested `dateNames`, `blockEditor` and\n`validation` groups are merged deeply, so partial overrides of those work\ntoo.\n\n```ts\nbootstrapApplication(App, {\n  providers: [provideMkI18n({ noResults: 'Brak wyników', close: 'Zamknij' })],\n});\n```\n\nA locale pack is a complete map that serves as the base — either through\nits own helper (`provideMkI18nPl(overrides)` from `@mk-kit/ui/locales/pl`)\nor explicitly: `provideMkI18n(overrides, MK_PL_I18N)`.",
      "file": "projects/mk-kit/core/i18n/mk-i18n.ts",
      "kind": "function",
      "signatures": [
-      "(overrides: Partial<Omit<MkI18nStrings, \"dateNames\" | \"blockEditor\" | \"validation\">> & { dateNames?: Partial<MkDateNames>; blockEditor?: Partial<MkBlockEditorStrings>; validation?: Partial<MkValidationStrings>; }): Provider"
+      "(overrides: MkI18nOverrides, base?: MkI18nStrings): Provider"
      ],
      "docs": "/core-services"
     },
@@ -3123,6 +3132,13 @@
      "file": "projects/mk-kit/core/forms/validation-messages.ts",
      "kind": "type",
      "definition": "Readonly<Record<string, string | ((err: any) => string)>>"
+    },
+    {
+     "name": "MkI18nOverrides",
+     "description": "Any subset of `MkI18nStrings`; the nested `dateNames`, `blockEditor`\nand `validation` groups may be partial too (they are merged deeply).",
+     "file": "projects/mk-kit/core/i18n/mk-i18n.ts",
+     "kind": "type",
+     "definition": "Partial< Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'> > & { dateNames?: Partial<MkDateNames>; blockEditor?: Partial<MkBlockEditorStrings>; validation?: Partial<MkValidationStrings>; }"
     },
     {
      "name": "MkPlacement",
@@ -22440,6 +22456,58 @@
      "file": "projects/mk-kit/media/image/image.ts",
      "kind": "type",
      "definition": "'loading' | 'loaded' | 'error'"
+    }
+   ]
+  },
+  {
+   "name": "locales/pl",
+   "import": "@mk-kit/ui/locales/pl",
+   "exports": [
+    {
+     "name": "mkPluralPl",
+     "description": "Picks the Polish plural form for a count: `one` for 1, `few` for 2–4\n(except 12–14), `many` otherwise — CLDR's `pl` rules for integers, which is\nall the library's counts ever are.\n\n```ts\nmkPluralPl(1, 'wynik', 'wyniki', 'wyników');  // 'wynik'\nmkPluralPl(3, 'wynik', 'wyniki', 'wyników');  // 'wyniki'\nmkPluralPl(12, 'wynik', 'wyniki', 'wyników'); // 'wyników'\n```",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "function",
+     "signatures": [
+      "(count: number, one: string, few: string, many: string): string"
+     ]
+    },
+    {
+     "name": "provideMkI18nPl",
+     "description": "Provides the Polish strings — `MK_PL_I18N` with any `overrides`\nmerged on top (deep for `dateNames`, `blockEditor` and `validation`, like\n`provideMkI18n`).\n\n```ts\nbootstrapApplication(App, {\n  providers: [provideMkI18nPl({ noData: 'Nic tu nie ma' })],\n});\n```",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "function",
+     "signatures": [
+      "(overrides?: MkI18nOverrides): Provider"
+     ]
+    },
+    {
+     "name": "MK_PL_BLOCK_EDITOR",
+     "description": "Polish strings of the block editor's chrome.",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "const",
+     "type": "MkBlockEditorStrings"
+    },
+    {
+     "name": "MK_PL_DATE_NAMES",
+     "description": "Polish month and weekday names (Sunday-first, lowercase as in `Intl`).",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "const",
+     "type": "MkDateNames"
+    },
+    {
+     "name": "MK_PL_I18N",
+     "description": "The complete Polish string map — every key of `MkI18nStrings`,\n`locale: 'pl-PL'` and `currency: 'PLN'` for the formatting pipes.\nProvide it whole with `provideMkI18nPl`, or pass it as the base of\n`provideMkI18n(overrides, MK_PL_I18N)`.",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "const",
+     "type": "MkI18nStrings"
+    },
+    {
+     "name": "MK_PL_VALIDATION",
+     "description": "Polish validation messages rendered by `mk-form-field`.",
+     "file": "projects/mk-kit/locales/pl/pl.ts",
+     "kind": "const",
+     "type": "MkValidationStrings"
     }
    ]
   },
