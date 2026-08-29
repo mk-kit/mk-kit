@@ -6822,7 +6822,7 @@ function mkCountryFlag(code: string): string
 
 Import: `import { mkDetectCardBrand } from '@mk-kit/ui/forms';`
 
-Detect the card network from the leading digits (IIN ranges).
+Detect the card network from the leading digits — `detectCardBrand` from `@mk-kit/validators`.
 
 ```ts
 function mkDetectCardBrand(digits: string): MkCardBrand | null
@@ -6842,8 +6842,7 @@ function mkHighlight(src: string, language: string): string
 
 Import: `import { mkIbanChecksum } from '@mk-kit/ui/forms';`
 
-ISO 13616 mod-97 check over a compact (no spaces, uppercase) IBAN.
-Assumes the shape `CC00…` has already been length-checked by the caller.
+ISO 7064 MOD 97-10 over a compact (uppercase, no separators) IBAN.
 
 ```ts
 function mkIbanChecksum(compact: string): boolean
@@ -6853,7 +6852,9 @@ function mkIbanChecksum(compact: string): boolean
 
 Import: `import { mkIbanIsValid } from '@mk-kit/ui/forms';`
 
-Full IBAN validity: known country, exact length, mod-97 check.
+Shape, the registry length for the country and the checksum — delegates
+to `isIban` from `@mk-kit/validators`. Unlike that function this one keeps
+the input kit's stricter rule that the country must be in the table.
 
 ```ts
 function mkIbanIsValid(compact: string): boolean
@@ -6879,7 +6880,7 @@ function mkIbanValidator(): ValidatorFn
 
 Import: `import { mkLuhnCheck } from '@mk-kit/ui/forms';`
 
-Luhn (mod 10) checksum over a digit string.
+Luhn (mod 10) checksum over a digit string — `isLuhn` from `@mk-kit/validators`.
 
 ```ts
 function mkLuhnCheck(digits: string): boolean
@@ -6889,9 +6890,8 @@ function mkLuhnCheck(digits: string): boolean
 
 Import: `import { mkNipChecksum } from '@mk-kit/ui/forms';`
 
-Polish NIP checksum: the weighted sum of the first nine digits modulo 11 is
-the tenth (check) digit. A remainder of 10 can never be a digit, so such a
-number is invalid whatever its last digit.
+Polish NIP checksum — delegates to `isNip` from `@mk-kit/validators`
+(weights 6-5-7-2-3-4-5-6-7 mod 11; a remainder of 10 is invalid).
 
 ```ts
 function mkNipChecksum(compact: string): boolean
@@ -6975,7 +6975,8 @@ const MK_CARD_BRAND_NAMES: Record<MkCardBrand, string>;
 
 Import: `import { MK_IBAN_LENGTHS } from '@mk-kit/ui/forms';`
 
-IBAN length per ISO 13616 country code (SEPA + common others).
+IBAN lengths per country — re-exported from `@mk-kit/validators`
+(`IBAN_LENGTHS`, the SWIFT registry).
 
 ```ts
 const MK_IBAN_LENGTHS: Readonly<Record<string, number>>;

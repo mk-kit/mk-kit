@@ -22,6 +22,11 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      # @mk-kit/ui depends on @mk-kit/validators; the library build resolves it
+      # from dist/validators through tsconfig paths, so build it first.
+      - name: Build + test validators package
+        run: npm run build:validators && npm run test:validators
+
       - name: Build library
         run: npm run build:lib
 
@@ -40,9 +45,6 @@ jobs:
 
       - name: Build + test MCP server
         run: npm run build:mcp && npm run test:mcp
-
-      - name: Build + test validators package
-        run: npm run build:validators && npm run test:validators
 
       - name: Build docs
         run: npm run build

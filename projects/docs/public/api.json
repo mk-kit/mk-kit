@@ -10407,7 +10407,7 @@
     },
     {
      "name": "mkDetectCardBrand",
-     "description": "Detect the card network from the leading digits (IIN ranges).",
+     "description": "Detect the card network from the leading digits — `detectCardBrand` from `@mk-kit/validators`.",
      "file": "projects/mk-kit/forms/card-number-input/card-number-input.ts",
      "kind": "function",
      "signatures": [
@@ -10425,7 +10425,7 @@
     },
     {
      "name": "mkIbanChecksum",
-     "description": "ISO 13616 mod-97 check over a compact (no spaces, uppercase) IBAN.\nAssumes the shape `CC00…` has already been length-checked by the caller.",
+     "description": "ISO 7064 MOD 97-10 over a compact (uppercase, no separators) IBAN.",
      "file": "projects/mk-kit/forms/iban-input/iban-input.ts",
      "kind": "function",
      "signatures": [
@@ -10434,7 +10434,7 @@
     },
     {
      "name": "mkIbanIsValid",
-     "description": "Full IBAN validity: known country, exact length, mod-97 check.",
+     "description": "Shape, the registry length for the country and the checksum — delegates\nto `isIban` from `@mk-kit/validators`. Unlike that function this one keeps\nthe input kit's stricter rule that the country must be in the table.",
      "file": "projects/mk-kit/forms/iban-input/iban-input.ts",
      "kind": "function",
      "signatures": [
@@ -10452,7 +10452,7 @@
     },
     {
      "name": "mkLuhnCheck",
-     "description": "Luhn (mod 10) checksum over a digit string.",
+     "description": "Luhn (mod 10) checksum over a digit string — `isLuhn` from `@mk-kit/validators`.",
      "file": "projects/mk-kit/forms/card-number-input/card-number-input.ts",
      "kind": "function",
      "signatures": [
@@ -10461,7 +10461,7 @@
     },
     {
      "name": "mkNipChecksum",
-     "description": "Polish NIP checksum: the weighted sum of the first nine digits modulo 11 is\nthe tenth (check) digit. A remainder of 10 can never be a digit, so such a\nnumber is invalid whatever its last digit.",
+     "description": "Polish NIP checksum — delegates to `isNip` from `@mk-kit/validators`\n(weights 6-5-7-2-3-4-5-6-7 mod 11; a remainder of 10 is invalid).",
      "file": "projects/mk-kit/forms/tax-id-input/tax-id-input.ts",
      "kind": "function",
      "signatures": [
@@ -10522,7 +10522,7 @@
     },
     {
      "name": "MK_IBAN_LENGTHS",
-     "description": "IBAN length per ISO 13616 country code (SEPA + common others).",
+     "description": "IBAN lengths per country — re-exported from `@mk-kit/validators`\n(`IBAN_LENGTHS`, the SWIFT registry).",
      "file": "projects/mk-kit/forms/iban-input/iban-input.ts",
      "kind": "const",
      "type": "Readonly<Record<string, number>>"

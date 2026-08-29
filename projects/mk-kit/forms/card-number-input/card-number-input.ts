@@ -23,6 +23,7 @@ import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
 import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { MkMask, mkApplyMask } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
+import { detectCardBrand, isLuhn } from '@mk-kit/validators';
 
 /** Card networks {@link MkCardNumberInput} recognises. */
 export type MkCardBrand =
@@ -43,33 +44,14 @@ export const MK_CARD_BRAND_NAMES: Record<MkCardBrand, string> = {
   jcb: 'JCB',
 };
 
-/** Detect the card network from the leading digits (IIN ranges). */
+/** Detect the card network from the leading digits — `detectCardBrand` from `@mk-kit/validators`. */
 export function mkDetectCardBrand(digits: string): MkCardBrand | null {
-  if (!digits) return null;
-  if (/^3[47]/.test(digits)) return 'amex';
-  if (/^(30[0-5]|36|38)/.test(digits)) return 'diners';
-  if (/^35/.test(digits)) return 'jcb';
-  if (/^(6011|64[4-9]|65)/.test(digits)) return 'discover';
-  if (/^(5[1-5]|22[2-9]|2[3-6]|27[0-2])/.test(digits)) return 'mastercard';
-  if (/^4/.test(digits)) return 'visa';
-  return null;
+  return detectCardBrand(digits);
 }
 
-/** Luhn (mod 10) checksum over a digit string. */
+/** Luhn (mod 10) checksum over a digit string — `isLuhn` from `@mk-kit/validators`. */
 export function mkLuhnCheck(digits: string): boolean {
-  if (!/^\d+$/.test(digits)) return false;
-  let sum = 0;
-  let double = false;
-  for (let i = digits.length - 1; i >= 0; i--) {
-    let d = digits.charCodeAt(i) - 48;
-    if (double) {
-      d *= 2;
-      if (d > 9) d -= 9;
-    }
-    sum += d;
-    double = !double;
-  }
-  return sum % 10 === 0;
+  return /^\d+$/.test(digits) && isLuhn(digits);
 }
 
 /** Grouping masks per brand (digit counts differ). */

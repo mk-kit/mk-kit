@@ -4,6 +4,18 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Changed
+
+- **`@mk-kit/validators` is now a dependency** — the IBAN (`mkIbanChecksum`,
+  `mkIbanIsValid`, `MK_IBAN_LENGTHS`, now the 88-country SWIFT registry),
+  NIP (`mkNipChecksum`) and card (`mkLuhnCheck`, `mkDetectCardBrand`)
+  algorithms delegate to the framework-free package instead of carrying their
+  own copies; the exported names and behaviour are unchanged. Installed
+  automatically with `@mk-kit/ui` (a regular dependency); it is the only
+  runtime dependency besides Angular.
+
 ## [0.45.0] — 2026-08-29
 
 ### Added

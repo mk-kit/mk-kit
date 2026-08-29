@@ -23,6 +23,7 @@ import { MK_I18N, mkUniqueId, mkValidatorChange } from '@mk-kit/ui/core';
 import { mkInjectFieldTouched } from '@mk-kit/ui/core';
 import { mkApplyMask, mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
+import { isNip } from '@mk-kit/validators';
 
 /**
  * Per-country business tax-identifier format for {@link MkTaxIdInput}.
@@ -47,20 +48,12 @@ export interface MkTaxIdFormat {
   validate?: (compact: string) => boolean;
 }
 
-/** NIP weights, applied to the first nine digits (PL). */
-const NIP_WEIGHTS = [6, 5, 7, 2, 3, 4, 5, 6, 7];
-
 /**
- * Polish NIP checksum: the weighted sum of the first nine digits modulo 11 is
- * the tenth (check) digit. A remainder of 10 can never be a digit, so such a
- * number is invalid whatever its last digit.
+ * Polish NIP checksum — delegates to `isNip` from `@mk-kit/validators`
+ * (weights 6-5-7-2-3-4-5-6-7 mod 11; a remainder of 10 is invalid).
  */
 export function mkNipChecksum(compact: string): boolean {
-  if (!/^\d{10}$/.test(compact)) return false;
-  let sum = 0;
-  for (let i = 0; i < 9; i++) sum += NIP_WEIGHTS[i] * Number(compact[i]);
-  const check = sum % 11;
-  return check < 10 && check === Number(compact[9]);
+  return /^\d{10}$/.test(compact) && isNip(compact);
 }
 
 /**

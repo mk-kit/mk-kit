@@ -130,8 +130,29 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
+      - name: Build validators (a dependency of the library)
+        run: npm run build:validators
+
       - name: Build library
         run: npm run build:lib
+
+      # Every runtime dependency of the package must already be on the registry
+      # in a version that satisfies its range — otherwise consumers cannot
+      # install this release (the first @mk-kit/validators is published by hand).
+      - name: Dependencies are installable
+        working-directory: dist/mk-kit
+        run: |
+          set -euo pipefail
+          node -e '
+            const deps = require("./package.json").dependencies ?? {};
+            for (const [name, range] of Object.entries(deps)) console.log(name + "@" + range);
+          ' | while read spec; do
+            if ! npm view "$spec" version >/dev/null 2>&1; then
+              echo "::error::$spec is not on npm — publish it first, or the release is uninstallable."
+              exit 1
+            fi
+            echo "ok $spec"
+          done
 
       # npm only accepts provenance attestations from public repositories, so
       # the flag follows the repository's visibility. OIDC trusted publishing

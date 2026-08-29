@@ -8,7 +8,9 @@
     "noImplicitReturns": true,
     "paths": {
       "@mk-kit/ui": ["./dist/mk-kit"],
-      "@mk-kit/ui/*": ["./dist/mk-kit/*"]
+      "@mk-kit/ui/*": ["./dist/mk-kit/*"],
+      "@mk-kit/validators": ["./dist/validators"],
+      "@mk-kit/validators/*": ["./dist/validators/*"]
     },
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
