@@ -43,6 +43,7 @@ Runs over stdio; nothing to host. Node ≥ 20.
 | `get_mk_kit_export` | Full API of one export as Markdown — import, selector, description + example, inputs, outputs, methods, docs link. Accepts class names or selectors. |
 | `list_mk_kit_exports` | Browse every entry point, or one entry point / kind, with one-line summaries. |
 | `get_mk_kit_overview` | What mk-kit is, install + setup conventions, links to every docs page (the site's `llms.txt`). |
+| `scaffold_mk_kit` | Paste-ready, entity-aware code for the first patterns an app builds: `crud-schematic` (the `ng g @mk-kit/ui:crud` command), `table-page`, `dynamic-form`, `dialog`, `embed`. Takes `entity` and a `fields` spec (`"name!:string,price:currency,status:select=draft|published"`). |
 
 Resources: `mk-kit://llms.txt`, `mk-kit://llms-full.txt`, `mk-kit://api.json`.
 

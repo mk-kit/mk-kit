@@ -4,6 +4,26 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Embed hardening** (`@mk-kit/ui/embed`) — `MkEmbedInit` gained `nonce`
+  (applied to every style/link element the app creates, including Angular's
+  own component styles via `CSP_NONCE` — for host pages whose `style-src`
+  forbids `'unsafe-inline'`) and `styleUrls` (`<link rel="stylesheet">` into
+  every shadow root and the overlay host, for CDN-hosted themes). Calling
+  `ready()` outside a browser now rejects with a clear message instead of a
+  deep Angular failure; `element()` remains a server-side no-op. The `/embed`
+  guide documents the production loader-snippet pattern.
+- **`scaffold_mk_kit` tool in `@mk-kit/mcp`** — paste-ready, entity-aware
+  code for the first patterns an app builds: `crud-schematic` (the
+  `ng g @mk-kit/ui:crud` command with the field grammar), `table-page`
+  (`mk-table` + `MkTableDataSource` against a REST endpoint),
+  `dynamic-form`, `dialog` (confirm + custom dialog via `MkDialogService`)
+  and `embed`. Takes `entity` and a `fields` spec; invalid specs return
+  correctable error messages.
+
 ## [0.49.0] — 2026-08-30
 
 ### Changed

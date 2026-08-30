@@ -141,11 +141,39 @@ mkEmbed({{ '{' }} styles: mkShadowCss(themeCss) {{ '}' }})
           <tr><td>Inputs</td><td>Dash-cased attributes (strings run through the input's transform — booleanAttribute / numberAttribute coerce as usual) and camel-cased element properties (any value). Names colliding with native element properties (title, hidden, dir…) stay attribute-only.</td></tr>
           <tr><td>Outputs</td><td>Bubbling, composed CustomEvents named after the output; the emitted value is event.detail.</td></tr>
           <tr><td>Component styles</td><td>Angular routes each component's own stylesheet into the shadow root it renders in — nothing is injected into the host page's head.</td></tr>
-          <tr><td>Theme</td><td>The styles option is adopted into every shadow root (constructable stylesheets, shared across instances). Run mk-kit's theme through mkShadowCss() so :root token blocks target :host; data-mk-theme="dark" on the element switches it to the dark palette.</td></tr>
+          <tr><td>Theme</td><td>The styles option is adopted into every shadow root (constructable stylesheets, shared across instances). Run mk-kit's theme through mkShadowCss() so :root token blocks target :host; data-mk-theme="dark" on the element switches it to the dark palette. styleUrls loads stylesheets from URLs (a CDN theme) as &lt;link&gt; elements instead.</td></tr>
+          <tr><td>CSP</td><td>Pass nonce (e.g. document.currentScript?.nonce) and it lands on every style and link element the app creates — Angular's own component styles included — so widgets work on host pages whose style-src forbids 'unsafe-inline'. Constructable stylesheets need no nonce at all.</td></tr>
+          <tr><td>SSR</td><td>element() is a no-op outside a browser, so the same bundle is safe to import in server builds; nothing bootstraps until an element actually connects in a browser.</td></tr>
           <tr><td>Overlays</td><td>MK_OVERLAY_ROOT (new in <a routerLink="/core-services">core</a>) points dialogs, anchored panels, toasts and tours at a page-level shadow host carrying the same styles. Set overlays: false to keep document.body.</td></tr>
           <tr><td>Lifecycle</td><td>mkReady resolves once rendered; mkComponent exposes the instance; disconnecting destroys the component (a same-task DOM move does not); destroy() tears down the application and the overlay host.</td></tr>
         </tbody>
       </table>
+
+      <h2>Shipping it: the loader snippet</h2>
+      <p>
+        Bundle your widgets + mk-kit + the embed entry into one deferred
+        script (any bundler; the custom elements upgrade whenever the script
+        lands, so order doesn't matter). The host page adds one line and
+        writes plain HTML:
+      </p>
+      <pre class="embed-code"><code>&lt;script src="https://cdn.acme.com/widgets/v1.js" defer&gt;&lt;/script&gt;
+
+&lt;acme-reviews product-id="42"&gt;&lt;/acme-reviews&gt;</code></pre>
+      <p>
+        Inside <code class="docs-inline">v1.js</code>, define the elements at
+        module scope — <code class="docs-inline">element()</code> only
+        registers the tag; the Angular application boots lazily when the
+        first element connects, so a page that carries the script but no
+        widget pays almost nothing. Version the URL
+        (<code class="docs-inline">/v1.js</code>) rather than the tag names:
+        custom elements cannot be redefined, so two widget versions on one
+        page must use different tags. On CSP-strict hosts read the nonce off
+        your own script tag:
+      </p>
+      <pre class="embed-code"><code>mkEmbed({{ '{' }}
+  styles: mkShadowCss(themeCss),
+  nonce: (document.currentScript as HTMLScriptElement | null)?.nonce,
+{{ '}' }}).element('acme-reviews', ReviewsWidget);</code></pre>
 
       <h2>Getting the theme CSS as text</h2>
       <p>

@@ -15178,6 +15178,8 @@ Members:
 | Name | Type | Description |
 | --- | --- | --- |
 | `styles`? | `string \| readonly string[] \| undefined` | CSS text adopted into every element's shadow root (and the overlay host). Pass the mk-kit theme through `mkShadowCss` so its `:root` token blocks target `:host`; append your own widget CSS after it. Shared as constructable stylesheets when the browser supports them (one parse for any number of instances), `<style>` elements otherwise. |
+| `styleUrls`? | `readonly string[] \| undefined` | Stylesheet URLs loaded as `<link rel="stylesheet">` into every shadow root (and the overlay host) — an alternative to inlining `styles` when the theme lives on a CDN. Loaded per shadow root by the browser's cache, so the network cost is paid once. |
+| `nonce`? | `string \| undefined` | CSP nonce applied to every style and link element this app creates — including Angular's own component styles (provided as `CSP_NONCE`) and the `<style>` fallback when constructable stylesheets are unavailable. For host pages with a `style-src` policy that forbids `'unsafe-inline'`. |
 | `providers`? | `(Provider \| EnvironmentProviders)[] \| undefined` | Extra providers for the shared application — `provideMkI18n(…)`, `provideMkExtendedIcons()`, `provideHttpClient()`, your services. |
 | `overlays`? | `boolean \| undefined` | Mount mk-kit overlays (dialogs, anchored panels, toasts, tours) inside a page-level shadow host that carries the same `styles`, instead of bare `document.body`. Default `true`; set `false` to keep the application default (overlays styled by the page's own stylesheets). |
 
