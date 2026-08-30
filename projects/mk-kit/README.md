@@ -7,8 +7,10 @@ date & time pickers, editors, kanban, overlays, an app shell — written for
 Angular 22 with signals and `OnPush` from day one. Every visual value is a
 `--mk-*` CSS custom property; light and dark ship out of the box; WCAG 2.1 AA
 is the target, not the marketing. MIT licensed. No third-party runtime
-dependencies — only Angular and the sibling `@mk-kit/validators` (the
-identifier checks, 14 kB, tree-shakeable).
+dependencies — only Angular and the sibling packages `@mk-kit/core` (the
+framework-free engines: diff, markdown, anchored positioning, query, dates)
+and `@mk-kit/validators` (the identifier checks) — both zero-dependency and
+tree-shakeable.
 
 - **Docs & live demos:** <https://mk-kit.dev>
 - **API reference:** <https://mk-kit.dev/api> — also as [api.json](https://mk-kit.dev/api.json), [llms.txt](https://mk-kit.dev/llms.txt) and [llms-full.txt](https://mk-kit.dev/llms-full.txt) for tools and AI assistants

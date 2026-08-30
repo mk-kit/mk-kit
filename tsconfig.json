@@ -9,6 +9,8 @@
     "paths": {
       "@mk-kit/ui": ["./dist/mk-kit"],
       "@mk-kit/ui/*": ["./dist/mk-kit/*"],
+      "@mk-kit/core": ["./dist/core"],
+      "@mk-kit/core/*": ["./dist/core/*"],
       "@mk-kit/validators": ["./dist/validators"],
       "@mk-kit/validators/*": ["./dist/validators/*"]
     },

@@ -12,7 +12,7 @@ Every component and directive below is standalone — import the class from its 
 
 ## @mk-kit/ui/core
 
-79 exports. `import { … } from '@mk-kit/ui/core';`
+81 exports. `import { … } from '@mk-kit/ui/core';`
 
 ### MkAnchoredPanel (directive)
 
@@ -274,7 +274,7 @@ panel — flipping to the opposite side when it would overflow and clamping
 back inside the viewport.
 
 ```ts
-function mkComputeAnchoredPosition(anchor: MkRectLike, panel: MkSize, viewport: MkSize, opts: MkAnchoredPositionOptions): MkAnchoredPosition
+function mkComputeAnchoredPosition(anchor: MkRectLike, panel: MkDimensions, viewport: MkDimensions, opts: MkAnchoredPositionOptions): MkAnchoredPosition
 ```
 
 ### mkCreateQueryGroup (function)
@@ -438,7 +438,7 @@ Import: `import { mkQueryOperatorLabel } from '@mk-kit/ui/core';`
 Localised label of an operator.
 
 ```ts
-function mkQueryOperatorLabel(op: MkQueryOperator, i18n?: MkI18nStrings): string
+function mkQueryOperatorLabel(op: MkQueryOperator, i18n?: MkQueryTextStrings): string
 ```
 
 ### mkQueryOperatorsFor (function)
@@ -501,7 +501,7 @@ Human-readable sentence for a query, e.g.
 `(Name contains "ada" and Orders at least 10) or Status is any of Active, Invited`.
 
 ```ts
-function mkQueryToText(group: MkQueryGroup, fields?: readonly MkQueryField[], i18n?: MkI18nStrings): string
+function mkQueryToText(group: MkQueryGroup, fields?: readonly MkQueryField[], i18n?: MkQueryTextStrings): string
 ```
 
 ### mkSignalErrorMessage (function)
@@ -701,6 +701,16 @@ Operators offered per field type, in menu order.
 const MK_QUERY_OPERATORS: Readonly<Record<MkQueryValueType, readonly MkQueryOperator[]>>;
 ```
 
+### MK_QUERY_TEXT_EN (const)
+
+Import: `import { MK_QUERY_TEXT_EN } from '@mk-kit/ui/core';`
+
+English defaults for `MkQueryTextStrings`.
+
+```ts
+const MK_QUERY_TEXT_EN: MkQueryTextStrings;
+```
+
 ### MK_QUERY_UNARY (const)
 
 Import: `import { MK_QUERY_UNARY } from '@mk-kit/ui/core';`
@@ -877,9 +887,7 @@ Members:
 
 Import: `import { MkDateNames } from '@mk-kit/ui/core';`
 
-Localised date-name tables consumed by the calendar, the date/month/week
-pickers and `formatDate`. All arrays are full-length (12 months, 7 weekdays
-starting with Sunday) — override the whole set for a locale.
+Localised month and weekday name tables (the shape `MK_I18N` carries).
 
 Members:
 
@@ -1258,6 +1266,41 @@ Members:
 | `operator` | `MkQueryOperator` |  |
 | `value`? | `unknown` |  |
 
+### MkQueryTextStrings (interface)
+
+Import: `import { MkQueryTextStrings } from '@mk-kit/ui/core';`
+
+The strings `mkQueryToText` and `mkQueryOperatorLabel` render
+with. A structural subset of mk-kit's `MkI18nStrings`, so the UI's full
+i18n map can be passed directly; defaults to `MK_QUERY_TEXT_EN`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `queryTrue` | `string` |  |
+| `queryFalse` | `string` |  |
+| `queryAnd` | `string` |  |
+| `queryOr` | `string` |  |
+| `queryNot` | `string` |  |
+| `queryOpEq` | `string` |  |
+| `queryOpNeq` | `string` |  |
+| `queryOpContains` | `string` |  |
+| `queryOpNotContains` | `string` |  |
+| `queryOpStartsWith` | `string` |  |
+| `queryOpEndsWith` | `string` |  |
+| `queryOpGt` | `string` |  |
+| `queryOpGte` | `string` |  |
+| `queryOpLt` | `string` |  |
+| `queryOpLte` | `string` |  |
+| `queryOpBetween` | `string` |  |
+| `queryOpIn` | `string` |  |
+| `queryOpNotIn` | `string` |  |
+| `queryOpBefore` | `string` |  |
+| `queryOpAfter` | `string` |  |
+| `queryOpEmpty` | `string` |  |
+| `queryOpNotEmpty` | `string` |  |
+
 ### MkSignalValidationError (interface)
 
 Import: `import { MkSignalValidationError } from '@mk-kit/ui/core';`
@@ -1438,7 +1481,7 @@ type MkOverlayRootFn = () => HTMLElement;
 
 Import: `import { MkPlacement } from '@mk-kit/ui/core';`
 
-Common placement values for overlays (menus, tooltips, popovers).
+Common placement values for anchored overlays (menus, tooltips, popovers).
 
 ```ts
 type MkPlacement = | 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end';

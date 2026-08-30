@@ -1,0 +1,20 @@
+{
+  "name": "@mk-kit/core",
+  "version": "0.1.0",
+  "description": "The framework-free engines under @mk-kit/ui — anchored-overlay positioning maths, a line/word diff, a markdown parser + HTML renderer, JSON syntax highlighting, an ANSI escape-code parser, calendar date helpers and a filter-query engine (predicate compiler + human-readable text). Pure TypeScript, zero dependencies.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" }
+  },
+  "files": ["*.js", "*.d.ts", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "keywords": ["diff", "markdown", "markdown-parser", "ansi", "syntax-highlighting", "anchored", "positioning", "popover", "date-utils", "calendar", "query-builder", "filter", "predicate", "framework-agnostic", "zero-dependency", "mk-kit"],
+  "homepage": "https://mk-kit.dev",
+  "repository": { "type": "git", "url": "git+https://github.com/mk-kit/mk-kit.git", "directory": "projects/core" },
+  "bugs": "https://github.com/mk-kit/mk-kit/issues",
+  "publishConfig": { "access": "public" }
+}

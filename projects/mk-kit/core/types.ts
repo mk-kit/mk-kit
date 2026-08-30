@@ -21,17 +21,5 @@ export type MkThemePreference = 'light' | 'dark' | 'system';
 /** Concrete resolved theme (never `system`). */
 export type MkResolvedTheme = 'light' | 'dark';
 
-/** Common placement values for overlays (menus, tooltips, popovers). */
-export type MkPlacement =
-  | 'top'
-  | 'top-start'
-  | 'top-end'
-  | 'bottom'
-  | 'bottom-start'
-  | 'bottom-end'
-  | 'left'
-  | 'left-start'
-  | 'left-end'
-  | 'right'
-  | 'right-start'
-  | 'right-end';
+/** Common placement values for overlays — delegated to `@mk-kit/core`. */
+export type { MkPlacement } from '@mk-kit/core';

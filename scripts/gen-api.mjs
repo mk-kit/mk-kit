@@ -63,6 +63,8 @@ const options = {
     '@mk-kit/ui': ['projects/mk-kit/src/public-api.ts'],
     '@mk-kit/ui/*': ['projects/mk-kit/*/index.ts'],
     // Built first (npm run build:validators) — a real dependency, resolved from dist/.
+    // Sources (not dist .d.ts) so re-exported engines keep their doc comments.
+    '@mk-kit/core': ['projects/core/src/index.ts'],
     '@mk-kit/validators': ['dist/validators/index.d.ts'],
   },
   noEmit: true,

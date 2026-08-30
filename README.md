@@ -9,6 +9,7 @@ projects/
   mk-kit/      → the publishable library (@mk-kit/ui)
   docs/        → the documentation & live-demo site
   mcp/         → @mk-kit/mcp — MCP server over the generated API reference
+  core/        → @mk-kit/core — the framework-free engines (diff, markdown, anchor maths, query, dates…)
   validators/  → @mk-kit/validators — zero-dependency PESEL / NIP / REGON / IBAN / VAT … checks
 ```
 

@@ -385,16 +385,16 @@
     {
      "name": "mkComputeAnchoredPosition",
      "description": "Pure viewport-positioning maths shared by every anchored overlay\n(`MkAnchoredPanel` and the tooltip). Given the anchor rect, the panel\nsize and the viewport size, returns the top/left for a `position: fixed`\npanel — flipping to the opposite side when it would overflow and clamping\nback inside the viewport.",
-     "file": "projects/mk-kit/core/overlay/anchored-overlay.ts",
+     "file": "projects/core/src/anchor.ts",
      "kind": "function",
      "signatures": [
-      "(anchor: MkRectLike, panel: MkSize, viewport: MkSize, opts: MkAnchoredPositionOptions): MkAnchoredPosition"
+      "(anchor: MkRectLike, panel: MkDimensions, viewport: MkDimensions, opts: MkAnchoredPositionOptions): MkAnchoredPosition"
      ]
     },
     {
      "name": "mkCreateQueryGroup",
      "description": "A fresh empty group.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(init?: Partial<Omit<MkQueryGroup, \"id\">>): MkQueryGroup"
@@ -403,7 +403,7 @@
     {
      "name": "mkCreateQueryRule",
      "description": "A fresh rule on `field`, using its first operator.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(field: MkQueryField): MkQueryRule"
@@ -430,7 +430,7 @@
     {
      "name": "mkHighlight",
      "description": "Highlight `src` for `language`, falling back to escaped plain text.",
-     "file": "projects/mk-kit/core/highlight/code-highlight.ts",
+     "file": "projects/core/src/highlight.ts",
      "kind": "function",
      "signatures": [
       "(src: string, language: string): string"
@@ -439,7 +439,7 @@
     {
      "name": "mkHighlightJson",
      "description": "Highlight a JSON document. Recognises object keys, strings, numbers, the\n`true`/`false`/`null` literals and structural punctuation. Invalid JSON is\nstill highlighted token-by-token (the editor validates separately).",
-     "file": "projects/mk-kit/core/highlight/code-highlight.ts",
+     "file": "projects/core/src/highlight.ts",
      "kind": "function",
      "signatures": [
       "(src: string): string"
@@ -457,7 +457,7 @@
     {
      "name": "mkIsQueryGroup",
      "description": "True for a group node (as opposed to a rule).",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(node: MkQueryNode): node is MkQueryGroup"
@@ -484,7 +484,7 @@
     {
      "name": "mkQueryCompact",
      "description": "Drop empty groups and rules that still need a value, so the API gets only complete conditions.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(group: MkQueryGroup): MkQueryGroup"
@@ -493,7 +493,7 @@
     {
      "name": "mkQueryIsEmpty",
      "description": "True when the tree holds no rule at all (empty groups only).",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(group: MkQueryGroup): boolean"
@@ -502,16 +502,16 @@
     {
      "name": "mkQueryOperatorLabel",
      "description": "Localised label of an operator.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
-      "(op: MkQueryOperator, i18n?: MkI18nStrings): string"
+      "(op: MkQueryOperator, i18n?: MkQueryTextStrings): string"
      ]
     },
     {
      "name": "mkQueryOperatorsFor",
      "description": "Operators a field offers (its own list, else the defaults for its type).",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(field: MkQueryField | undefined): readonly MkQueryOperator[]"
@@ -520,7 +520,7 @@
     {
      "name": "mkQueryRuleCount",
      "description": "Number of rules in the tree.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(group: MkQueryGroup): number"
@@ -529,7 +529,7 @@
     {
      "name": "mkQueryRuleIsComplete",
      "description": "A rule is complete when its operator needs no value or has one.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(rule: MkQueryRule): boolean"
@@ -538,7 +538,7 @@
     {
      "name": "mkQueryRuleMatches",
      "description": "Evaluate one rule against a row.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "(rule: MkQueryRule, row: Record<string, unknown>, field?: MkQueryField): boolean"
@@ -547,7 +547,7 @@
     {
      "name": "mkQueryToPredicate",
      "description": "Compile a query into a row predicate for client-side filtering\n(`rows.filter(mkQueryToPredicate(query, fields))`). Unfinished rules are\nignored, so a half-edited query never blanks the table.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
       "<T extends object = Record<string, unknown>>(group: MkQueryGroup, fields?: readonly MkQueryField[]): (row: T) => boolean"
@@ -556,10 +556,10 @@
     {
      "name": "mkQueryToText",
      "description": "Human-readable sentence for a query, e.g.\n`(Name contains \"ada\" and Orders at least 10) or Status is any of Active, Invited`.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "function",
      "signatures": [
-      "(group: MkQueryGroup, fields?: readonly MkQueryField[], i18n?: MkI18nStrings): string"
+      "(group: MkQueryGroup, fields?: readonly MkQueryField[], i18n?: MkQueryTextStrings): string"
      ]
     },
     {
@@ -583,7 +583,7 @@
     {
      "name": "mkUniqueId",
      "description": "Generates a stable, unique DOM id for wiring `aria-*` relationships\n(labels, descriptions, controls). Prefer this over `Math.random()` so\nids are deterministic within a render and SSR-safe.",
-     "file": "projects/mk-kit/core/a11y/unique-id.ts",
+     "file": "projects/core/src/id.ts",
      "kind": "function",
      "signatures": [
       "(prefix?: string): string"
@@ -667,21 +667,28 @@
     {
      "name": "MK_QUERY_OPERATORS",
      "description": "Operators offered per field type, in menu order.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "const",
      "type": "Readonly<Record<MkQueryValueType, readonly MkQueryOperator[]>>"
     },
     {
+     "name": "MK_QUERY_TEXT_EN",
+     "description": "English defaults for `MkQueryTextStrings`.",
+     "file": "projects/core/src/query.ts",
+     "kind": "const",
+     "type": "MkQueryTextStrings"
+    },
+    {
      "name": "MK_QUERY_UNARY",
      "description": "Operators that take no value.",
-     "file": "projects/mk-kit/core/query/query.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "const",
      "type": "ReadonlySet<MkQueryOperator>"
     },
     {
      "name": "MkAnchoredPosition",
      "description": "Resolved coordinates (viewport-relative, for `position: fixed`).",
-     "file": "projects/mk-kit/core/overlay/anchored-overlay.ts",
+     "file": "projects/core/src/anchor.ts",
      "kind": "interface",
      "members": [
       {
@@ -704,7 +711,7 @@
     {
      "name": "MkAnchoredPositionOptions",
      "description": "Options controlling `mkComputeAnchoredPosition`.",
-     "file": "projects/mk-kit/core/overlay/anchored-overlay.ts",
+     "file": "projects/core/src/anchor.ts",
      "kind": "interface",
      "members": [
       {
@@ -1350,8 +1357,8 @@
     },
     {
      "name": "MkDateNames",
-     "description": "Localised date-name tables consumed by the calendar, the date/month/week\npickers and `formatDate`. All arrays are full-length (12 months, 7 weekdays\nstarting with Sunday) — override the whole set for a locale.",
-     "file": "projects/mk-kit/core/i18n/mk-i18n.ts",
+     "description": "Localised month and weekday name tables (the shape `MK_I18N` carries).",
+     "file": "projects/core/src/dates.ts",
      "kind": "interface",
      "members": [
       {
@@ -2833,7 +2840,7 @@
     {
      "name": "MkQueryField",
      "description": "A field the user can filter on.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "interface",
      "members": [
       {
@@ -2875,7 +2882,7 @@
     {
      "name": "MkQueryFieldOption",
      "description": "A choice for `select` fields.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "interface",
      "members": [
       {
@@ -2893,7 +2900,7 @@
     {
      "name": "MkQueryGroup",
      "description": "A group of rules and nested groups joined by one combinator, optionally negated.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "interface",
      "members": [
       {
@@ -2922,7 +2929,7 @@
     {
      "name": "MkQueryRule",
      "description": "A leaf condition. `value` is `[from, to]` for `between`, an array for `in` / `notIn`, absent for `empty` / `notEmpty`. Dates are ISO strings.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "interface",
      "members": [
       {
@@ -2945,6 +2952,124 @@
        "type": "unknown",
        "description": "",
        "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkQueryTextStrings",
+     "description": "The strings `mkQueryToText` and `mkQueryOperatorLabel` render\nwith. A structural subset of mk-kit's `MkI18nStrings`, so the UI's full\ni18n map can be passed directly; defaults to `MK_QUERY_TEXT_EN`.",
+     "file": "projects/core/src/query.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "queryTrue",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryFalse",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryAnd",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOr",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryNot",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpEq",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpNeq",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpContains",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpNotContains",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpStartsWith",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpEndsWith",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpGt",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpGte",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpLt",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpLte",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpBetween",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpIn",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpNotIn",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpBefore",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpAfter",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpEmpty",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "queryOpNotEmpty",
+       "type": "string",
+       "description": ""
       }
      ]
     },
@@ -3124,7 +3249,7 @@
     {
      "name": "MkCodeLanguage",
      "description": "Languages with built-in highlighting. Unknown values render plain text.",
-     "file": "projects/mk-kit/core/highlight/code-highlight.ts",
+     "file": "projects/core/src/highlight.ts",
      "kind": "type",
      "definition": "'json' | 'plaintext'"
     },
@@ -3165,36 +3290,36 @@
     },
     {
      "name": "MkPlacement",
-     "description": "Common placement values for overlays (menus, tooltips, popovers).",
-     "file": "projects/mk-kit/core/types.ts",
+     "description": "Common placement values for anchored overlays (menus, tooltips, popovers).",
+     "file": "projects/core/src/anchor.ts",
      "kind": "type",
      "definition": "| 'top' | 'top-start' | 'top-end' | 'bottom' | 'bottom-start' | 'bottom-end' | 'left' | 'left-start' | 'left-end' | 'right' | 'right-start' | 'right-end'"
     },
     {
      "name": "MkQueryCombinator",
      "description": "",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "type",
      "definition": "'and' | 'or'"
     },
     {
      "name": "MkQueryNode",
      "description": "",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "type",
      "definition": "MkQueryRule | MkQueryGroup"
     },
     {
      "name": "MkQueryOperator",
      "description": "Comparison operators. Which apply depends on the field type.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "type",
      "definition": "| 'eq' | 'neq' | 'contains' | 'notContains' | 'startsWith' | 'endsWith' | 'gt' | 'gte' | 'lt' | 'lte' | 'between' | 'in' | 'notIn' | 'before' | 'after' | 'empty' | 'notEmpty'"
     },
     {
      "name": "MkQueryValueType",
      "description": "Value kind of a filterable field; decides the editor and the operators offered.",
-     "file": "projects/mk-kit/core/query/query.types.ts",
+     "file": "projects/core/src/query.ts",
      "kind": "type",
      "definition": "'string' | 'number' | 'boolean' | 'date' | 'select'"
     },
@@ -10440,7 +10565,7 @@
     {
      "name": "mkHighlight",
      "description": "Highlight `src` for `language`, falling back to escaped plain text.",
-     "file": "projects/mk-kit/core/highlight/code-highlight.ts",
+     "file": "projects/core/src/highlight.ts",
      "kind": "function",
      "signatures": [
       "(src: string, language: string): string"
@@ -11217,7 +11342,7 @@
     {
      "name": "MkCodeLanguage",
      "description": "Languages with built-in highlighting. Unknown values render plain text.",
-     "file": "projects/mk-kit/core/highlight/code-highlight.ts",
+     "file": "projects/core/src/highlight.ts",
      "kind": "type",
      "definition": "'json' | 'plaintext'"
     },
@@ -12271,7 +12396,7 @@
     {
      "name": "addDays",
      "description": "A new date `count` days after `date` (negative to subtract).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, count: number): Date"
@@ -12280,7 +12405,7 @@
     {
      "name": "addMonths",
      "description": "A new date `count` months after `date` (negative to subtract). Clamps the\nday of month so e.g. Jan 31 + 1 month = Feb 28/29, not Mar 3.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, count: number): Date"
@@ -12289,7 +12414,7 @@
     {
      "name": "buildMonthMatrix",
      "description": "Build a fixed 6×7 matrix of `Date` cells for `viewDate`'s month, including\nthe leading days from the previous month and trailing days from the next so\nevery row is full. `firstDayOfWeek` is 0 (Sunday) … 6 (Saturday).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(viewDate: Date, firstDayOfWeek?: number): Date[][]"
@@ -12298,7 +12423,7 @@
     {
      "name": "clampDate",
      "description": "Clamp `date` into the inclusive `[min, max]` range (either bound optional).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, min?: Date | null, max?: Date | null): Date"
@@ -12307,7 +12432,7 @@
     {
      "name": "endOfMonth",
      "description": "Midnight on the last day of `date`'s month.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date): Date"
@@ -12316,7 +12441,7 @@
     {
      "name": "endOfWeek",
      "description": "The last day of the week containing `date`, at midnight.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, firstDayOfWeek?: number): Date"
@@ -12325,7 +12450,7 @@
     {
      "name": "formatDate",
      "description": "Format `date` using a small pattern set. Supported tokens:\n`yyyy` (4-digit year), `MMMM` (full month), `MMM` (short month),\n`MM` (2-digit month), `dd` (2-digit day), `d` (day), `ddd` (short weekday),\n`HH` / `H` (24-hour, padded / bare), `hh` / `h` (12-hour, padded / bare),\n`mm` (2-digit minutes) and `a` (`AM` / `PM`). Longer tokens are matched\nfirst so `MMMM` wins over `MM`. Month/weekday names come from `names` when\ngiven, else English.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, pattern: string, names?: MkDateNames): string"
@@ -12334,7 +12459,7 @@
     {
      "name": "formatISODate",
      "description": "Format `date` as an ISO calendar date `YYYY-MM-DD` (local time).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date): string"
@@ -12343,7 +12468,7 @@
     {
      "name": "getISOWeek",
      "description": "ISO-8601 week number (1–53) of `date`. Weeks start on Monday and week 1 is\nthe week containing the first Thursday of the year.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date): number"
@@ -12352,7 +12477,7 @@
     {
      "name": "getMonthNames",
      "description": "Full month names, index 0 = January (from `names`, else English).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(names?: MkDateNames): readonly string[]"
@@ -12361,7 +12486,7 @@
     {
      "name": "getWeekdayFullName",
      "description": "Full weekday name for `date` (for screen-reader labels).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, names?: MkDateNames): string"
@@ -12370,7 +12495,7 @@
     {
      "name": "getWeekdayNames",
      "description": "Weekday header labels ordered to start at `firstDayOfWeek`.\n`format` selects `'short'` (e.g. `Mon`) or `'narrow'` (e.g. `M`).\nLabels come from `names` when given, else English.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(firstDayOfWeek?: number, format?: \"short\" | \"narrow\", names?: MkDateNames): string[]"
@@ -12379,7 +12504,7 @@
     {
      "name": "isAfter",
      "description": "True when `a` is strictly after `b` (full timestamp comparison).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(a: Date, b: Date): boolean"
@@ -12388,7 +12513,7 @@
     {
      "name": "isBefore",
      "description": "True when `a` is strictly before `b` (full timestamp comparison).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(a: Date, b: Date): boolean"
@@ -12397,7 +12522,7 @@
     {
      "name": "isSameDay",
      "description": "True when both dates fall on the same calendar day (local time).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(a: Date, b: Date): boolean"
@@ -12406,7 +12531,7 @@
     {
      "name": "isSameMonth",
      "description": "True when both dates fall in the same calendar month of the same year.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(a: Date, b: Date): boolean"
@@ -12415,7 +12540,7 @@
     {
      "name": "parseISODate",
      "description": "Parse a `YYYY-MM-DD` string into a local-time `Date`, or `null` if invalid.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(value: string | null | undefined): Date | null"
@@ -12424,7 +12549,7 @@
     {
      "name": "startOfDay",
      "description": "Midnight (00:00:00.000) on `date`'s calendar day.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date): Date"
@@ -12433,7 +12558,7 @@
     {
      "name": "startOfMonth",
      "description": "Midnight (00:00:00.000) on the first day of `date`'s month.",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date): Date"
@@ -12442,7 +12567,7 @@
     {
      "name": "startOfWeek",
      "description": "The first day of the week containing `date`, at midnight. `firstDayOfWeek`\nis the week's starting weekday (0 = Sunday … 6 = Saturday).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "function",
      "signatures": [
       "(date: Date, firstDayOfWeek?: number): Date"
@@ -12573,7 +12698,7 @@
     {
      "name": "MkWeekday",
      "description": "Day-of-week index 0 (Sunday) … 6 (Saturday).",
-     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "file": "projects/core/src/dates.ts",
      "kind": "type",
      "definition": "0 | 1 | 2 | 3 | 4 | 5 | 6"
     }
@@ -16407,7 +16532,7 @@
     {
      "name": "mkComputeDiff",
      "description": "Compute a line diff between `before` and `after`. Returns one `MkDiffRow`\nper line in document order, with `equal` / `insert` / `delete` ops and 1-based\nbefore/after line numbers. With `wordHighlight` (default true) changed lines\nalso carry word-level `segments`.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "function",
      "signatures": [
       "(before: string, after: string, options?: MkDiffOptions): MkDiffRow[]"
@@ -16425,7 +16550,7 @@
     {
      "name": "mkDiffStats",
      "description": "Summary counts (added / removed / unchanged lines) for a diff.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "function",
      "signatures": [
       "(rows: MkDiffRow[]): MkDiffStats"
@@ -16506,7 +16631,7 @@
     {
      "name": "mkParseAnsi",
      "description": "Parse one log line into styled spans. Pure — same input, same output.\nAdjacent runs with identical styling are merged, so a plain line yields a\nsingle span (or none when empty).",
-     "file": "projects/mk-kit/data/log-viewer/ansi.ts",
+     "file": "projects/core/src/ansi.ts",
      "kind": "function",
      "signatures": [
       "(line: string): MkAnsiSpan[]"
@@ -16515,7 +16640,7 @@
     {
      "name": "mkParseMarkdown",
      "description": "Parse markdown source into a typed AST. Pure and dependency-free — safe to\nrun on a server. Unsafe link/image URLs are already dropped at this stage,\nso the AST never carries a `javascript:` (or other non-allow-listed) URL.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "function",
      "signatures": [
       "(src: string, options?: MkMarkdownParseOptions): MkMarkdownBlock[]"
@@ -16542,7 +16667,7 @@
     {
      "name": "mkRenderMarkdown",
      "description": "Render a parsed AST to an HTML string. The output contains only tags this\nrenderer generates (all source text is escaped), so it is safe to bind to\n`[innerHTML]` — Angular's sanitizer keeps every element/attribute used here.\nFenced code is highlighted via `mkHighlight` for its known languages.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "function",
      "signatures": [
       "(blocks: MkMarkdownBlock[], options?: MkMarkdownRenderOptions): string"
@@ -16569,7 +16694,7 @@
     {
      "name": "mkStripAnsi",
      "description": "Remove every ANSI escape sequence from a line (for copy / search).",
-     "file": "projects/mk-kit/data/log-viewer/ansi.ts",
+     "file": "projects/core/src/ansi.ts",
      "kind": "function",
      "signatures": [
       "(line: string): string"
@@ -16592,7 +16717,7 @@
     {
      "name": "MkAnsiSpan",
      "description": "One styled run of text within a parsed line.",
-     "file": "projects/mk-kit/data/log-viewer/ansi.ts",
+     "file": "projects/core/src/ansi.ts",
      "kind": "interface",
      "members": [
       {
@@ -16694,7 +16819,7 @@
     {
      "name": "MkDiffOptions",
      "description": "Options for `mkComputeDiff`.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "interface",
      "members": [
       {
@@ -16714,7 +16839,7 @@
     {
      "name": "MkDiffRow",
      "description": "One line of a computed diff.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "interface",
      "members": [
       {
@@ -16748,7 +16873,7 @@
     {
      "name": "MkDiffSegment",
      "description": "A word-level segment within a changed line.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "interface",
      "members": [
       {
@@ -16766,7 +16891,7 @@
     {
      "name": "MkDiffStats",
      "description": "Summary counts for a diff.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "interface",
      "members": [
       {
@@ -17027,7 +17152,7 @@
     {
      "name": "MkMarkdownList",
      "description": "An ordered or unordered (tight) list block.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "interface",
      "members": [
       {
@@ -17055,7 +17180,7 @@
     {
      "name": "MkMarkdownListItem",
      "description": "One `<li>`: tight inline content plus an optional nested list.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "interface",
      "members": [
       {
@@ -17073,7 +17198,7 @@
     {
      "name": "MkMarkdownParseOptions",
      "description": "",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "interface",
      "members": [
       {
@@ -17087,7 +17212,7 @@
     {
      "name": "MkMarkdownRenderOptions",
      "description": "",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "interface",
      "members": [
       {
@@ -17422,7 +17547,7 @@
     {
      "name": "MkDiffOp",
      "description": "The kind of change for a diff row/segment.",
-     "file": "projects/mk-kit/data/diff/diff-util.ts",
+     "file": "projects/core/src/diff.ts",
      "kind": "type",
      "definition": "'equal' | 'insert' | 'delete'"
     },
@@ -17436,21 +17561,21 @@
     {
      "name": "MkMarkdownAlign",
      "description": "Column alignment of a table, from the delimiter row's colons.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "type",
      "definition": "'left' | 'center' | 'right' | null"
     },
     {
      "name": "MkMarkdownBlock",
      "description": "Block-level node of the markdown AST.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "type",
      "definition": "| { kind: 'heading'; level: 1 | 2 | 3 | 4 | 5 | 6; children: MkMarkdownInline[] } | { kind: 'paragraph'; children: MkMarkdownInline[] } | { kind: 'code'; language: string; code: string } | { kind: 'blockquote'; children: MkMarkdownBlock[] } | { kind: 'hr' } | MkMarkdownList | { kind: 'table'; align: MkMarkdownAlign[]; header: MkMarkdownInline[][]; rows: MkMarkdownInline[][][]; }"
     },
     {
      "name": "MkMarkdownInline",
      "description": "Inline (phrasing) node of the markdown AST.",
-     "file": "projects/mk-kit/data/markdown/markdown-parse.ts",
+     "file": "projects/core/src/markdown.ts",
      "kind": "type",
      "definition": "| { kind: 'text'; text: string } | { kind: 'softbreak' } | { kind: 'break' } | { kind: 'code'; code: string } | { kind: 'strong'; children: MkMarkdownInline[] } | { kind: 'em'; children: MkMarkdownInline[] } | { kind: 'del'; children: MkMarkdownInline[] } | { kind: 'link'; href: string; children: MkMarkdownInline[] } | { kind: 'image'; src: string; alt: string }"
     },
