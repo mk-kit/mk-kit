@@ -4,6 +4,19 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **Four new locale packs** — `@mk-kit/ui/locales/de` (German, `de-DE`/EUR),
+  `locales/uk` (Ukrainian, `uk-UA`/UAH), `locales/es` (Spanish, `es-ES`/EUR)
+  and `locales/fr` (French, `fr-FR`/EUR), each a complete `MkI18nStrings`
+  map with date names, validation messages, the block-editor chrome and a
+  CLDR plural picker (`mkPluralDe` / `mkPluralUk` / `mkPluralEs` /
+  `mkPluralFr`), provided via `provideMkI18nDe` / …Uk / …Es / …Fr with
+  overrides merging over the pack. Same conformance spec as `locales/pl`:
+  full key coverage, shape parity and no untranslated strings.
+
 ## [0.47.0] — 2026-08-30
 
 ### Added

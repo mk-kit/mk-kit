@@ -15138,6 +15138,250 @@ Members:
 | `providers`? | `(Provider \| EnvironmentProviders)[] \| undefined` | Extra providers for the shared application — `provideMkI18n(…)`, `provideMkExtendedIcons()`, `provideHttpClient()`, your services. |
 | `overlays`? | `boolean \| undefined` | Mount mk-kit overlays (dialogs, anchored panels, toasts, tours) inside a page-level shadow host that carries the same `styles`, instead of bare `document.body`. Default `true`; set `false` to keep the application default (overlays styled by the page's own stylesheets). |
 
+## @mk-kit/ui/locales/de
+
+6 exports. `import { … } from '@mk-kit/ui/locales/de';`
+
+### mkPluralDe (function)
+
+Import: `import { mkPluralDe } from '@mk-kit/ui/locales/de';`
+
+Picks the German plural form for a count — CLDR's `de` rules for integers:
+`one` for 1, `other` for everything else.
+
+```ts
+mkPluralDe(1, 'Ergebnis', 'Ergebnisse'); // 'Ergebnis'
+mkPluralDe(3, 'Ergebnis', 'Ergebnisse'); // 'Ergebnisse'
+```
+
+```ts
+function mkPluralDe(count: number, one: string, other: string): string
+```
+
+### provideMkI18nDe (function)
+
+Import: `import { provideMkI18nDe } from '@mk-kit/ui/locales/de';`
+
+Provides the German strings — `MK_DE_I18N` with any `overrides`
+merged on top (deep for `dateNames`, `blockEditor` and `validation`, like
+`provideMkI18n`).
+
+```ts
+bootstrapApplication(App, {
+  providers: [provideMkI18nDe({ noData: 'Nichts zu sehen' })],
+});
+```
+
+```ts
+function provideMkI18nDe(overrides?: MkI18nOverrides): Provider
+```
+
+### MK_DE_BLOCK_EDITOR (const)
+
+Import: `import { MK_DE_BLOCK_EDITOR } from '@mk-kit/ui/locales/de';`
+
+German strings of the block editor's chrome.
+
+```ts
+const MK_DE_BLOCK_EDITOR: MkBlockEditorStrings;
+```
+
+### MK_DE_DATE_NAMES (const)
+
+Import: `import { MK_DE_DATE_NAMES } from '@mk-kit/ui/locales/de';`
+
+German month and weekday names (Sunday-first, as in `Intl`).
+
+```ts
+const MK_DE_DATE_NAMES: MkDateNames;
+```
+
+### MK_DE_I18N (const)
+
+Import: `import { MK_DE_I18N } from '@mk-kit/ui/locales/de';`
+
+The complete German string map — every key of `MkI18nStrings`,
+`locale: 'de-DE'` and `currency: 'EUR'` for the formatting pipes.
+Provide it whole with `provideMkI18nDe`, or pass it as the base of
+`provideMkI18n(overrides, MK_DE_I18N)`.
+
+```ts
+const MK_DE_I18N: MkI18nStrings;
+```
+
+### MK_DE_VALIDATION (const)
+
+Import: `import { MK_DE_VALIDATION } from '@mk-kit/ui/locales/de';`
+
+German validation messages rendered by `mk-form-field`.
+
+```ts
+const MK_DE_VALIDATION: MkValidationStrings;
+```
+
+## @mk-kit/ui/locales/es
+
+6 exports. `import { … } from '@mk-kit/ui/locales/es';`
+
+### mkPluralEs (function)
+
+Import: `import { mkPluralEs } from '@mk-kit/ui/locales/es';`
+
+Picks the Spanish plural form for a count — CLDR's `es` rules for integers:
+`one` for 1, `other` for everything else.
+
+```ts
+mkPluralEs(1, 'resultado', 'resultados'); // 'resultado'
+mkPluralEs(3, 'resultado', 'resultados'); // 'resultados'
+```
+
+```ts
+function mkPluralEs(count: number, one: string, other: string): string
+```
+
+### provideMkI18nEs (function)
+
+Import: `import { provideMkI18nEs } from '@mk-kit/ui/locales/es';`
+
+Provides the Spanish strings — `MK_ES_I18N` with any `overrides`
+merged on top (deep for `dateNames`, `blockEditor` and `validation`, like
+`provideMkI18n`).
+
+```ts
+bootstrapApplication(App, {
+  providers: [provideMkI18nEs({ noData: 'No hay nada aquí' })],
+});
+```
+
+```ts
+function provideMkI18nEs(overrides?: MkI18nOverrides): Provider
+```
+
+### MK_ES_BLOCK_EDITOR (const)
+
+Import: `import { MK_ES_BLOCK_EDITOR } from '@mk-kit/ui/locales/es';`
+
+Spanish strings of the block editor's chrome.
+
+```ts
+const MK_ES_BLOCK_EDITOR: MkBlockEditorStrings;
+```
+
+### MK_ES_DATE_NAMES (const)
+
+Import: `import { MK_ES_DATE_NAMES } from '@mk-kit/ui/locales/es';`
+
+Spanish month and weekday names (Sunday-first, lowercase as in `Intl`).
+
+```ts
+const MK_ES_DATE_NAMES: MkDateNames;
+```
+
+### MK_ES_I18N (const)
+
+Import: `import { MK_ES_I18N } from '@mk-kit/ui/locales/es';`
+
+The complete Spanish string map — every key of `MkI18nStrings`,
+`locale: 'es-ES'` and `currency: 'EUR'` for the formatting pipes.
+Provide it whole with `provideMkI18nEs`, or pass it as the base of
+`provideMkI18n(overrides, MK_ES_I18N)`.
+
+```ts
+const MK_ES_I18N: MkI18nStrings;
+```
+
+### MK_ES_VALIDATION (const)
+
+Import: `import { MK_ES_VALIDATION } from '@mk-kit/ui/locales/es';`
+
+Spanish validation messages rendered by `mk-form-field`.
+
+```ts
+const MK_ES_VALIDATION: MkValidationStrings;
+```
+
+## @mk-kit/ui/locales/fr
+
+6 exports. `import { … } from '@mk-kit/ui/locales/fr';`
+
+### mkPluralFr (function)
+
+Import: `import { mkPluralFr } from '@mk-kit/ui/locales/fr';`
+
+Picks the French plural form for a count — CLDR's `fr` rules for integers:
+`one` for 0 and 1, `other` for everything else.
+
+```ts
+mkPluralFr(1, 'résultat', 'résultats'); // 'résultat'
+mkPluralFr(0, 'résultat', 'résultats'); // 'résultat'
+mkPluralFr(3, 'résultat', 'résultats'); // 'résultats'
+```
+
+```ts
+function mkPluralFr(count: number, one: string, other: string): string
+```
+
+### provideMkI18nFr (function)
+
+Import: `import { provideMkI18nFr } from '@mk-kit/ui/locales/fr';`
+
+Provides the French strings — `MK_FR_I18N` with any `overrides`
+merged on top (deep for `dateNames`, `blockEditor` and `validation`, like
+`provideMkI18n`).
+
+```ts
+bootstrapApplication(App, {
+  providers: [provideMkI18nFr({ noData: 'Rien à afficher ici' })],
+});
+```
+
+```ts
+function provideMkI18nFr(overrides?: MkI18nOverrides): Provider
+```
+
+### MK_FR_BLOCK_EDITOR (const)
+
+Import: `import { MK_FR_BLOCK_EDITOR } from '@mk-kit/ui/locales/fr';`
+
+French strings of the block editor's chrome.
+
+```ts
+const MK_FR_BLOCK_EDITOR: MkBlockEditorStrings;
+```
+
+### MK_FR_DATE_NAMES (const)
+
+Import: `import { MK_FR_DATE_NAMES } from '@mk-kit/ui/locales/fr';`
+
+French month and weekday names (Sunday-first, lowercase as in `Intl`).
+
+```ts
+const MK_FR_DATE_NAMES: MkDateNames;
+```
+
+### MK_FR_I18N (const)
+
+Import: `import { MK_FR_I18N } from '@mk-kit/ui/locales/fr';`
+
+The complete French string map — every key of `MkI18nStrings`,
+`locale: 'fr-FR'` and `currency: 'EUR'` for the formatting pipes.
+Provide it whole with `provideMkI18nFr`, or pass it as the base of
+`provideMkI18n(overrides, MK_FR_I18N)`.
+
+```ts
+const MK_FR_I18N: MkI18nStrings;
+```
+
+### MK_FR_VALIDATION (const)
+
+Import: `import { MK_FR_VALIDATION } from '@mk-kit/ui/locales/fr';`
+
+French validation messages rendered by `mk-form-field`.
+
+```ts
+const MK_FR_VALIDATION: MkValidationStrings;
+```
+
 ## @mk-kit/ui/locales/pl
 
 6 exports. `import { … } from '@mk-kit/ui/locales/pl';`
@@ -15219,6 +15463,89 @@ Polish validation messages rendered by `mk-form-field`.
 
 ```ts
 const MK_PL_VALIDATION: MkValidationStrings;
+```
+
+## @mk-kit/ui/locales/uk
+
+6 exports. `import { … } from '@mk-kit/ui/locales/uk';`
+
+### mkPluralUk (function)
+
+Import: `import { mkPluralUk } from '@mk-kit/ui/locales/uk';`
+
+Picks the Ukrainian plural form for a count — CLDR's `uk` rules for
+integers: `one` when the number ends in 1 (but not 11), `few` when it ends
+in 2–4 (but not 12–14), `many` otherwise.
+
+```ts
+mkPluralUk(1, 'результат', 'результати', 'результатів');  // 'результат'
+mkPluralUk(3, 'результат', 'результати', 'результатів');  // 'результати'
+mkPluralUk(11, 'результат', 'результати', 'результатів'); // 'результатів'
+```
+
+```ts
+function mkPluralUk(count: number, one: string, few: string, many: string): string
+```
+
+### provideMkI18nUk (function)
+
+Import: `import { provideMkI18nUk } from '@mk-kit/ui/locales/uk';`
+
+Provides the Ukrainian strings — `MK_UK_I18N` with any `overrides`
+merged on top (deep for `dateNames`, `blockEditor` and `validation`, like
+`provideMkI18n`).
+
+```ts
+bootstrapApplication(App, {
+  providers: [provideMkI18nUk({ noData: 'Тут нічого немає' })],
+});
+```
+
+```ts
+function provideMkI18nUk(overrides?: MkI18nOverrides): Provider
+```
+
+### MK_UK_BLOCK_EDITOR (const)
+
+Import: `import { MK_UK_BLOCK_EDITOR } from '@mk-kit/ui/locales/uk';`
+
+Ukrainian strings of the block editor's chrome.
+
+```ts
+const MK_UK_BLOCK_EDITOR: MkBlockEditorStrings;
+```
+
+### MK_UK_DATE_NAMES (const)
+
+Import: `import { MK_UK_DATE_NAMES } from '@mk-kit/ui/locales/uk';`
+
+Ukrainian month and weekday names (Sunday-first, lowercase as in `Intl`).
+
+```ts
+const MK_UK_DATE_NAMES: MkDateNames;
+```
+
+### MK_UK_I18N (const)
+
+Import: `import { MK_UK_I18N } from '@mk-kit/ui/locales/uk';`
+
+The complete Ukrainian string map — every key of `MkI18nStrings`,
+`locale: 'uk-UA'` and `currency: 'UAH'` for the formatting pipes.
+Provide it whole with `provideMkI18nUk`, or pass it as the base of
+`provideMkI18n(overrides, MK_UK_I18N)`.
+
+```ts
+const MK_UK_I18N: MkI18nStrings;
+```
+
+### MK_UK_VALIDATION (const)
+
+Import: `import { MK_UK_VALIDATION } from '@mk-kit/ui/locales/uk';`
+
+Ukrainian validation messages rendered by `mk-form-field`.
+
+```ts
+const MK_UK_VALIDATION: MkValidationStrings;
 ```
 
 ## @mk-kit/ui/testing

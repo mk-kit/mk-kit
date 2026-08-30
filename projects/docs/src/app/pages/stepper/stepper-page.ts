@@ -4,6 +4,7 @@ import {
   MkButton,
   MkCheckbox,
   MkFormField,
+  MkIcon,
   MkInput,
   MkStep,
   MkStepper,
@@ -26,6 +27,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkFormField,
     MkInput,
     MkCheckbox,
+    MkIcon,
   ],
   template: `
     <div class="docs-page docs-container">
@@ -94,7 +96,7 @@ import { DocsExample } from '../../shared/docs-example';
               <p>Optional — you can skip this step.</p>
             </mk-step>
             <mk-step label="Finish">
-              <p>🎉 Complete.</p>
+              <p><mk-icon name="circle-check" /> Complete.</p>
             </mk-step>
           </mk-stepper>
           <div style="display: flex; gap: var(--mk-space-2); margin-top: var(--mk-space-3);">
