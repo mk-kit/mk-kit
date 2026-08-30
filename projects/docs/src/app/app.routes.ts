@@ -66,6 +66,11 @@ export const routes: Routes = [
       import('./pages/migration/migration-page').then((m) => m.MigrationPage),
   },
   {
+    path: 'crud',
+    title: 'CRUD generator — mk-kit',
+    loadComponent: () => import('./pages/crud/crud-page').then((m) => m.CrudPage),
+  },
+  {
     path: 'components/images',
     title: 'Images & lightbox — mk-kit',
     loadComponent: () =>

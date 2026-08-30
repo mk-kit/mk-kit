@@ -152,6 +152,11 @@ export class App {
           keywords: 'angular material migration mapping equivalents mat-dialog mat-snackbar switch',
         },
         {
+          label: 'CRUD generator',
+          path: '/crud',
+          keywords: 'crud generator schematic scaffold entity admin ng generate list form service routes spec',
+        },
+        {
           label: 'Changelog',
           path: '/changelog',
           keywords: 'changelog releases versions release notes history breaking changes',

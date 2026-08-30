@@ -1,0 +1,48 @@
+{
+  "$schema": "http://json-schema.org/schema",
+  "$id": "MkKitCrud",
+  "title": "@mk-kit/ui crud schematic",
+  "type": "object",
+  "properties": {
+    "entity": {
+      "type": "string",
+      "description": "Singular entity name, e.g. \"product\" or \"OrderLine\".",
+      "$default": {
+        "$source": "argv",
+        "index": 0
+      }
+    },
+    "fields": {
+      "type": "string",
+      "default": "name!:string",
+      "description": "Comma-separated fields as key:type — \"!\" marks required, selects take options: \"name!:string,price:currency,status:select=draft|published,createdAt:date\". Types: string, textarea, email, url, number, currency, boolean, date, datetime, select, tags."
+    },
+    "plural": {
+      "type": "string",
+      "description": "Plural override when the naive pluralizer guesses wrong (e.g. --plural people)."
+    },
+    "api": {
+      "type": "string",
+      "description": "REST base URL (e.g. /api/products). Set: the service uses HttpClient; unset: an in-memory store that runs immediately."
+    },
+    "path": {
+      "type": "string",
+      "description": "Directory the entity folder is created in. Default: the application's src/app."
+    },
+    "project": {
+      "type": "string",
+      "description": "Workspace project to target. Default: the first application project."
+    },
+    "route": {
+      "type": "boolean",
+      "default": true,
+      "description": "Wire a lazy route into the application's app.routes.ts."
+    },
+    "spec": {
+      "type": "boolean",
+      "default": true,
+      "description": "Generate a harness-driven spec for the pages."
+    }
+  },
+  "required": ["entity"]
+}

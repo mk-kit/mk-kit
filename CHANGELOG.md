@@ -4,6 +4,20 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **CRUD generator** — `ng g @mk-kit/ui:crud <entity>` scaffolds a working
+  admin slice from a field spec (e.g. `--fields
+  "name!:string,price:currency,status:select=draft|published,createdAt:date"`):
+  a typed model with the table columns and dynamic-form schema in one file, a
+  data service (in-memory by default so the pages run immediately; HttpClient
+  against a REST base with `--api`), an `mk-table` list page with search,
+  sorting, pagination and delete confirmation, an `mk-dynamic-form`
+  create/edit page, lazy routes wired into `app.routes.ts`, and a
+  harness-driven spec (`--no-spec` to skip). Guide: <https://mk-kit.dev/crud>.
+
 ## [0.46.0] — 2026-08-29
 
 ### Changed

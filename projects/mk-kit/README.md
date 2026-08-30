@@ -29,7 +29,14 @@ ng add @mk-kit/ui
 **Coming from PrimeNG?** `ng g @mk-kit/ui:migrate-primeng --dry-run` shows
 what the codemod would rewrite (imports, class names, 1:1 selectors, a few
 input names) and what needs a manual touch; without `--dry-run` it applies
-the changes and writes `primeng-migration.md`. Details: <https://mk-kit.dev/migration>. By hand instead:
+the changes and writes `primeng-migration.md`. Details: <https://mk-kit.dev/migration>.
+
+**Scaffolding an admin screen?** `ng g @mk-kit/ui:crud product --fields
+"name!:string,price:currency,status:select=draft|published"` generates a
+working slice — typed model, data service (in-memory, or `--api /api/products`
+for HttpClient), `mk-table` list page with search/sort/pagination/delete,
+`mk-dynamic-form` create/edit page, lazy routes wired into the app, and a
+harness-driven spec. Details: <https://mk-kit.dev/crud>. By hand instead:
 
 ```bash
 npm install @mk-kit/ui
