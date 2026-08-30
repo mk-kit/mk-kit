@@ -374,6 +374,15 @@
      ]
     },
     {
+     "name": "mkBodyLevelAncestor",
+     "description": "The direct child of `document.body` an overlay-root descendant lives under,\ncrossing shadow boundaries on the way up — `null` when the node is not under\n`body` at all. The overlay service uses it to keep the overlay's own host\nout of the elements it makes `inert` behind a modal.",
+     "file": "projects/mk-kit/core/overlay/overlay-root.ts",
+     "kind": "function",
+     "signatures": [
+      "(node: Node, body: HTMLElement): Element | null"
+     ]
+    },
+    {
      "name": "mkComputeAnchoredPosition",
      "description": "Pure viewport-positioning maths shared by every anchored overlay\n(`MkAnchoredPanel` and the tooltip). Given the anchor rect, the panel\nsize and the viewport size, returns the top/left for a `position: fixed`\npanel — flipping to the opposite side when it would overflow and clamping\nback inside the viewport.",
      "file": "projects/mk-kit/core/overlay/anchored-overlay.ts",
@@ -619,6 +628,13 @@
      "file": "projects/mk-kit/core/overlay/overlay-ref.ts",
      "kind": "token",
      "type": "InjectionToken<unknown>"
+    },
+    {
+     "name": "MK_OVERLAY_ROOT",
+     "description": "Where mk-kit mounts everything that leaves the component tree: overlay\ncontainers (dialogs), anchored panels (selects, menus, tooltips), toast /\nsnackbar containers and the tour surfaces. Defaults to `document.body`.\n\nOverride it to confine those surfaces to another element — `@mk-kit/ui/embed`\npoints it at a themed shadow-DOM host so overlays opened by embedded custom\nelements stay isolated from the host page's stylesheet:\n\n```ts\n{ provide: MK_OVERLAY_ROOT, useValue: () => myOverlayHost }\n```",
+     "file": "projects/mk-kit/core/overlay/overlay-root.ts",
+     "kind": "token",
+     "type": "InjectionToken<MkOverlayRootFn>"
     },
     {
      "name": "MK_DEFAULT_BREAKPOINTS",
@@ -3139,6 +3155,13 @@
      "file": "projects/mk-kit/core/i18n/mk-i18n.ts",
      "kind": "type",
      "definition": "Partial< Omit<MkI18nStrings, 'dateNames' | 'blockEditor' | 'validation'> > & { dateNames?: Partial<MkDateNames>; blockEditor?: Partial<MkBlockEditorStrings>; validation?: Partial<MkValidationStrings>; }"
+    },
+    {
+     "name": "MkOverlayRootFn",
+     "description": "Resolves the element overlay surfaces are appended to. A function (not an\nelement) because the root may be created lazily, after DI is set up.",
+     "file": "projects/mk-kit/core/overlay/overlay-root.ts",
+     "kind": "type",
+     "definition": "() => HTMLElement"
     },
     {
      "name": "MkPlacement",
@@ -22456,6 +22479,85 @@
      "file": "projects/mk-kit/media/image/image.ts",
      "kind": "type",
      "definition": "'loading' | 'loaded' | 'error'"
+    }
+   ]
+  },
+  {
+   "name": "embed",
+   "import": "@mk-kit/ui/embed",
+   "exports": [
+    {
+     "name": "MkEmbedApp",
+     "description": "One shared embed application. Create it with `mkEmbed`.",
+     "file": "projects/mk-kit/embed/embed.ts",
+     "kind": "class",
+     "methods": [
+      {
+       "name": "element",
+       "signature": "(tag: string, component: Type<unknown>): this",
+       "description": "Defines `tag` as a custom element rendering `component`. Chainable; a\nno-op when the tag is already defined (hot reload, duplicate script) or\noutside a browser."
+      },
+      {
+       "name": "ready",
+       "signature": "(): Promise<void>",
+       "description": "Resolves when the shared application is running (created on demand)."
+      },
+      {
+       "name": "whenStable",
+       "signature": "(): Promise<void>",
+       "description": "Resolves when the application has no pending change detection."
+      },
+      {
+       "name": "destroy",
+       "signature": "(): void",
+       "description": "Destroys the shared application, every mounted component and the overlay\nhost. Defined tags remain registered (the platform cannot undefine them)\nbut render nothing afterwards."
+      }
+     ],
+     "properties": []
+    },
+    {
+     "name": "mkEmbed",
+     "description": "Creates an embed application: a factory for custom elements that render\nmk-kit-based Angular components behind shadow DOM.\n\n- **Lazy**: `element()` only defines the tag; the Angular application is\n  created on the first element actually connected to a document.\n- **Shared**: every element of one `mkEmbed()` call runs in one zoneless\n  `ApplicationRef` with one provider set.\n- **Isolated but themable**: the host page's CSS cannot reach the widget\n  internals, while `--mk-*` custom properties still inherit through the\n  shadow boundary — set them on the element (or any ancestor) to theme it.\n- **Styled**: Angular routes each component's own styles into the shadow\n  root it renders in; the `styles` option supplies the token/theme layer.\n\n```ts\nimport { mkEmbed, mkShadowCss } from '@mk-kit/ui/embed';\nimport themeCss from '@mk-kit/ui/styles.css' with { type: 'text' };\n\nmkEmbed({ styles: mkShadowCss(themeCss) })\n  .element('acme-reviews', ReviewsWidget)\n  .element('acme-signup', SignupWidget);\n```\n\n```html\n<acme-reviews product-id=\"42\" style=\"--mk-primary: #7c3aed\"></acme-reviews>\n```\n\nInputs are exposed as dash-cased attributes (string values go through the\ninput's `transform`, so `booleanAttribute` / `numberAttribute` inputs coerce\nas usual) and as camel-cased element properties (any value); outputs become\nbubbling, composed `CustomEvent`s named after the output, with the emitted\nvalue as `detail`.",
+     "file": "projects/mk-kit/embed/embed.ts",
+     "kind": "function",
+     "signatures": [
+      "(init?: MkEmbedInit): MkEmbedApp"
+     ]
+    },
+    {
+     "name": "mkShadowCss",
+     "description": "Rewrites a document-level stylesheet for adoption into a shadow root:\n`:root` never matches inside one, so token blocks like mk-kit's\n`:root { --mk-primary: … }` are retargeted to `:host`. Theme opt-ins keep\nworking — `:root:not([data-mk-theme='light'])` becomes\n`:host:not([data-mk-theme='light'])`, so `<my-widget data-mk-theme=\"dark\">`\nswitches one embedded element to the dark palette.\n\n```ts\nimport themeCss from '@mk-kit/ui/styles.css' with { type: 'text' };\nmkEmbed({ styles: mkShadowCss(themeCss) });\n```",
+     "file": "projects/mk-kit/embed/shadow-css.ts",
+     "kind": "function",
+     "signatures": [
+      "(css: string): string"
+     ]
+    },
+    {
+     "name": "MkEmbedInit",
+     "description": "Options for `mkEmbed`.",
+     "file": "projects/mk-kit/embed/embed.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "styles",
+       "type": "string | readonly string[] | undefined",
+       "description": "CSS text adopted into every element's shadow root (and the overlay host).\nPass the mk-kit theme through `mkShadowCss` so its `:root` token\nblocks target `:host`; append your own widget CSS after it. Shared as\nconstructable stylesheets when the browser supports them (one parse for\nany number of instances), `<style>` elements otherwise.",
+       "optional": true
+      },
+      {
+       "name": "providers",
+       "type": "(Provider | EnvironmentProviders)[] | undefined",
+       "description": "Extra providers for the shared application — `provideMkI18n(…)`,\n`provideMkExtendedIcons()`, `provideHttpClient()`, your services.",
+       "optional": true
+      },
+      {
+       "name": "overlays",
+       "type": "boolean | undefined",
+       "description": "Mount mk-kit overlays (dialogs, anchored panels, toasts, tours) inside a\npage-level shadow host that carries the same `styles`, instead of bare\n`document.body`. Default `true`; set `false` to keep the application\ndefault (overlays styled by the page's own stylesheets).",
+       "optional": true
+      }
+     ]
     }
    ]
   },

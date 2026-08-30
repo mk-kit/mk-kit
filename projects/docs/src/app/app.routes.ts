@@ -71,6 +71,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/crud/crud-page').then((m) => m.CrudPage),
   },
   {
+    path: 'embed',
+    title: 'Embedding as custom elements — mk-kit',
+    loadComponent: () => import('./pages/embed/embed-page').then((m) => m.EmbedPage),
+  },
+  {
     path: 'components/images',
     title: 'Images & lightbox — mk-kit',
     loadComponent: () =>

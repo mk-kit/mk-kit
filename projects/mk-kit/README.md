@@ -114,9 +114,10 @@ Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
 `feedback`, `directives`, `dnd`, `media`, `icon`, `icon/extended` (the opt-in
 305-icon set), `button`, `checkbox`, `chip`, `context-menu`, `layout`, `chat`,
 `query-builder`, `dynamic-form`, `rich-text`, `block-editor`, plus `testing`
-(component harnesses for specs) and `locales/pl` (the Polish string pack) —
-the last two are never re-exported from the umbrella. `sideEffects: false`
-throughout.
+(component harnesses for specs), `locales/pl` (the Polish string pack) and
+`embed` (ship components as shadow-DOM custom elements,
+<https://mk-kit.dev/embed>) — the last three are never re-exported from the
+umbrella. `sideEffects: false` throughout.
 
 ## Theming
 

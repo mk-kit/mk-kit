@@ -10,6 +10,7 @@ import {
   output,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_OVERLAY_ROOT } from './overlay-root';
 import type { MkPlacement } from '../types';
 
 /** Options controlling {@link mkComputeAnchoredPosition}. */
@@ -154,6 +155,7 @@ export function mkComputeAnchoredPosition(
 export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
   private readonly host = inject<ElementRef<HTMLElement>>(ElementRef);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   /** The trigger element to position against. */
@@ -230,7 +232,7 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     // matters in the no-Popover fallback; the top layer ignores z-index.
     el.style.setProperty('z-index', 'var(--mk-z-menu)');
 
-    this.document.body.appendChild(el);
+    this.overlayRoot().appendChild(el);
 
     // Promote into the top layer when the Popover API is available.
     const withPopover = el as HTMLElement & {

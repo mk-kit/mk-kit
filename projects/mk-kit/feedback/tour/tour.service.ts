@@ -13,6 +13,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_OVERLAY_ROOT } from '@mk-kit/ui/core';
 import {
   MK_TOUR_DATA,
   MkTourPopup,
@@ -50,6 +51,7 @@ export class MkTourService {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _steps = signal<readonly MkTourStep[]>([]);
@@ -191,7 +193,7 @@ export class MkTourService {
       }),
     });
     this.appRef.attachView(ref.hostView);
-    this.document.body.appendChild(ref.location.nativeElement);
+    this.overlayRoot().appendChild(ref.location.nativeElement);
     this.popupRef = ref;
   }
 
@@ -257,7 +259,7 @@ export class MkTourService {
     scrim.style.cssText =
       'position:fixed;inset:0;background:var(--mk-overlay-scrim,rgba(0,0,0,0.45));animation:mk-overlay-fade var(--mk-duration-fast,140ms) var(--mk-ease-out,ease);';
     scrim.style.setProperty('z-index', 'var(--mk-z-overlay, 1000)');
-    this.document.body.appendChild(scrim);
+    this.overlayRoot().appendChild(scrim);
     this.scrim = scrim;
   }
 

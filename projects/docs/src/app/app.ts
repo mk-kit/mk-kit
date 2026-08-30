@@ -157,6 +157,11 @@ export class App {
           keywords: 'crud generator schematic scaffold entity admin ng generate list form service routes spec',
         },
         {
+          label: 'Embedding',
+          path: '/embed',
+          keywords: 'embed custom elements web components shadow dom widget wordpress cms isolation mkEmbed overlay root',
+        },
+        {
           label: 'Changelog',
           path: '/changelog',
           keywords: 'changelog releases versions release notes history breaking changes',
