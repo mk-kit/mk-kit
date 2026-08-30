@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.47.0",
+ "version": "0.48.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,10 +9,10 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3678637,
-  "min": 1612653,
-  "brotli": 288751,
-  "budgetKiB": 3624
+  "raw": 3768101,
+  "min": 1679664,
+  "brotli": 311270,
+  "budgetKiB": 3752
  },
  "entries": [
   {
@@ -2722,6 +2722,147 @@
    ]
   },
   {
+   "name": "locales/de",
+   "import": "@mk-kit/ui/locales/de",
+   "file": "mk-kit-ui-locales-de.mjs",
+   "raw": 20629,
+   "min": 15166,
+   "brotli": 5495,
+   "budgetKiB": 32,
+   "items": [
+    {
+     "name": "provideMkI18nDe",
+     "kind": "function",
+     "own": 5434,
+     "size": 8491
+    },
+    {
+     "name": "MK_DE_I18N",
+     "kind": "const",
+     "own": 5395,
+     "size": 5663
+    },
+    {
+     "name": "MK_DE_BLOCK_EDITOR",
+     "kind": "const",
+     "own": 1595,
+     "size": 1877
+    },
+    {
+     "name": "MK_DE_VALIDATION",
+     "kind": "const",
+     "own": 628,
+     "size": 892
+    },
+    {
+     "name": "MK_DE_DATE_NAMES",
+     "kind": "const",
+     "own": 243,
+     "size": 503
+    },
+    {
+     "name": "mkPluralDe",
+     "kind": "function",
+     "own": 86,
+     "size": 353
+    }
+   ]
+  },
+  {
+   "name": "locales/es",
+   "import": "@mk-kit/ui/locales/es",
+   "file": "mk-kit-ui-locales-es.mjs",
+   "raw": 20691,
+   "min": 15217,
+   "brotli": 5317,
+   "budgetKiB": 32,
+   "items": [
+    {
+     "name": "provideMkI18nEs",
+     "kind": "function",
+     "own": 5251,
+     "size": 8378
+    },
+    {
+     "name": "MK_ES_I18N",
+     "kind": "const",
+     "own": 5209,
+     "size": 5501
+    },
+    {
+     "name": "MK_ES_BLOCK_EDITOR",
+     "kind": "const",
+     "own": 1546,
+     "size": 1847
+    },
+    {
+     "name": "MK_ES_VALIDATION",
+     "kind": "const",
+     "own": 574,
+     "size": 843
+    },
+    {
+     "name": "MK_ES_DATE_NAMES",
+     "kind": "const",
+     "own": 229,
+     "size": 494
+    },
+    {
+     "name": "mkPluralEs",
+     "kind": "function",
+     "own": 86,
+     "size": 354
+    }
+   ]
+  },
+  {
+   "name": "locales/fr",
+   "import": "@mk-kit/ui/locales/fr",
+   "file": "mk-kit-ui-locales-fr.mjs",
+   "raw": 21258,
+   "min": 15709,
+   "brotli": 5532,
+   "budgetKiB": 32,
+   "items": [
+    {
+     "name": "provideMkI18nFr",
+     "kind": "function",
+     "own": 5476,
+     "size": 8546
+    },
+    {
+     "name": "MK_FR_I18N",
+     "kind": "const",
+     "own": 5434,
+     "size": 5707
+    },
+    {
+     "name": "MK_FR_BLOCK_EDITOR",
+     "kind": "const",
+     "own": 1605,
+     "size": 1901
+    },
+    {
+     "name": "MK_FR_VALIDATION",
+     "kind": "const",
+     "own": 597,
+     "size": 869
+    },
+    {
+     "name": "MK_FR_DATE_NAMES",
+     "kind": "const",
+     "own": 243,
+     "size": 511
+    },
+    {
+     "name": "mkPluralFr",
+     "kind": "function",
+     "own": 74,
+     "size": 352
+    }
+   ]
+  },
+  {
    "name": "locales/pl",
    "import": "@mk-kit/ui/locales/pl",
    "file": "mk-kit-ui-locales-pl.mjs",
@@ -2765,6 +2906,53 @@
      "kind": "function",
      "own": 127,
      "size": 399
+    }
+   ]
+  },
+  {
+   "name": "locales/uk",
+   "import": "@mk-kit/ui/locales/uk",
+   "file": "mk-kit-ui-locales-uk.mjs",
+   "raw": 26886,
+   "min": 20919,
+   "brotli": 6175,
+   "budgetKiB": 32,
+   "items": [
+    {
+     "name": "provideMkI18nUk",
+     "kind": "function",
+     "own": 6114,
+     "size": 9514
+    },
+    {
+     "name": "MK_UK_I18N",
+     "kind": "const",
+     "own": 6063,
+     "size": 6344
+    },
+    {
+     "name": "MK_UK_BLOCK_EDITOR",
+     "kind": "const",
+     "own": 1848,
+     "size": 2132
+    },
+    {
+     "name": "MK_UK_VALIDATION",
+     "kind": "const",
+     "own": 722,
+     "size": 997
+    },
+    {
+     "name": "MK_UK_DATE_NAMES",
+     "kind": "const",
+     "own": 292,
+     "size": 564
+    },
+    {
+     "name": "mkPluralUk",
+     "kind": "function",
+     "own": 142,
+     "size": 401
     }
    ]
   },
