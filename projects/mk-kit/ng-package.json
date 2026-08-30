@@ -17,6 +17,7 @@
     "entryFile": "src/public-api.ts"
   },
   "allowedNonPeerDependencies": [
+    "@mk-kit/core",
     "@mk-kit/validators"
   ]
 }

@@ -4,6 +4,25 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Changed
+
+- **`@mk-kit/core` is now a dependency** — the framework-free engines moved
+  to a zero-dependency sibling package usable from any framework: the
+  anchored-overlay positioning maths (`mkComputeAnchoredPosition`,
+  `MkPlacement`), the diff engine (`mkComputeDiff`, `mkDiffStats`), the
+  markdown parser/renderer, the JSON syntax highlighter, the ANSI parser,
+  the calendar date helpers (`formatDate`, `buildMonthMatrix`, … and
+  `MkDateNames`), the filter-query engine (`mkQueryToPredicate`,
+  `mkQueryToText`, …) and `mkUniqueId`. `@mk-kit/ui` re-exports every name
+  unchanged from the same import paths, so no application code changes;
+  the package installs automatically (a regular dependency, like
+  `@mk-kit/validators`). `mkQueryOperatorLabel` / `mkQueryToText` now
+  accept any object with the query strings (`MkQueryTextStrings`, new,
+  with `MK_QUERY_TEXT_EN` defaults) — the full `MkI18nStrings` map
+  qualifies as before.
+
 ## [0.48.0] — 2026-08-30
 
 ### Added

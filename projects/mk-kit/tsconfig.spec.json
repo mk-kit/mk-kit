@@ -8,6 +8,8 @@
     "paths": {
       "@mk-kit/ui": ["./src/public-api.ts"],
       "@mk-kit/ui/*": ["./*"],
+      "@mk-kit/core": ["../../dist/core"],
+      "@mk-kit/core/*": ["../../dist/core/*"],
       "@mk-kit/validators": ["../../dist/validators"],
       "@mk-kit/validators/*": ["../../dist/validators/*"]
     }

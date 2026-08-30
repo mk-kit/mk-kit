@@ -8,18 +8,8 @@ export type MkSortAnnounceDirection = 'asc' | 'desc';
  * pickers and `formatDate`. All arrays are full-length (12 months, 7 weekdays
  * starting with Sunday) — override the whole set for a locale.
  */
-export interface MkDateNames {
-  /** Full month names, January-first (12). */
-  months: readonly string[];
-  /** Abbreviated month names (12). */
-  monthsShort: readonly string[];
-  /** Full weekday names, Sunday-first (7). */
-  weekdays: readonly string[];
-  /** Abbreviated weekday names (7). */
-  weekdaysShort: readonly string[];
-  /** One/two-letter weekday names for calendar headers (7). */
-  weekdaysNarrow: readonly string[];
-}
+export type { MkDateNames } from '@mk-kit/core';
+import type { MkDateNames } from '@mk-kit/core';
 
 /** Strings used by the block editor's chrome. */
 export interface MkBlockEditorStrings {

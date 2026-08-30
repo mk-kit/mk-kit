@@ -9,7 +9,7 @@
     "gen:api": "node scripts/gen-api.mjs",
     "gen:cost": "node scripts/gen-cost.mjs",
     "build:theme": "sass projects/mk-kit/src/styles/mk-kit.scss projects/mk-kit/src/styles/mk-kit.css --no-source-map --style expanded --no-charset",
-    "build:lib": "npm run build:validators && npm run build:theme && ng build mk-kit && npm run build:schematics",
+    "build:lib": "npm run build:core && npm run build:validators && npm run build:theme && ng build mk-kit && npm run build:schematics",
     "build:mcp": "tsc -p projects/mcp/tsconfig.json && node scripts/build-mcp.mjs",
     "build:schematics": "tsc -p projects/mk-kit/schematics/tsconfig.schematics.json && cp projects/mk-kit/schematics/collection.json projects/mk-kit/schematics/package.json dist/mk-kit/schematics/ && cp projects/mk-kit/schematics/ng-add/schema.json dist/mk-kit/schematics/ng-add/schema.json && cp projects/mk-kit/schematics/migrate-primeng/schema.json dist/mk-kit/schematics/migrate-primeng/schema.json && cp projects/mk-kit/schematics/crud/schema.json dist/mk-kit/schematics/crud/schema.json",
     "watch:lib": "ng build mk-kit --watch --configuration development",
@@ -18,7 +18,9 @@
     "test:lib": "ng test mk-kit --no-watch",
     "test:docs": "ng test docs --no-watch",
     "test:mcp": "vitest run --root projects/mcp",
+    "build:core": "tsc -p projects/core/tsconfig.json && node scripts/build-core.mjs",
     "build:validators": "tsc -p projects/validators/tsconfig.json && node scripts/build-validators.mjs",
+    "test:core": "vitest run --root projects/core",
     "test:validators": "vitest run --root projects/validators",
     "test:visual": "playwright test",
     "test:visual:update": "playwright test --update-snapshots"
