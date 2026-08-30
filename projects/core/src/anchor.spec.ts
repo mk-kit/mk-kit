@@ -87,26 +87,3 @@ describe('mkComputeAnchoredPosition', () => {
     expect(pos.placement).toBe('top');
   });
 });
-
-@Component({
-  selector: 'mk-anchored-host',
-  changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [MkAnchoredPanel],
-  template: `
-    <button #trigger>trigger</button>
-    @if (open()) {
-      <div
-        class="panel"
-        mkAnchoredPanel
-        [mkAnchoredPanelFor]="trigger"
-        (dismiss)="dismissed.set(dismissed() + 1)"
-      >
-        panel
-      </div>
-    }
-  `,
-})
-class AnchoredHost {
-  readonly open = signal(false);
-  readonly dismissed = signal(0);
-}

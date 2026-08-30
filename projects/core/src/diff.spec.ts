@@ -55,11 +55,3 @@ describe('mkComputeDiff', () => {
     expect(mkDiffStats(rows)).toEqual({ added: 2, removed: 1, unchanged: 2 });
   });
 });
-
-@Component({
-  imports: [MkDiff],
-  template: `<mk-diff before="a\nb\nc" after="a\nB\nc" [mode]="mode()" />`,
-})
-class Host {
-  mode = signal<MkDiffMode>('unified');
-}
