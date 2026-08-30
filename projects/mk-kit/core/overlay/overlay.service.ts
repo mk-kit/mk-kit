@@ -13,6 +13,7 @@ import {
 import { isPlatformBrowser } from '@angular/common';
 import { MkFocusTrap } from '../a11y/focus-trap';
 import { MK_OVERLAY_DATA, MkOverlayRef } from './overlay-ref';
+import { MK_OVERLAY_ROOT, mkBodyLevelAncestor } from './overlay-root';
 
 export interface MkOverlayConfig<TData = unknown> {
   /** Arbitrary data injected via `MK_OVERLAY_DATA`. */
@@ -81,6 +82,7 @@ export class MkOverlayService implements OnDestroy {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   // All coordination state lives on the INSTANCE, not the module: the service
@@ -288,7 +290,7 @@ export class MkOverlayService implements OnDestroy {
     overlayRef.componentRef = componentRef;
     this.appRef.attachView(componentRef.hostView);
 
-    this.document.body.appendChild(container);
+    this.overlayRoot().appendChild(container);
 
     // Lock body scroll while any overlay is open (see lockBodyScroll for the
     // iOS-proof fixed-body technique and the reference counting).
@@ -306,9 +308,13 @@ export class MkOverlayService implements OnDestroy {
     const isModal = hasBackdrop && role !== 'menu';
     const inerted: Element[] = [];
     if (isModal) {
+      // With a custom MK_OVERLAY_ROOT the container is nested (possibly behind
+      // a shadow boundary), so resolve which body child carries it — that one
+      // must stay interactive.
+      const containerHost = mkBodyLevelAncestor(container, this.document.body);
       for (const sibling of Array.from(this.document.body.children)) {
         if (
-          sibling === container ||
+          sibling === containerHost ||
           sibling.hasAttribute('inert') ||
           sibling.matches(INERT_EXEMPT_SELECTOR)
         ) {

@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_OVERLAY_ROOT } from '@mk-kit/ui/core';
 import { MkToastContainer } from './toast-container';
 
 /** Semantic tones supported by toasts. */
@@ -77,6 +78,7 @@ export class MkToastService {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _toasts = signal<readonly MkToastItem[]>([]);
@@ -184,7 +186,7 @@ export class MkToastService {
       environmentInjector: this.envInjector,
     });
     this.appRef.attachView(ref.hostView);
-    this.document.body.appendChild(ref.location.nativeElement);
+    this.overlayRoot().appendChild(ref.location.nativeElement);
     this.containerRef = ref;
   }
 }

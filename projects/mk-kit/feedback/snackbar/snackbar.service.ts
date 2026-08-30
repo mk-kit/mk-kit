@@ -10,6 +10,7 @@ import {
   signal,
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
+import { MK_OVERLAY_ROOT } from '@mk-kit/ui/core';
 import { MkSnackbarContainer } from './snackbar-container';
 
 /** Semantic tone of a snackbar. `neutral` is the default dark bar. */
@@ -114,6 +115,7 @@ export class MkSnackbarService {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
 
   private readonly _active = signal<MkSnackbarItem | null>(null);
@@ -215,7 +217,7 @@ export class MkSnackbarService {
       environmentInjector: this.envInjector,
     });
     this.appRef.attachView(ref.hostView);
-    this.document.body.appendChild(ref.location.nativeElement);
+    this.overlayRoot().appendChild(ref.location.nativeElement);
     this.containerRef = ref;
   }
 }

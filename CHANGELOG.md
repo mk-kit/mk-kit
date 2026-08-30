@@ -8,6 +8,26 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
 
 ### Added
 
+- **`@mk-kit/ui/embed`** — ship mk-kit-based components as standalone custom
+  elements: `mkEmbed({ styles, providers }).element('acme-reviews',
+  ReviewsWidget)`. Widgets render behind shadow DOM (host-page CSS cannot
+  reach them; `--mk-*` custom properties still inherit through, so the page
+  themes them), one lazily created zoneless application is shared by every
+  element, inputs become dash-cased attributes (transforms apply) and element
+  properties, outputs become bubbling composed `CustomEvent`s, and Angular
+  routes each component's styles into the shadow root it renders in.
+  `mkShadowCss()` retargets the theme's `:root` token blocks to `:host` for
+  adoption. Overlays opened by embedded components (dialogs, anchored panels,
+  toasts, tours) mount inside a themed `<mk-embed-overlays>` shadow host
+  instead of the bare page. Not re-exported from the umbrella. ~14 KiB raw.
+  Guide: <https://mk-kit.dev/embed>.
+- **`MK_OVERLAY_ROOT`** (core) — injection token resolving the element all
+  teleported surfaces mount into (overlay containers, anchored panels,
+  tooltips, toast/snackbar containers, tour popups and scrim). Defaults to
+  `document.body`, so nothing changes for existing apps; `@mk-kit/ui/embed`
+  overrides it. The modal `inert` fence now resolves the overlay's body-level
+  host across shadow boundaries (`mkBodyLevelAncestor`).
+
 - **CRUD generator** — `ng g @mk-kit/ui:crud <entity>` scaffolds a working
   admin slice from a field spec (e.g. `--fields
   "name!:string,price:currency,status:select=draft|published,createdAt:date"`):

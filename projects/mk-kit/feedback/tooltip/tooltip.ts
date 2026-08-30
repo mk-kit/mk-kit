@@ -15,6 +15,7 @@ import {
 } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import { mkUniqueId } from '@mk-kit/ui/core';
+import { MK_OVERLAY_ROOT } from '@mk-kit/ui/core';
 import { mkComputeAnchoredPosition } from '@mk-kit/ui/core';
 import type { MkPlacement } from '@mk-kit/ui/core';
 
@@ -92,6 +93,7 @@ export class MkTooltip {
   private readonly appRef = inject(ApplicationRef);
   private readonly envInjector = inject(EnvironmentInjector);
   private readonly document = inject(DOCUMENT);
+  private readonly overlayRoot = inject(MK_OVERLAY_ROOT);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   /** Set by pointerdown so the focusin it causes doesn't re-open the tip. */
   private suppressFocusShow = false;
@@ -243,7 +245,7 @@ export class MkTooltip {
     this.appRef.attachView(ref.hostView);
 
     const panel = ref.location.nativeElement as HTMLElement;
-    this.document.body.appendChild(panel);
+    this.overlayRoot().appendChild(panel);
     this.ref = ref;
 
     // Hoverable (the listeners die with the panel element on hide) …
