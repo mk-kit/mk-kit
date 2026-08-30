@@ -10,6 +10,11 @@
       "description": "Migrates a PrimeNG app to @mk-kit/ui: rewrites imports, class names and 1:1 selectors, annotates what needs a manual touch, cleans angular.json / package.json and writes a report.",
       "factory": "./migrate-primeng/index#migratePrimeng",
       "schema": "./migrate-primeng/schema.json"
+    },
+    "crud": {
+      "description": "Generates a CRUD slice for one entity: model + columns + form schema, data service (in-memory or --api), mk-table list page, mk-dynamic-form create/edit page, lazy routes and a harness spec.",
+      "factory": "./crud/index#crud",
+      "schema": "./crud/schema.json"
     }
   }
 }
