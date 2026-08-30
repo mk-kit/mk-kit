@@ -4,6 +4,7 @@ import {
   MkAlert,
   MkAutocomplete,
   MkButton,
+  MkIcon,
   MkSelect,
   MkThemeService,
 } from '@mk-kit/ui';
@@ -26,7 +27,7 @@ export class I18nDemo {}
 
 @Component({
   selector: 'docs-getting-started-page',
-  imports: [MkButton, MkAlert, I18nDemo],
+  imports: [MkButton, MkAlert, MkIcon, I18nDemo],
   changeDetection: ChangeDetectionStrategy.OnPush,
   template: `
     <div class="docs-page docs-container">
@@ -111,9 +112,9 @@ export class I18nDemo {}
         (preference: {{ theme.preference() }}):
       </p>
       <div class="gs-theme-demo">
-        <button mkButton size="sm" [variant]="theme.preference() === 'light' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('light')">☀ Light</button>
-        <button mkButton size="sm" [variant]="theme.preference() === 'dark' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('dark')">☾ Dark</button>
-        <button mkButton size="sm" [variant]="theme.preference() === 'system' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('system')">◐ System</button>
+        <button mkButton size="sm" [variant]="theme.preference() === 'light' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('light')"><mk-icon name="sun" /> Light</button>
+        <button mkButton size="sm" [variant]="theme.preference() === 'dark' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('dark')"><mk-icon name="moon" /> Dark</button>
+        <button mkButton size="sm" [variant]="theme.preference() === 'system' ? 'solid' : 'outline'" tone="neutral" (click)="theme.setTheme('system')"><mk-icon name="monitor" /> System</button>
       </div>
       <pre class="gs-code"><code>{{ themeSnippet }}</code></pre>
 
@@ -123,7 +124,8 @@ export class I18nDemo {}
         and screen-reader announcements — comes from an injectable map. Override
         any subset with <code class="docs-inline">provideMkI18n</code> at bootstrap
         (or scoped to a subtree), or provide a complete locale pack from
-        <code class="docs-inline">&#64;mk-kit/ui/locales/*</code>. The demo
+        <code class="docs-inline">&#64;mk-kit/ui/locales/*</code> —
+        Polish, German, Ukrainian, Spanish and French ship today. The demo
         below is a subtree on the Polish pack:
       </p>
       <div class="gs-theme-demo">

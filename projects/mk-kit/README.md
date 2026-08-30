@@ -114,10 +114,11 @@ Available: `core`, `forms`, `datetime`, `table`, `data`, `navigation`,
 `feedback`, `directives`, `dnd`, `media`, `icon`, `icon/extended` (the opt-in
 305-icon set), `button`, `checkbox`, `chip`, `context-menu`, `layout`, `chat`,
 `query-builder`, `dynamic-form`, `rich-text`, `block-editor`, plus `testing`
-(component harnesses for specs), `locales/pl` (the Polish string pack) and
-`embed` (ship components as shadow-DOM custom elements,
-<https://mk-kit.dev/embed>) — the last three are never re-exported from the
-umbrella. `sideEffects: false` throughout.
+(component harnesses for specs), `locales/pl` · `locales/de` · `locales/uk` ·
+`locales/es` · `locales/fr` (complete string packs) and `embed` (ship
+components as shadow-DOM custom elements, <https://mk-kit.dev/embed>) —
+harnesses, locales and embed are never re-exported from the umbrella.
+`sideEffects: false` throughout.
 
 ## Theming
 
@@ -177,13 +178,19 @@ bootstrapApplication(AppRoot, {
 ```
 
 Complete translations are their own entry points, so an app carries only the
-locales it provides — today Polish:
+locales it provides — Polish (`pl`), German (`de`), Ukrainian (`uk`),
+Spanish (`es`) and French (`fr`):
 
 ```ts
 import { provideMkI18nPl } from '@mk-kit/ui/locales/pl';
+// …or provideMkI18nDe / provideMkI18nUk / provideMkI18nEs / provideMkI18nFr
 
 providers: [provideMkI18nPl({ noData: 'Nic tu nie ma' })]; // overrides merge over the pack
 ```
+
+Each pack ships with a conformance spec (full key coverage, shapes, CLDR
+plural rules) — a new language is one file plus that spec; contributions
+welcome.
 
 Overrides can be scoped to a component subtree for mixed-locale screens.
 Layout and arrow keys flip under `dir="rtl"`.
