@@ -1,5 +1,6 @@
 import {
   ApplicationRef,
+  CSP_NONCE,
   ChangeDetectionStrategy,
   Component,
   ComponentRef,
@@ -23,6 +24,20 @@ export interface MkEmbedInit {
    * any number of instances), `<style>` elements otherwise.
    */
   styles?: string | readonly string[];
+  /**
+   * Stylesheet URLs loaded as `<link rel="stylesheet">` into every shadow
+   * root (and the overlay host) — an alternative to inlining `styles` when
+   * the theme lives on a CDN. Loaded per shadow root by the browser's cache,
+   * so the network cost is paid once.
+   */
+  styleUrls?: readonly string[];
+  /**
+   * CSP nonce applied to every style and link element this app creates —
+   * including Angular's own component styles (provided as `CSP_NONCE`) and
+   * the `<style>` fallback when constructable stylesheets are unavailable.
+   * For host pages with a `style-src` policy that forbids `'unsafe-inline'`.
+   */
+  nonce?: string;
   /**
    * Extra providers for the shared application — `provideMkI18n(…)`,
    * `provideMkExtendedIcons()`, `provideHttpClient()`, your services.
@@ -89,7 +104,7 @@ export class MkEmbedApp {
   constructor(init: MkEmbedInit = {}) {
     this.init = init;
     const styles = init.styles == null ? [] : typeof init.styles === 'string' ? [init.styles] : [...init.styles];
-    this._mkStyles = new MkEmbedStyles(styles);
+    this._mkStyles = new MkEmbedStyles(styles, init.styleUrls ?? [], init.nonce);
   }
 
   /**
@@ -133,9 +148,15 @@ export class MkEmbedApp {
   /** @internal */
   _mkApplication(): Promise<ApplicationRef> {
     if (this.destroyed) return Promise.reject(new Error('This MkEmbedApp was destroyed.'));
+    if (typeof document === 'undefined') {
+      return Promise.reject(
+        new Error('mkEmbed needs a browser — on the server, defining elements is a no-op and nothing should await ready().'),
+      );
+    }
     this.appPromise ??= createApplication({
       providers: [
         provideZonelessChangeDetection(),
+        ...(this.init.nonce ? [{ provide: CSP_NONCE, useValue: this.init.nonce }] : []),
         ...(this.init.overlays === false
           ? []
           : [{ provide: MK_OVERLAY_ROOT, useValue: () => this.overlayRootElement() }]),
@@ -195,14 +216,27 @@ class MkEmbedStyleAnchor {}
 
 /**
  * The embed styles, parsed once and shared: constructable stylesheets where
- * supported, cloned `<style>` elements otherwise.
+ * supported, cloned `<style>` elements otherwise, plus `<link>` elements for
+ * `styleUrls`. The nonce lands on every element this class creates.
  */
 class MkEmbedStyles {
   private sheets: CSSStyleSheet[] | null | undefined;
 
-  constructor(private readonly css: readonly string[]) {}
+  constructor(
+    private readonly css: readonly string[],
+    private readonly urls: readonly string[],
+    private readonly nonce?: string,
+  ) {}
 
   adopt(root: ShadowRoot): void {
+    const doc = root.host.ownerDocument;
+    for (const url of this.urls) {
+      const link = doc.createElement('link');
+      link.rel = 'stylesheet';
+      link.href = url;
+      if (this.nonce) link.setAttribute('nonce', this.nonce);
+      root.appendChild(link);
+    }
     if (!this.css.length) return;
     if (this.sheets === undefined) {
       try {
@@ -223,10 +257,10 @@ class MkEmbedStyles {
         // Fall through to <style> elements.
       }
     }
-    const doc = root.host.ownerDocument;
     for (const text of this.css) {
       const el = doc.createElement('style');
       el.textContent = text;
+      if (this.nonce) el.setAttribute('nonce', this.nonce);
       root.appendChild(el);
     }
   }

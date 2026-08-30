@@ -87,9 +87,9 @@ describe('mk-kit MCP server', () => {
     await client.connect(clientTransport);
   });
 
-  it('advertises the four tools and three resources', async () => {
+  it('advertises the five tools and three resources', async () => {
     const tools = (await client.listTools()).tools.map((t) => t.name).sort();
-    expect(tools).toEqual(['get_mk_kit_export', 'get_mk_kit_overview', 'list_mk_kit_exports', 'search_mk_kit']);
+    expect(tools).toEqual(['get_mk_kit_export', 'get_mk_kit_overview', 'list_mk_kit_exports', 'scaffold_mk_kit', 'search_mk_kit']);
     const resources = (await client.listResources()).resources.map((r) => r.uri).sort();
     expect(resources).toEqual(['mk-kit://api.json', 'mk-kit://llms-full.txt', 'mk-kit://llms.txt']);
   });
@@ -122,6 +122,30 @@ describe('mk-kit MCP server', () => {
     expect(table).not.toContain('MkTable** (component)');
     const bad = await client.callTool({ name: 'list_mk_kit_exports', arguments: { entry: 'nope' } });
     expect(bad.isError).toBe(true);
+  });
+
+  it('scaffold_mk_kit renders entity-aware recipes and rejects bad field specs', async () => {
+    const table = await text(
+      await client.callTool({
+        name: 'scaffold_mk_kit',
+        arguments: { recipe: 'table-page', entity: 'product', fields: 'name!:string,price:currency' },
+      }),
+    );
+    expect(table).toContain('class ProductListPage');
+    expect(table).toContain("{ key: 'price', header: 'Price', sortable: true, align: 'end' },");
+    expect(table).toContain('new MkTableDataSource<Product>');
+
+    const crud = await text(
+      await client.callTool({ name: 'scaffold_mk_kit', arguments: { recipe: 'crud-schematic', entity: 'order' } }),
+    );
+    expect(crud).toContain('ng g @mk-kit/ui:crud order');
+
+    const bad = await client.callTool({
+      name: 'scaffold_mk_kit',
+      arguments: { recipe: 'dynamic-form', fields: 'name:blob' },
+    });
+    expect(bad.isError).toBe(true);
+    expect(await text(bad)).toContain('Unknown field type "blob"');
   });
 
   it('get_mk_kit_overview and the resources serve the llms files', async () => {

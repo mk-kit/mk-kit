@@ -22671,6 +22671,18 @@
        "optional": true
       },
       {
+       "name": "styleUrls",
+       "type": "readonly string[] | undefined",
+       "description": "Stylesheet URLs loaded as `<link rel=\"stylesheet\">` into every shadow\nroot (and the overlay host) — an alternative to inlining `styles` when\nthe theme lives on a CDN. Loaded per shadow root by the browser's cache,\nso the network cost is paid once.",
+       "optional": true
+      },
+      {
+       "name": "nonce",
+       "type": "string | undefined",
+       "description": "CSP nonce applied to every style and link element this app creates —\nincluding Angular's own component styles (provided as `CSP_NONCE`) and\nthe `<style>` fallback when constructable stylesheets are unavailable.\nFor host pages with a `style-src` policy that forbids `'unsafe-inline'`.",
+       "optional": true
+      },
+      {
        "name": "providers",
        "type": "(Provider | EnvironmentProviders)[] | undefined",
        "description": "Extra providers for the shared application — `provideMkI18n(…)`,\n`provideMkExtendedIcons()`, `provideHttpClient()`, your services.",

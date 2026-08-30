@@ -204,6 +204,28 @@ describe('@mk-kit/ui/embed', () => {
     expect(document.querySelector('mk-embed-overlays')).toBeNull();
   });
 
+  it('loads styleUrls as <link> elements in the shadow root, nonce applied', async () => {
+    app = mkEmbed({ styleUrls: ['https://cdn.example.com/theme.css'], nonce: 'test-nonce' });
+    const { el } = mountTag(app);
+    document.body.appendChild(el);
+    await el.mkReady;
+
+    const link = el.shadowRoot!.querySelector('link[rel="stylesheet"]');
+    expect(link?.getAttribute('href')).toBe('https://cdn.example.com/theme.css');
+    expect(link?.getAttribute('nonce')).toBe('test-nonce');
+  });
+
+  it('threads the CSP nonce into Angular component styles', async () => {
+    app = mkEmbed({ nonce: 'test-nonce' });
+    const { el } = mountTag(app);
+    document.body.appendChild(el);
+    await el.mkReady;
+
+    const styles = [...el.shadowRoot!.querySelectorAll('style')];
+    expect(styles.length).toBeGreaterThan(0);
+    expect(styles.every((s) => s.getAttribute('nonce') === 'test-nonce')).toBe(true);
+  });
+
   it('element() is idempotent per tag and ignores non-browser platforms gracefully', () => {
     app = mkEmbed();
     const tag = nextTag();

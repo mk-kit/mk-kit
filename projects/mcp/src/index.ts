@@ -1,5 +1,8 @@
 import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { z } from 'zod';
+import { SCAFFOLD_RECIPES, scaffold, type ScaffoldRecipe } from './scaffolds.js';
+
+export { SCAFFOLD_RECIPES, parseFields, scaffold, type ScaffoldInput, type ScaffoldRecipe } from './scaffolds.js';
 
 /* ------------------------------------------------------------------------ */
 /* Data — the same artefacts the docs site serves (scripts/gen-api.mjs)      */
@@ -209,7 +212,8 @@ export function createMkKitServer(data: MkKitData): McpServer {
         `Reference for ${version}, the Angular component library (mk-kit.dev). ` +
         `Use search_mk_kit to find a component/directive/service/helper by name, selector or what it does, ` +
         `then get_mk_kit_export for its full API (inputs, outputs, methods, import path). ` +
-        `Call get_mk_kit_overview once for install/setup conventions. ` +
+        `Call get_mk_kit_overview once for install/setup conventions, and scaffold_mk_kit for paste-ready ` +
+        `starting points (CRUD slice, table page, dynamic form, dialogs, custom-element embedding). ` +
         `Every component is standalone: import the class from the entry point shown and add it to \`imports\`.`,
     },
   );
@@ -311,6 +315,33 @@ export function createMkKitServer(data: MkKitData): McpServer {
       annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
     },
     () => ({ content: [{ type: 'text', text: data.llms }] }),
+  );
+
+  server.registerTool(
+    'scaffold_mk_kit',
+    {
+      title: 'Scaffold an mk-kit pattern',
+      description:
+        `Paste-ready ${version} code for the patterns apps build first — pass a recipe and optionally the entity ` +
+        `name and fields. Recipes: crud-schematic (the ng g @mk-kit/ui:crud command that generates a whole slice — ` +
+        `prefer it when the user wants list + form + service), table-page (mk-table + MkTableDataSource against a ` +
+        `REST endpoint), dynamic-form (schema-driven mk-dynamic-form), dialog (MkDialogService confirm + custom ` +
+        `dialog), embed (ship a component as a shadow-DOM custom element). Field grammar: "key:type" comma-separated, ` +
+        `"!" marks required, selects list options — "name!:string,price:currency,status:select=draft|published".`,
+      inputSchema: {
+        recipe: z.enum([...SCAFFOLD_RECIPES] as [ScaffoldRecipe, ...ScaffoldRecipe[]]).describe('Which pattern to scaffold'),
+        entity: z.string().optional().describe('Singular entity name, e.g. "product" or "OrderLine" (default "item")'),
+        fields: z.string().optional().describe('Field spec, e.g. "name!:string,price:currency" (default "name!:string")'),
+      },
+      annotations: { readOnlyHint: true, idempotentHint: true, openWorldHint: false },
+    },
+    ({ recipe, entity, fields }) => {
+      try {
+        return { content: [{ type: 'text', text: scaffold({ recipe, entity, fields }) }] };
+      } catch (err) {
+        return { content: [{ type: 'text', text: String(err instanceof Error ? err.message : err) }], isError: true };
+      }
+    },
   );
 
   server.registerResource(
