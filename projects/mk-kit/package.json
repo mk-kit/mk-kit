@@ -1,6 +1,6 @@
 {
   "name": "@mk-kit/ui",
-  "version": "0.46.0",
+  "version": "0.47.0",
   "publishConfig": {
     "access": "public"
   },
@@ -21,7 +21,7 @@
     "css-variables",
     "themable"
   ],
-  "author": "Mateusz Korna\u015b",
+  "author": "Mateusz Kornaś",
   "license": "MIT",
   "homepage": "https://github.com/mk-kit/mk-kit#readme",
   "repository": {
