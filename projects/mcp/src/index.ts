@@ -329,7 +329,7 @@ export function createMkKitServer(data: MkKitData): McpServer {
         `dialog), embed (ship a component as a shadow-DOM custom element). Field grammar: "key:type" comma-separated, ` +
         `"!" marks required, selects list options — "name!:string,price:currency,status:select=draft|published".`,
       inputSchema: {
-        recipe: z.enum(SCAFFOLD_RECIPES as [ScaffoldRecipe, ...ScaffoldRecipe[]]).describe('Which pattern to scaffold'),
+        recipe: z.enum([...SCAFFOLD_RECIPES] as [ScaffoldRecipe, ...ScaffoldRecipe[]]).describe('Which pattern to scaffold'),
         entity: z.string().optional().describe('Singular entity name, e.g. "product" or "OrderLine" (default "item")'),
         fields: z.string().optional().describe('Field spec, e.g. "name!:string,price:currency" (default "name!:string")'),
       },
