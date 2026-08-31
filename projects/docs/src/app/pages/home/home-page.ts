@@ -639,6 +639,10 @@ interface Mapping {
              href="https://github.com/mk-kit/mk-kit" target="_blank" rel="noopener">
             GitHub ↗
           </a>
+          <a mkButton variant="ghost" tone="neutral" size="lg"
+             href="https://www.npmjs.com/package/@mk-kit/ui" target="_blank" rel="noopener">
+            npm ↗
+          </a>
         </div>
       </section>
 
@@ -650,6 +654,7 @@ interface Mapping {
             <a routerLink="/components-index">Components</a>
             <a routerLink="/changelog">Changelog</a>
             <a href="https://github.com/mk-kit/mk-kit" target="_blank" rel="noopener">GitHub</a>
+            <a href="https://www.npmjs.com/package/@mk-kit/ui" target="_blank" rel="noopener">npm</a>
           </nav>
         </div>
       </footer>
