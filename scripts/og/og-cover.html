@@ -1,0 +1,57 @@
+<!doctype html><html><head><meta charset="utf-8"><style>
+html,body{margin:0;width:1200px;height:630px;overflow:hidden;font-family:Inter,ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;}
+.c{position:relative;width:1200px;height:630px;background:#0f1222;color:#fff;overflow:hidden}
+.glow{position:absolute;width:900px;height:900px;border-radius:50%;background:radial-gradient(closest-side,rgba(99,102,241,.5),rgba(99,102,241,0));right:-260px;top:-320px}
+.glow2{position:absolute;width:640px;height:640px;border-radius:50%;background:radial-gradient(closest-side,rgba(236,72,153,.22),rgba(236,72,153,0));left:-200px;bottom:-360px}
+.grid{position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,.04) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,.04) 1px,transparent 1px);background-size:44px 44px}
+.left{position:absolute;left:72px;top:64px;bottom:64px;width:620px;display:flex;flex-direction:column;justify-content:space-between}
+.brand{display:flex;align-items:center;gap:14px;font-weight:700;font-size:26px;letter-spacing:-.01em}
+.mark{width:48px;height:48px;border-radius:13px;background:#4f46e5;display:grid;place-items:center;font-size:19px;font-weight:800;box-shadow:0 8px 24px rgba(79,70,229,.45)}
+.eyebrow{margin-top:36px;font-size:15px;letter-spacing:.18em;text-transform:uppercase;color:#a5b4fc;font-weight:600}
+h1{margin:10px 0 0;font-size:58px;line-height:1.06;letter-spacing:-.03em;font-weight:800}
+h1 span{color:#a5b4fc}
+.sub{margin-top:20px;font-size:20px;color:#c7cbe0;max-width:560px;line-height:1.45}
+.cmd{align-self:flex-start;margin-top:auto;font:500 19px ui-monospace,"JetBrains Mono","SF Mono",Menlo,monospace;color:#e2e8f0;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14);padding:14px 18px;border-radius:12px}
+.cmd b{color:#f9a8d4;font-weight:500}
+.card{position:absolute;right:72px;top:120px;width:360px;background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:24px;backdrop-filter:blur(6px);box-shadow:0 30px 60px rgba(0,0,0,.35)}
+.card__title{font-size:14px;font-weight:600;color:#e2e8f0;margin:0}
+.card__sub{font-size:11px;color:#8b90ad;margin:2px 0 16px}
+.kpis{display:flex;gap:10px;margin-bottom:18px}
+.kpi{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:10px;padding:10px 12px}
+.kpi__label{font-size:10px;color:#8b90ad;text-transform:uppercase;letter-spacing:.06em}
+.kpi__value{font-size:19px;font-weight:700;margin-top:2px;font-variant-numeric:tabular-nums}
+.kpi__delta{font-size:10px;color:#86efac;margin-top:2px;font-weight:600}
+.bars{display:flex;align-items:flex-end;gap:10px;height:96px;padding:0 4px;border-bottom:1px solid rgba(255,255,255,.12)}
+.bar{flex:1;border-radius:5px 5px 0 0;background:linear-gradient(180deg,#818cf8,#4f46e5)}
+.swrow{display:flex;align-items:center;gap:8px;margin-top:16px}
+.sw{width:18px;height:18px;border-radius:50%}
+.sw--active{outline:2px solid #fff;outline-offset:2px}
+.swlabel{margin-left:auto;font:500 11px ui-monospace,Menlo,monospace;color:#a5b4fc}
+.badge{position:absolute;right:72px;bottom:64px;font-size:15px;font-weight:600;color:#86efac;background:rgba(34,197,94,.12);border:1px solid rgba(34,197,94,.35);padding:10px 16px;border-radius:999px}
+</style></head><body><div class="c"><div class="grid"></div><div class="glow"></div><div class="glow2"></div>
+<div class="left"><div><div class="brand"><div class="mark">mk</div>mk-kit</div>
+<div class="eyebrow">Angular 22 &middot; Signals &middot; MIT</div>
+<h1>Ship the admin.<br><span>Skip the component library.</span></h1>
+<div class="sub">190+ standalone components for dashboards and internal tools. CSS-variable theming, dark mode, WCAG&nbsp;2.1&nbsp;AA.</div></div>
+<div class="cmd">ng add <b>@mk-kit/ui</b></div></div>
+<div class="card">
+<p class="card__title">Revenue</p>
+<p class="card__sub">Last 6 months</p>
+<div class="kpis">
+<div class="kpi"><div class="kpi__label">MRR</div><div class="kpi__value">$48k</div><div class="kpi__delta">▲ 12.4%</div></div>
+<div class="kpi"><div class="kpi__label">Active</div><div class="kpi__value">8,642</div><div class="kpi__delta">▲ 3.1%</div></div>
+</div>
+<div class="bars">
+<div class="bar" style="height:52%"></div><div class="bar" style="height:60%"></div><div class="bar" style="height:56%"></div><div class="bar" style="height:72%"></div><div class="bar" style="height:84%"></div><div class="bar" style="height:100%"></div>
+</div>
+<div class="swrow">
+<span class="sw sw--active" style="background:#4f46e5"></span>
+<span class="sw" style="background:#059669"></span>
+<span class="sw" style="background:#e11d48"></span>
+<span class="sw" style="background:#d97706"></span>
+<span class="sw" style="background:#334155"></span>
+<span class="swlabel">--mk-primary</span>
+</div>
+</div>
+<div class="badge">MIT · free for good</div>
+</div></body></html>
