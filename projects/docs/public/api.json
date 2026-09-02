@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.50.0",
+ "version": "0.51.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -18296,22 +18296,6 @@
      "docs": "/components/popovers"
     },
     {
-     "name": "MkPromptDialog",
-     "description": "Internal component backing `MkDialogService.prompt`. Renders a single text\nfield and resolves the overlay ref with the entered string on confirm, or\n`null` on cancel / Escape / backdrop. Submitting the form (Enter) confirms.",
-     "file": "projects/mk-kit/feedback/dialog/prompt-dialog.ts",
-     "kind": "component",
-     "selector": "mk-prompt-dialog",
-     "selectors": [
-      "mk-prompt-dialog"
-     ],
-     "inputs": [],
-     "outputs": [],
-     "methods": [],
-     "properties": [],
-     "queries": [],
-     "docs": "/components/dialogs"
-    },
-    {
      "name": "MkResult",
      "description": "Result — a centred, full-page status state: a success confirmation, an error,\nan empty 404/403/500 page. Renders a large status icon (chosen from\n`status`), a title, a muted subtitle, projected body content, and a row of\naction buttons at the bottom.\n\nSlots: `[mkResultIcon]` (custom icon, overrides the built-in glyph),\n`[mkResultTitle]` (custom heading, used when `resultTitle` is unset), default\ncontent (extra body), `[mkResultActions]` (buttons).\n\n```html\n<mk-result status=\"success\" resultTitle=\"Payment complete\"\n  subtitle=\"Your order is on its way.\">\n  <button mkButton mkResultActions>Back home</button>\n</mk-result>\n```",
      "file": "projects/mk-kit/feedback/result/result.ts",
@@ -23195,7 +23179,7 @@
       {
        "name": "get",
        "signature": "<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T>",
-       "description": "First matching harness; throws when there is none."
+       "description": "First matching harness; throws when there is none. Retries for a short\nwhile first: overlays such as `MkDialogService.prompt()` render after a\nlazy chunk resolves, so the host may appear a few ticks after the call.\n`has()` / `getOrNull()` stay immediate so absence can be asserted."
       },
       {
        "name": "getOrNull",

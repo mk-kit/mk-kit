@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.50.0 — full API reference
+# @mk-kit/ui 0.51.0 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -11667,7 +11667,7 @@ type MkTagVariant = 'solid' | 'soft' | 'outline';
 
 ## @mk-kit/ui/feedback
 
-56 exports. `import { … } from '@mk-kit/ui/feedback';`
+55 exports. `import { … } from '@mk-kit/ui/feedback';`
 
 ### MkAlert (component)
 
@@ -12111,18 +12111,6 @@ Properties:
 | --- | --- | --- |
 | `panelId` | `string` | Stable id for `aria-controls` on the trigger. |
 | `opened` | `Signal<boolean>` | Whether the popover is open. |
-
-### MkPromptDialog (component)
-
-Selector: `mk-prompt-dialog`
-
-Docs: https://mk-kit.dev/components/dialogs
-
-Import: `import { MkPromptDialog } from '@mk-kit/ui/feedback';`
-
-Internal component backing `MkDialogService.prompt`. Renders a single text
-field and resolves the overlay ref with the entered string on confirm, or
-`null` on cancel / Escape / backdrop. Submitting the form (Enter) confirms.
 
 ### MkResult (component)
 
@@ -15702,7 +15690,7 @@ Methods:
 | `rootElement(): MkTestElement` | Wrap the root element itself. |
 | `element(selector: string): MkTestElement` |  |
 | `elements(selector: string): MkTestElement[]` |  |
-| `get<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T>` | First matching harness; throws when there is none. |
+| `get<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T>` | First matching harness; throws when there is none. Retries for a short while first: overlays such as `MkDialogService.prompt()` render after a lazy chunk resolves, so the host may appear a few ticks after the call. `has()` / `getOrNull()` stay immediate so absence can be asserted. |
 | `getOrNull<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T \| null>` |  |
 | `has<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<boolean>` |  |
 | `getAll<T extends MkHarness>(type: MkHarnessType<T>, filters?: MkHarnessFilters): Promise<T[]>` |  |
