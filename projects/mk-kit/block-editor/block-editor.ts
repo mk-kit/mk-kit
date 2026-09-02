@@ -13,7 +13,7 @@ import {
 } from '@angular/core';
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import { MK_I18N, type MkBlockEditorStrings } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import {
   MK_BLOCK_DOCUMENT_VERSION,
   type MkBlock,

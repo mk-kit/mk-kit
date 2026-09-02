@@ -23,7 +23,7 @@ import {
 } from '@angular/forms';
 import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkFormField } from '../form-field/form-field';
 
 /**

@@ -27,7 +27,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkFormField } from '@mk-kit/ui/forms';
 import { MkCalendar } from '../calendar/calendar';
 import {

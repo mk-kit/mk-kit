@@ -15,7 +15,7 @@ import {
 import { ControlValueAccessor, NG_VALUE_ACCESSOR } from '@angular/forms';
 import type { MkSize, MkTone, MkVariant } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkButton } from '@mk-kit/ui/button';
 import { MkIcon } from '@mk-kit/ui/icon';
 import { MkFormField } from '../form-field/form-field';

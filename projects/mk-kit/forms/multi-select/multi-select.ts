@@ -29,7 +29,7 @@ import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkChip } from '@mk-kit/ui/chip';
 import { MkFormField } from '../form-field/form-field';
 

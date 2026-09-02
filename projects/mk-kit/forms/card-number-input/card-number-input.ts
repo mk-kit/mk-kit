@@ -20,7 +20,7 @@ import {
 } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkMask, mkApplyMask } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 import { detectCardBrand, isLuhn } from '@mk-kit/validators';

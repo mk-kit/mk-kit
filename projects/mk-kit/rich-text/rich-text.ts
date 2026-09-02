@@ -11,7 +11,7 @@ import {
 } from '@angular/core';
 import { NG_VALUE_ACCESSOR, type ControlValueAccessor } from '@angular/forms';
 import { MK_I18N, MkFieldContext } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkRichTextEngine } from './rich-text-engine';
 import { sanitizeInlineHtml } from './sanitize';
 
