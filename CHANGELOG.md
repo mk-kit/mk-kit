@@ -4,6 +4,25 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.51.0] — 2026-09-02
+
+### Changed
+
+- **`MkDialogService.prompt()` loads its dialog on demand**
+  (`@mk-kit/ui/feedback`). The prompt dialog was the only part of `feedback`
+  that imported `@mk-kit/ui/forms`, and the service's static reference to it
+  shipped the whole forms entry (plus checkbox and navigation, which forms
+  pulls in) to every app that injects the dialog service — a storefront that
+  never prompts paid ~46 kB gzipped for it. The method already returned a
+  promise; the panel now opens after a microtask instead of synchronously.
+- **`MkPromptDialog` is no longer exported.** It is an implementation detail
+  of `prompt()`; the `MkPromptDialogData` type stays public. If you opened it
+  yourself through `MkDialogService.open()`, switch to `prompt()`.
+- **`MkHarnessLoader.get()` retries briefly** (`@mk-kit/ui/testing`, up to
+  ~300 ms) before throwing, so a harness lookup right after `prompt()` — or
+  any overlay that renders a tick later — still finds its host. `has()` and
+  `getOrNull()` stay immediate, so absence can still be asserted.
+
 ## [0.50.0] — 2026-08-30
 
 ### Added

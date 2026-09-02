@@ -27,6 +27,13 @@ describe('MkDialogService — confirm / alert / prompt', () => {
       document.querySelectorAll<HTMLButtonElement>('.mk-overlay-panel button'),
     );
   }
+  /** The prompt dialog is a lazy chunk — wait for its panel to render. */
+  async function promptRendered(): Promise<void> {
+    await vi.waitFor(() => {
+      appRef.tick();
+      if (!document.querySelector('.mk-overlay-panel input')) throw new Error('no prompt yet');
+    });
+  }
   function clickButton(label: string): void {
     const btn = overlayButtons().find(
       (b) => b.textContent?.trim() === label,
@@ -66,7 +73,7 @@ describe('MkDialogService — confirm / alert / prompt', () => {
       label: 'Name',
       value: 'draft',
     });
-    appRef.tick();
+    await promptRendered();
     const input = document.querySelector(
       '.mk-overlay-panel input',
     ) as HTMLInputElement;
@@ -85,7 +92,7 @@ describe('MkDialogService — confirm / alert / prompt', () => {
     // resolved to the MkInput directive, not the element).
     const focus = vi.spyOn(HTMLInputElement.prototype, 'focus');
     service.prompt({ title: 'Rename', label: 'Name' });
-    appRef.tick();
+    await promptRendered();
     await new Promise((r) => setTimeout(r));
     const input = document.querySelector('.mk-overlay-panel input') as HTMLInputElement;
     expect(focus.mock.instances).toContain(input);
@@ -94,14 +101,14 @@ describe('MkDialogService — confirm / alert / prompt', () => {
 
   it('prompt resolves null on cancel', async () => {
     const result = service.prompt({ title: 'Rename' });
-    appRef.tick();
+    await promptRendered();
     clickButton('Cancel');
     expect(await result).toBeNull();
   });
 
   it('a required prompt disables OK until a value is entered', async () => {
     service.prompt({ title: 'Rename', required: true });
-    appRef.tick();
+    await promptRendered();
     const ok = overlayButtons().find((b) => b.textContent?.trim() === 'OK')!;
     expect(ok.disabled).toBe(true);
 

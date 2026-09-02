@@ -285,9 +285,19 @@ export class MkHarnessLoader {
     return Array.from(this.root.querySelectorAll<HTMLElement>(selector)).map((el) => new MkTestElement(el, this.settle));
   }
 
-  /** First matching harness; throws when there is none. */
+  /**
+   * First matching harness; throws when there is none. Retries for a short
+   * while first: overlays such as `MkDialogService.prompt()` render after a
+   * lazy chunk resolves, so the host may appear a few ticks after the call.
+   * `has()` / `getOrNull()` stay immediate so absence can be asserted.
+   */
   async get<T extends MkHarness>(type: MkHarnessType<T>, filters: MkHarnessFilters = {}): Promise<T> {
-    const [first] = await this.getAll(type, filters);
+    let first: T | undefined;
+    for (let attempt = 0; attempt < 30; attempt++) {
+      [first] = await this.getAll(type, filters);
+      if (first) break;
+      await new Promise((resolve) => setTimeout(resolve, 10));
+    }
     if (!first) {
       throw new Error(
         `No ${type.name} found (host "${type.hostSelector}"${filters.selector ? `, selector "${filters.selector}"` : ''}${

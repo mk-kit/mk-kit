@@ -6,7 +6,7 @@ import {
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkOverlayRef } from '@mk-kit/ui/core';
 import { MkConfirmDialog, MkConfirmDialogData } from './confirm-dialog';
-import { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
+import type { MkPromptDialog, MkPromptDialogData } from './prompt-dialog';
 
 /**
  * Panel width preset. The panel is always `min(target, 92vw)`, so it shrinks to
@@ -100,7 +100,12 @@ export class MkDialogService {
    * Open a single-field prompt dialog. Resolves with the entered string, or
    * `null` if the user cancels, presses Escape, or clicks the backdrop.
    */
-  prompt(data: MkPromptDialogData): Promise<string | null> {
+  async prompt(data: MkPromptDialogData): Promise<string | null> {
+    // Loaded on demand: the prompt dialog is the only thing in `feedback` that
+    // needs `@mk-kit/ui/forms`, and a static reference here shipped the whole
+    // forms entry (input, form field, and their dependencies) to every app
+    // that injects this service — including ones that never prompt.
+    const { MkPromptDialog } = await import('./prompt-dialog');
     const ref = this.open<MkPromptDialog, string | null, MkPromptDialogData>(
       MkPromptDialog,
       { data, ariaLabel: data.title },
