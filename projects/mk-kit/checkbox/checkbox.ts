@@ -21,7 +21,7 @@ import type { MkSize, MkTone } from '@mk-kit/ui/core';
 import { MkFieldContext } from '@mk-kit/ui/core';
 import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 
 /**
  * Checkbox — a themed checkbox built on a visually-hidden native

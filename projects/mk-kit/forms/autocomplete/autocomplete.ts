@@ -20,7 +20,7 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkLiveAnnouncer } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { MkFormField } from '../form-field/form-field';
 
 /** A single suggestion for {@link MkAutocomplete}. */

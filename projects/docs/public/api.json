@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.51.0",
+ "version": "0.52.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -443,15 +443,6 @@
      "kind": "function",
      "signatures": [
       "(src: string): string"
-     ]
-    },
-    {
-     "name": "mkInjectFieldTouched",
-     "description": "Touched-gate for a control's `invalid` input under Signal Forms.\n\nWhen a control is bound with the `[formField]` directive, Angular writes the\nfield's `invalid()` state straight into the control's `invalid` input — from\nthe first render, before the user has reached the field. mk-kit controls\npass that input through this gate so the invalid visual (and `aria-invalid`)\nonly shows once the field is touched or dirty, matching how `mk-form-field`\nreveals its message and how `submit()` (which marks every field touched)\nsurfaces the remaining problems.\n\nReturns a signal that is always `true` for a control that is not bound with\n`[formField]`, so a standalone `[invalid]=\"true\"` keeps working as before.\nCall it in a field initializer (an injection context):\n\n```ts\nprivate readonly fieldTouched = mkInjectFieldTouched();\nprotected readonly isInvalid = computed(\n  () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),\n);\n```\n\nThe binding is looked up lazily, on first read: the `FormField` directive\nitself injects the element's `NG_VALUE_ACCESSOR` (the control) while it is\ncreated, so resolving it from the control's constructor would be circular.",
-     "file": "projects/mk-kit/core/forms/signal-field.ts",
-     "kind": "function",
-     "signatures": [
-      "(): Signal<boolean>"
      ]
     },
     {
@@ -3379,6 +3370,21 @@
      "file": "projects/mk-kit/core/types.ts",
      "kind": "type",
      "definition": "'solid' | 'soft' | 'outline' | 'ghost' | 'link'"
+    }
+   ]
+  },
+  {
+   "name": "core/signal-forms",
+   "import": "@mk-kit/ui/core/signal-forms",
+   "exports": [
+    {
+     "name": "mkInjectFieldTouched",
+     "description": "Touched-gate for a control's `invalid` input under Signal Forms.\n\nWhen a control is bound with the `[formField]` directive, Angular writes the\nfield's `invalid()` state straight into the control's `invalid` input — from\nthe first render, before the user has reached the field. mk-kit controls\npass that input through this gate so the invalid visual (and `aria-invalid`)\nonly shows once the field is touched or dirty, matching how `mk-form-field`\nreveals its message and how `submit()` (which marks every field touched)\nsurfaces the remaining problems.\n\nReturns a signal that is always `true` for a control that is not bound with\n`[formField]`, so a standalone `[invalid]=\"true\"` keeps working as before.\nCall it in a field initializer (an injection context):\n\n```ts\nprivate readonly fieldTouched = mkInjectFieldTouched();\nprotected readonly isInvalid = computed(\n  () => (this.invalid() && this.fieldTouched()) || (this.field?.hasError() ?? false),\n);\n```\n\nThe binding is looked up lazily, on first read: the `FormField` directive\nitself injects the element's `NG_VALUE_ACCESSOR` (the control) while it is\ncreated, so resolving it from the control's constructor would be circular.",
+     "file": "projects/mk-kit/core/signal-forms/signal-field.ts",
+     "kind": "function",
+     "signatures": [
+      "(): Signal<boolean>"
+     ]
     }
    ]
   },

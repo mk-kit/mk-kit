@@ -8,6 +8,7 @@
  * importing chunk.
  */
 export * from '@mk-kit/ui/core';
+export * from '@mk-kit/ui/core/signal-forms';
 export * from '@mk-kit/ui/icon';
 export * from '@mk-kit/ui/icon/extended';
 export * from '@mk-kit/ui/chip';

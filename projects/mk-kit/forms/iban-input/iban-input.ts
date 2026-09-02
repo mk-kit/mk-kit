@@ -20,7 +20,7 @@ import {
 } from '@angular/forms';
 import type { MkSize } from '@mk-kit/ui/core';
 import { MK_I18N, mkUniqueId } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 import { mkMaskCaret } from '@mk-kit/ui/directives';
 import { MkFormField } from '../form-field/form-field';
 import { IBAN_LENGTHS, ibanMod97, isIban } from '@mk-kit/validators';

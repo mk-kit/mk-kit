@@ -22,7 +22,7 @@ import type { MkSize } from '@mk-kit/ui/core';
 import { mkValidatorChange } from '@mk-kit/ui/core';
 import { MkFormField } from '../form-field/form-field';
 import { MK_I18N } from '@mk-kit/ui/core';
-import { mkInjectFieldTouched } from '@mk-kit/ui/core';
+import { mkInjectFieldTouched } from '@mk-kit/ui/core/signal-forms';
 
 /**
  * Rating — a star rating input (and read-only display). Implements the ARIA

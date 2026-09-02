@@ -4,6 +4,19 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.52.0] — 2026-09-02
+
+### Changed
+
+- **`mkInjectFieldTouched` moved to `@mk-kit/ui/core/signal-forms`.** It was
+  the one thing in `@mk-kit/ui/core` that imports a value from
+  `@angular/forms/signals` (the `FORM_FIELD` token), which pulled
+  `@angular/forms` (~48 kB raw / 13 kB gzipped) into every app that touches
+  `core` — including pages with no form on them. The form controls import it
+  from the new nested entry; the root `@mk-kit/ui` barrel still re-exports it.
+  If you imported it from `@mk-kit/ui/core` directly, switch the path. Nothing
+  else in `core` changed.
+
 ## [0.51.0] — 2026-09-02
 
 ### Changed
