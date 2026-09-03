@@ -23544,7 +23544,12 @@
       {
        "name": "isEmpty",
        "signature": "(): boolean",
-       "description": ""
+       "description": "True when the table shows no data rows (an `emptyMessage` row does not count)."
+      },
+      {
+       "name": "emptyMessage",
+       "signature": "(): string | null",
+       "description": "The rendered `emptyMessage`, or `null` while the table has rows."
       },
       {
        "name": "setFilter",
@@ -23571,7 +23576,7 @@
     },
     {
      "name": "MkTableRowHarness",
-     "description": "One data row of `mk-table`.",
+     "description": "One data row of `mk-table` (the `emptyMessage` placeholder row is not one).",
      "file": "projects/mk-kit/testing/harnesses/table.harness.ts",
      "kind": "class",
      "methods": [

@@ -98,6 +98,7 @@ interface Row {
       [maxHeight]="200"
       [(filters)]="filters"
     />
+    <mk-table class="empty" [columns]="columns" [data]="[]" emptyMessage="Nothing here" />
   `,
 })
 class Host {
@@ -324,6 +325,17 @@ describe('@mk-kit/ui/testing harnesses', () => {
       await table.toggleAll();
       expect(await table.selectedRowCount()).toBe(0);
       expect(table.isEmpty()).toBe(false);
+      expect(table.emptyMessage()).toBeNull();
+    });
+
+    it('does not count the emptyMessage row as data', async () => {
+      const table = (await loader.getAll(MkTableHarness))[2];
+      // The placeholder is a `<tr class="mk-table__row mk-table__row--empty">`,
+      // so a bare row selector used to report one row and isEmpty() === false.
+      expect(table.isEmpty()).toBe(true);
+      expect(await table.rowCount()).toBe(0);
+      expect(await table.cellTexts()).toEqual([]);
+      expect(table.emptyMessage()).toBe('Nothing here');
     });
 
     it('drives the filter row and the virtual window', async () => {

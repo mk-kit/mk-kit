@@ -1,9 +1,9 @@
 import { MkHarness, MkTestElement, pickBy } from '../harness';
 import { MkCheckboxHarness } from './form-controls.harness';
 
-/** One data row of `mk-table`. */
+/** One data row of `mk-table` (the `emptyMessage` placeholder row is not one). */
 export class MkTableRowHarness extends MkHarness {
-  static override readonly hostSelector = 'tr.mk-table__row';
+  static override readonly hostSelector = 'tr.mk-table__row:not(.mk-table__row--empty)';
 
   /** Cell texts of the data columns (expand / select cells excluded). */
   cells(): string[] {
@@ -92,8 +92,14 @@ export class MkTableHarness extends MkHarness {
     await (await this.loader.within(th).get(MkCheckboxHarness)).toggle();
   }
 
+  /** True when the table shows no data rows (an `emptyMessage` row does not count). */
   isEmpty(): boolean {
-    return !this.q('tr.mk-table__row');
+    return !this.q(MkTableRowHarness.hostSelector);
+  }
+
+  /** The rendered `emptyMessage`, or `null` while the table has rows. */
+  emptyMessage(): string | null {
+    return this.q('.mk-table__empty')?.text() ?? null;
   }
 
   /**

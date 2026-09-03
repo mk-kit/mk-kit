@@ -17,7 +17,7 @@ const HARNESSES: HarnessDoc[] = [
   { name: 'MkFormFieldHarness', host: 'mk-form-field', methods: 'label(), hint(), error(), hasError(), isRequired(), control(HarnessType)' },
   { name: 'MkTabsHarness', host: 'mk-tabs', methods: 'labels(), selectedIndex(), selectedLabel(), select(index | label | RegExp), isDisabled(tab), selectedPanelText()' },
   { name: 'MkMenuHarness', host: '[mkMenuTriggerFor] (matched by aria-haspopup="menu")', methods: 'open(), close(), isOpen(), items(), clickItem(index | text | RegExp), isItemDisabled(item)' },
-  { name: 'MkTableHarness', host: 'mk-table', methods: 'headers(), rows(), rowCount(), cellTexts(), sortBy(column), sortDirection(column), toggleAll(), selectedRowCount(), isEmpty()' },
+  { name: 'MkTableHarness', host: 'mk-table', methods: 'headers(), rows(), rowCount(), cellTexts(), sortBy(column), sortDirection(column), toggleAll(), selectedRowCount(), isEmpty(), emptyMessage()' },
   { name: 'MkTableRowHarness', host: 'tr.mk-table__row', methods: 'cells(), cell(i), isSelected(), toggleSelected(), isExpanded(), toggleExpanded(), click()' },
   { name: 'MkDialogHarness', host: '.mk-overlay-panel[role=dialog] — via loader.document()', methods: 'title(), bodyText(), buttons(), clickButton(index | text | RegExp), close(), pressEscape(), input()' },
   { name: 'MkToastHarness', host: 'mk-toast — via loader.document()', methods: 'title(), message(), tone(), actionLabel(), clickAction(), dismiss()' },
