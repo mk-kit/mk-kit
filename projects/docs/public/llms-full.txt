@@ -15832,7 +15832,8 @@ Methods:
 | `sortDirection(which: number \| string \| RegExp): string \| null` | `'ascending' \| 'descending' \| 'none' \| null` (null = not sortable). |
 | `selectedRowCount(): Promise<number>` |  |
 | `toggleAll(): Promise<void>` | Toggle the header "select all" checkbox. |
-| `isEmpty(): boolean` |  |
+| `isEmpty(): boolean` | True when the table shows no data rows (an `emptyMessage` row does not count). |
+| `emptyMessage(): string \| null` | The rendered `emptyMessage`, or `null` while the table has rows. |
 | `setFilter(key: string, value: string): Promise<void>` | Set a header-row filter (table is `filterable`). `value` is typed into a text / number / date box, or picked from a select by option label or value; `''` clears that filter. |
 | `filterValue(key: string): string` | The current value of a header-row filter control (`''` when unset). |
 | `clearFilters(): Promise<void>` | Clear every header-row filter. |
@@ -15842,7 +15843,7 @@ Methods:
 
 Import: `import { MkTableRowHarness } from '@mk-kit/ui/testing';`
 
-One data row of `mk-table`.
+One data row of `mk-table` (the `emptyMessage` placeholder row is not one).
 
 Methods:
 

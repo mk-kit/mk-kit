@@ -4,6 +4,18 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Fixed
+
+- **`MkTableHarness` ignored `emptyMessage` rows** (`@mk-kit/ui/testing`).
+  The placeholder row `mk-table` renders when `data` is empty carries the
+  row class, so `isEmpty()` returned `false`, and `rows()` / `rowCount()` /
+  `cellTexts()` counted it as a data row whenever an `emptyMessage` was set.
+  `MkTableRowHarness` now matches data rows only, `isEmpty()` follows, and a
+  new `emptyMessage()` returns the rendered placeholder text (`null` while
+  the table has rows).
+
 ## [0.52.0] — 2026-09-02
 
 ### Changed
