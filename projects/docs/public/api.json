@@ -13346,7 +13346,7 @@
      "file": "projects/mk-kit/table/data-source.ts",
      "kind": "function",
      "signatures": [
-      "<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): MkDataFetcher<T>"
+      "<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): (req: MkDataRequest) => Promise<MkDataPage<T>>"
      ]
     },
     {

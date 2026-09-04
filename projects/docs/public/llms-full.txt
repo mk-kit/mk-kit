@@ -8699,7 +8699,7 @@ ds = new MkTableDataSource(mkClientFetcher(() => this.rows()));
 ```
 
 ```ts
-function mkClientFetcher<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): MkDataFetcher<T>
+function mkClientFetcher<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): (req: MkDataRequest) => Promise<MkDataPage<T>>
 ```
 
 ### mkCompactFilters (function)
