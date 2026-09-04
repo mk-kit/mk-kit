@@ -4,6 +4,21 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.54.0] — 2026-09-04
+
+### Added
+
+- **Kanban column header and footer templates** (`@mk-kit/ui/kanban`).
+  `<ng-template mkKanbanColumnHeader let-column let-count="count">` replaces
+  the default title + count header (rename / delete / "add here" actions live
+  there now instead of a toolbar), and
+  `<ng-template mkKanbanColumnFooter let-column>` renders under each card
+  list (a quick-add input, say). Both get
+  `{ $implicit: column, index, count }` (`MkKanbanColumnContext`).
+  `<ng-template mkKanbanCard>` marks the card renderer explicitly; a plain
+  `<ng-template>` still works as before, so nothing changes for existing
+  boards.
+
 ## [0.53.0] — 2026-09-04
 
 ### Changed

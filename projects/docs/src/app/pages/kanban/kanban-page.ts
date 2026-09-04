@@ -2,7 +2,11 @@ import { ChangeDetectionStrategy, Component, signal } from '@angular/core';
 import {
   MkAlert,
   MkBadge,
+  MkButton,
   MkKanban,
+  MkKanbanCardDef,
+  MkKanbanColumnFooterDef,
+  MkKanbanColumnHeaderDef,
   type MkKanbanCardMovedEvent,
   type MkKanbanColumn,
 } from '@mk-kit/ui';
@@ -15,7 +19,7 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-kanban-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkAlert, MkBadge, MkKanban],
+  imports: [DocsExample, MkAlert, MkBadge, MkButton, MkKanban, MkKanbanCardDef, MkKanbanColumnHeaderDef, MkKanbanColumnFooterDef],
   template: `
     <div class="docs-page docs-container">
       <h1>Kanban</h1>
@@ -96,6 +100,39 @@ import { DocsExample } from '../../shared/docs-example';
       </docs-example>
 
       <!-- ============================================================ -->
+      <h2>Column header and footer templates</h2>
+      <p>
+        Since 0.54 a column's header and footer are yours to render, too.
+        <code class="docs-inline">mkKanbanColumnHeader</code> replaces the
+        default title + count (put rename / delete / "add here" actions
+        there), <code class="docs-inline">mkKanbanColumnFooter</code> renders
+        under the card list (a quick-add control, say). Both receive
+        <code class="docs-inline">{{ '{' }} $implicit: column, index, count {{ '}' }}</code>.
+        When you project several templates, mark the card one with
+        <code class="docs-inline">mkKanbanCard</code>; a single plain
+        <code class="docs-inline">&lt;ng-template&gt;</code> keeps working.
+      </p>
+      <docs-example [code]="slotsCode" [column]="true">
+        <mk-kanban [(columns)]="board" style="width: 100%">
+          <ng-template mkKanbanColumnHeader let-column let-count="count">
+            <span style="display: flex; align-items: center; gap: var(--mk-space-2); width: 100%;">
+              <strong style="flex: 1 1 auto;">{{ column.title }}</strong>
+              <mk-badge size="sm" tone="neutral">{{ count }}</mk-badge>
+              <button mkButton size="sm" variant="ghost" tone="neutral" type="button" (click)="addCard(column)">+</button>
+            </span>
+          </ng-template>
+          <ng-template mkKanbanCard let-card>
+            <strong>{{ card.title }}</strong>
+          </ng-template>
+          <ng-template mkKanbanColumnFooter let-column>
+            <button mkButton size="sm" variant="ghost" tone="neutral" type="button" style="width: 100%" (click)="addCard(column)">
+              + Add to {{ column.title }}
+            </button>
+          </ng-template>
+        </mk-kanban>
+      </docs-example>
+
+      <!-- ============================================================ -->
       <h2>API</h2>
       <table class="docs-props">
         <thead>
@@ -105,7 +142,9 @@ import { DocsExample } from '../../shared/docs-example';
           <tr><td><code>[(columns)]</code></td><td><code>MkKanbanColumn[]</code></td><td><code>[]</code></td><td>The board's columns and their cards (two-way). Replaced immutably on every drop.</td></tr>
           <tr><td><code>disabled</code></td><td><code>boolean</code></td><td><code>false</code></td><td>Disable all dragging on the board (columns and cards stay visible).</td></tr>
           <tr><td><code>(cardMoved)</code></td><td><code>MkKanbanCardMovedEvent</code></td><td>—</td><td>Fires after the model update: <code>{{ '{' }} card, from, to, fromIndex, toIndex {{ '}' }}</code> (<code>from</code>/<code>to</code> are column ids).</td></tr>
-          <tr><td><code>ng-template</code></td><td>slot</td><td>—</td><td>Optional card renderer; context: <code>$implicit</code> = card, <code>column</code> = owning column.</td></tr>
+          <tr><td><code>ng-template[mkKanbanCard]</code></td><td>slot</td><td>—</td><td>Card renderer; context: <code>$implicit</code> = card, <code>column</code> = owning column. A single plain <code>ng-template</code> is treated as the card renderer too.</td></tr>
+          <tr><td><code>ng-template[mkKanbanColumnHeader]</code></td><td>slot</td><td>—</td><td>Replaces the default header (title + count); context: <code>$implicit</code> = column, <code>index</code>, <code>count</code>.</td></tr>
+          <tr><td><code>ng-template[mkKanbanColumnFooter]</code></td><td>slot</td><td>—</td><td>Rendered under the card list of every column; same context as the header.</td></tr>
         </tbody>
       </table>
       <p>
@@ -210,6 +249,27 @@ export class KanbanPage {
 ]);
 
 <mk-kanban [(columns)]="board" (cardMoved)="persist($event)" />`;
+
+  protected addCard(column: MkKanbanColumn): void {
+    const n = this.board().reduce((sum, c) => sum + c.cards.length, 0) + 1;
+    this.board.update((cols) =>
+      cols.map((c) => (c.id === column.id ? { ...c, cards: [...c.cards, { id: `n${n}`, title: `New card ${n}` }] } : c)),
+    );
+  }
+
+  protected readonly slotsCode = `<mk-kanban [(columns)]="board">
+  <ng-template mkKanbanColumnHeader let-column let-count="count">
+    <strong>{{ column.title }}</strong>
+    <mk-badge size="sm">{{ count }}</mk-badge>
+    <button mkButton size="sm" variant="ghost" (click)="addCard(column)">+</button>
+  </ng-template>
+  <ng-template mkKanbanCard let-card>
+    <strong>{{ card.title }}</strong>
+  </ng-template>
+  <ng-template mkKanbanColumnFooter let-column>
+    <button mkButton size="sm" variant="ghost" (click)="addCard(column)">+ Add to {{ column.title }}</button>
+  </ng-template>
+</mk-kanban>`;
 
   protected readonly templateCode = `<mk-kanban [(columns)]="board">
   <ng-template let-card let-column="column">

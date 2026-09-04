@@ -6,10 +6,17 @@
       [attr.aria-label]="column.title"
     >
       <header class="mk-kanban__column-header">
-        <span class="mk-kanban__column-title">{{ column.title }}</span>
-        <span class="mk-kanban__column-count" aria-hidden="true">
-          {{ column.cards.length }}
-        </span>
+        @if (headerTemplate(); as header) {
+          <ng-container
+            [ngTemplateOutlet]="header"
+            [ngTemplateOutletContext]="{ $implicit: column, index: colIndex, count: column.cards.length }"
+          />
+        } @else {
+          <span class="mk-kanban__column-title">{{ column.title }}</span>
+          <span class="mk-kanban__column-count" aria-hidden="true">
+            {{ column.cards.length }}
+          </span>
+        }
       </header>
 
       <div
@@ -37,6 +44,15 @@
           </div>
         }
       </div>
+
+      @if (footerTemplate(); as footer) {
+        <div class="mk-kanban__column-footer">
+          <ng-container
+            [ngTemplateOutlet]="footer"
+            [ngTemplateOutletContext]="{ $implicit: column, index: colIndex, count: column.cards.length }"
+          />
+        </div>
+      }
     </section>
   }
 </div>

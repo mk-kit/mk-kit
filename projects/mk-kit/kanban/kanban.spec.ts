@@ -1,6 +1,13 @@
-import { provideZonelessChangeDetection } from '@angular/core';
+import { Component, provideZonelessChangeDetection, signal } from '@angular/core';
 import { ComponentFixture, TestBed } from '@angular/core/testing';
-import { MkKanban, type MkKanbanCardMovedEvent, type MkKanbanColumn } from './kanban';
+import {
+  MkKanban,
+  MkKanbanCardDef,
+  MkKanbanColumnFooterDef,
+  MkKanbanColumnHeaderDef,
+  type MkKanbanCardMovedEvent,
+  type MkKanbanColumn,
+} from './kanban';
 
 describe('MkKanban', () => {
   let fixture: ComponentFixture<MkKanban>;
@@ -118,5 +125,71 @@ describe('MkKanban', () => {
 
     expect(kanban.columns()[0].cards.map((c) => c.id)).toEqual(['a1', 'a2']);
     expect(moved).not.toHaveBeenCalled();
+  });
+
+  describe('column header / footer templates', () => {
+    const columns = (): MkKanbanColumn[] => [
+      { id: 'a', title: 'To do', cards: [{ id: 'a1', title: 'A1' }, { id: 'a2', title: 'A2' }] },
+      { id: 'b', title: 'Done', cards: [] },
+    ];
+
+    @Component({
+      imports: [MkKanban, MkKanbanCardDef, MkKanbanColumnHeaderDef, MkKanbanColumnFooterDef],
+      template: `
+        <mk-kanban [(columns)]="board">
+          <ng-template mkKanbanColumnFooter let-column let-count="count">
+            <button class="add" type="button">+ {{ column.title }} ({{ count }})</button>
+          </ng-template>
+          <ng-template mkKanbanColumnHeader let-column let-index="index" let-count="count">
+            <span class="head">{{ index }}:{{ column.title }}={{ count }}</span>
+          </ng-template>
+          <ng-template mkKanbanCard let-card let-column="column">
+            <em class="card">{{ card.title }}@{{ column.id }}</em>
+          </ng-template>
+        </mk-kanban>
+      `,
+    })
+    class Host {
+      readonly board = signal(columns());
+    }
+
+    @Component({
+      imports: [MkKanban, MkKanbanColumnHeaderDef],
+      template: `
+        <mk-kanban [(columns)]="board">
+          <ng-template mkKanbanColumnHeader let-column>
+            <span class="head">{{ column.title }}</span>
+          </ng-template>
+          <ng-template let-card>
+            <em class="card">{{ card.title }}</em>
+          </ng-template>
+        </mk-kanban>
+      `,
+    })
+    class PlainCardHost {
+      readonly board = signal(columns());
+    }
+
+    it('renders header, card and footer templates with their contexts, regardless of order', () => {
+      const host = TestBed.createComponent(Host);
+      host.detectChanges();
+      const el = host.nativeElement as HTMLElement;
+      expect([...el.querySelectorAll('.head')].map((h) => h.textContent)).toEqual(['0:To do=2', '1:Done=0']);
+      expect(el.querySelector('.mk-kanban__column-title')).toBeNull();
+      expect([...el.querySelectorAll('.card')].map((c) => c.textContent)).toEqual(['A1@a', 'A2@a']);
+      expect([...el.querySelectorAll('.mk-kanban__column-footer .add')].map((b) => b.textContent)).toEqual([
+        '+ To do (2)',
+        '+ Done (0)',
+      ]);
+    });
+
+    it('keeps the pre-0.54 rule: a plain ng-template is the card, even next to a header template', () => {
+      const host = TestBed.createComponent(PlainCardHost);
+      host.detectChanges();
+      const el = host.nativeElement as HTMLElement;
+      expect([...el.querySelectorAll('.head')].map((h) => h.textContent)).toEqual(['To do', 'Done']);
+      expect([...el.querySelectorAll('.card')].map((c) => c.textContent)).toEqual(['A1', 'A2']);
+      expect(el.querySelector('.mk-kanban__column-footer')).toBeNull();
+    });
   });
 });
