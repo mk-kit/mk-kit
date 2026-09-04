@@ -18,8 +18,8 @@ import { mkUniqueId } from '@mk-kit/ui/core';
 import { mkGetFocusable } from '@mk-kit/ui/core';
 import { MK_I18N } from '@mk-kit/ui/core';
 import { MkAnchoredPanel } from '@mk-kit/ui/core';
-import { MkBadge } from '@mk-kit/ui/data';
-import { MkEmptyState } from '@mk-kit/ui/data';
+import { MkBadge } from '@mk-kit/ui/status';
+import { MkEmptyState } from '@mk-kit/ui/status';
 import { MkIcon } from '@mk-kit/ui/icon';
 
 /** A single notification shown in the {@link MkNotificationCenter} panel. */

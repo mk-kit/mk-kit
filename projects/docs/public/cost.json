@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.52.1",
+ "version": "0.53.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,9 +9,9 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3710559,
-  "min": 1682466,
-  "brotli": 312262,
+  "raw": 3714118,
+  "min": 1683810,
+  "brotli": 314908,
   "budgetKiB": 3752
  },
  "entries": [
@@ -175,7 +175,7 @@
      "selector": "mk-chat",
      "docs": "/components/chat",
      "own": 7681,
-     "size": 24786
+     "size": 24701
     },
     {
      "name": "MkChatMessageComponent",
@@ -183,7 +183,7 @@
      "selector": "mk-chat-message",
      "docs": "/components/chat",
      "own": 3421,
-     "size": 19821
+     "size": 19817
     },
     {
      "name": "MkPromptBox",
@@ -191,14 +191,14 @@
      "selector": "mk-prompt-box",
      "docs": "/components/chat",
      "own": 3412,
-     "size": 16293
+     "size": 16273
     },
     {
      "name": "MkChatMessageDef",
      "kind": "directive",
      "selector": "ng-template[mkChatMessageDef]",
      "own": 312,
-     "size": 1481
+     "size": 1468
     }
    ]
   },
@@ -449,9 +449,9 @@
    "name": "data",
    "import": "@mk-kit/ui/data",
    "file": "mk-kit-ui-data.mjs",
-   "raw": 658373,
-   "min": 291699,
-   "brotli": 48426,
+   "raw": 612683,
+   "min": 273641,
+   "brotli": 45941,
    "budgetKiB": 680,
    "items": [
     {
@@ -459,95 +459,95 @@
      "kind": "component",
      "selector": "mk-org-chart",
      "docs": "/components/org-chart",
-     "own": 5965,
-     "size": 10986
+     "own": 5944,
+     "size": 10951
     },
     {
      "name": "MkLineChart",
      "kind": "component",
      "selector": "mk-line-chart",
      "docs": "/components/charts",
-     "own": 5531,
-     "size": 10543
+     "own": 5525,
+     "size": 10533
     },
     {
      "name": "MkBarChart",
      "kind": "component",
      "selector": "mk-bar-chart",
      "docs": "/components/charts",
-     "own": 5511,
-     "size": 10551
+     "own": 5520,
+     "size": 10532
     },
     {
      "name": "MkLogViewer",
      "kind": "component",
      "selector": "mk-log-viewer",
      "docs": "/components/markdown",
-     "own": 4694,
-     "size": 10147
+     "own": 4684,
+     "size": 10166
     },
     {
      "name": "MkScatterChart",
      "kind": "component",
      "selector": "mk-scatter-chart",
      "docs": "/components/charts",
-     "own": 4604,
-     "size": 9666
+     "own": 4626,
+     "size": 9641
     },
     {
      "name": "MkDonutChart",
      "kind": "component",
      "selector": "mk-donut-chart",
      "docs": "/components/proportion-charts",
-     "own": 4370,
-     "size": 9439
+     "own": 4380,
+     "size": 9400
     },
     {
      "name": "MkMarkdown",
      "kind": "component",
      "selector": "mk-markdown",
      "docs": "/components/markdown",
-     "own": 4149,
-     "size": 4775
+     "own": 4147,
+     "size": 4776
     },
     {
      "name": "MkRadarChart",
      "kind": "component",
      "selector": "mk-radar-chart",
      "docs": "/components/proportion-charts",
-     "own": 3874,
-     "size": 8905
+     "own": 3881,
+     "size": 8896
     },
     {
      "name": "MkDiff",
      "kind": "component",
      "selector": "mk-diff",
      "docs": "/components/data",
-     "own": 3779,
-     "size": 8851
+     "own": 3754,
+     "size": 8806
     },
     {
      "name": "MkCarousel",
      "kind": "component",
      "selector": "mk-carousel",
      "docs": "/components/data",
-     "own": 3699,
-     "size": 8747
+     "own": 3701,
+     "size": 8712
     },
     {
      "name": "MkHeatmap",
      "kind": "component",
      "selector": "mk-heatmap",
      "docs": "/components/charts",
-     "own": 3534,
-     "size": 4135
+     "own": 3517,
+     "size": 4084
     },
     {
      "name": "MkTreemap",
      "kind": "component",
      "selector": "mk-treemap",
      "docs": "/components/proportion-charts",
-     "own": 3458,
+     "own": 3448,
      "size": 8460
     },
     {
@@ -555,419 +555,379 @@
      "kind": "component",
      "selector": "mk-qr-code",
      "docs": "/components/data",
-     "own": 3412,
-     "size": 8429
+     "own": 3388,
+     "size": 8400
     },
     {
      "name": "MkCalendarHeatmap",
      "kind": "component",
      "selector": "mk-calendar-heatmap",
      "docs": "/components/charts",
-     "own": 3323,
-     "size": 8347
+     "own": 3308,
+     "size": 8313
     },
     {
      "name": "MkInlineEdit",
      "kind": "component",
      "selector": "mk-inline-edit",
      "docs": "/components/table",
-     "own": 3061,
-     "size": 8192
+     "own": 3049,
+     "size": 8179
     },
     {
      "name": "MkJsonViewer",
      "kind": "component",
      "selector": "mk-json-viewer",
      "docs": "/components/data",
-     "own": 3020,
-     "size": 8013
+     "own": 2995,
+     "size": 8007
     },
     {
      "name": "MkProfileCard",
      "kind": "component",
      "selector": "mk-profile-card",
      "docs": "/components/cards-lists",
-     "own": 2884,
-     "size": 3459
+     "own": 2841,
+     "size": 3430
     },
     {
      "name": "MkFunnelChart",
      "kind": "component",
      "selector": "mk-funnel-chart",
      "docs": "/components/proportion-charts",
-     "own": 2536,
-     "size": 7578
+     "own": 2517,
+     "size": 7561
     },
     {
      "name": "mkEncodeQr",
      "kind": "function",
-     "own": 2473,
-     "size": 3113
-    },
-    {
-     "name": "MkKanban",
-     "kind": "component",
-     "selector": "mk-kanban",
-     "docs": "/components/data",
-     "own": 2373,
-     "size": 12360
+     "own": 2483,
+     "size": 3083
     },
     {
      "name": "MkAvatarGroup",
      "kind": "component",
      "selector": "mk-avatar-group",
      "docs": "/components/badges-avatars",
-     "own": 2363,
-     "size": 2971
+     "own": 2355,
+     "size": 2959
     },
     {
      "name": "MkSkeletonPreset",
      "kind": "component",
      "selector": "mk-skeleton-preset",
      "docs": "/components/loading",
-     "own": 2329,
-     "size": 7355
+     "own": 2327,
+     "size": 7340
     },
     {
      "name": "MkSparkline",
      "kind": "component",
      "selector": "mk-sparkline",
      "docs": "/components/charts",
-     "own": 2209,
-     "size": 2813
+     "own": 2203,
+     "size": 2819
     },
     {
      "name": "MkCode",
      "kind": "component",
      "selector": "mk-code",
      "docs": "/components/data",
-     "own": 2197,
-     "size": 3460
+     "own": 2183,
+     "size": 3445
     },
     {
      "name": "MkCountdown",
      "kind": "component",
      "selector": "mk-countdown",
      "docs": "/components/data",
-     "own": 2185,
-     "size": 7221
+     "own": 2176,
+     "size": 7196
     },
     {
      "name": "MkGauge",
      "kind": "component",
      "selector": "mk-gauge",
      "docs": "/components/proportion-charts",
-     "own": 2124,
-     "size": 2717
+     "own": 2103,
+     "size": 2726
     },
     {
      "name": "MkProgressRing",
      "kind": "component",
      "selector": "mk-progress-ring",
      "docs": "/components/proportion-charts",
-     "own": 1943,
-     "size": 2566
+     "own": 1934,
+     "size": 2552
     },
     {
      "name": "MkProgressBar",
      "kind": "component",
      "selector": "mk-progress-bar",
      "docs": "/components/loading",
-     "own": 1928,
-     "size": 2537
+     "own": 1921,
+     "size": 2517
     },
     {
      "name": "MkAvatar",
      "kind": "component",
      "selector": "mk-avatar",
      "docs": "/components/badges-avatars",
-     "own": 1909,
-     "size": 2515
+     "own": 1911,
+     "size": 2494
     },
     {
      "name": "MkStatCard",
      "kind": "component",
      "selector": "mk-stat-card",
      "docs": "/components/cards-lists",
-     "own": 1839,
-     "size": 2445
+     "own": 1845,
+     "size": 2436
     },
     {
      "name": "MkVirtualScroll",
      "kind": "component",
      "selector": "mk-virtual-scroll",
      "docs": "/components/data",
-     "own": 1781,
-     "size": 2384
+     "own": 1767,
+     "size": 2364
     },
     {
      "name": "MkTimelineItem",
      "kind": "component",
      "selector": "mk-timeline-item",
      "docs": "/components/empty-timeline",
-     "own": 1774,
-     "size": 7438
-    },
-    {
-     "name": "MkBadgeOverlay",
-     "kind": "directive",
-     "selector": "[mkBadgeOverlay]",
-     "docs": "/components/badges-avatars",
-     "own": 1627,
-     "size": 2216
+     "own": 1764,
+     "size": 7413
     },
     {
      "name": "MkListItem",
      "kind": "component",
      "selector": "mk-list-item",
      "docs": "/components/cards-lists",
-     "own": 1577,
-     "size": 2175
+     "own": 1570,
+     "size": 2165
     },
     {
      "name": "MkSkeleton",
      "kind": "component",
      "selector": "mk-skeleton",
      "docs": "/components/loading",
-     "own": 1571,
-     "size": 2174
-    },
-    {
-     "name": "MkEmptyState",
-     "kind": "component",
-     "selector": "mk-empty-state",
-     "docs": "/components/empty-timeline",
-     "own": 1552,
-     "size": 7188
+     "own": 1562,
+     "size": 2153
     },
     {
      "name": "MkDescriptionList",
      "kind": "component",
      "selector": "mk-description-list",
      "docs": "/components/cards-lists",
-     "own": 1546,
-     "size": 2159
-    },
-    {
-     "name": "MkBadge",
-     "kind": "component",
-     "selector": "mk-badge",
-     "docs": "/components/badges-avatars",
-     "own": 1510,
-     "size": 2106
-    },
-    {
-     "name": "MkSpinner",
-     "kind": "component",
-     "selector": "mk-spinner",
-     "docs": "/components/loading",
-     "own": 1436,
-     "size": 6461
+     "own": 1542,
+     "size": 2122
     },
     {
      "name": "MkTag",
      "kind": "component",
      "selector": "mk-tag",
      "docs": "/components/badges-avatars",
-     "own": 1395,
-     "size": 1964
+     "own": 1357,
+     "size": 1949
     },
     {
      "name": "MkCard",
      "kind": "component",
      "selector": "mk-card",
      "docs": "/components/cards-lists",
-     "own": 1196,
-     "size": 1778
+     "own": 1190,
+     "size": 1779
     },
     {
      "name": "MkDivider",
      "kind": "component",
      "selector": "mk-divider",
      "docs": "/components/cards-lists",
-     "own": 1137,
-     "size": 1729
+     "own": 1134,
+     "size": 1707
     },
     {
      "name": "mkSquarify",
      "kind": "function",
-     "own": 1042,
-     "size": 1652
+     "own": 1038,
+     "size": 1646
     },
     {
      "name": "mkHeatmapCellColors",
      "kind": "function",
-     "own": 992,
-     "size": 1603
+     "own": 985,
+     "size": 1599
+    },
+    {
+     "name": "MkProfileMeta",
+     "kind": "component",
+     "selector": "[mkProfileMeta]",
+     "own": 931,
+     "size": 1518
     },
     {
      "name": "MkList",
      "kind": "component",
      "selector": "mk-list",
      "docs": "/components/cards-lists",
-     "own": 941,
-     "size": 1555
-    },
-    {
-     "name": "MkProfileMeta",
-     "kind": "component",
-     "selector": "[mkProfileMeta]",
-     "own": 937,
-     "size": 1562
+     "own": 928,
+     "size": 1540
     },
     {
      "name": "MkDescItem",
      "kind": "component",
      "selector": "mk-desc-item",
-     "own": 922,
-     "size": 1545
+     "own": 921,
+     "size": 1519
     },
     {
      "name": "mkBuildJsonTree",
      "kind": "function",
-     "own": 908,
-     "size": 1502
+     "own": 902,
+     "size": 1503
     },
     {
      "name": "MkCardFooter",
      "kind": "component",
      "selector": "mk-card-footer, [mkCardFooter]",
-     "own": 873,
-     "size": 1484
+     "own": 866,
+     "size": 1456
     },
     {
      "name": "MkCardHeader",
      "kind": "component",
      "selector": "mk-card-header, [mkCardHeader]",
      "docs": "/components/cards-lists",
-     "own": 871,
-     "size": 1492
-    },
-    {
-     "name": "MkCardTitle",
-     "kind": "component",
-     "selector": "mk-card-title",
-     "own": 867,
-     "size": 1489
+     "own": 862,
+     "size": 1462
     },
     {
      "name": "MkProfileActions",
      "kind": "component",
      "selector": "[mkProfileActions]",
-     "own": 864,
-     "size": 1482
+     "own": 857,
+     "size": 1448
+    },
+    {
+     "name": "MkCardTitle",
+     "kind": "component",
+     "selector": "mk-card-title",
+     "own": 856,
+     "size": 1447
     },
     {
      "name": "MkTimeline",
      "kind": "component",
      "selector": "mk-timeline",
      "docs": "/components/empty-timeline",
-     "own": 826,
-     "size": 1439
+     "own": 822,
+     "size": 1426
     },
     {
      "name": "mkParseRgb",
      "kind": "function",
-     "own": 815,
-     "size": 1423
-    },
-    {
-     "name": "mkArcPath",
-     "kind": "function",
-     "own": 786,
-     "size": 1411
+     "own": 810,
+     "size": 1405
     },
     {
      "name": "mkOrgChartFromFlat",
      "kind": "function",
-     "own": 784,
-     "size": 1371
+     "own": 789,
+     "size": 1379
+    },
+    {
+     "name": "mkArcPath",
+     "kind": "function",
+     "own": 778,
+     "size": 1375
     },
     {
      "name": "MkOrgChartNodeDef",
      "kind": "directive",
      "selector": "ng-template[mkOrgChartNodeDef]",
-     "own": 775,
-     "size": 1395
+     "own": 769,
+     "size": 1364
     },
     {
      "name": "mkNiceTicks",
      "kind": "function",
-     "own": 768,
-     "size": 1400
+     "own": 765,
+     "size": 1395
     },
     {
      "name": "MkCarouselSlide",
      "kind": "directive",
      "selector": "[mkCarouselSlide]",
-     "own": 762,
-     "size": 1379
+     "own": 758,
+     "size": 1356
     },
     {
      "name": "mkContrastRatio",
      "kind": "function",
-     "own": 746,
-     "size": 1361
+     "own": 744,
+     "size": 1346
     },
     {
      "name": "mkAreaPath",
      "kind": "function",
-     "own": 726,
-     "size": 1332
-    },
-    {
-     "name": "mkRelativeLuminance",
-     "kind": "function",
-     "own": 705,
-     "size": 1326
+     "own": 721,
+     "size": 1302
     },
     {
      "name": "mkFormatCompact",
      "kind": "function",
-     "own": 701,
-     "size": 1326
+     "own": 703,
+     "size": 1291
+    },
+    {
+     "name": "mkRelativeLuminance",
+     "kind": "function",
+     "own": 700,
+     "size": 1305
     },
     {
      "name": "mkSplitDuration",
      "kind": "function",
-     "own": 700,
-     "size": 1315
+     "own": 696,
+     "size": 1287
     },
     {
      "name": "mkLinePath",
      "kind": "function",
-     "own": 697,
-     "size": 1296
+     "own": 680,
+     "size": 1281
     },
     {
      "name": "mkMixRgb",
      "kind": "function",
-     "own": 690,
-     "size": 1301
-    },
-    {
-     "name": "mkChartColor",
-     "kind": "function",
-     "own": 672,
-     "size": 1284
+     "own": 673,
+     "size": 1282
     },
     {
      "name": "mkLinearScale",
      "kind": "function",
-     "own": 664,
+     "own": 662,
      "size": 1264
+    },
+    {
+     "name": "mkChartColor",
+     "kind": "function",
+     "own": 648,
+     "size": 1280
     },
     {
      "name": "MK_HEATMAP_MIN_CONTRAST",
      "kind": "const",
-     "own": 639,
-     "size": 1271
+     "own": 632,
+     "size": 1227
     },
     {
      "name": "MK_CHART_PALETTE_SIZE",
      "kind": "const",
-     "own": 634,
-     "size": 1244
+     "own": 628,
+     "size": 1238
     }
    ]
   },
@@ -1492,9 +1452,9 @@
    "name": "feedback",
    "import": "@mk-kit/ui/feedback",
    "file": "mk-kit-ui-feedback.mjs",
-   "raw": 234018,
-   "min": 106601,
-   "brotli": 18075,
+   "raw": 234020,
+   "min": 106603,
+   "brotli": 18080,
    "budgetKiB": 260,
    "items": [
     {
@@ -1502,7 +1462,7 @@
      "kind": "service",
      "docs": "/components/dialogs",
      "own": 4887,
-     "size": 22325
+     "size": 21912
     },
     {
      "name": "MkConfirmDialog",
@@ -1510,7 +1470,7 @@
      "selector": "mk-confirm-dialog",
      "docs": "/components/dialogs",
      "own": 3946,
-     "size": 16189
+     "size": 15431
     },
     {
      "name": "MkDialog",
@@ -1518,14 +1478,14 @@
      "selector": "mk-dialog",
      "docs": "/components/dialogs",
      "own": 3403,
-     "size": 9352
+     "size": 8503
     },
     {
      "name": "MkTourService",
      "kind": "service",
      "docs": "/components/status",
      "own": 3185,
-     "size": 10599
+     "size": 9803
     },
     {
      "name": "MkNotificationCenter",
@@ -1533,49 +1493,49 @@
      "selector": "mk-notification-center",
      "docs": "/components/status",
      "own": 3123,
-     "size": 16802
+     "size": 15953
     },
     {
      "name": "MkToastService",
      "kind": "service",
      "docs": "/components/snackbar",
      "own": 2627,
-     "size": 9492
+     "size": 8639
     },
     {
      "name": "MkToastContainer",
      "kind": "component",
      "selector": "mk-toast-container",
      "own": 2619,
-     "size": 9511
+     "size": 8641
     },
     {
      "name": "MkToast",
      "kind": "component",
      "selector": "mk-toast",
      "own": 2616,
-     "size": 9510
+     "size": 8650
     },
     {
      "name": "MkSnackbar",
      "kind": "component",
      "selector": "mk-snackbar",
      "own": 2571,
-     "size": 8164
+     "size": 7317
     },
     {
      "name": "MkSnackbarService",
      "kind": "service",
      "docs": "/components/snackbar",
      "own": 2571,
-     "size": 8180
+     "size": 7343
     },
     {
      "name": "MkSnackbarContainer",
      "kind": "component",
      "selector": "mk-snackbar-container",
      "own": 2568,
-     "size": 8164
+     "size": 7328
     },
     {
      "name": "MkPopconfirm",
@@ -1583,7 +1543,7 @@
      "selector": "mk-popconfirm",
      "docs": "/components/popovers",
      "own": 2239,
-     "size": 11090
+     "size": 10212
     },
     {
      "name": "MkBottomSheet",
@@ -1591,7 +1551,7 @@
      "selector": "mk-bottom-sheet",
      "docs": "/components/bottom-sheet",
      "own": 2192,
-     "size": 8126
+     "size": 7291
     },
     {
      "name": "MkTooltip",
@@ -1599,14 +1559,14 @@
      "selector": "[mkTooltip]",
      "docs": "/components/popovers",
      "own": 2036,
-     "size": 3753
+     "size": 2909
     },
     {
      "name": "MkTourPopup",
      "kind": "component",
      "selector": "mk-tour-popup",
      "own": 2006,
-     "size": 9497
+     "size": 8648
     },
     {
      "name": "MkAlert",
@@ -1614,7 +1574,7 @@
      "selector": "mk-alert",
      "docs": "/components/feedback",
      "own": 1911,
-     "size": 7506
+     "size": 6621
     },
     {
      "name": "MkBanner",
@@ -1622,15 +1582,7 @@
      "selector": "mk-banner",
      "docs": "/components/feedback",
      "own": 1829,
-     "size": 7418
-    },
-    {
-     "name": "MkBlockUi",
-     "kind": "directive",
-     "selector": "[mkBlockUi]",
-     "docs": "/components/loading",
-     "own": 1763,
-     "size": 7827
+     "size": 6548
     },
     {
      "name": "MkHovercard",
@@ -1638,7 +1590,15 @@
      "selector": "mk-hovercard",
      "docs": "/components/popovers",
      "own": 1757,
-     "size": 4673
+     "size": 3832
+    },
+    {
+     "name": "MkBlockUi",
+     "kind": "directive",
+     "selector": "[mkBlockUi]",
+     "docs": "/components/loading",
+     "own": 1751,
+     "size": 6947
     },
     {
      "name": "MkResult",
@@ -1646,14 +1606,14 @@
      "selector": "mk-result",
      "docs": "/components/status",
      "own": 1717,
-     "size": 2880
+     "size": 2049
     },
     {
      "name": "MkBlockUiService",
      "kind": "service",
      "docs": "/components/loading",
-     "own": 1660,
-     "size": 7737
+     "own": 1658,
+     "size": 6874
     },
     {
      "name": "MkPopover",
@@ -1661,7 +1621,7 @@
      "selector": "mk-popover",
      "docs": "/components/popovers",
      "own": 1576,
-     "size": 4613
+     "size": 3760
     },
     {
      "name": "MkLoadingBar",
@@ -1669,28 +1629,28 @@
      "selector": "mk-loading-bar",
      "docs": "/components/feedback",
      "own": 1483,
-     "size": 7028
+     "size": 6178
     },
     {
      "name": "MkBlockUiOverlay",
      "kind": "component",
      "selector": "mk-block-ui-overlay",
      "own": 1151,
-     "size": 7216
+     "size": 6346
     },
     {
      "name": "MkTooltipPanel",
      "kind": "component",
      "selector": "mk-tooltip",
      "own": 868,
-     "size": 2054
+     "size": 1200
     },
     {
      "name": "MkLoadingBarService",
      "kind": "service",
      "docs": "/components/feedback",
      "own": 775,
-     "size": 1940
+     "size": 1103
     },
     {
      "name": "MkHovercardTrigger",
@@ -1698,7 +1658,7 @@
      "selector": "[mkHovercardFor]",
      "docs": "/components/popovers",
      "own": 768,
-     "size": 1947
+     "size": 1104
     },
     {
      "name": "MkDialogTitle",
@@ -1706,7 +1666,7 @@
      "selector": "mk-dialog-title",
      "docs": "/components/dialogs",
      "own": 656,
-     "size": 1899
+     "size": 1060
     },
     {
      "name": "MkPopoverTrigger",
@@ -1714,7 +1674,7 @@
      "selector": "[mkPopoverTriggerFor]",
      "docs": "/components/popovers",
      "own": 630,
-     "size": 1806
+     "size": 953
     },
     {
      "name": "MkPopconfirmTrigger",
@@ -1722,26 +1682,26 @@
      "selector": "[mkPopconfirmFor]",
      "docs": "/components/popovers",
      "own": 628,
-     "size": 1802
+     "size": 954
     },
     {
      "name": "MkBottomSheetService",
      "kind": "service",
      "docs": "/components/bottom-sheet",
      "own": 612,
-     "size": 3674
+     "size": 2831
     },
     {
      "name": "MkSnackbarRef",
      "kind": "class",
      "own": 442,
-     "size": 1610
+     "size": 771
     },
     {
      "name": "MK_TOUR_DATA",
      "kind": "token",
      "own": 331,
-     "size": 1508
+     "size": 652
     }
    ]
   },
@@ -2378,6 +2338,25 @@
      "kind": "const",
      "own": 543,
      "size": 630
+    }
+   ]
+  },
+  {
+   "name": "kanban",
+   "import": "@mk-kit/ui/kanban",
+   "file": "mk-kit-ui-kanban.mjs",
+   "raw": 14014,
+   "min": 5768,
+   "brotli": 1843,
+   "budgetKiB": null,
+   "items": [
+    {
+     "name": "MkKanban",
+     "kind": "component",
+     "selector": "mk-kanban",
+     "docs": "/components/data",
+     "own": 1841,
+     "size": 11560
     }
    ]
   },
@@ -3073,12 +3052,55 @@
    ]
   },
   {
+   "name": "status",
+   "import": "@mk-kit/ui/status",
+   "file": "mk-kit-ui-status.mjs",
+   "raw": 33216,
+   "min": 12907,
+   "brotli": 3052,
+   "budgetKiB": null,
+   "items": [
+    {
+     "name": "MkBadgeOverlay",
+     "kind": "directive",
+     "selector": "[mkBadgeOverlay]",
+     "docs": "/components/badges-avatars",
+     "own": 1150,
+     "size": 1400
+    },
+    {
+     "name": "MkEmptyState",
+     "kind": "component",
+     "selector": "mk-empty-state",
+     "docs": "/components/empty-timeline",
+     "own": 1087,
+     "size": 6387
+    },
+    {
+     "name": "MkBadge",
+     "kind": "component",
+     "selector": "mk-badge",
+     "docs": "/components/badges-avatars",
+     "own": 1057,
+     "size": 1302
+    },
+    {
+     "name": "MkSpinner",
+     "kind": "component",
+     "selector": "mk-spinner",
+     "docs": "/components/loading",
+     "own": 957,
+     "size": 5621
+    }
+   ]
+  },
+  {
    "name": "table",
    "import": "@mk-kit/ui/table",
    "file": "mk-kit-ui-table.mjs",
-   "raw": 183755,
-   "min": 77929,
-   "brotli": 16054,
+   "raw": 185772,
+   "min": 78654,
+   "brotli": 16285,
    "budgetKiB": 184,
    "items": [
     {
@@ -3086,8 +3108,8 @@
      "kind": "component",
      "selector": "mk-table",
      "docs": "/components/table",
-     "own": 13967,
-     "size": 20293
+     "own": 13970,
+     "size": 20324
     },
     {
      "name": "MkSortHeader",
@@ -3095,14 +3117,14 @@
      "selector": "[mkSortHeader]",
      "docs": "/components/sort",
      "own": 1761,
-     "size": 6768
+     "size": 6759
     },
     {
      "name": "MkTableDataSource",
      "kind": "class",
      "docs": "/components/table#data-source",
-     "own": 1502,
-     "size": 1873
+     "own": 1504,
+     "size": 1881
     },
     {
      "name": "MkSort",
@@ -3122,7 +3144,13 @@
      "name": "mkToCsv",
      "kind": "function",
      "own": 668,
-     "size": 949
+     "size": 951
+    },
+    {
+     "name": "mkClientFetcher",
+     "kind": "function",
+     "own": 562,
+     "size": 876
     },
     {
      "name": "mkDownloadText",
@@ -3134,7 +3162,7 @@
      "name": "mkCompactFilters",
      "kind": "function",
      "own": 395,
-     "size": 676
+     "size": 675
     },
     {
      "name": "MkTableCell",

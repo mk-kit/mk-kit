@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.52.1 — full API reference
+# @mk-kit/ui 0.53.0 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -8401,7 +8401,7 @@ type MkWeekday = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 
 ## @mk-kit/ui/table
 
-37 exports. `import { … } from '@mk-kit/ui/table';`
+39 exports. `import { … } from '@mk-kit/ui/table';`
 
 ### MkSortHeader (component)
 
@@ -8665,6 +8665,7 @@ Methods:
 | `setQuery(query: MkQueryGroup \| null): void` | Set (or clear with `null`) the structured query from `mk-query-builder`. Empty groups and unfinished rules are dropped before the request; a query with nothing left is sent as `null`. Resets to page 1 and loads at once. |
 | `setFilters(filters: MkTableFilters \| null): void` | Set (or clear with `null` / `{}`) the per-column filters from `mk-table`'s header filter row — bind `(filtersChange)="ds.setFilters($event)"` and turn the table's `clientFilter` off. Empty entries are dropped before the request; nothing left is sent as `null`. Resets to page 1 and loads at once (the table already debounces nothing, so debounce the fetcher if your API needs it). A no-op when unchanged. |
 | `refresh(): void` | Re-run the current request immediately (e.g. after a mutation). Flushes a pending debounced filter, since the request reads the live filter value. |
+| `reload(): void` | Back to page 1 and load — the "filters changed outside the search box" case. Unlike `setPage`, this loads even when already on page 1, so callers no longer need `page() === 1 ? refresh() : setPage(1)`. |
 | `connectSort(sort: MkSort): void` | Pipe an `mkSort` directive's changes into `setSort`. Idempotent per directive instance; all subscriptions are released by `destroy`. |
 | `destroy(): void` | Cancel pending work: the debounce timer, any in-flight Observable fetch, and `connectSort` subscriptions. In-flight Promise settles are discarded. Called automatically on host destroy when created in an injection context. |
 
@@ -8683,6 +8684,23 @@ Properties:
 | `query` | `Signal<MkQueryGroup \| null>` | Current structured query, or `null`. |
 | `filters` | `Signal<MkTableFilters \| null>` | Current per-column filters, or `null`. |
 | `empty` | `Signal<boolean>` | True when a settled load reported no rows at all. |
+
+### mkClientFetcher (function)
+
+Import: `import { mkClientFetcher } from '@mk-kit/ui/table';`
+
+In-memory `MkDataFetcher`: filter, sort and slice a full row set that
+the app already holds (an API that returns everything). Lets a client-side
+list use `MkTableDataSource` — same pager, footer and API as a
+server-paged one — without hand-rolling `filtered/sorted/paged` computeds.
+
+```ts
+ds = new MkTableDataSource(mkClientFetcher(() => this.rows()));
+```
+
+```ts
+function mkClientFetcher<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): MkDataFetcher<T>
+```
 
 ### mkCompactFilters (function)
 
@@ -8743,6 +8761,19 @@ Members:
 | `row` | `T` | The edited row. |
 | `key` | `string` | The column key that was edited. |
 | `value` | `string` | The new (string) value the user entered. |
+
+### MkClientFetcherOptions (interface)
+
+Import: `import { MkClientFetcherOptions } from '@mk-kit/ui/table';`
+
+Options for `mkClientFetcher`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `match`? | `((row: T, query: string) => boolean) \| undefined` | Row matcher for `setFilter` text; default: case-insensitive substring over every string/number field. |
+| `compare`? | `((a: T, b: T, sort: MkSortState) => number) \| undefined` | Comparator for an active sort; default: locale compare on `row[sort.active]`. |
 
 ### MkColumnResize (interface)
 
@@ -9090,9 +9121,171 @@ for `number` and `date`. Empty strings and `null` mean "no filter".
 type MkTableFilters = Record<string, unknown>;
 ```
 
+## @mk-kit/ui/status
+
+6 exports. `import { … } from '@mk-kit/ui/status';`
+
+### MkBadge (component)
+
+Selector: `mk-badge`
+
+Docs: https://mk-kit.dev/components/badges-avatars
+
+Import: `import { MkBadge } from '@mk-kit/ui/status';`
+
+Badge — a compact status pill, typically for counts or short state labels.
+Set `dot` for a minimal notification indicator with no text.
+
+```html
+<mk-badge tone="success">Active</mk-badge>
+<mk-badge tone="danger" variant="solid">3</mk-badge>
+<mk-badge tone="danger" dot aria-label="Unread messages" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `tone` | `MkTone` | `'primary'` | Semantic color tone. |
+| `variant` | `MkBadgeVariant` | `'soft'` | Visual treatment. |
+| `size` | `MkSize` | `'md'` | Size scale. |
+| `dot` | `boolean` | `false` | Render as a tiny dot (no text) for notification indicators. |
+
+### MkEmptyState (component)
+
+Selector: `mk-empty-state`
+
+Docs: https://mk-kit.dev/components/empty-timeline
+
+Import: `import { MkEmptyState } from '@mk-kit/ui/status';`
+
+EmptyState — a centered placeholder for "nothing here yet" situations: empty
+tables, no search results, a fresh dashboard, a cleared inbox. Provide a
+`title` (and usually a `description`), an `icon` or projected media, and
+call-to-action buttons via the actions slot.
+
+Slots: `[mkEmptyStateMedia]` (custom illustration, overrides `icon`), default
+content (extra body), `[mkEmptyStateActions]` (buttons).
+
+```html
+<mk-empty-state icon="search" title="No results"
+  description="Try adjusting your filters.">
+  <button mkButton mkEmptyStateActions variant="outline">Clear filters</button>
+</mk-empty-state>
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `icon` | `string` | `''` | Name of a registered icon shown above the title (ignored if media is projected). |
+| `title` | `string` | `''` | Main heading, e.g. "No invoices yet". |
+| `description` | `string` | `''` | Supporting sentence under the title. |
+| `size` | `MkSize` | `'md'` | Overall scale of the block. |
+
+### MkSpinner (component)
+
+Selector: `mk-spinner`
+
+Docs: https://mk-kit.dev/components/loading
+
+Import: `import { MkSpinner } from '@mk-kit/ui/status';`
+
+Spinner — a circular indeterminate loading indicator. Exposes `role="status"`
+with a visually-hidden label so assistive tech announces the loading state.
+The animation slows under `prefers-reduced-motion`.
+
+```html
+<mk-spinner />
+<mk-spinner size="lg" tone="neutral" label="Fetching results" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `size` | `MkSize` | `'md'` | Size scale. |
+| `tone` | `MkTone` | `'primary'` | Semantic color tone. |
+| `label` | `string` | `this.i18n.loading` | Visually-hidden status label announced to screen readers. |
+
+### MkBadgeOverlay (directive)
+
+Selector: `[mkBadgeOverlay]`
+
+Docs: https://mk-kit.dev/components/badges-avatars
+
+Import: `import { MkBadgeOverlay } from '@mk-kit/ui/status';`
+
+Badge overlay — anchors a small badge (count, dot or short text) to a corner
+of ANY element: an icon button, an avatar, a tab label. The host stays a
+single tab stop; the badge is a decorative, non-focusable child.
+
+- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.
+- `mkBadgeOverlayDot` renders a textless dot ("something is new").
+- `mkBadgeOverlayAriaLabel` is the screen-reader text ("3 unread"). It is
+  rendered in a visually hidden span and wired to the host with
+  `aria-describedby`, so it is announced after the host's own name even
+  when the host has an `aria-label`. When it is given, the visible badge is
+  `aria-hidden` so the count is not read twice.
+- Positions use logical insets, so `top-end` sits at the top-right in LTR
+  and the top-left in RTL.
+
+The badge is painted with the global `.mk-badge-overlay` styles from
+`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.
+
+```html
+<button mkButton iconOnly aria-label="Notifications"
+        [mkBadgeOverlay]="unread()" mkBadgeOverlayTone="danger"
+        [mkBadgeOverlayAriaLabel]="unread() + ' unread'">
+  <mk-icon name="bell" />
+</button>
+
+<mk-avatar name="Ada Lovelace" mkBadgeOverlay mkBadgeOverlayDot
+           mkBadgeOverlayTone="success" mkBadgeOverlayPosition="bottom-end" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `mkBadgeOverlay` | `string \| number \| null \| undefined` | `null` | Badge content — a count or a short label. `null` / empty hides the badge unless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers so `mkBadgeOverlay="120"` also collapses to `99+`. |
+| `mkBadgeOverlayPosition` | `MkBadgeOverlayPosition` | `'top-end'` | Corner the badge is anchored to (logical: `end` flips in RTL). |
+| `mkBadgeOverlayTone` | `MkTone` | `'primary'` | Semantic color tone (same scale as `mk-badge`). |
+| `mkBadgeOverlayDot` | `boolean` | `false` | Render a textless dot instead of the content. |
+| `mkBadgeOverlayMax` | `number` | `99` | Numbers above this render as `<max>+`. `0` disables the cap. |
+| `mkBadgeOverlayHidden` | `boolean` | `false` | Hide the badge while keeping the directive (and its aria wiring) in place. |
+| `mkBadgeOverlayAriaLabel` | `string` | `''` | Screen-reader text for the badge, e.g. `"3 unread"`. Announced as the host's description; the visible badge becomes `aria-hidden`. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `label` | `Signal<string>` | The text painted in the badge (`''` in dot mode). |
+| `visible` | `Signal<boolean>` | Whether the badge is currently rendered. |
+
+### MkBadgeOverlayPosition (type)
+
+Import: `import { MkBadgeOverlayPosition } from '@mk-kit/ui/status';`
+
+Corner of the host an `MkBadgeOverlay` is anchored to.
+
+```ts
+type MkBadgeOverlayPosition = | 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start';
+```
+
+### MkBadgeVariant (type)
+
+Import: `import { MkBadgeVariant } from '@mk-kit/ui/status';`
+
+Visual treatment for a `MkBadge`.
+
+```ts
+type MkBadgeVariant = 'solid' | 'soft' | 'outline';
+```
+
 ## @mk-kit/ui/data
 
-131 exports. `import { … } from '@mk-kit/ui/data';`
+127 exports. `import { … } from '@mk-kit/ui/data';`
 
 ### MkAvatar (component)
 
@@ -9785,45 +9978,6 @@ Methods:
 | --- | --- |
 | `expandAll(): void` | Expand every object/array node. |
 | `collapseAll(): void` | Collapse everything (the root stays visible). |
-
-### MkKanban (component)
-
-Selector: `mk-kanban`
-
-Docs: https://mk-kit.dev/components/data
-
-Import: `import { MkKanban } from '@mk-kit/ui/data';`
-
-Kanban board — a horizontal row of columns whose cards can be dragged and
-reordered within a column or transferred between columns. Built on the dnd
-group's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both
-pointer and keyboard dragging (WCAG 2.1.1) for free.
-
-Bind `columns` two-way; the model is updated immutably on each drop. Project
-an `<ng-template>` to render custom card content — it receives the card as
-`$implicit` and the owning column as `column`:
-
-```html
-<mk-kanban [(columns)]="board" (cardMoved)="onMoved($event)">
-  <ng-template #cardTemplate let-card let-column="column">
-    <strong>{{ card.title }}</strong>
-  </ng-template>
-</mk-kanban>
-```
-
-Inputs:
-
-| Name | Type | Default | Description |
-| --- | --- | --- | --- |
-| `columns` (two-way) | `MkKanbanColumn[]` | `[]` | The board's columns and their cards (two-way). Updated on every drop. |
-| `disabled` | `boolean` | `false` | Disable all dragging on the board. |
-
-Outputs:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `columnsChange` | `MkKanbanColumn[]` | Emits when `columns` changes (two-way binding). |
-| `cardMoved` | `MkKanbanCardMovedEvent` | Emitted after the model is updated when a card is moved. |
 
 ### MkLineChart (component)
 
@@ -11176,50 +11330,6 @@ Members:
 | `path` | `string` | Unique path (e.g. `$.users[0].name`) used for expansion tracking. |
 | `depth` | `number` | Nesting depth (root = 0). |
 
-### MkKanbanCard (interface)
-
-Import: `import { MkKanbanCard } from '@mk-kit/ui/data';`
-
-A single draggable card on a `MkKanban` board.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `id` | `unknown` | Stable identity used for tracking and move events. |
-| `title` | `string` | Text shown by the default card renderer. |
-
-### MkKanbanCardMovedEvent (interface)
-
-Import: `import { MkKanbanCardMovedEvent } from '@mk-kit/ui/data';`
-
-Emitted by `MkKanban` after a card has been moved (between or within
-columns) and the two-way `columns` model has been updated.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `card` | `MkKanbanCard` | The card that was moved. |
-| `from` | `unknown` | `id` of the column the card came from. |
-| `to` | `unknown` | `id` of the column the card was dropped into. |
-| `fromIndex` | `number` | The card's index within the source column before the move. |
-| `toIndex` | `number` | The card's index within the destination column after the move. |
-
-### MkKanbanColumn (interface)
-
-Import: `import { MkKanbanColumn } from '@mk-kit/ui/data';`
-
-A column (bucket) of `MkKanbanCard`s on a `MkKanban` board.
-
-Members:
-
-| Name | Type | Description |
-| --- | --- | --- |
-| `id` | `unknown` | Stable identity used for tracking and move events. |
-| `title` | `string` | Heading shown in the column header and used as its aria-label. |
-| `cards` | `MkKanbanCard[]` | The ordered cards contained in this column. |
-
 ### MkLogToken (interface)
 
 Import: `import { MkLogToken } from '@mk-kit/ui/data';`
@@ -11668,6 +11778,93 @@ Visual treatment for a `MkTag`.
 ```ts
 type MkTagVariant = 'solid' | 'soft' | 'outline';
 ```
+
+## @mk-kit/ui/kanban
+
+4 exports. `import { … } from '@mk-kit/ui/kanban';`
+
+### MkKanban (component)
+
+Selector: `mk-kanban`
+
+Docs: https://mk-kit.dev/components/data
+
+Import: `import { MkKanban } from '@mk-kit/ui/kanban';`
+
+Kanban board — a horizontal row of columns whose cards can be dragged and
+reordered within a column or transferred between columns. Built on the dnd
+group's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both
+pointer and keyboard dragging (WCAG 2.1.1) for free.
+
+Bind `columns` two-way; the model is updated immutably on each drop. Project
+an `<ng-template>` to render custom card content — it receives the card as
+`$implicit` and the owning column as `column`:
+
+```html
+<mk-kanban [(columns)]="board" (cardMoved)="onMoved($event)">
+  <ng-template #cardTemplate let-card let-column="column">
+    <strong>{{ card.title }}</strong>
+  </ng-template>
+</mk-kanban>
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `columns` (two-way) | `MkKanbanColumn[]` | `[]` | The board's columns and their cards (two-way). Updated on every drop. |
+| `disabled` | `boolean` | `false` | Disable all dragging on the board. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `columnsChange` | `MkKanbanColumn[]` | Emits when `columns` changes (two-way binding). |
+| `cardMoved` | `MkKanbanCardMovedEvent` | Emitted after the model is updated when a card is moved. |
+
+### MkKanbanCard (interface)
+
+Import: `import { MkKanbanCard } from '@mk-kit/ui/kanban';`
+
+A single draggable card on a `MkKanban` board.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `unknown` | Stable identity used for tracking and move events. |
+| `title` | `string` | Text shown by the default card renderer. |
+
+### MkKanbanCardMovedEvent (interface)
+
+Import: `import { MkKanbanCardMovedEvent } from '@mk-kit/ui/kanban';`
+
+Emitted by `MkKanban` after a card has been moved (between or within
+columns) and the two-way `columns` model has been updated.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `card` | `MkKanbanCard` | The card that was moved. |
+| `from` | `unknown` | `id` of the column the card came from. |
+| `to` | `unknown` | `id` of the column the card was dropped into. |
+| `fromIndex` | `number` | The card's index within the source column before the move. |
+| `toIndex` | `number` | The card's index within the destination column after the move. |
+
+### MkKanbanColumn (interface)
+
+Import: `import { MkKanbanColumn } from '@mk-kit/ui/kanban';`
+
+A column (bucket) of `MkKanbanCard`s on a `MkKanban` board.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `unknown` | Stable identity used for tracking and move events. |
+| `title` | `string` | Heading shown in the column header and used as its aria-label. |
+| `cards` | `MkKanbanCard[]` | The ordered cards contained in this column. |
 
 ## @mk-kit/ui/feedback
 

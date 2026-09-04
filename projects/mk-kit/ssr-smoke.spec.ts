@@ -73,7 +73,7 @@ import { MkScrollArea } from '@mk-kit/ui/navigation/scroll-area';
 import { MkBackToTop } from '@mk-kit/ui/navigation/back-to-top';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkTooltip } from '@mk-kit/ui/feedback/tooltip';
-import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/data/badge';
+import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/status';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
 import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';

@@ -4,6 +4,33 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.53.0] — 2026-09-04
+
+### Changed
+
+- **Spinner, badge and empty-state moved to a new `@mk-kit/ui/status` entry.**
+  `MkDialogService`/`MkToastService` (`feedback`) used them from
+  `@mk-kit/ui/data`, so any app that injects the dialog or toast service
+  eagerly — every app with an error interceptor — carried the whole data group
+  (charts, viewers, kanban and, through kanban, `dnd`) in its initial bundle:
+  ~108 kB of `data` + 19.5 kB of `dnd` measured in a code-split admin app.
+  `feedback` now imports the three from `status`; `@mk-kit/ui/data` re-exports
+  them, so existing imports keep working.
+- **Kanban moved to its own `@mk-kit/ui/kanban` entry** and is *not*
+  re-exported from `data` any more — it is the only data component that needs
+  `dnd`. Import `MkKanban` from `@mk-kit/ui/kanban` (or the root barrel).
+
+### Added
+
+- **`MkTableDataSource.reload()`** — page 1 + load, even when already on page
+  1. The "filters changed outside the search box" case no longer needs
+  `page() === 1 ? refresh() : setPage(1)`.
+- **`mkClientFetcher(rows, opts?)`** (`@mk-kit/ui/table`) — an in-memory
+  `MkDataFetcher` (substring filter over string/number fields, locale sort on
+  the active column, slice) so lists whose API returns everything can use the
+  same data source, pager and chrome as server-paged ones. Override `match` /
+  `compare` for custom rules.
+
 ## [0.52.1] — 2026-09-03
 
 ### Fixed

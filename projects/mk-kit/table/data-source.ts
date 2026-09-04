@@ -325,6 +325,16 @@ export class MkTableDataSource<T> {
   }
 
   /**
+   * Back to page 1 and load — the "filters changed outside the search box"
+   * case. Unlike {@link setPage}, this loads even when already on page 1, so
+   * callers no longer need `page() === 1 ? refresh() : setPage(1)`.
+   */
+  reload(): void {
+    this._page.set(1);
+    this.load();
+  }
+
+  /**
    * Pipe an `mkSort` directive's changes into {@link setSort}. Idempotent per
    * directive instance; all subscriptions are released by {@link destroy}.
    */
@@ -441,4 +451,56 @@ export class MkTableDataSource<T> {
     if (this.activeSub === sub) this.activeSub = null;
     sub.unsubscribe();
   }
+}
+
+/** Options for {@link mkClientFetcher}. */
+export interface MkClientFetcherOptions<T> {
+  /** Row matcher for `setFilter` text; default: case-insensitive substring over every string/number field. */
+  match?: (row: T, query: string) => boolean;
+  /** Comparator for an active sort; default: locale compare on `row[sort.active]`. */
+  compare?: (a: T, b: T, sort: MkSortState) => number;
+}
+
+/**
+ * In-memory {@link MkDataFetcher}: filter, sort and slice a full row set that
+ * the app already holds (an API that returns everything). Lets a client-side
+ * list use {@link MkTableDataSource} — same pager, footer and API as a
+ * server-paged one — without hand-rolling `filtered/sorted/paged` computeds.
+ *
+ * ```ts
+ * ds = new MkTableDataSource(mkClientFetcher(() => this.rows()));
+ * ```
+ */
+export function mkClientFetcher<T>(
+  rows: () => readonly T[],
+  opts: MkClientFetcherOptions<T> = {},
+): (req: MkDataRequest) => Promise<MkDataPage<T>> {
+  const match =
+    opts.match ??
+    ((row: T, q: string) =>
+      Object.values(row as Record<string, unknown>).some((v) =>
+        (typeof v === 'string' || typeof v === 'number') &&
+        String(v).toLowerCase().includes(q),
+      ));
+  const compare =
+    opts.compare ??
+    ((a: T, b: T, sort: MkSortState) => {
+      const av = (a as Record<string, unknown>)[sort.active];
+      const bv = (b as Record<string, unknown>)[sort.active];
+      if (av == null && bv == null) return 0;
+      if (av == null) return 1;
+      if (bv == null) return -1;
+      if (typeof av === 'number' && typeof bv === 'number') return av - bv;
+      return String(av).localeCompare(String(bv), undefined, { numeric: true, sensitivity: 'base' });
+    });
+  return (req) => {
+    const q = req.filter.trim().toLowerCase();
+    let out = q ? rows().filter((r) => match(r, q)) : [...rows()];
+    if (req.sort && req.sort.direction !== 'none') {
+      const dir = req.sort.direction === 'desc' ? -1 : 1;
+      out = [...out].sort((a, b) => dir * compare(a, b, req.sort as MkSortState));
+    }
+    const start = (req.page - 1) * req.pageSize;
+    return Promise.resolve({ rows: out.slice(start, start + req.pageSize), total: out.length });
+  };
 }

@@ -6,6 +6,7 @@ import {
   MkDataPage,
   MkDataRequest,
   MkTableDataSource,
+  mkClientFetcher,
 } from './data-source';
 import { MkSort } from './sort/sort';
 import { MkSortHeader } from './sort/sort-header';
@@ -635,5 +636,70 @@ describe('MkTableDataSource', () => {
       await drain();
       expect(ds.rows()).toEqual([]); // resolution after host destroy ignored
     });
+  });
+});
+
+describe('MkTableDataSource.reload()', () => {
+  it('goes back to page 1 and loads even when already there', async () => {
+    const requests: MkDataRequest[] = [];
+    const ds = new MkTableDataSource<Row>(async (req) => {
+      requests.push(req);
+      return pageOf([1]);
+    });
+    await drain();
+    ds.setPage(3);
+    await drain();
+    ds.reload();
+    await drain();
+    expect(requests.map((r) => r.page)).toEqual([1, 3, 1]);
+    ds.reload();
+    await drain();
+    expect(requests.length).toBe(4); // setPage(1) would have been a no-op here
+    ds.destroy();
+  });
+});
+
+describe('mkClientFetcher', () => {
+  const rows = [
+    { id: 3, name: 'Żurek', price: 18 },
+    { id: 1, name: 'Ramen', price: 34 },
+    { id: 2, name: 'Gyoza', price: 22 },
+    { id: 4, name: 'ramen mini', price: 20 },
+  ];
+  const fetch = mkClientFetcher(() => rows);
+  const req = (over: Partial<MkDataRequest> = {}): MkDataRequest => ({
+    page: 1, pageSize: 10, sort: null, filter: '', query: null, filters: null, ...over,
+  });
+
+  it('slices pages and reports the full total', async () => {
+    const p1 = await fetch(req({ pageSize: 3 }));
+    const p2 = await fetch(req({ page: 2, pageSize: 3 }));
+    expect(p1.rows.map((r) => r.id)).toEqual([3, 1, 2]);
+    expect(p1.total).toBe(4);
+    expect(p2.rows.map((r) => r.id)).toEqual([4]);
+  });
+
+  it('filters case-insensitively across string and number fields', async () => {
+    expect((await fetch(req({ filter: 'RAMEN' }))).rows.map((r) => r.id)).toEqual([1, 4]);
+    expect((await fetch(req({ filter: '22' }))).rows.map((r) => r.id)).toEqual([2]);
+    expect((await fetch(req({ filter: 'nope' }))).total).toBe(0);
+  });
+
+  it('sorts the WHOLE set by the active column, both directions, and ignores a cleared sort', async () => {
+    const asc = await fetch(req({ sort: { active: 'price', direction: 'asc' }, pageSize: 2 }));
+    expect(asc.rows.map((r) => r.id)).toEqual([3, 4]);
+    const desc = await fetch(req({ sort: { active: 'name', direction: 'desc' } }));
+    expect(desc.rows.map((r) => r.name)).toEqual(['Żurek', 'ramen mini', 'Ramen', 'Gyoza']);
+    const none = await fetch(req({ sort: { active: 'name', direction: 'none' } }));
+    expect(none.rows.map((r) => r.id)).toEqual([3, 1, 2, 4]);
+  });
+
+  it('honours custom match and compare', async () => {
+    const f = mkClientFetcher(() => rows, {
+      match: (r, q) => r.name.toLowerCase().startsWith(q),
+      compare: (a, b) => a.id - b.id,
+    });
+    expect((await f(req({ filter: 'g' }))).rows.map((r) => r.id)).toEqual([2]);
+    expect((await f(req({ sort: { active: 'anything', direction: 'asc' } }))).rows.map((r) => r.id)).toEqual([1, 2, 3, 4]);
   });
 });
