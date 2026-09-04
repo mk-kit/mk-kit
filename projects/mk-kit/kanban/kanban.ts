@@ -2,10 +2,13 @@ import { NgTemplateOutlet } from '@angular/common';
 import {
   ChangeDetectionStrategy,
   Component,
+  Directive,
   TemplateRef,
   booleanAttribute,
   computed,
   contentChild,
+  contentChildren,
+  inject,
   input,
   model,
   output,
@@ -54,6 +57,44 @@ export interface MkKanbanCardMovedEvent {
   toIndex: number;
 }
 
+/** Context handed to the column header / footer templates. */
+export interface MkKanbanColumnContext {
+  /** The column being rendered. */
+  $implicit: MkKanbanColumn;
+  /** Its position in `columns`. */
+  index: number;
+  /** `column.cards.length`, for a count badge. */
+  count: number;
+}
+
+/**
+ * Marks the projected card renderer explicitly:
+ * `<ng-template mkKanbanCard let-card let-column="column">`. Without it the
+ * first plain `<ng-template>` inside `<mk-kanban>` is used, as before 0.54.
+ */
+@Directive({ selector: 'ng-template[mkKanbanCard]' })
+export class MkKanbanCardDef {
+  readonly template = inject<TemplateRef<unknown>>(TemplateRef);
+}
+
+/**
+ * Replaces the default column header (title + count):
+ * `<ng-template mkKanbanColumnHeader let-column let-count="count">`.
+ */
+@Directive({ selector: 'ng-template[mkKanbanColumnHeader]' })
+export class MkKanbanColumnHeaderDef {
+  readonly template = inject<TemplateRef<MkKanbanColumnContext>>(TemplateRef);
+}
+
+/**
+ * Rendered under each column's card list — a "quick add" input, say:
+ * `<ng-template mkKanbanColumnFooter let-column>`.
+ */
+@Directive({ selector: 'ng-template[mkKanbanColumnFooter]' })
+export class MkKanbanColumnFooterDef {
+  readonly template = inject<TemplateRef<MkKanbanColumnContext>>(TemplateRef);
+}
+
 /**
  * Kanban board — a horizontal row of columns whose cards can be dragged and
  * reordered within a column or transferred between columns. Built on the dnd
@@ -62,12 +103,21 @@ export interface MkKanbanCardMovedEvent {
  *
  * Bind `columns` two-way; the model is updated immutably on each drop. Project
  * an `<ng-template>` to render custom card content — it receives the card as
- * `$implicit` and the owning column as `column`:
+ * `$implicit` and the owning column as `column`. Column headers and footers
+ * take their own templates (`mkKanbanColumnHeader` / `mkKanbanColumnFooter`,
+ * context `{ $implicit: column, index, count }`):
  *
  * ```html
  * <mk-kanban [(columns)]="board" (cardMoved)="onMoved($event)">
- *   <ng-template #cardTemplate let-card let-column="column">
+ *   <ng-template mkKanbanColumnHeader let-column let-count="count">
+ *     <strong>{{ column.title }}</strong> {{ count }}
+ *     <button (click)="rename(column)">Rename</button>
+ *   </ng-template>
+ *   <ng-template mkKanbanCard let-card let-column="column">
  *     <strong>{{ card.title }}</strong>
+ *   </ng-template>
+ *   <ng-template mkKanbanColumnFooter let-column>
+ *     <button (click)="add(column)">+ Card</button>
  *   </ng-template>
  * </mk-kanban>
  * ```
@@ -90,8 +140,27 @@ export class MkKanban {
   /** Emitted after the model is updated when a card is moved. */
   readonly cardMoved = output<MkKanbanCardMovedEvent>();
 
-  /** Optional consumer-projected card renderer (`$implicit` = card). */
-  protected readonly cardTemplate = contentChild<TemplateRef<unknown>>(TemplateRef);
+  private readonly cardDef = contentChild(MkKanbanCardDef);
+  private readonly headerDef = contentChild(MkKanbanColumnHeaderDef);
+  private readonly footerDef = contentChild(MkKanbanColumnFooterDef);
+  /** Every projected template, for the pre-0.54 "first plain template is the card" rule. */
+  private readonly templates = contentChildren(TemplateRef);
+
+  /** Consumer-projected card renderer: `[mkKanbanCard]`, else the first template that is not a header/footer. */
+  protected readonly cardTemplate = computed<TemplateRef<unknown> | undefined>(() => {
+    const explicit = this.cardDef()?.template;
+    if (explicit) return explicit;
+    // A query and a directive's injected TemplateRef are different instances
+    // of the same template — compare their anchor nodes.
+    const taken = new Set(
+      [this.headerDef(), this.footerDef()].map((d) => d?.template.elementRef.nativeElement as Node | undefined),
+    );
+    return this.templates().find((t) => !taken.has(t.elementRef.nativeElement as Node));
+  });
+  /** Optional column header renderer (replaces title + count). */
+  protected readonly headerTemplate = computed(() => this.headerDef()?.template);
+  /** Optional column footer renderer (under the card list). */
+  protected readonly footerTemplate = computed(() => this.footerDef()?.template);
 
   /** Board-scoped prefix so this board's drop-list ids never collide. */
   private readonly boardId = mkUniqueId('mk-kanban');

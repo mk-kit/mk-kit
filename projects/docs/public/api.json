@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.53.0",
+ "version": "0.54.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -17792,7 +17792,7 @@
    "exports": [
     {
      "name": "MkKanban",
-     "description": "Kanban board — a horizontal row of columns whose cards can be dragged and\nreordered within a column or transferred between columns. Built on the dnd\ngroup's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both\npointer and keyboard dragging (WCAG 2.1.1) for free.\n\nBind `columns` two-way; the model is updated immutably on each drop. Project\nan `<ng-template>` to render custom card content — it receives the card as\n`$implicit` and the owning column as `column`:\n\n```html\n<mk-kanban [(columns)]=\"board\" (cardMoved)=\"onMoved($event)\">\n  <ng-template #cardTemplate let-card let-column=\"column\">\n    <strong>{{ card.title }}</strong>\n  </ng-template>\n</mk-kanban>\n```",
+     "description": "Kanban board — a horizontal row of columns whose cards can be dragged and\nreordered within a column or transferred between columns. Built on the dnd\ngroup's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both\npointer and keyboard dragging (WCAG 2.1.1) for free.\n\nBind `columns` two-way; the model is updated immutably on each drop. Project\nan `<ng-template>` to render custom card content — it receives the card as\n`$implicit` and the owning column as `column`. Column headers and footers\ntake their own templates (`mkKanbanColumnHeader` / `mkKanbanColumnFooter`,\ncontext `{ $implicit: column, index, count }`):\n\n```html\n<mk-kanban [(columns)]=\"board\" (cardMoved)=\"onMoved($event)\">\n  <ng-template mkKanbanColumnHeader let-column let-count=\"count\">\n    <strong>{{ column.title }}</strong> {{ count }}\n    <button (click)=\"rename(column)\">Rename</button>\n  </ng-template>\n  <ng-template mkKanbanCard let-card let-column=\"column\">\n    <strong>{{ card.title }}</strong>\n  </ng-template>\n  <ng-template mkKanbanColumnFooter let-column>\n    <button (click)=\"add(column)\">+ Card</button>\n  </ng-template>\n</mk-kanban>\n```",
      "file": "projects/mk-kit/kanban/kanban.ts",
      "kind": "component",
      "selector": "mk-kanban",
@@ -17831,6 +17831,51 @@
      "properties": [],
      "queries": [],
      "docs": "/components/data"
+    },
+    {
+     "name": "MkKanbanCardDef",
+     "description": "Marks the projected card renderer explicitly:\n`<ng-template mkKanbanCard let-card let-column=\"column\">`. Without it the\nfirst plain `<ng-template>` inside `<mk-kanban>` is used, as before 0.54.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanCard]",
+     "selectors": [
+      "mkKanbanCard"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
+    },
+    {
+     "name": "MkKanbanColumnFooterDef",
+     "description": "Rendered under each column's card list — a \"quick add\" input, say:\n`<ng-template mkKanbanColumnFooter let-column>`.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanColumnFooter]",
+     "selectors": [
+      "mkKanbanColumnFooter"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
+    },
+    {
+     "name": "MkKanbanColumnHeaderDef",
+     "description": "Replaces the default column header (title + count):\n`<ng-template mkKanbanColumnHeader let-column let-count=\"count\">`.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanColumnHeader]",
+     "selectors": [
+      "mkKanbanColumnHeader"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": []
     },
     {
      "name": "MkKanbanCard",
@@ -17903,6 +17948,29 @@
        "name": "cards",
        "type": "MkKanbanCard[]",
        "description": "The ordered cards contained in this column."
+      }
+     ]
+    },
+    {
+     "name": "MkKanbanColumnContext",
+     "description": "Context handed to the column header / footer templates.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "$implicit",
+       "type": "MkKanbanColumn",
+       "description": "The column being rendered."
+      },
+      {
+       "name": "index",
+       "type": "number",
+       "description": "Its position in `columns`."
+      },
+      {
+       "name": "count",
+       "type": "number",
+       "description": "`column.cards.length`, for a count badge."
       }
      ]
     }

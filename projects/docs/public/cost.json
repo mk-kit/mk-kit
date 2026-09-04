@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.53.0",
+ "version": "0.54.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,9 +9,9 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3714118,
-  "min": 1683810,
-  "brotli": 314908,
+  "raw": 3721023,
+  "min": 1686001,
+  "brotli": 315325,
   "budgetKiB": 3752
  },
  "entries": [
@@ -2345,9 +2345,9 @@
    "name": "kanban",
    "import": "@mk-kit/ui/kanban",
    "file": "mk-kit-ui-kanban.mjs",
-   "raw": 14014,
-   "min": 5768,
-   "brotli": 1843,
+   "raw": 20919,
+   "min": 7959,
+   "brotli": 2260,
    "budgetKiB": null,
    "items": [
     {
@@ -2355,8 +2355,29 @@
      "kind": "component",
      "selector": "mk-kanban",
      "docs": "/components/data",
-     "own": 1841,
-     "size": 11560
+     "own": 2242,
+     "size": 11880
+    },
+    {
+     "name": "MkKanbanColumnFooterDef",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanColumnFooter]",
+     "own": 268,
+     "size": 542
+    },
+    {
+     "name": "MkKanbanColumnHeaderDef",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanColumnHeader]",
+     "own": 268,
+     "size": 541
+    },
+    {
+     "name": "MkKanbanCardDef",
+     "kind": "directive",
+     "selector": "ng-template[mkKanbanCard]",
+     "own": 266,
+     "size": 538
     }
    ]
   },
