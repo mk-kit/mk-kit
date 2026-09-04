@@ -18,7 +18,7 @@ import {
   type ComponentRef,
 } from '@angular/core';
 import { MK_I18N } from '@mk-kit/ui/core';
-import { MkSpinner } from '@mk-kit/ui/data';
+import { MkSpinner } from '@mk-kit/ui/status';
 
 /**
  * The translucent panel with a spinner that `mkBlockUi` and

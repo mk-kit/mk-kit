@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.52.1",
+ "version": "0.53.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -13255,6 +13255,11 @@
        "description": "Re-run the current request immediately (e.g. after a mutation). Flushes a\npending debounced filter, since the request reads the live filter value."
       },
       {
+       "name": "reload",
+       "signature": "(): void",
+       "description": "Back to page 1 and load — the \"filters changed outside the search box\"\ncase. Unlike `setPage`, this loads even when already on page 1, so\ncallers no longer need `page() === 1 ? refresh() : setPage(1)`."
+      },
+      {
        "name": "connectSort",
        "signature": "(sort: MkSort): void",
        "description": "Pipe an `mkSort` directive's changes into `setSort`. Idempotent per\ndirective instance; all subscriptions are released by `destroy`."
@@ -13336,6 +13341,15 @@
      "docs": "/components/table#data-source"
     },
     {
+     "name": "mkClientFetcher",
+     "description": "In-memory `MkDataFetcher`: filter, sort and slice a full row set that\nthe app already holds (an API that returns everything). Lets a client-side\nlist use `MkTableDataSource` — same pager, footer and API as a\nserver-paged one — without hand-rolling `filtered/sorted/paged` computeds.\n\n```ts\nds = new MkTableDataSource(mkClientFetcher(() => this.rows()));\n```",
+     "file": "projects/mk-kit/table/data-source.ts",
+     "kind": "function",
+     "signatures": [
+      "<T>(rows: () => readonly T[], opts?: MkClientFetcherOptions<T>): (req: MkDataRequest) => Promise<MkDataPage<T>>"
+     ]
+    },
+    {
      "name": "mkCompactFilters",
      "description": "Drop the empty entries of a filter map (`null` when nothing is left).",
      "file": "projects/mk-kit/table/table/table.ts",
@@ -13392,6 +13406,27 @@
        "name": "value",
        "type": "string",
        "description": "The new (string) value the user entered."
+      }
+     ]
+    },
+    {
+     "name": "MkClientFetcherOptions",
+     "description": "Options for `mkClientFetcher`.",
+     "file": "projects/mk-kit/table/data-source.ts",
+     "kind": "interface",
+     "typeParams": "<T>",
+     "members": [
+      {
+       "name": "match",
+       "type": "((row: T, query: string) => boolean) | undefined",
+       "description": "Row matcher for `setFilter` text; default: case-insensitive substring over every string/number field.",
+       "optional": true
+      },
+      {
+       "name": "compare",
+       "type": "((a: T, b: T, sort: MkSortState) => number) | undefined",
+       "description": "Comparator for an active sort; default: locale compare on `row[sort.active]`.",
+       "optional": true
       }
      ]
     },
@@ -13954,6 +13989,215 @@
    ]
   },
   {
+   "name": "status",
+   "import": "@mk-kit/ui/status",
+   "exports": [
+    {
+     "name": "MkBadge",
+     "description": "Badge — a compact status pill, typically for counts or short state labels.\nSet `dot` for a minimal notification indicator with no text.\n\n```html\n<mk-badge tone=\"success\">Active</mk-badge>\n<mk-badge tone=\"danger\" variant=\"solid\">3</mk-badge>\n<mk-badge tone=\"danger\" dot aria-label=\"Unread messages\" />\n```",
+     "file": "projects/mk-kit/status/badge/badge.ts",
+     "kind": "component",
+     "selector": "mk-badge",
+     "selectors": [
+      "mk-badge"
+     ],
+     "inputs": [
+      {
+       "name": "tone",
+       "type": "MkTone",
+       "description": "Semantic color tone.",
+       "default": "'primary'"
+      },
+      {
+       "name": "variant",
+       "type": "MkBadgeVariant",
+       "description": "Visual treatment.",
+       "default": "'soft'"
+      },
+      {
+       "name": "size",
+       "type": "MkSize",
+       "description": "Size scale.",
+       "default": "'md'"
+      },
+      {
+       "name": "dot",
+       "type": "boolean",
+       "description": "Render as a tiny dot (no text) for notification indicators.",
+       "default": "false"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/badges-avatars"
+    },
+    {
+     "name": "MkEmptyState",
+     "description": "EmptyState — a centered placeholder for \"nothing here yet\" situations: empty\ntables, no search results, a fresh dashboard, a cleared inbox. Provide a\n`title` (and usually a `description`), an `icon` or projected media, and\ncall-to-action buttons via the actions slot.\n\nSlots: `[mkEmptyStateMedia]` (custom illustration, overrides `icon`), default\ncontent (extra body), `[mkEmptyStateActions]` (buttons).\n\n```html\n<mk-empty-state icon=\"search\" title=\"No results\"\n  description=\"Try adjusting your filters.\">\n  <button mkButton mkEmptyStateActions variant=\"outline\">Clear filters</button>\n</mk-empty-state>\n```",
+     "file": "projects/mk-kit/status/empty-state/empty-state.ts",
+     "kind": "component",
+     "selector": "mk-empty-state",
+     "selectors": [
+      "mk-empty-state"
+     ],
+     "inputs": [
+      {
+       "name": "icon",
+       "type": "string",
+       "description": "Name of a registered icon shown above the title (ignored if media is projected).",
+       "default": "''"
+      },
+      {
+       "name": "title",
+       "type": "string",
+       "description": "Main heading, e.g. \"No invoices yet\".",
+       "default": "''"
+      },
+      {
+       "name": "description",
+       "type": "string",
+       "description": "Supporting sentence under the title.",
+       "default": "''"
+      },
+      {
+       "name": "size",
+       "type": "MkSize",
+       "description": "Overall scale of the block.",
+       "default": "'md'"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/empty-timeline"
+    },
+    {
+     "name": "MkSpinner",
+     "description": "Spinner — a circular indeterminate loading indicator. Exposes `role=\"status\"`\nwith a visually-hidden label so assistive tech announces the loading state.\nThe animation slows under `prefers-reduced-motion`.\n\n```html\n<mk-spinner />\n<mk-spinner size=\"lg\" tone=\"neutral\" label=\"Fetching results\" />\n```",
+     "file": "projects/mk-kit/status/spinner/spinner.ts",
+     "kind": "component",
+     "selector": "mk-spinner",
+     "selectors": [
+      "mk-spinner"
+     ],
+     "inputs": [
+      {
+       "name": "size",
+       "type": "MkSize",
+       "description": "Size scale.",
+       "default": "'md'"
+      },
+      {
+       "name": "tone",
+       "type": "MkTone",
+       "description": "Semantic color tone.",
+       "default": "'primary'"
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "description": "Visually-hidden status label announced to screen readers.",
+       "default": "this.i18n.loading"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/loading"
+    },
+    {
+     "name": "MkBadgeOverlay",
+     "description": "Badge overlay — anchors a small badge (count, dot or short text) to a corner\nof ANY element: an icon button, an avatar, a tab label. The host stays a\nsingle tab stop; the badge is a decorative, non-focusable child.\n\n- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.\n- `mkBadgeOverlayDot` renders a textless dot (\"something is new\").\n- `mkBadgeOverlayAriaLabel` is the screen-reader text (\"3 unread\"). It is\n  rendered in a visually hidden span and wired to the host with\n  `aria-describedby`, so it is announced after the host's own name even\n  when the host has an `aria-label`. When it is given, the visible badge is\n  `aria-hidden` so the count is not read twice.\n- Positions use logical insets, so `top-end` sits at the top-right in LTR\n  and the top-left in RTL.\n\nThe badge is painted with the global `.mk-badge-overlay` styles from\n`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.\n\n```html\n<button mkButton iconOnly aria-label=\"Notifications\"\n        [mkBadgeOverlay]=\"unread()\" mkBadgeOverlayTone=\"danger\"\n        [mkBadgeOverlayAriaLabel]=\"unread() + ' unread'\">\n  <mk-icon name=\"bell\" />\n</button>\n\n<mk-avatar name=\"Ada Lovelace\" mkBadgeOverlay mkBadgeOverlayDot\n           mkBadgeOverlayTone=\"success\" mkBadgeOverlayPosition=\"bottom-end\" />\n```",
+     "file": "projects/mk-kit/status/badge/badge-overlay.ts",
+     "kind": "directive",
+     "selector": "[mkBadgeOverlay]",
+     "selectors": [
+      "mkBadgeOverlay"
+     ],
+     "inputs": [
+      {
+       "name": "mkBadgeOverlay",
+       "type": "string | number | null | undefined",
+       "description": "Badge content — a count or a short label. `null` / empty hides the badge\nunless `mkBadgeOverlayDot` is set. Numeric strings are treated as numbers\nso `mkBadgeOverlay=\"120\"` also collapses to `99+`.",
+       "default": "null"
+      },
+      {
+       "name": "mkBadgeOverlayPosition",
+       "type": "MkBadgeOverlayPosition",
+       "description": "Corner the badge is anchored to (logical: `end` flips in RTL).",
+       "default": "'top-end'"
+      },
+      {
+       "name": "mkBadgeOverlayTone",
+       "type": "MkTone",
+       "description": "Semantic color tone (same scale as `mk-badge`).",
+       "default": "'primary'"
+      },
+      {
+       "name": "mkBadgeOverlayDot",
+       "type": "boolean",
+       "description": "Render a textless dot instead of the content.",
+       "default": "false"
+      },
+      {
+       "name": "mkBadgeOverlayMax",
+       "type": "number",
+       "description": "Numbers above this render as `<max>+`. `0` disables the cap.",
+       "default": "99"
+      },
+      {
+       "name": "mkBadgeOverlayHidden",
+       "type": "boolean",
+       "description": "Hide the badge while keeping the directive (and its aria wiring) in place.",
+       "default": "false"
+      },
+      {
+       "name": "mkBadgeOverlayAriaLabel",
+       "type": "string",
+       "description": "Screen-reader text for the badge, e.g. `\"3 unread\"`. Announced as the\nhost's description; the visible badge becomes `aria-hidden`.",
+       "default": "''"
+      }
+     ],
+     "outputs": [],
+     "methods": [],
+     "properties": [
+      {
+       "name": "label",
+       "type": "Signal<string>",
+       "description": "The text painted in the badge (`''` in dot mode).",
+       "readonly": true
+      },
+      {
+       "name": "visible",
+       "type": "Signal<boolean>",
+       "description": "Whether the badge is currently rendered.",
+       "readonly": true
+      }
+     ],
+     "queries": [],
+     "docs": "/components/badges-avatars"
+    },
+    {
+     "name": "MkBadgeOverlayPosition",
+     "description": "Corner of the host an `MkBadgeOverlay` is anchored to.",
+     "file": "projects/mk-kit/status/badge/badge-overlay.ts",
+     "kind": "type",
+     "definition": "| 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start'"
+    },
+    {
+     "name": "MkBadgeVariant",
+     "description": "Visual treatment for a `MkBadge`.",
+     "file": "projects/mk-kit/status/badge/badge.ts",
+     "kind": "type",
+     "definition": "'solid' | 'soft' | 'outline'"
+    }
+   ]
+  },
+  {
    "name": "data",
    "import": "@mk-kit/ui/data",
    "exports": [
@@ -14038,7 +14282,7 @@
     {
      "name": "MkBadge",
      "description": "Badge — a compact status pill, typically for counts or short state labels.\nSet `dot` for a minimal notification indicator with no text.\n\n```html\n<mk-badge tone=\"success\">Active</mk-badge>\n<mk-badge tone=\"danger\" variant=\"solid\">3</mk-badge>\n<mk-badge tone=\"danger\" dot aria-label=\"Unread messages\" />\n```",
-     "file": "projects/mk-kit/data/badge/badge.ts",
+     "file": "projects/mk-kit/status/badge/badge.ts",
      "kind": "component",
      "selector": "mk-badge",
      "selectors": [
@@ -14741,7 +14985,7 @@
     {
      "name": "MkEmptyState",
      "description": "EmptyState — a centered placeholder for \"nothing here yet\" situations: empty\ntables, no search results, a fresh dashboard, a cleared inbox. Provide a\n`title` (and usually a `description`), an `icon` or projected media, and\ncall-to-action buttons via the actions slot.\n\nSlots: `[mkEmptyStateMedia]` (custom illustration, overrides `icon`), default\ncontent (extra body), `[mkEmptyStateActions]` (buttons).\n\n```html\n<mk-empty-state icon=\"search\" title=\"No results\"\n  description=\"Try adjusting your filters.\">\n  <button mkButton mkEmptyStateActions variant=\"outline\">Clear filters</button>\n</mk-empty-state>\n```",
-     "file": "projects/mk-kit/data/empty-state/empty-state.ts",
+     "file": "projects/mk-kit/status/empty-state/empty-state.ts",
      "kind": "component",
      "selector": "mk-empty-state",
      "selectors": [
@@ -15119,48 +15363,6 @@
        "description": "Collapse everything (the root stays visible)."
       }
      ],
-     "properties": [],
-     "queries": [],
-     "docs": "/components/data"
-    },
-    {
-     "name": "MkKanban",
-     "description": "Kanban board — a horizontal row of columns whose cards can be dragged and\nreordered within a column or transferred between columns. Built on the dnd\ngroup's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both\npointer and keyboard dragging (WCAG 2.1.1) for free.\n\nBind `columns` two-way; the model is updated immutably on each drop. Project\nan `<ng-template>` to render custom card content — it receives the card as\n`$implicit` and the owning column as `column`:\n\n```html\n<mk-kanban [(columns)]=\"board\" (cardMoved)=\"onMoved($event)\">\n  <ng-template #cardTemplate let-card let-column=\"column\">\n    <strong>{{ card.title }}</strong>\n  </ng-template>\n</mk-kanban>\n```",
-     "file": "projects/mk-kit/data/kanban/kanban.ts",
-     "kind": "component",
-     "selector": "mk-kanban",
-     "selectors": [
-      "mk-kanban"
-     ],
-     "inputs": [
-      {
-       "name": "columns",
-       "type": "MkKanbanColumn[]",
-       "description": "The board's columns and their cards (two-way). Updated on every drop.",
-       "model": true,
-       "default": "[]"
-      },
-      {
-       "name": "disabled",
-       "type": "boolean",
-       "description": "Disable all dragging on the board.",
-       "default": "false"
-      }
-     ],
-     "outputs": [
-      {
-       "name": "columnsChange",
-       "type": "MkKanbanColumn[]",
-       "description": "Emits when `columns` changes (two-way binding).",
-       "model": true
-      },
-      {
-       "name": "cardMoved",
-       "type": "MkKanbanCardMovedEvent",
-       "description": "Emitted after the model is updated when a card is moved."
-      }
-     ],
-     "methods": [],
      "properties": [],
      "queries": [],
      "docs": "/components/data"
@@ -16139,7 +16341,7 @@
     {
      "name": "MkSpinner",
      "description": "Spinner — a circular indeterminate loading indicator. Exposes `role=\"status\"`\nwith a visually-hidden label so assistive tech announces the loading state.\nThe animation slows under `prefers-reduced-motion`.\n\n```html\n<mk-spinner />\n<mk-spinner size=\"lg\" tone=\"neutral\" label=\"Fetching results\" />\n```",
-     "file": "projects/mk-kit/data/spinner/spinner.ts",
+     "file": "projects/mk-kit/status/spinner/spinner.ts",
      "kind": "component",
      "selector": "mk-spinner",
      "selectors": [
@@ -16393,7 +16595,7 @@
     {
      "name": "MkBadgeOverlay",
      "description": "Badge overlay — anchors a small badge (count, dot or short text) to a corner\nof ANY element: an icon button, an avatar, a tab label. The host stays a\nsingle tab stop; the badge is a decorative, non-focusable child.\n\n- Numbers above `mkBadgeOverlayMax` (default 99) collapse to `99+`.\n- `mkBadgeOverlayDot` renders a textless dot (\"something is new\").\n- `mkBadgeOverlayAriaLabel` is the screen-reader text (\"3 unread\"). It is\n  rendered in a visually hidden span and wired to the host with\n  `aria-describedby`, so it is announced after the host's own name even\n  when the host has an `aria-label`. When it is given, the visible badge is\n  `aria-hidden` so the count is not read twice.\n- Positions use logical insets, so `top-end` sits at the top-right in LTR\n  and the top-left in RTL.\n\nThe badge is painted with the global `.mk-badge-overlay` styles from\n`@mk-kit/ui/styles.css` and follows the `--mk-*` tone tokens.\n\n```html\n<button mkButton iconOnly aria-label=\"Notifications\"\n        [mkBadgeOverlay]=\"unread()\" mkBadgeOverlayTone=\"danger\"\n        [mkBadgeOverlayAriaLabel]=\"unread() + ' unread'\">\n  <mk-icon name=\"bell\" />\n</button>\n\n<mk-avatar name=\"Ada Lovelace\" mkBadgeOverlay mkBadgeOverlayDot\n           mkBadgeOverlayTone=\"success\" mkBadgeOverlayPosition=\"bottom-end\" />\n```",
-     "file": "projects/mk-kit/data/badge/badge-overlay.ts",
+     "file": "projects/mk-kit/status/badge/badge-overlay.ts",
      "kind": "directive",
      "selector": "[mkBadgeOverlay]",
      "selectors": [
@@ -17059,80 +17261,6 @@
      ]
     },
     {
-     "name": "MkKanbanCard",
-     "description": "A single draggable card on a `MkKanban` board.",
-     "file": "projects/mk-kit/data/kanban/kanban.ts",
-     "kind": "interface",
-     "members": [
-      {
-       "name": "id",
-       "type": "unknown",
-       "description": "Stable identity used for tracking and move events."
-      },
-      {
-       "name": "title",
-       "type": "string",
-       "description": "Text shown by the default card renderer."
-      }
-     ]
-    },
-    {
-     "name": "MkKanbanCardMovedEvent",
-     "description": "Emitted by `MkKanban` after a card has been moved (between or within\ncolumns) and the two-way `columns` model has been updated.",
-     "file": "projects/mk-kit/data/kanban/kanban.ts",
-     "kind": "interface",
-     "members": [
-      {
-       "name": "card",
-       "type": "MkKanbanCard",
-       "description": "The card that was moved."
-      },
-      {
-       "name": "from",
-       "type": "unknown",
-       "description": "`id` of the column the card came from."
-      },
-      {
-       "name": "to",
-       "type": "unknown",
-       "description": "`id` of the column the card was dropped into."
-      },
-      {
-       "name": "fromIndex",
-       "type": "number",
-       "description": "The card's index within the source column before the move."
-      },
-      {
-       "name": "toIndex",
-       "type": "number",
-       "description": "The card's index within the destination column after the move."
-      }
-     ]
-    },
-    {
-     "name": "MkKanbanColumn",
-     "description": "A column (bucket) of `MkKanbanCard`s on a `MkKanban` board.",
-     "file": "projects/mk-kit/data/kanban/kanban.ts",
-     "kind": "interface",
-     "members": [
-      {
-       "name": "id",
-       "type": "unknown",
-       "description": "Stable identity used for tracking and move events."
-      },
-      {
-       "name": "title",
-       "type": "string",
-       "description": "Heading shown in the column header and used as its aria-label."
-      },
-      {
-       "name": "cards",
-       "type": "MkKanbanCard[]",
-       "description": "The ordered cards contained in this column."
-      }
-     ]
-    },
-    {
      "name": "MkLogToken",
      "description": "One render token of a log line: a styled run, optionally a search match.",
      "file": "projects/mk-kit/data/log-viewer/log-viewer.ts",
@@ -17504,14 +17632,14 @@
     {
      "name": "MkBadgeOverlayPosition",
      "description": "Corner of the host an `MkBadgeOverlay` is anchored to.",
-     "file": "projects/mk-kit/data/badge/badge-overlay.ts",
+     "file": "projects/mk-kit/status/badge/badge-overlay.ts",
      "kind": "type",
      "definition": "| 'top-end' | 'top-start' | 'bottom-end' | 'bottom-start'"
     },
     {
      "name": "MkBadgeVariant",
      "description": "Visual treatment for a `MkBadge`.",
-     "file": "projects/mk-kit/data/badge/badge.ts",
+     "file": "projects/mk-kit/status/badge/badge.ts",
      "kind": "type",
      "definition": "'solid' | 'soft' | 'outline'"
     },
@@ -17655,6 +17783,128 @@
      "file": "projects/mk-kit/data/tag/tag.ts",
      "kind": "type",
      "definition": "'solid' | 'soft' | 'outline'"
+    }
+   ]
+  },
+  {
+   "name": "kanban",
+   "import": "@mk-kit/ui/kanban",
+   "exports": [
+    {
+     "name": "MkKanban",
+     "description": "Kanban board — a horizontal row of columns whose cards can be dragged and\nreordered within a column or transferred between columns. Built on the dnd\ngroup's connected `[mkDropList]` / `[mkDrag]` directives, so it inherits both\npointer and keyboard dragging (WCAG 2.1.1) for free.\n\nBind `columns` two-way; the model is updated immutably on each drop. Project\nan `<ng-template>` to render custom card content — it receives the card as\n`$implicit` and the owning column as `column`:\n\n```html\n<mk-kanban [(columns)]=\"board\" (cardMoved)=\"onMoved($event)\">\n  <ng-template #cardTemplate let-card let-column=\"column\">\n    <strong>{{ card.title }}</strong>\n  </ng-template>\n</mk-kanban>\n```",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "component",
+     "selector": "mk-kanban",
+     "selectors": [
+      "mk-kanban"
+     ],
+     "inputs": [
+      {
+       "name": "columns",
+       "type": "MkKanbanColumn[]",
+       "description": "The board's columns and their cards (two-way). Updated on every drop.",
+       "model": true,
+       "default": "[]"
+      },
+      {
+       "name": "disabled",
+       "type": "boolean",
+       "description": "Disable all dragging on the board.",
+       "default": "false"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "columnsChange",
+       "type": "MkKanbanColumn[]",
+       "description": "Emits when `columns` changes (two-way binding).",
+       "model": true
+      },
+      {
+       "name": "cardMoved",
+       "type": "MkKanbanCardMovedEvent",
+       "description": "Emitted after the model is updated when a card is moved."
+      }
+     ],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/data"
+    },
+    {
+     "name": "MkKanbanCard",
+     "description": "A single draggable card on a `MkKanban` board.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "id",
+       "type": "unknown",
+       "description": "Stable identity used for tracking and move events."
+      },
+      {
+       "name": "title",
+       "type": "string",
+       "description": "Text shown by the default card renderer."
+      }
+     ]
+    },
+    {
+     "name": "MkKanbanCardMovedEvent",
+     "description": "Emitted by `MkKanban` after a card has been moved (between or within\ncolumns) and the two-way `columns` model has been updated.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "card",
+       "type": "MkKanbanCard",
+       "description": "The card that was moved."
+      },
+      {
+       "name": "from",
+       "type": "unknown",
+       "description": "`id` of the column the card came from."
+      },
+      {
+       "name": "to",
+       "type": "unknown",
+       "description": "`id` of the column the card was dropped into."
+      },
+      {
+       "name": "fromIndex",
+       "type": "number",
+       "description": "The card's index within the source column before the move."
+      },
+      {
+       "name": "toIndex",
+       "type": "number",
+       "description": "The card's index within the destination column after the move."
+      }
+     ]
+    },
+    {
+     "name": "MkKanbanColumn",
+     "description": "A column (bucket) of `MkKanbanCard`s on a `MkKanban` board.",
+     "file": "projects/mk-kit/kanban/kanban.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "id",
+       "type": "unknown",
+       "description": "Stable identity used for tracking and move events."
+      },
+      {
+       "name": "title",
+       "type": "string",
+       "description": "Heading shown in the column header and used as its aria-label."
+      },
+      {
+       "name": "cards",
+       "type": "MkKanbanCard[]",
+       "description": "The ordered cards contained in this column."
+      }
+     ]
     }
    ]
   },

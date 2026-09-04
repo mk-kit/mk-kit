@@ -8,10 +8,10 @@ import { Component, provideZonelessChangeDetection, signal, type Type } from '@a
 import { TestBed } from '@angular/core/testing';
 
 import { MkAvatar } from './avatar/avatar';
-import { MkBadge } from './badge/badge';
+import { MkBadge } from '@mk-kit/ui/status';
 import { MkTag } from './tag/tag';
 import { MkDivider } from './divider/divider';
-import { MkSpinner } from './spinner/spinner';
+import { MkSpinner } from '@mk-kit/ui/status';
 import { MkStatCard } from './stat-card/stat-card';
 
 function mount(template: string, imports: Type<unknown>[]) {

@@ -64,7 +64,7 @@ import { MkDonutChart } from '@mk-kit/ui/data/charts';
 import { MkNumberInput } from '@mk-kit/ui/forms/number-input';
 import { MkDescItem, MkDescriptionList } from '@mk-kit/ui/data/description-list';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
-import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/data/badge';
+import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/status';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
 import { MkDrag, MkDragHandle, MkDropList, MkSortableList } from '@mk-kit/ui/dnd';
