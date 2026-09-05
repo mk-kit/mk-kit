@@ -160,6 +160,21 @@ import { DocsExample } from '../../shared/docs-example';
             <td><code>Observable&lt;string&gt;</code></td>
             <td><code>lang</code> as a stream, for code still built around RxJS.</td>
           </tr>
+          <tr>
+            <td><code>translatePlural</code> pipe</td>
+            <td><code>count | translatePlural: keyBase: params?</code></td>
+            <td>Template form of <code>plural()</code>.</td>
+          </tr>
+          <tr>
+            <td><code>documentLang</code> option</td>
+            <td><code>boolean</code></td>
+            <td>Mirror <code>use()</code> onto <code>&lt;html lang&gt;</code>. Default on.</td>
+          </tr>
+          <tr>
+            <td><code>mkFsTranslateLoader(&#123; dirs &#125;)</code></td>
+            <td><code>@mk-kit/ui/translate/server</code></td>
+            <td>SSR reads the JSON from disk — no self-fetch during render.</td>
+          </tr>
         </tbody>
       </table>
     </div>
@@ -195,7 +210,8 @@ provideMkTranslate({
 }),
 
 // SSR (app.config.server.ts): read the same files from disk instead of HTTP
-loader: () => ({ load: (lang) => JSON.parse(readFileSync(\`\${dir}/\${lang}.json\`, 'utf8')) }),
+import { mkFsTranslateLoader } from '@mk-kit/ui/translate/server';
+loader: mkFsTranslateLoader({ dirs: [join(import.meta.dirname, '../browser/assets/i18n')] }),
 
 // a loader is one method
 interface MkTranslateLoader { load(lang: string): Promise<MkTranslationTree> | MkTranslationTree; }`;
