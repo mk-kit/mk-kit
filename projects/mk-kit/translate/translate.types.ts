@@ -46,6 +46,16 @@ export interface MkTranslateConfig {
    */
   preload?: boolean;
   /**
+   * What a server render hands to the browser through `TransferState`:
+   * - `'used'` (default): only the keys read while rendering this page —
+   *   a few KB — so hydration never flashes raw keys, while the full
+   *   dictionary loads in the background right after;
+   * - `'all'`: the whole dictionary (no second request, but every page
+   *   carries it);
+   * - `'none'`: nothing; the browser loads the file itself before bootstrap.
+   */
+  transfer?: 'used' | 'all' | 'none';
+  /**
    * Mirror the active language onto `<html lang>` (server and browser), so
    * screen readers, hyphenation and search engines follow `use()`. Default
    * `true`.

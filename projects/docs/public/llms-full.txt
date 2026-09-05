@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.55.0 — full API reference
+# @mk-kit/ui 0.55.1 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -12125,6 +12125,7 @@ Methods:
 | `loadedLangs(): string[]` | Languages currently in memory. |
 | `patch(lang: string, strings: MkTranslationTree \| MkFlatTranslations): void` | Merge strings into `lang` at runtime — a translation editor previewing an edit, or a late-arriving overrides payload. Nested or flat. |
 | `set(lang: string, strings: MkTranslationTree \| MkFlatTranslations): void` | Replace `lang` entirely (tests, editors reloading from source). |
+| `isPartial(lang?: string): boolean` | `true` while `lang` holds only a server render's keys and the rest is still loading. |
 
 Properties:
 
@@ -12262,6 +12263,7 @@ Members:
 | `loader` | `MkTranslateLoaderFactory` | Base strings — the bundled JSON, typically (`mkHttpTranslateLoader`). |
 | `overrides`? | `MkTranslateLoaderFactory \| undefined` | Optional second source merged OVER the base per language: edits kept in a database, a tenant's wording, a translator's work in progress. A loader that throws or resolves `{}` leaves the base untouched. |
 | `preload`? | `boolean \| undefined` | Block application bootstrap until the initial language is loaded, so the first render never shows raw keys and `instant()` calls inside `computed()` never cache them. Default `true`. |
+| `transfer`? | `"none" \| "used" \| "all" \| undefined` | What a server render hands to the browser through `TransferState`: - `'used'` (default): only the keys read while rendering this page —   a few KB — so hydration never flashes raw keys, while the full   dictionary loads in the background right after; - `'all'`: the whole dictionary (no second request, but every page   carries it); - `'none'`: nothing; the browser loads the file itself before bootstrap. |
 | `documentLang`? | `boolean \| undefined` | Mirror the active language onto `<html lang>` (server and browser), so screen readers, hyphenation and search engines follow `use()`. Default `true`. |
 | `onMissing`? | `((key: string, lang: string) => string \| undefined \| void) \| undefined` | Called for a key missing in both the active and the fallback language. Return a string to render instead of the key. Missing keys are also collected in `MkTranslate.missingKeys`. |
 

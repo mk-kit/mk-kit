@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.55.0",
+ "version": "0.55.1",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -18296,6 +18296,11 @@
        "name": "set",
        "signature": "(lang: string, strings: MkTranslationTree | MkFlatTranslations): void",
        "description": "Replace `lang` entirely (tests, editors reloading from source)."
+      },
+      {
+       "name": "isPartial",
+       "signature": "(lang?: string): boolean",
+       "description": "`true` while `lang` holds only a server render's keys and the rest is still loading."
       }
      ],
      "properties": [
@@ -18452,6 +18457,12 @@
        "name": "preload",
        "type": "boolean | undefined",
        "description": "Block application bootstrap until the initial language is loaded, so the\nfirst render never shows raw keys and `instant()` calls inside\n`computed()` never cache them. Default `true`.",
+       "optional": true
+      },
+      {
+       "name": "transfer",
+       "type": "\"none\" | \"used\" | \"all\" | undefined",
+       "description": "What a server render hands to the browser through `TransferState`:\n- `'used'` (default): only the keys read while rendering this page —\n  a few KB — so hydration never flashes raw keys, while the full\n  dictionary loads in the background right after;\n- `'all'`: the whole dictionary (no second request, but every page\n  carries it);\n- `'none'`: nothing; the browser loads the file itself before bootstrap.",
        "optional": true
       },
       {

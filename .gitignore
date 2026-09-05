@@ -8,6 +8,7 @@
 
 # Node
 node_modules/
+node_modules
 # A stray `npm …` run with its cwd inside projects/mk-kit materialises a
 # nested install from the lib's package.json — harmless once ignored, but
 # delete it if builds start failing with duplicate-@angular type errors.

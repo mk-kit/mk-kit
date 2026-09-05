@@ -26,6 +26,13 @@ export const MK_TRANSLATE_CONFIG = new InjectionToken<MkTranslateConfig>('MK_TRA
 
 const PLACEHOLDER = /\{\{\s*([\w.-]+)\s*\}\}/g;
 
+/** What a server render hands to the browser for one language. */
+interface MkTransferPayload {
+  strings: MkFlatTranslations;
+  /** Only the keys the render used — the rest is loading in the background. */
+  partial: boolean;
+}
+
 /** `{ a: { b: 'x' } }` → `{ 'a.b': 'x' }`; already-dotted keys pass through. */
 export function mkFlattenTranslations(
   tree: MkTranslationTree | null | undefined,
@@ -101,10 +108,19 @@ export class MkTranslate {
   private overridesLoader: MkTranslateLoader | null = null;
   private readonly dictionaries = new Map<string, MkFlatTranslations>();
   private readonly declared = new Set<string>();
+  /** Languages holding only the keys a server render used (see `transfer`). */
+  private readonly partial = new Set<string>();
+  /** Keys read on the server, per language — what `transfer: 'used'` ships. */
+  private readonly used = new Map<string, Set<string>>();
   private readonly pending = new Map<string, Promise<void>>();
   /** Bumped whenever a dictionary changes, so readers recompute. */
   private readonly version = signal(0);
-  private readonly missing = signal<ReadonlySet<string>>(new Set());
+  // Missing keys are noticed while templates render, where writing a signal
+  // is forbidden (NG0600) — so the set is plain and a tick signal is bumped
+  // in a microtask, once per batch of misses.
+  private readonly missing = new Set<string>();
+  private readonly missingTick = signal(0);
+  private missingFlush: Promise<void> | null = null;
 
   /** The active language. Read it in a `computed()` to follow switches. */
   readonly lang = signal<string>(this.config?.lang ?? 'en');
@@ -116,7 +132,10 @@ export class MkTranslate {
   /** `lang` as an observable, for code still written around streams. */
   readonly langChange = toObservable(this.lang);
   /** Keys asked for that neither the active nor the fallback language has. */
-  readonly missingKeys = computed(() => [...this.missing()].sort());
+  readonly missingKeys = computed(() => {
+    this.missingTick();
+    return [...this.missing].sort();
+  });
 
   constructor() {
     if (!this.config && isDevMode()) {
@@ -161,12 +180,23 @@ export class MkTranslate {
    * when the strings are in memory; a failed load rejects and leaves the
    * previous language active.
    */
-  async use(lang: string): Promise<void> {
-    await this.load(lang);
-    if (this.config?.fallbackLang && this.config.fallbackLang !== lang) {
-      // Best effort: a missing fallback file must not block the switch.
-      this.load(this.config.fallbackLang).catch(() => undefined);
+  use(lang: string): Promise<void> {
+    // A language already in memory switches synchronously — no microtask
+    // between the click and the re-render, and code that reads the service
+    // right after `use()` (tests, `computed()` setups) sees the new state.
+    const fallback = this.config?.fallbackLang;
+    const needsFallback = !!fallback && fallback !== lang && !this.dictionaries.has(fallback);
+    if (this.dictionaries.has(lang) && !needsFallback) {
+      this.activate(lang);
+      return Promise.resolve();
     }
+    // The fallback rides along so that, once `use()` resolves, per-key
+    // fallback works too. Its failure never blocks the switch.
+    const fallbackLoad = needsFallback ? this.load(fallback!).catch(() => undefined) : Promise.resolve();
+    return Promise.all([this.load(lang), fallbackLoad]).then(() => this.activate(lang));
+  }
+
+  private activate(lang: string): void {
     this.lang.set(lang);
     if (this.config?.documentLang !== false) {
       this.document?.documentElement?.setAttribute('lang', lang);
@@ -174,8 +204,8 @@ export class MkTranslate {
   }
 
   /** Load a language into memory without switching to it. */
-  async load(lang: string): Promise<void> {
-    if (this.dictionaries.has(lang)) return;
+  load(lang: string): Promise<void> {
+    if (this.dictionaries.has(lang)) return Promise.resolve();
     let task = this.pending.get(lang);
     if (!task) {
       task = this.fetch(lang).finally(() => this.pending.delete(lang));
@@ -194,9 +224,12 @@ export class MkTranslate {
   instant(key: string, params?: MkTranslateParams): string {
     const lang = this.lang();
     this.version();
+    if (this.isServer) this.noteUsed(lang, key);
     const found = this.lookup(key, lang);
     if (found === undefined) {
-      this.recordMissing(key);
+      // A partial (hydration) dictionary is expected to lack keys until the
+      // background load merges — those are not misses.
+      if (!this.partial.has(lang)) this.recordMissing(key);
       const replacement = this.config?.onMissing?.(key, lang);
       return typeof replacement === 'string' ? replacement : key;
     }
@@ -271,12 +304,26 @@ export class MkTranslate {
   }
 
   private async fetch(lang: string): Promise<void> {
-    const stateKey = makeStateKey<MkFlatTranslations>(`mk-translate:${lang}`);
-    // Hydration: the server already loaded and serialised this language.
+    const stateKey = makeStateKey<MkTransferPayload>(`mk-translate:${lang}`);
+    // Hydration: the server already loaded (some of) this language.
     if (!this.isServer && this.transfer?.hasKey(stateKey)) {
-      const flat = this.transfer.get(stateKey, {});
+      const payload = this.transfer.get(stateKey, { strings: {}, partial: false });
       this.transfer.remove(stateKey);
-      this.dictionaries.set(lang, flat);
+      this.dictionaries.set(lang, payload.strings);
+      if (payload.partial) {
+        // Enough to hydrate without a flash; the rest arrives in the
+        // background and merges under the same keys.
+        this.partial.add(lang);
+        void this.fetchFull(lang)
+          .then((flat) => {
+            this.dictionaries.set(lang, { ...flat, ...this.dictionaries.get(lang) });
+            this.partial.delete(lang);
+            this.bump();
+          })
+          .catch((err) => {
+            if (isDevMode()) console.warn(`[mk-translate] background load of "${lang}" failed`, err);
+          });
+      }
       this.bump();
       return;
     }
@@ -285,6 +332,14 @@ export class MkTranslate {
       this.bump();
       return;
     }
+    const flat = await this.fetchFull(lang);
+    this.dictionaries.set(lang, flat);
+    if (this.isServer && this.transfer) this.serialize(lang, stateKey, flat);
+    this.bump();
+  }
+
+  /** Base + overrides for `lang`, flattened. */
+  private async fetchFull(lang: string): Promise<MkFlatTranslations> {
     const base = mkFlattenTranslations(await this.baseLoader().load(lang));
     let overrides: MkFlatTranslations = {};
     const overridesLoader = this.overridesLoaderOrNull();
@@ -295,10 +350,43 @@ export class MkTranslate {
         if (isDevMode()) console.warn(`[mk-translate] overrides for "${lang}" failed to load`, err);
       }
     }
-    const flat = { ...base, ...overrides };
-    this.dictionaries.set(lang, flat);
-    if (this.isServer && this.transfer) this.transfer.set(stateKey, flat);
-    this.bump();
+    return { ...base, ...overrides };
+  }
+
+  /** Server: decide what rides to the browser (see `MkTranslateConfig.transfer`). */
+  private serialize(lang: string, stateKey: ReturnType<typeof makeStateKey<MkTransferPayload>>, flat: MkFlatTranslations): void {
+    const mode = this.config?.transfer ?? 'used';
+    if (mode === 'none' || !this.transfer) return;
+    if (mode === 'all') {
+      this.transfer.set(stateKey, { strings: flat, partial: false });
+      return;
+    }
+    // 'used': resolved lazily when the page serialises, after every
+    // template ran — only the keys this render actually read.
+    this.transfer.onSerialize(stateKey, () => {
+      const keys = this.used.get(lang);
+      const strings: MkFlatTranslations = {};
+      if (keys) for (const k of keys) if (flat[k] !== undefined) strings[k] = flat[k];
+      return { strings, partial: true };
+    });
+  }
+
+  private noteUsed(lang: string, key: string): void {
+    let set = this.used.get(lang);
+    if (!set) this.used.set(lang, (set = new Set()));
+    set.add(key);
+    const fallback = this.config?.fallbackLang;
+    if (fallback && fallback !== lang) {
+      let fb = this.used.get(fallback);
+      if (!fb) this.used.set(fallback, (fb = new Set()));
+      fb.add(key);
+    }
+  }
+
+  /** `true` while `lang` holds only a server render's keys and the rest is still loading. */
+  isPartial(lang = this.lang()): boolean {
+    this.version();
+    return this.partial.has(lang);
   }
 
   private baseLoader(): MkTranslateLoader {
@@ -322,9 +410,11 @@ export class MkTranslate {
   }
 
   private recordMissing(key: string): void {
-    if (this.missing().has(key)) return;
-    const next = new Set(this.missing());
-    next.add(key);
-    this.missing.set(next);
+    if (this.missing.has(key)) return;
+    this.missing.add(key);
+    this.missingFlush ??= Promise.resolve().then(() => {
+      this.missingFlush = null;
+      this.missingTick.update((v) => v + 1);
+    });
   }
 }

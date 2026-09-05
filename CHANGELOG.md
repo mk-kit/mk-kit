@@ -4,6 +4,23 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.55.1] — 2026-09-05
+
+### Fixed / improved (`@mk-kit/ui/translate`)
+
+- `use()` switches **synchronously** when the language is already in memory
+  and, for a fresh language, resolves with the fallback loaded too — per-key
+  fallback works right after the switch.
+- A key first missed while a template renders is recorded without writing a
+  signal mid-render (NG0600); `missingKeys` updates on the next microtask.
+- **SSR hand-off is configurable**: `transfer: 'used' | 'all' | 'none'`. The
+  default `'used'` ships only the keys the server render actually read (a
+  few hundred bytes instead of the whole file) and the browser loads the
+  rest in the background; `isPartial()` tells while it does. `'all'` is the
+  previous behaviour, `'none'` sends nothing.
+- `.gitignore` also ignores a `node_modules` symlink (one was committed with
+  0.55.0 and removed by the release).
+
 ## [0.55.0] — 2026-09-05
 
 ### Added

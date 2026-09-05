@@ -82,6 +82,7 @@ describe('MkTranslate', () => {
     // Present nowhere: the key itself, reported once.
     expect(t.instant('nope.nothing')).toBe('nope.nothing');
     expect(t.instant('nope.nothing')).toBe('nope.nothing');
+    await Promise.resolve();
     expect(t.missingKeys()).toEqual(['nope.nothing']);
     expect(onMissing).toHaveBeenCalledWith('nope.nothing', 'en');
   });
@@ -157,6 +158,18 @@ describe('MkTranslate', () => {
     expect(t.instant('onlyPl')).toBe('onlyPl');
   });
 
+  it('switches synchronously to a language that is already in memory', async () => {
+    const t = setup();
+    await t.use('pl');
+    await t.load('en');
+    void t.use('en');
+    expect(t.lang()).toBe('en');
+    expect(t.instant('menu.title')).toBe('Menu');
+    t.set('de', { menu: { title: 'Speisekarte' } });
+    void t.use('de');
+    expect(t.instant('menu.title')).toBe('Speisekarte');
+  });
+
   it('loads each language once even when asked concurrently', async () => {
     const load = vi.fn(async (lang: string) => (lang === 'pl' ? PL : EN));
     const t = setup({ loader: () => ({ load }) });
@@ -179,9 +192,8 @@ describe('MkTranslate', () => {
     expect(t.instant('menu.title')).toBe('Menu');
   });
 
-  it('serialises loaded strings on the server and reuses them in the browser', async () => {
-    // Server: load → TransferState.
-    const server = setup({}, [{ provide: PLATFORM_ID, useValue: 'server' }]);
+  it("transfer: 'all' serialises the whole language on the server and the browser reuses it", async () => {
+    const server = setup({ transfer: 'all' }, [{ provide: PLATFORM_ID, useValue: 'server' }]);
     await server.use('pl');
     const state = TestBed.inject(TransferState);
     const key = makeStateKey<Record<string, string>>('mk-translate:pl');
@@ -189,17 +201,58 @@ describe('MkTranslate', () => {
     const payload = state.toJson();
     TestBed.resetTestingModule();
 
-    // Browser: seeded state → no loader call.
     const load = vi.fn(async () => PL);
     const browser = setup({ loader: () => ({ load }) }, [{ provide: PLATFORM_ID, useValue: 'browser' }]);
     const browserState = TestBed.inject(TransferState);
-    browserState.onSerialize = undefined as never;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     (browserState as any).store = JSON.parse(payload);
     await browser.use('pl');
     expect(load).not.toHaveBeenCalled();
     expect(browser.instant('menu.title')).toBe('Menu');
+    expect(browser.isPartial()).toBe(false);
     expect(browserState.hasKey(key)).toBe(false);
+  });
+
+  it("transfer: 'used' (default) ships only the keys the render read, then the browser fills in the rest", async () => {
+    const server = setup({}, [{ provide: PLATFORM_ID, useValue: 'server' }]);
+    await server.use('pl');
+    server.instant('menu.title');
+    server.instant('cart.total', { amount: 1 });
+    server.instant('not.in.file');
+    const state = TestBed.inject(TransferState);
+    const json = JSON.parse(state.toJson()) as Record<string, { strings: Record<string, string>; partial: boolean }>;
+    expect(json['mk-translate:pl']).toEqual({
+      strings: { 'menu.title': 'Menu', 'cart.total': 'Razem: {{amount}} zł' },
+      partial: true,
+    });
+    TestBed.resetTestingModule();
+
+    let release!: () => void;
+    const load = vi.fn(() => new Promise<MkTranslationTree>((r) => (release = () => r(PL))));
+    const browser = setup({ loader: () => ({ load }) }, [{ provide: PLATFORM_ID, useValue: 'browser' }]);
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    (TestBed.inject(TransferState) as any).store = json;
+    await browser.use('pl');
+    // Hydration keys are there at once; the background load has started.
+    expect(browser.instant('menu.title')).toBe('Menu');
+    expect(browser.isPartial()).toBe(true);
+    expect(load).toHaveBeenCalledTimes(1);
+    // A key outside the subset is not a miss while partial.
+    expect(browser.instant('onlyPl')).toBe('onlyPl');
+    await Promise.resolve();
+    expect(browser.missingKeys()).toEqual([]);
+    release();
+    await Promise.resolve();
+    await Promise.resolve();
+    expect(browser.isPartial()).toBe(false);
+    expect(browser.instant('onlyPl')).toBe('tylko po polsku');
+  });
+
+  it("transfer: 'none' leaves TransferState empty", async () => {
+    const server = setup({ transfer: 'none' }, [{ provide: PLATFORM_ID, useValue: 'server' }]);
+    await server.use('pl');
+    server.instant('menu.title');
+    expect(TestBed.inject(TransferState).toJson()).toBe('{}');
   });
 });
 
@@ -212,6 +265,17 @@ describe('translate pipe', () => {
     count = signal(2);
     missing: string | null = null;
   }
+
+  it('records a key missed during render without writing a signal mid-render (NG0600)', async () => {
+    const t = setup();
+    await t.use('pl');
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.missing = 'not.there';
+    await fixture.whenStable();
+    expect((fixture.nativeElement as HTMLElement).querySelector('span')!.textContent).toBe('not.there');
+    await Promise.resolve();
+    expect(t.missingKeys()).toEqual(['not.there']);
+  });
 
   it('renders, follows params, and re-renders on a language switch', async () => {
     const t = setup();
