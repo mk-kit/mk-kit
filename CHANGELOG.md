@@ -20,6 +20,12 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   mk-board carried this code; now they share it. Live picker on the theming
   page.
 
+### Fixed
+
+- `gen-cost` measured an optional peer dependency (`html5-qrcode`) as part of
+  the scanner entry when it happened to be installed. Peer dependencies are
+  external now; `cost.json` covers all 37 entry points (321 KiB brotli).
+
 ## [0.57.0] — 2026-09-05
 
 ### Added
