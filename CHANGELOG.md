@@ -28,7 +28,8 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
   `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
   of a `TranslateModule` import. `use()` switches synchronously when the
-  language is already loaded.
+  language is already loaded; a key first missed while a template renders
+  is recorded without tripping NG0600.
 
 ## [0.54.0] — 2026-09-04
 

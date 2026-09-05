@@ -82,6 +82,7 @@ describe('MkTranslate', () => {
     // Present nowhere: the key itself, reported once.
     expect(t.instant('nope.nothing')).toBe('nope.nothing');
     expect(t.instant('nope.nothing')).toBe('nope.nothing');
+    await Promise.resolve();
     expect(t.missingKeys()).toEqual(['nope.nothing']);
     expect(onMissing).toHaveBeenCalledWith('nope.nothing', 'en');
   });
@@ -224,6 +225,17 @@ describe('translate pipe', () => {
     count = signal(2);
     missing: string | null = null;
   }
+
+  it('records a key missed during render without writing a signal mid-render (NG0600)', async () => {
+    const t = setup();
+    await t.use('pl');
+    const fixture = TestBed.createComponent(Host);
+    fixture.componentInstance.missing = 'not.there';
+    await fixture.whenStable();
+    expect((fixture.nativeElement as HTMLElement).querySelector('span')!.textContent).toBe('not.there');
+    await Promise.resolve();
+    expect(t.missingKeys()).toEqual(['not.there']);
+  });
 
   it('renders, follows params, and re-renders on a language switch', async () => {
     const t = setup();

@@ -104,7 +104,12 @@ export class MkTranslate {
   private readonly pending = new Map<string, Promise<void>>();
   /** Bumped whenever a dictionary changes, so readers recompute. */
   private readonly version = signal(0);
-  private readonly missing = signal<ReadonlySet<string>>(new Set());
+  // Missing keys are noticed while templates render, where writing a signal
+  // is forbidden (NG0600) — so the set is plain and a tick signal is bumped
+  // in a microtask, once per batch of misses.
+  private readonly missing = new Set<string>();
+  private readonly missingTick = signal(0);
+  private missingFlush: Promise<void> | null = null;
 
   /** The active language. Read it in a `computed()` to follow switches. */
   readonly lang = signal<string>(this.config?.lang ?? 'en');
@@ -116,7 +121,10 @@ export class MkTranslate {
   /** `lang` as an observable, for code still written around streams. */
   readonly langChange = toObservable(this.lang);
   /** Keys asked for that neither the active nor the fallback language has. */
-  readonly missingKeys = computed(() => [...this.missing()].sort());
+  readonly missingKeys = computed(() => {
+    this.missingTick();
+    return [...this.missing].sort();
+  });
 
   constructor() {
     if (!this.config && isDevMode()) {
@@ -333,9 +341,11 @@ export class MkTranslate {
   }
 
   private recordMissing(key: string): void {
-    if (this.missing().has(key)) return;
-    const next = new Set(this.missing());
-    next.add(key);
-    this.missing.set(next);
+    if (this.missing.has(key)) return;
+    this.missing.add(key);
+    this.missingFlush ??= Promise.resolve().then(() => {
+      this.missingFlush = null;
+      this.missingTick.update((v) => v + 1);
+    });
   }
 }
