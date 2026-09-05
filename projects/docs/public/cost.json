@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.54.0",
+ "version": "0.55.0",
  "method": "esbuild",
  "externals": [
   "@angular/*",
@@ -9,10 +9,10 @@
  ],
  "esbuild": "0.28.1",
  "total": {
-  "raw": 3739956,
-  "min": 1692101,
-  "brotli": 316344,
-  "budgetKiB": 3752
+  "raw": 3759084,
+  "min": 1697964,
+  "brotli": 318601,
+  "budgetKiB": 3784
  },
  "entries": [
   {
@@ -3333,6 +3333,101 @@
      "kind": "function",
      "own": 81,
      "size": 81
+    }
+   ]
+  },
+  {
+   "name": "translate",
+   "import": "@mk-kit/ui/translate",
+   "file": "mk-kit-ui-translate.mjs",
+   "raw": 17149,
+   "min": 5403,
+   "brotli": 1955,
+   "budgetKiB": 24,
+   "items": [
+    {
+     "name": "MkTranslateImports",
+     "kind": "const",
+     "own": 1635,
+     "size": 1635
+    },
+    {
+     "name": "provideMkTranslate",
+     "kind": "function",
+     "own": 1627,
+     "size": 1627
+    },
+    {
+     "name": "MkTranslatePluralPipe",
+     "kind": "pipe",
+     "own": 1609,
+     "size": 1609
+    },
+    {
+     "name": "MkTranslatePipe",
+     "kind": "pipe",
+     "own": 1605,
+     "size": 1605
+    },
+    {
+     "name": "MkTranslate",
+     "kind": "service",
+     "docs": "/components/translate",
+     "own": 1543,
+     "size": 1543
+    },
+    {
+     "name": "mkUnflattenTranslations",
+     "kind": "function",
+     "own": 390,
+     "size": 390
+    },
+    {
+     "name": "mkInterpolate",
+     "kind": "function",
+     "own": 389,
+     "size": 389
+    },
+    {
+     "name": "mkFlattenTranslations",
+     "kind": "function",
+     "own": 356,
+     "size": 356
+    },
+    {
+     "name": "mkHttpTranslateLoader",
+     "kind": "function",
+     "own": 348,
+     "size": 348
+    },
+    {
+     "name": "mkStaticTranslateLoader",
+     "kind": "function",
+     "own": 291,
+     "size": 291
+    },
+    {
+     "name": "MK_TRANSLATE_CONFIG",
+     "kind": "token",
+     "own": 285,
+     "size": 285
+    }
+   ]
+  },
+  {
+   "name": "translate/server",
+   "import": "@mk-kit/ui/translate/server",
+   "file": "mk-kit-ui-translate-server.mjs",
+   "raw": 1979,
+   "min": 460,
+   "brotli": 302,
+   "budgetKiB": 8,
+   "items": [
+    {
+     "name": "mkFsTranslateLoader",
+     "kind": "function",
+     "own": 304,
+     "size": 304
     }
    ]
   }
