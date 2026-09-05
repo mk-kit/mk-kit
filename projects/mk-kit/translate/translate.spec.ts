@@ -157,6 +157,18 @@ describe('MkTranslate', () => {
     expect(t.instant('onlyPl')).toBe('onlyPl');
   });
 
+  it('switches synchronously to a language that is already in memory', async () => {
+    const t = setup();
+    await t.use('pl');
+    await t.load('en');
+    void t.use('en');
+    expect(t.lang()).toBe('en');
+    expect(t.instant('menu.title')).toBe('Menu');
+    t.set('de', { menu: { title: 'Speisekarte' } });
+    void t.use('de');
+    expect(t.instant('menu.title')).toBe('Speisekarte');
+  });
+
   it('loads each language once even when asked concurrently', async () => {
     const load = vi.fn(async (lang: string) => (lang === 'pl' ? PL : EN));
     const t = setup({ loader: () => ({ load }) });

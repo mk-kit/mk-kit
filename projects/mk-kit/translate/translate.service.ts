@@ -161,11 +161,22 @@ export class MkTranslate {
    * when the strings are in memory; a failed load rejects and leaves the
    * previous language active.
    */
-  async use(lang: string): Promise<void> {
-    await this.load(lang);
-    if (this.config?.fallbackLang && this.config.fallbackLang !== lang) {
+  use(lang: string): Promise<void> {
+    // A language already in memory switches synchronously — no microtask
+    // between the click and the re-render, and code that reads the service
+    // right after `use()` (tests, `computed()` setups) sees the new state.
+    if (this.dictionaries.has(lang)) {
+      this.activate(lang);
+      return Promise.resolve();
+    }
+    return this.load(lang).then(() => this.activate(lang));
+  }
+
+  private activate(lang: string): void {
+    const fallback = this.config?.fallbackLang;
+    if (fallback && fallback !== lang && !this.dictionaries.has(fallback)) {
       // Best effort: a missing fallback file must not block the switch.
-      this.load(this.config.fallbackLang).catch(() => undefined);
+      this.load(fallback).catch(() => undefined);
     }
     this.lang.set(lang);
     if (this.config?.documentLang !== false) {
@@ -174,8 +185,8 @@ export class MkTranslate {
   }
 
   /** Load a language into memory without switching to it. */
-  async load(lang: string): Promise<void> {
-    if (this.dictionaries.has(lang)) return;
+  load(lang: string): Promise<void> {
+    if (this.dictionaries.has(lang)) return Promise.resolve();
     let task = this.pending.get(lang);
     if (!task) {
       task = this.fetch(lang).finally(() => this.pending.delete(lang));

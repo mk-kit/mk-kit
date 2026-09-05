@@ -27,7 +27,8 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   of fetching its own endpoint. Migration aliases so an ngx-translate app
   moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
   `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
-  of a `TranslateModule` import.
+  of a `TranslateModule` import. `use()` switches synchronously when the
+  language is already loaded.
 
 ## [0.54.0] — 2026-09-04
 
