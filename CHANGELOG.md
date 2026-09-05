@@ -4,6 +4,17 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+- **`@mk-kit/ui/attention`** — three services for apps that watch a queue
+  of incoming work. `MkTabAttention.set(count, label)` badges the favicon and
+  blinks the title only while the tab is hidden (`provideMkTabAttention` for
+  colour / period). `MkNotificationSound` plays a synthesised chime or file
+  presets (`provideMkNotificationSound({ presets, storageKey })`), unlocking
+  the `AudioContext` on enable and on first interaction; `play()` honours the
+  device mute, `preview()` does not. `provideMkSessionExpiry({ expiresAt,
+  extend, onExpire, warnBeforeMs?, enabled? })` opens `mk-session-expiry-dialog`
+  before a session lapses — extend, sign out, or sign out at zero — re-armed
+  on every token rotation. Five new `MkI18nStrings` (`sessionExpiry*`).
+
 ## [0.56.0] — 2026-09-05
 
 ### Added

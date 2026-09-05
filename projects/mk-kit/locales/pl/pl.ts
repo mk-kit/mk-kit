@@ -254,6 +254,11 @@ export const MK_PL_I18N: MkI18nStrings = {
   translationEditorReset: 'Przywróć oryginalny tekst',
   translationEditorExport: 'Eksportuj CSV',
   translationEditorKeys: 'kluczy',
+  sessionExpiryTitle: 'Sesja zaraz wygaśnie',
+  sessionExpiryExtend: 'Zostaję — przedłuż sesję',
+  sessionExpiryExtending: 'Przedłużam…',
+  sessionExpiryLogout: 'Wyloguj teraz',
+  sessionExpiryBody: (countdown) => `Ze względów bezpieczeństwa zostaniesz wylogowany za ${countdown}. Niezapisane zmiany zostaną utracone.`,
   resultsCount: (count) =>
     `${count} ${plural(count, 'wynik', 'wyniki', 'wyników')}`,
 

@@ -243,6 +243,11 @@ export const MK_FR_I18N: MkI18nStrings = {
   translationEditorReset: 'Restaurer le texte d’origine',
   translationEditorExport: 'Exporter en CSV',
   translationEditorKeys: 'clés',
+  sessionExpiryTitle: 'Votre session est sur le point d’expirer',
+  sessionExpiryExtend: 'Rester connecté',
+  sessionExpiryExtending: 'Prolongation…',
+  sessionExpiryLogout: 'Se déconnecter maintenant',
+  sessionExpiryBody: (countdown) => `Pour des raisons de sécurité, vous serez déconnecté dans ${countdown}. Les modifications non enregistrées seront perdues.`,
   resultsCount: (count) =>
     `${count} ${plural(count, 'résultat', 'résultats')}`,
 

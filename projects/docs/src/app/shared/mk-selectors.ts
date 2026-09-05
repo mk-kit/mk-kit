@@ -136,6 +136,7 @@ export const MK_SELECTORS: Readonly<Record<string, string>> = {
   'mk-scatter-chart': 'MkScatterChart',
   'mk-scroll-area': 'MkScrollArea',
   'mk-select': 'MkSelect',
+  'mk-session-expiry-dialog': 'MkSessionExpiryDialog',
   'mk-signature-pad': 'MkSignaturePad',
   'mk-skeleton': 'MkSkeleton',
   'mk-skeleton-preset': 'MkSkeletonPreset',

@@ -293,6 +293,12 @@ export interface MkI18nStrings {
   translationEditorReset: string;
   translationEditorExport: string;
   translationEditorKeys: string;
+  /** Session-expiry dialog (`@mk-kit/ui/attention`). */
+  sessionExpiryTitle: string;
+  sessionExpiryExtend: string;
+  sessionExpiryExtending: string;
+  sessionExpiryLogout: string;
+  sessionExpiryBody: (countdown: string) => string;
   /** Announced when a filterable list updates (autocomplete, multi-select, command palette). */
   resultsCount: (count: number) => string;
 
@@ -835,6 +841,11 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   translationEditorReset: 'Restore the original text',
   translationEditorExport: 'Export CSV',
   translationEditorKeys: 'keys',
+  sessionExpiryTitle: 'Your session is about to end',
+  sessionExpiryExtend: 'Stay signed in',
+  sessionExpiryExtending: 'Extending…',
+  sessionExpiryLogout: 'Sign out now',
+  sessionExpiryBody: (countdown) => `For security you will be signed out in ${countdown}. Unsaved changes will be lost.`,
   resultsCount: (count) => (count === 1 ? '1 result' : `${count} results`),
 
   previousPage: 'Go to previous page',

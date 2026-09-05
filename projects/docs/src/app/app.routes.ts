@@ -114,6 +114,12 @@ export const routes: Routes = [
       import('./pages/dialogs/dialogs-page').then((m) => m.DialogsPage),
   },
   {
+    path: 'components/attention',
+    title: 'Attention — mk-kit',
+    loadComponent: () =>
+      import('./pages/attention/attention-page').then((m) => m.AttentionPage),
+  },
+  {
     path: 'components/translate',
     title: 'Translate — mk-kit',
     loadComponent: () =>

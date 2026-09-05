@@ -254,6 +254,11 @@ export const MK_UK_I18N: MkI18nStrings = {
   translationEditorReset: 'Відновити оригінальний текст',
   translationEditorExport: 'Експортувати CSV',
   translationEditorKeys: 'ключів',
+  sessionExpiryTitle: 'Сеанс незабаром завершиться',
+  sessionExpiryExtend: 'Залишитися в системі',
+  sessionExpiryExtending: 'Продовження…',
+  sessionExpiryLogout: 'Вийти зараз',
+  sessionExpiryBody: (countdown) => `З міркувань безпеки вас буде вилучено із системи через ${countdown}. Незбережені зміни буде втрачено.`,
   resultsCount: (count) =>
     `${count} ${plural(count, 'результат', 'результати', 'результатів')}`,
 
