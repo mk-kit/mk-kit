@@ -225,6 +225,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mk-popconfirm / mkPopconfirmFor', desc: 'Inline confirm bubble before a destructive action.', path: '/components/popovers' },
       { name: 'mk-hovercard / mkHovercardFor', desc: 'Preview card shown on hover with safe delays.', path: '/components/popovers' },
       { name: 'MkTranslate / translate', desc: 'App translations as signals: use(), instant(), plural(), the translate pipe, overrides.', path: '/components/translate' },
+      { name: 'mk-translation-editor', desc: 'Keys × locales grid with inline edits kept as overrides.', path: '/components/translate' },
       { name: 'mk-result', desc: 'Full-page success/error/info outcome screen.', path: '/components/status' },
       { name: 'mk-notification-center', desc: 'Bell + panel of grouped in-app notifications.', path: '/components/status' },
       { name: 'MkTourService', desc: 'Step-by-step product tour with anchored popups.', path: '/components/status' },

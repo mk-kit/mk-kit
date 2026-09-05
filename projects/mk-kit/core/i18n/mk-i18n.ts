@@ -284,6 +284,15 @@ export interface MkI18nStrings {
   noResults: string;
   /** Empty data table / list. */
   noData: string;
+  /** Translation editor (`@mk-kit/ui/translate/editor`). */
+  translationEditorSearch: string;
+  translationEditorAll: string;
+  translationEditorOverridden: string;
+  translationEditorMissing: string;
+  translationEditorKey: string;
+  translationEditorReset: string;
+  translationEditorExport: string;
+  translationEditorKeys: string;
   /** Announced when a filterable list updates (autocomplete, multi-select, command palette). */
   resultsCount: (count: number) => string;
 
@@ -818,6 +827,14 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   noOptions: 'No options',
   noResults: 'No results',
   noData: 'No data to display',
+  translationEditorSearch: 'Search keys and text',
+  translationEditorAll: 'All',
+  translationEditorOverridden: 'Edited',
+  translationEditorMissing: 'Missing',
+  translationEditorKey: 'Key',
+  translationEditorReset: 'Restore the original text',
+  translationEditorExport: 'Export CSV',
+  translationEditorKeys: 'keys',
   resultsCount: (count) => (count === 1 ? '1 result' : `${count} results`),
 
   previousPage: 'Go to previous page',

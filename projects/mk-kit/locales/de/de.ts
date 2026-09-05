@@ -234,6 +234,14 @@ export const MK_DE_I18N: MkI18nStrings = {
   noOptions: 'Keine Optionen',
   noResults: 'Keine Ergebnisse',
   noData: 'Keine Daten vorhanden',
+  translationEditorSearch: 'Schlüssel und Text suchen',
+  translationEditorAll: 'Alle',
+  translationEditorOverridden: 'Bearbeitet',
+  translationEditorMissing: 'Fehlend',
+  translationEditorKey: 'Schlüssel',
+  translationEditorReset: 'Originaltext wiederherstellen',
+  translationEditorExport: 'CSV exportieren',
+  translationEditorKeys: 'Schlüssel',
   resultsCount: (count) =>
     `${count} ${plural(count, 'Ergebnis', 'Ergebnisse')}`,
 

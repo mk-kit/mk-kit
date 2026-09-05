@@ -1,5 +1,6 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { MkButton, MkButtonToggle, MkButtonToggleGroup } from '@mk-kit/ui';
+import { MkTranslationEditor, type MkTranslationChange } from '@mk-kit/ui/translate/editor';
 import {
   MK_TRANSLATE_CONFIG,
   MkTranslate,
@@ -15,7 +16,14 @@ import { DocsExample } from '../../shared/docs-example';
 @Component({
   selector: 'docs-translate-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkTranslatePipe, MkButton, MkButtonToggle, MkButtonToggleGroup],
+  imports: [
+    DocsExample,
+    MkTranslatePipe,
+    MkButton,
+    MkButtonToggle,
+    MkButtonToggleGroup,
+    MkTranslationEditor,
+  ],
   // A page-local instance so the demo's languages never touch the docs app
   // itself; an app registers `provideMkTranslate()` once, in app.config.ts.
   providers: [
@@ -101,6 +109,29 @@ import { DocsExample } from '../../shared/docs-example';
       </p>
       <docs-example [code]="setupCode" column>
         <p>See the code tab.</p>
+      </docs-example>
+
+      <h2>Editor</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-translation-editor&gt;</code>
+        (<code class="docs-inline">@mk-kit/ui/translate/editor</code>) shows keys
+        as rows and locales as columns; click a cell to edit. The base strings
+        are your bundled files; edits are <em>overrides</em> kept apart, so a
+        cell can be restored to the file text and a rebuild never loses an
+        edit. Search by key or text, filter to <em>edited</em> or
+        <em>missing in a locale</em>, export CSV. Persist each
+        <code class="docs-inline">changed</code> event however you like and
+        feed the result back through <code class="docs-inline">overrides</code>
+        — the runtime's <code class="docs-inline">overrides</code> loader then
+        serves the same table to the app.
+      </p>
+      <docs-example [code]="editorCode" column>
+        <mk-translation-editor
+          [locales]="['en', 'pl']"
+          [base]="editorBase"
+          [overrides]="editorOverrides()"
+          (changed)="onEditorChange($event)"
+        />
       </docs-example>
 
       <h2>API</h2>
@@ -191,6 +222,28 @@ export class TranslatePage {
   switchLang(lang: unknown): void {
     if (lang === 'en' || lang === 'pl') void this.translate.use(lang);
   }
+
+  readonly editorBase = {
+    en: { 'menu.title': 'Menu', 'cart.total': 'Total', 'cart.empty': 'Your cart is empty' },
+    pl: { 'menu.title': 'Menu', 'cart.total': 'Razem' },
+  };
+  readonly editorOverrides = signal<Record<string, Record<string, string>>>({ pl: { 'menu.title': 'Karta' } });
+
+  onEditorChange(change: MkTranslationChange): void {
+    this.editorOverrides.update((all) => {
+      const locale = { ...(all[change.locale] ?? {}) };
+      if (change.value === null) delete locale[change.key];
+      else locale[change.key] = change.value;
+      return { ...all, [change.locale]: locale };
+    });
+  }
+
+  readonly editorCode = `<mk-translation-editor
+  [locales]="['en', 'pl']"
+  [base]="base()"          // the bundled files, flat or nested
+  [overrides]="overrides()" // your table of edits
+  (changed)="save($event)"  // { locale, key, value | null, previous }
+/>`;
 
   readonly pipeCode = `<p>{{ 'demo.greeting' | translate: { name: 'Ada' } }}</p>
 <p>{{ translate.plural('demo.cart', count()) }}</p>

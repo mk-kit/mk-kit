@@ -1,0 +1,95 @@
+<div class="mk-translation-editor__toolbar">
+  <input
+    mkInput
+    type="search"
+    class="mk-translation-editor__search"
+    [value]="query()"
+    (input)="query.set($any($event.target).value)"
+    [placeholder]="i18n.translationEditorSearch"
+    [attr.aria-label]="i18n.translationEditorSearch"
+  />
+  <div class="mk-translation-editor__filters" role="group">
+    <button
+      mkButton
+      size="sm"
+      [variant]="filter() === 'all' ? 'solid' : 'outline'"
+      (click)="setFilter('all')"
+    >
+      {{ i18n.translationEditorAll }} · {{ keys().length }}
+    </button>
+    <button
+      mkButton
+      size="sm"
+      [variant]="filter() === 'overridden' ? 'solid' : 'outline'"
+      [attr.aria-pressed]="filter() === 'overridden'"
+      (click)="setFilter('overridden')"
+    >
+      {{ i18n.translationEditorOverridden }} · {{ overriddenTotal() }}
+    </button>
+    @for (s of stats(); track s.locale) {
+      @if (s.missing > 0) {
+        <button
+          mkButton
+          size="sm"
+          tone="warning"
+          [variant]="filter() === 'missing:' + s.locale ? 'solid' : 'outline'"
+          [attr.aria-pressed]="filter() === 'missing:' + s.locale"
+          (click)="setFilter('missing:' + s.locale)"
+        >
+          {{ i18n.translationEditorMissing }} {{ s.locale.toUpperCase() }} · {{ s.missing }}
+        </button>
+      }
+    }
+  </div>
+  <span class="mk-translation-editor__count">{{ rows().length }} {{ i18n.translationEditorKeys }}</span>
+  <button mkButton size="sm" variant="ghost" (click)="exportCsv()">
+    <mk-icon name="download" [size]="16" />
+    {{ i18n.translationEditorExport }}
+  </button>
+</div>
+
+<mk-table
+  [columns]="columns()"
+  [data]="rows()"
+  density="compact"
+  stickyHeader
+  virtual
+  [rowHeight]="44"
+  class="mk-translation-editor__table"
+>
+  <ng-template mkTableCell="key" let-row="row">
+    <code class="mk-translation-editor__key">{{ row.key }}</code>
+  </ng-template>
+  @for (locale of locales(); track locale) {
+    <ng-template [mkTableCell]="locale" let-row="row">
+      <div
+        class="mk-translation-editor__cell"
+        [class.mk-translation-editor__cell--overridden]="hasOverride(locale, row.key)"
+        [class.mk-translation-editor__cell--missing]="isMissing(locale, row.key)"
+      >
+        <mk-inline-edit
+          size="sm"
+          [value]="row[locale]"
+          [disabled]="readonly()"
+          [placeholder]="isMissing(locale, row.key) ? i18n.translationEditorMissing : i18n.empty"
+          [ariaLabel]="row.key + ' · ' + locale"
+          (saved)="onSaved(locale, row.key, $event)"
+        />
+        @if (hasOverride(locale, row.key) && !readonly()) {
+          <button
+            mkButton
+            variant="ghost"
+            size="sm"
+            iconOnly
+            class="mk-translation-editor__reset"
+            [attr.aria-label]="i18n.translationEditorReset"
+            [attr.title]="i18n.translationEditorReset"
+            (click)="reset(locale, row.key)"
+          >
+            <mk-icon name="undo" [size]="16" />
+          </button>
+        }
+      </div>
+    </ng-template>
+  }
+</mk-table>
