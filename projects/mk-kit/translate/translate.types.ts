@@ -46,6 +46,12 @@ export interface MkTranslateConfig {
    */
   preload?: boolean;
   /**
+   * Mirror the active language onto `<html lang>` (server and browser), so
+   * screen readers, hyphenation and search engines follow `use()`. Default
+   * `true`.
+   */
+  documentLang?: boolean;
+  /**
    * Called for a key missing in both the active and the fallback language.
    * Return a string to render instead of the key. Missing keys are also
    * collected in {@link MkTranslate.missingKeys}.

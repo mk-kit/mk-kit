@@ -17989,6 +17989,14 @@
      "signature": "(key: string | null | undefined, params?: MkTranslateParams): string"
     },
     {
+     "name": "MkTranslatePluralPipe",
+     "description": "`translatePlural` — the CLDR plural form under `keyBase` for a count\n(see `MkTranslate.plural`), interpolated with `{ count, ...params }`.\n\n```html\n{{ guests | translatePlural: 'reservation.guests' }}   <!-- 2 osoby / 5 osób -->\n```",
+     "file": "projects/mk-kit/translate/translate.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "translatePlural",
+     "signature": "(count: number | string | null | undefined, keyBase: string, params?: MkTranslateParams): string"
+    },
+    {
      "name": "MkTranslate",
      "description": "App translations as signals: a `lang` you switch with `use()`, `instant()`\nfor code, the `translate` pipe for templates, and `plural()` for CLDR\ncount forms. Dictionaries are the plain nested JSON you already have; an\noptional overrides loader (a database of edits, say) is merged on top per\nlanguage. On the server the loaded strings ride to the browser through\n`TransferState`, so hydration never refetches or flashes raw keys.\n\n```ts\nprovideMkTranslate({\n  lang: 'pl',\n  fallbackLang: 'pl',\n  loader: mkHttpTranslateLoader({ prefix: '/assets/i18n/' }),\n});\n```\n```html\n{{ 'checkout.cart.total' | translate }}\n{{ 'checkout.cart.freeDeliveryMissing' | translate: { amount: 12 } }}\n```",
      "file": "projects/mk-kit/translate/translate.service.ts",
@@ -18187,6 +18195,12 @@
        "name": "preload",
        "type": "boolean | undefined",
        "description": "Block application bootstrap until the initial language is loaded, so the\nfirst render never shows raw keys and `instant()` calls inside\n`computed()` never cache them. Default `true`.",
+       "optional": true
+      },
+      {
+       "name": "documentLang",
+       "type": "boolean | undefined",
+       "description": "Mirror the active language onto `<html lang>` (server and browser), so\nscreen readers, hyphenation and search engines follow `use()`. Default\n`true`.",
        "optional": true
       },
       {
@@ -24474,6 +24488,46 @@
      "file": "projects/mk-kit/testing/harness.ts",
      "kind": "type",
      "definition": "| 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown'"
+    }
+   ]
+  },
+  {
+   "name": "translate/server",
+   "import": "@mk-kit/ui/translate/server",
+   "exports": [
+    {
+     "name": "mkFsTranslateLoader",
+     "description": "Server-side loader that reads the translation JSON from disk instead of\nfetching the app's own HTTP endpoint during SSR — no self-request, no\nproxy hop, no interceptor ordering to get right. Register it in the\nserver config only (`app.config.server.ts`); the browser keeps\n`mkHttpTranslateLoader`. Files are parsed once per process.\n\n```ts\n// app.config.server.ts\nprovideMkTranslate({\n  ...browserTranslateConfig,\n  loader: mkFsTranslateLoader({\n    dirs: [join(import.meta.dirname, '../browser/assets/i18n'), join(process.cwd(), 'src/assets/i18n')],\n  }),\n})\n```",
+     "file": "projects/mk-kit/translate/server/fs-loader.ts",
+     "kind": "function",
+     "signatures": [
+      "(options: MkFsTranslateLoaderOptions): MkTranslateLoaderFactory"
+     ]
+    },
+    {
+     "name": "MkFsTranslateLoaderOptions",
+     "description": "Options for `mkFsTranslateLoader`.",
+     "file": "projects/mk-kit/translate/server/fs-loader.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "dirs",
+       "type": "string[]",
+       "description": "Directories searched in order for `<lang><suffix>`; the first readable\nfile wins. Typical: the built browser assets next to the server bundle,\nthen the source tree for `ng serve`."
+      },
+      {
+       "name": "suffix",
+       "type": "string | undefined",
+       "description": "File suffix after the language code. Default `.json`.",
+       "optional": true
+      },
+      {
+       "name": "onNotFound",
+       "type": "\"empty\" | \"throw\" | undefined",
+       "description": "When no directory has the file: return `{}` (default) so the app boots\nwith keys as text, or throw so the failure surfaces at once.",
+       "optional": true
+      }
+     ]
     }
    ]
   }

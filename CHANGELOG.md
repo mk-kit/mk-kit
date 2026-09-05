@@ -20,7 +20,11 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   initial language before the first render, and on the server the strings
   ride to the browser through `TransferState`. Loaders:
   `mkHttpTranslateLoader({ prefix, suffix })`, `mkStaticTranslateLoader(map)`,
-  or any `{ load(lang) }`.
+  or any `{ load(lang) }`. Also the `translatePlural` pipe
+  (`{{ n | translatePlural: 'guests' }}`), `documentLang` (mirrors `use()`
+  onto `<html lang>`, on by default), and **`@mk-kit/ui/translate/server`**
+  with `mkFsTranslateLoader({ dirs })` — SSR reads the JSON from disk instead
+  of fetching its own endpoint.
 
 ## [0.54.0] — 2026-09-04
 

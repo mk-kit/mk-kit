@@ -1,9 +1,11 @@
 import { Component, PLATFORM_ID, signal, TransferState, makeStateKey } from '@angular/core';
+import { DOCUMENT } from '@angular/common';
 import { TestBed } from '@angular/core/testing';
 import { describe, expect, it, vi } from 'vitest';
 import {
   MkTranslate,
   MkTranslatePipe,
+  MkTranslatePluralPipe,
   mkFlattenTranslations,
   mkInterpolate,
   mkStaticTranslateLoader,
@@ -129,6 +131,19 @@ describe('MkTranslate', () => {
     expect(t.loadedLangs()).toContain('pl');
   });
 
+  it('mirrors the active language onto <html lang> unless told not to', async () => {
+    const t = setup();
+    const html = TestBed.inject(DOCUMENT).documentElement;
+    await t.use('en');
+    expect(html.getAttribute('lang')).toBe('en');
+    await t.use('pl');
+    expect(html.getAttribute('lang')).toBe('pl');
+    TestBed.resetTestingModule();
+    const quiet = setup({ documentLang: false });
+    await quiet.use('en');
+    expect(TestBed.inject(DOCUMENT).documentElement.getAttribute('lang')).toBe('pl');
+  });
+
   it('loads each language once even when asked concurrently', async () => {
     const load = vi.fn(async (lang: string) => (lang === 'pl' ? PL : EN));
     const t = setup({ loader: () => ({ load }) });
@@ -201,5 +216,30 @@ describe('translate pipe', () => {
     await t.use('en');
     await fixture.whenStable();
     expect(text()).toBe('5 items');
+  });
+});
+
+describe('translatePlural pipe', () => {
+  @Component({
+    imports: [MkTranslatePluralPipe],
+    template: `<p>{{ n() | translatePlural: 'guests' }}</p>`,
+  })
+  class Host {
+    n = signal(1);
+  }
+
+  it('renders the CLDR form and follows the count and the language', async () => {
+    const t = setup();
+    await t.use('pl');
+    const fixture = TestBed.createComponent(Host);
+    await fixture.whenStable();
+    const text = () => (fixture.nativeElement as HTMLElement).querySelector('p')!.textContent;
+    expect(text()).toBe('1 osoba');
+    fixture.componentInstance.n.set(5);
+    await fixture.whenStable();
+    expect(text()).toBe('5 osób');
+    await t.use('en');
+    await fixture.whenStable();
+    expect(text()).toBe('5 guests');
   });
 });

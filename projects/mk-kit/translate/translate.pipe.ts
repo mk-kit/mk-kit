@@ -22,3 +22,20 @@ export class MkTranslatePipe implements PipeTransform {
     return this.translate.instant(key, params);
   }
 }
+
+/**
+ * `translatePlural` — the CLDR plural form under `keyBase` for a count
+ * (see {@link MkTranslate.plural}), interpolated with `{ count, ...params }`.
+ *
+ * ```html
+ * {{ guests | translatePlural: 'reservation.guests' }}   <!-- 2 osoby / 5 osób -->
+ * ```
+ */
+@Pipe({ name: 'translatePlural', pure: false })
+export class MkTranslatePluralPipe implements PipeTransform {
+  private readonly translate = inject(MkTranslate);
+
+  transform(count: number | string | null | undefined, keyBase: string, params?: MkTranslateParams): string {
+    return this.translate.plural(keyBase, Number(count) || 0, params);
+  }
+}

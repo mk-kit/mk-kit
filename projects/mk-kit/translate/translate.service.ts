@@ -11,7 +11,7 @@ import {
   signal,
   TransferState,
 } from '@angular/core';
-import { isPlatformServer } from '@angular/common';
+import { DOCUMENT, isPlatformServer } from '@angular/common';
 import { toObservable } from '@angular/core/rxjs-interop';
 import type {
   MkFlatTranslations,
@@ -95,6 +95,7 @@ export class MkTranslate {
   private readonly injector = inject(Injector);
   private readonly transfer = inject(TransferState, { optional: true });
   private readonly isServer = isPlatformServer(inject(PLATFORM_ID));
+  private readonly document = inject(DOCUMENT, { optional: true });
 
   private loader: MkTranslateLoader | null = null;
   private overridesLoader: MkTranslateLoader | null = null;
@@ -139,6 +140,9 @@ export class MkTranslate {
       this.load(this.config.fallbackLang).catch(() => undefined);
     }
     this.lang.set(lang);
+    if (this.config?.documentLang !== false) {
+      this.document?.documentElement?.setAttribute('lang', lang);
+    }
   }
 
   /** Load a language into memory without switching to it. */

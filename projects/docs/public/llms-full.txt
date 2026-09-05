@@ -11919,7 +11919,7 @@ Members:
 
 ## @mk-kit/ui/translate
 
-16 exports. `import { … } from '@mk-kit/ui/translate';`
+17 exports. `import { … } from '@mk-kit/ui/translate';`
 
 ### MkTranslatePipe (pipe)
 
@@ -11935,6 +11935,19 @@ the host view dirty, so this stays cheap under OnPush and zoneless.
 ```html
 {{ 'menu.title' | translate }}
 {{ 'cart.items' | translate: { count: 3 } }}
+```
+
+### MkTranslatePluralPipe (pipe)
+
+Pipe name: `translatePlural` · `transform(count: number | string | null | undefined, keyBase: string, params?: MkTranslateParams): string`
+
+Import: `import { MkTranslatePluralPipe } from '@mk-kit/ui/translate';`
+
+`translatePlural` — the CLDR plural form under `keyBase` for a count
+(see `MkTranslate.plural`), interpolated with `{ count, ...params }`.
+
+```html
+{{ guests | translatePlural: 'reservation.guests' }}   <!-- 2 osoby / 5 osób -->
 ```
 
 ### MkTranslate (service)
@@ -12101,6 +12114,7 @@ Members:
 | `loader` | `MkTranslateLoaderFactory` | Base strings — the bundled JSON, typically (`mkHttpTranslateLoader`). |
 | `overrides`? | `MkTranslateLoaderFactory \| undefined` | Optional second source merged OVER the base per language: edits kept in a database, a tenant's wording, a translator's work in progress. A loader that throws or resolves `{}` leaves the base untouched. |
 | `preload`? | `boolean \| undefined` | Block application bootstrap until the initial language is loaded, so the first render never shows raw keys and `instant()` calls inside `computed()` never cache them. Default `true`. |
+| `documentLang`? | `boolean \| undefined` | Mirror the active language onto `<html lang>` (server and browser), so screen readers, hyphenation and search engines follow `use()`. Default `true`. |
 | `onMissing`? | `((key: string, lang: string) => string \| undefined \| void) \| undefined` | Called for a key missing in both the active and the fallback language. Return a string to render instead of the key. Missing keys are also collected in `MkTranslate.missingKeys`. |
 
 ### MkTranslateLoader (interface)
@@ -16479,3 +16493,45 @@ Keys accepted by `MkTestElement.sendKeys` besides printable characters.
 ```ts
 type MkTestKey = | 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown';
 ```
+
+## @mk-kit/ui/translate/server
+
+2 exports. `import { … } from '@mk-kit/ui/translate/server';`
+
+### mkFsTranslateLoader (function)
+
+Import: `import { mkFsTranslateLoader } from '@mk-kit/ui/translate/server';`
+
+Server-side loader that reads the translation JSON from disk instead of
+fetching the app's own HTTP endpoint during SSR — no self-request, no
+proxy hop, no interceptor ordering to get right. Register it in the
+server config only (`app.config.server.ts`); the browser keeps
+`mkHttpTranslateLoader`. Files are parsed once per process.
+
+```ts
+// app.config.server.ts
+provideMkTranslate({
+  ...browserTranslateConfig,
+  loader: mkFsTranslateLoader({
+    dirs: [join(import.meta.dirname, '../browser/assets/i18n'), join(process.cwd(), 'src/assets/i18n')],
+  }),
+})
+```
+
+```ts
+function mkFsTranslateLoader(options: MkFsTranslateLoaderOptions): MkTranslateLoaderFactory
+```
+
+### MkFsTranslateLoaderOptions (interface)
+
+Import: `import { MkFsTranslateLoaderOptions } from '@mk-kit/ui/translate/server';`
+
+Options for `mkFsTranslateLoader`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `dirs` | `string[]` | Directories searched in order for `<lang><suffix>`; the first readable file wins. Typical: the built browser assets next to the server bundle, then the source tree for `ng serve`. |
+| `suffix`? | `string \| undefined` | File suffix after the language code. Default `.json`. |
+| `onNotFound`? | `"empty" \| "throw" \| undefined` | When no directory has the file: return `{}` (default) so the app boots with keys as text, or throw so the failure surfaces at once. |
