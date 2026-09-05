@@ -11,6 +11,11 @@
       "input": ".",
       "glob": "THIRD_PARTY_NOTICES.md",
       "output": "."
+    },
+    {
+      "input": "./bin",
+      "glob": "*.mjs",
+      "output": "./bin"
     }
   ],
   "lib": {

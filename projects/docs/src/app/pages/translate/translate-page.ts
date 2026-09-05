@@ -134,6 +134,22 @@ import { DocsExample } from '../../shared/docs-example';
         />
       </docs-example>
 
+      <h2>CLI</h2>
+      <p>
+        <code class="docs-inline">mk-translate check</code> keeps the JSON
+        files honest in CI: keys no template or <code class="docs-inline">instant()</code>
+        call references (string literals and the dynamic prefixes the code
+        builds — <code class="docs-inline">'Day' + n</code>,
+        <code class="docs-inline">ns.$&#123;key&#125;</code> in a template literal,
+        <code class="docs-inline">translatePlural</code> bases), keys a locale
+        lacks, keys a locale has that the base does not. Exit 1 on any finding;
+        <code class="docs-inline">--fix</code> deletes the unused keys from
+        every file, <code class="docs-inline">--json</code> for tooling.
+      </p>
+      <docs-example [code]="cliCode" column>
+        <p>See the code tab.</p>
+      </docs-example>
+
       <h2>API</h2>
       <table class="docs-props">
         <thead>
@@ -244,6 +260,16 @@ export class TranslatePage {
   [overrides]="overrides()" // your table of edits
   (changed)="save($event)"  // { locale, key, value | null, previous }
 />`;
+
+  readonly cliCode = `# package.json
+"check:i18n": "mk-translate check --dir src/assets/i18n --src src"
+
+$ mk-translate check --dir src/assets/i18n --src src --list
+i18n: 1386 keys in pl · used 1386 (6200 literal sites, 21 dynamic prefixes, 812 files)
+✓ i18n keys clean (no unused keys, en/ru in parity with pl)
+
+# options: --base <lang> --langs pl,en --src <dir> (repeatable) --ext ts,html
+#          --prefix <p> (extra dynamic prefix) --list --fix --json`;
 
   readonly pipeCode = `<p>{{ 'demo.greeting' | translate: { name: 'Ada' } }}</p>
 <p>{{ translate.plural('demo.cart', count()) }}</p>
