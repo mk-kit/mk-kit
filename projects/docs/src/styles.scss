@@ -6,6 +6,8 @@
 /* Import the library theme from source (stable across library rebuilds).
    Published apps instead use: @import '@mk-kit/ui/styles.css'; */
 @import '../../mk-kit/src/styles/mk-kit.css';
+/* Presets are opt-in per subtree (data-mk-preset) — see /theming. */
+@import '../../mk-kit/src/styles/presets/momentum.css';
 
 /* AZ Widgets (contact form, consent banner) pick these up through their
    Shadow DOM, so they follow the docs theme incl. dark mode. */

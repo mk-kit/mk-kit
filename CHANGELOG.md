@@ -4,7 +4,7 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
-## [Unreleased]
+## [0.55.0] — 2026-09-05
 
 ### Added
 
@@ -28,6 +28,32 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
   `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
   of a `TranslateModule` import.
+- **Theme presets** — a second stylesheet that re-declares the token set
+  behind one attribute: `@import '@mk-kit/ui/presets/<name>.css'` after the
+  base theme and `data-mk-preset="<name>"` on `<html>` or any subtree. Light
+  and dark resolve like the base theme; a preset steps aside for
+  `data-mk-contrast="high"`. The first is **`momentum`**: Manrope set heavy
+  and tight, soft violet-grey surfaces, 11/13/16/20 px radii, feather-light
+  card shadows, an indigo accent meant to be swapped at runtime (the recipe
+  is on the theming page) and the Momentum bucket palette as
+  `--mk-chart-1…8`. The contrast smoke test reads every preset and holds it
+  to the same WCAG AA pairs as the base theme. `build:theme` now compiles the
+  whole `src/styles` tree, so a new preset is one `.scss` file.
+- **`[mkDropZone]`** (`@mk-kit/ui/dnd`) — a drop target that is not a list.
+  An item from a connected `[mkDropList]` can be released anywhere on it and
+  the zone reports *where*: client coordinates, the offset inside the zone
+  and the 0–1 fraction along each axis (`MkDropZoneEvent`), so a position
+  becomes a time on a timeline, a priority band, a "focus on this" pane.
+  Wired like a list (`mkDropZoneId` named in `mkDropListConnectedTo`);
+  `mkDropZoneEntered` / `mkDropZoneMoved` / `mkDropZoneLeft` /
+  `mkDropZoneDropped`; `mkDropZoneLabel` names the group for announcements.
+  No placeholder while hovering a zone; zones and lists may overlap and the
+  innermost target wins. Keyboard: zones join the document-ordered travel
+  group of connected lists, so the list-crossing arrows reach them and
+  Space/Enter drops at the centre — announced through two new i18n strings,
+  `dndMovedToZone` and `dndDroppedInZone`, in every locale pack.
+  `MkDragDropRegistry` gains `registerZone` / `getZone` / `connectedZones` /
+  `travelGroup`.
 
 ## [0.54.0] — 2026-09-04
 

@@ -160,6 +160,27 @@ theme.resolvedTheme();       // signal: 'light' | 'dark'
 
 The choice is persisted to `localStorage`; the service is SSR-safe.
 
+### Presets
+
+A preset re-declares the whole token set — type, radii, shadows, every
+colour in light and dark — behind one attribute, so a second look is one
+import and one attribute, on `<html>` or on any subtree:
+
+```css
+@import '@mk-kit/ui/styles.css';
+@import '@mk-kit/ui/presets/momentum.css';
+```
+
+```html
+<html data-mk-preset="momentum">
+```
+
+`momentum` is the first: Manrope set heavy and tight, soft violet-grey
+surfaces, generous radii, feather-light shadows, an indigo accent meant to
+be swapped at runtime. Presets hold the same text/surface pairs to WCAG AA as
+the base theme and step aside for `data-mk-contrast="high"`. Live demo and
+the accent-swap recipe at <https://mk-kit.dev/theming#presets>.
+
 ### Density & touch
 
 Three densities — `comfortable`, `compact`, `touch` — via `data-mk-density`

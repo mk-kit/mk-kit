@@ -1,6 +1,6 @@
 {
   "name": "@mk-kit/ui",
-  "version": "0.54.0",
+  "version": "0.55.0",
   "publishConfig": {
     "access": "public"
   },
@@ -49,6 +49,10 @@
     "./styles.css": {
       "style": "./styles/mk-kit.css",
       "default": "./styles/mk-kit.css"
+    },
+    "./presets/momentum.css": {
+      "style": "./styles/presets/momentum.css",
+      "default": "./styles/presets/momentum.css"
     }
   }
 }

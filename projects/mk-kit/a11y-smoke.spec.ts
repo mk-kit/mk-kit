@@ -67,7 +67,7 @@ import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/status';
 import { MkProgressBar } from '@mk-kit/ui/data/progress-bar';
 import { MkCard, MkCardFooter, MkCardHeader, MkCardTitle } from '@mk-kit/ui/data/card';
-import { MkDrag, MkDragHandle, MkDropList, MkSortableList } from '@mk-kit/ui/dnd';
+import { MkDrag, MkDragHandle, MkDropList, MkDropZone, MkSortableList } from '@mk-kit/ui/dnd';
 import { MkRepeater, MkRepeaterRow } from '@mk-kit/ui/forms/repeater';
 import { MkHeatmap } from '@mk-kit/ui/data/charts';
 import { MkCalendar } from '@mk-kit/ui/datetime/calendar';
@@ -616,6 +616,27 @@ class DropListListboxHost {
   ];
 }
 
+/** A list connected to a labelled drop zone (a named group, no items of its own). */
+@Component({
+  imports: [MkDropList, MkDrag, MkDropZone],
+  template: `
+    <div mkDropList mkDropListLabel="Backlog" [mkDropListData]="rows" [mkDropListConnectedTo]="['focus']">
+      @for (r of rows; track r.id) {
+        <div mkDrag [mkDragData]="r">{{ r.title }}</div>
+      }
+    </div>
+    <section mkDropZone mkDropZoneId="focus" mkDropZoneLabel="Focus now">
+      <p>Drop a card here to focus on it.</p>
+    </section>
+  `,
+})
+class DropZoneHost {
+  rows = [
+    { id: 1, title: 'Write the brief' },
+    { id: 2, title: 'Review the brief' },
+  ];
+}
+
 /** Rows with focusable handles and their own controls: a plain list. */
 @Component({
   imports: [MkDropList, MkDrag, MkDragHandle, MkInput],
@@ -757,6 +778,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'drop list (div: group of buttons)', host: DropListGroupHost },
   { name: 'drop list (ul: listbox of options)', host: DropListListboxHost },
   { name: 'drop list (ul: rows with focusable handles)', host: DropListHandleHost },
+  { name: 'drop zone (list + named target)', host: DropZoneHost },
   { name: 'sortable list', host: SortableListHost },
   { name: 'sortable list (labelledBy heading)', host: SortableListLabelledByHost },
   { name: 'repeater (reorderable rows with inputs)', host: RepeaterHost },

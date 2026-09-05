@@ -1,0 +1,272 @@
+/* =========================================================================
+ * Momentum — a warm, high-energy preset
+ * -------------------------------------------------------------------------
+ * The look of the Momentum task app: Manrope set heavy and tight, soft
+ * violet-grey surfaces, generous radii, feather-light card shadows and an
+ * indigo accent that is meant to be swapped at runtime (see below).
+ *
+ *   import '@mk-kit/ui/styles.css';
+ *   import '@mk-kit/ui/presets/momentum.css';
+ *   <html data-mk-preset="momentum">
+ *
+ * Works on <html> for the whole app or on any subtree — these are plain
+ * custom properties, they inherit. Light and dark resolve with the same
+ * precedence as the base theme (`data-mk-theme`, else the OS). The preset
+ * steps aside for `data-mk-contrast="high"`: the high-contrast values are
+ * tuned for legibility and the preset never overrides them.
+ *
+ * The preset sets the font family but does not load it. Load Manrope
+ * yourself (Google Fonts, weights 500–800) or the stack falls back to the
+ * system sans without complaint.
+ *
+ * Accent swapping — the app changes its accent at runtime by writing
+ * `--mk-primary`, `--mk-primary-hover`, `--mk-primary-active`,
+ * `--mk-primary-subtle`, `--mk-primary-subtle-hover`,
+ * `--mk-primary-subtle-text`, `--mk-focus-ring`, `--mk-selected-bg` and
+ * `--mk-selected-text` on the same element. Everything else stays.
+ *
+ * Every text/surface pair the base theme holds to WCAG AA is held to AA here
+ * too (`contrast-smoke.spec.ts` reads this file as well).
+ * ========================================================================= */
+/* Theme-independent: type, geometry, elevation shape, motion. */
+/* Light (default) + the theme-independent tokens. */
+[data-mk-preset=momentum]:not([data-mk-contrast=high]) {
+  color-scheme: light;
+  --mk-font-sans: 'Manrope', system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  --mk-font-weight-normal: 500;
+  --mk-font-weight-medium: 600;
+  --mk-font-weight-semibold: 700;
+  --mk-font-weight-bold: 800;
+  --mk-line-height-tight: 1.18;
+  --mk-line-height-snug: 1.28;
+  --mk-line-height-normal: 1.5;
+  --mk-letter-spacing-tight: -0.02em;
+  --mk-letter-spacing-wide: 0.12em;
+  --mk-radius-xs: 5px;
+  --mk-radius-sm: 8px;
+  --mk-radius-md: 11px;
+  --mk-radius-lg: 13px;
+  --mk-radius-xl: 16px;
+  --mk-radius-2xl: 20px;
+  --mk-duration-fast: 150ms;
+  --mk-duration-normal: 220ms;
+  --mk-duration-slow: 360ms;
+  --mk-ease-emphasized: cubic-bezier(0.2, 0.8, 0.2, 1);
+  --mk-bg: #f4f4f8;
+  --mk-surface: #ffffff;
+  --mk-surface-2: #fbfbfe;
+  --mk-surface-3: #f4f4f9;
+  --mk-surface-inverse: #16161f;
+  --mk-overlay-scrim: rgba(22, 22, 31, 0.45);
+  --mk-text: #16161f;
+  --mk-text-muted: #42424f;
+  --mk-text-subtle: #6e6e82;
+  --mk-text-inverse: #ffffff;
+  --mk-text-disabled: #a9a9ba;
+  --mk-border: #ececf2;
+  --mk-border-strong: #d6d6e0;
+  --mk-border-subtle: #f1f1f6;
+  --mk-hover-overlay: rgba(22, 22, 31, 0.04);
+  --mk-active-overlay: rgba(22, 22, 31, 0.08);
+  --mk-selected-bg: #ebeafb;
+  --mk-selected-text: #4a3fc9;
+  --mk-primary: #5b4fe0;
+  --mk-primary-hover: #4f43d1;
+  --mk-primary-active: #4338be;
+  --mk-primary-contrast: #ffffff;
+  --mk-primary-subtle: #ebeafb;
+  --mk-primary-subtle-hover: #dedcf8;
+  --mk-primary-subtle-text: #4a3fc9;
+  --mk-success: #168553;
+  --mk-success-hover: #137548;
+  --mk-success-contrast: #ffffff;
+  --mk-success-subtle: #e4f6ee;
+  --mk-success-subtle-text: #136e47;
+  --mk-warning: #a8660e;
+  --mk-warning-hover: #93590c;
+  --mk-warning-contrast: #ffffff;
+  --mk-warning-subtle: #fbf1e1;
+  --mk-warning-subtle-text: #7f4e0b;
+  --mk-danger: #d4433a;
+  --mk-danger-hover: #bf3a32;
+  --mk-danger-contrast: #ffffff;
+  --mk-danger-text: #c43d33;
+  --mk-danger-subtle: #fce9e7;
+  --mk-danger-subtle-text: #a8322a;
+  --mk-info: #2568d6;
+  --mk-info-hover: #1f58b8;
+  --mk-info-contrast: #ffffff;
+  --mk-info-subtle: #e6effd;
+  --mk-info-subtle-text: #1b4e9e;
+  --mk-neutral-subtle: #f4f4f9;
+  --mk-neutral-subtle-hover: #eaeaf1;
+  --mk-neutral-subtle-text: #42424f;
+  --mk-focus-ring: #5b4fe0;
+  --mk-shadow-xs: 0 1px 2px rgba(22, 22, 31, 0.05);
+  --mk-shadow-sm: 0 2px 6px rgba(22, 22, 31, 0.05);
+  --mk-shadow-md: 0 8px 18px rgba(22, 22, 31, 0.12);
+  --mk-shadow-lg: 0 22px 50px rgba(22, 22, 31, 0.22);
+  --mk-shadow-xl: 0 32px 70px rgba(22, 22, 31, 0.4);
+  --mk-skeleton-base: #ececf2;
+  --mk-skeleton-shine: #f7f7fb;
+  --mk-scrollbar-thumb: #ececf2;
+  --mk-scrollbar-thumb-hover: #d6d6e0;
+  --mk-code-bg: #f4f4f9;
+  --mk-chart-1: #5b4fe0;
+  --mk-chart-2: #1faa6e;
+  --mk-chart-3: #ff6b5c;
+  --mk-chart-4: #e0982e;
+  --mk-chart-5: #a85cd6;
+  --mk-chart-6: #3aafa9;
+  --mk-chart-7: #d85c8a;
+  --mk-chart-8: #6e8bff;
+}
+
+/* Auto (OS) dark, unless explicitly overridden to light. */
+@media (prefers-color-scheme: dark) {
+  :root:not([data-mk-theme=light]) [data-mk-preset=momentum]:not([data-mk-contrast=high]),
+  :root:not([data-mk-theme=light])[data-mk-preset=momentum]:not([data-mk-contrast=high]) {
+    color-scheme: dark;
+    --mk-bg: #0d0d13;
+    --mk-surface: #1b1b25;
+    --mk-surface-2: #14141c;
+    --mk-surface-3: #23232f;
+    --mk-surface-inverse: #f3f3f8;
+    --mk-overlay-scrim: rgba(0, 0, 0, 0.6);
+    --mk-text: #f3f3f8;
+    --mk-text-muted: #c3c3cf;
+    --mk-text-subtle: #8e8ea2;
+    --mk-text-inverse: #14141c;
+    --mk-text-disabled: #5c5c70;
+    --mk-border: #2a2a38;
+    --mk-border-strong: #3a3a4c;
+    --mk-border-subtle: #22222e;
+    --mk-hover-overlay: rgba(255, 255, 255, 0.05);
+    --mk-active-overlay: rgba(255, 255, 255, 0.09);
+    --mk-selected-bg: #26244a;
+    --mk-selected-text: #c9c3fa;
+    --mk-primary: #6d62ec;
+    --mk-primary-hover: #7f75f0;
+    --mk-primary-active: #918af4;
+    --mk-primary-contrast: #ffffff;
+    --mk-primary-subtle: #26244a;
+    --mk-primary-subtle-hover: #2f2c5c;
+    --mk-primary-subtle-text: #c9c3fa;
+    --mk-success: #2bc282;
+    --mk-success-hover: #4ed39a;
+    --mk-success-contrast: #06281a;
+    --mk-success-subtle: #123326;
+    --mk-success-subtle-text: #7ee2b3;
+    --mk-warning: #f0a93a;
+    --mk-warning-hover: #f5bb5c;
+    --mk-warning-contrast: #2a1a02;
+    --mk-warning-subtle: #33240f;
+    --mk-warning-subtle-text: #fbcf7a;
+    --mk-danger: #f06c62;
+    --mk-danger-hover: #f58a82;
+    --mk-danger-contrast: #2a0b09;
+    --mk-danger-text: #f58a82;
+    --mk-danger-subtle: #3a1a1a;
+    --mk-danger-subtle-text: #fca9a2;
+    --mk-info: #5b9cf9;
+    --mk-info-hover: #7cb1fb;
+    --mk-info-contrast: #04182e;
+    --mk-info-subtle: #12243c;
+    --mk-info-subtle-text: #a8ccfd;
+    --mk-neutral-subtle: #23232f;
+    --mk-neutral-subtle-hover: #2c2c3a;
+    --mk-neutral-subtle-text: #c3c3cf;
+    --mk-focus-ring: #8478f2;
+    --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+    --mk-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+    --mk-shadow-md: 0 8px 18px rgba(0, 0, 0, 0.5);
+    --mk-shadow-lg: 0 22px 50px rgba(0, 0, 0, 0.55);
+    --mk-shadow-xl: 0 32px 70px rgba(0, 0, 0, 0.65);
+    --mk-skeleton-base: #23232f;
+    --mk-skeleton-shine: #2e2e3c;
+    --mk-scrollbar-thumb: #2a2a38;
+    --mk-scrollbar-thumb-hover: #3a3a4c;
+    --mk-code-bg: #23232f;
+    --mk-chart-1: #8478f2;
+    --mk-chart-2: #2fc07f;
+    --mk-chart-3: #ff7d70;
+    --mk-chart-4: #f0a93a;
+    --mk-chart-5: #bb7de3;
+    --mk-chart-6: #4dc2bc;
+    --mk-chart-7: #e5709c;
+    --mk-chart-8: #86a0ff;
+  }
+}
+/* Explicit dark. */
+[data-mk-theme=dark] [data-mk-preset=momentum]:not([data-mk-contrast=high]),
+[data-mk-preset=momentum]:not([data-mk-contrast=high])[data-mk-theme=dark] {
+  color-scheme: dark;
+  --mk-bg: #0d0d13;
+  --mk-surface: #1b1b25;
+  --mk-surface-2: #14141c;
+  --mk-surface-3: #23232f;
+  --mk-surface-inverse: #f3f3f8;
+  --mk-overlay-scrim: rgba(0, 0, 0, 0.6);
+  --mk-text: #f3f3f8;
+  --mk-text-muted: #c3c3cf;
+  --mk-text-subtle: #8e8ea2;
+  --mk-text-inverse: #14141c;
+  --mk-text-disabled: #5c5c70;
+  --mk-border: #2a2a38;
+  --mk-border-strong: #3a3a4c;
+  --mk-border-subtle: #22222e;
+  --mk-hover-overlay: rgba(255, 255, 255, 0.05);
+  --mk-active-overlay: rgba(255, 255, 255, 0.09);
+  --mk-selected-bg: #26244a;
+  --mk-selected-text: #c9c3fa;
+  --mk-primary: #6d62ec;
+  --mk-primary-hover: #7f75f0;
+  --mk-primary-active: #918af4;
+  --mk-primary-contrast: #ffffff;
+  --mk-primary-subtle: #26244a;
+  --mk-primary-subtle-hover: #2f2c5c;
+  --mk-primary-subtle-text: #c9c3fa;
+  --mk-success: #2bc282;
+  --mk-success-hover: #4ed39a;
+  --mk-success-contrast: #06281a;
+  --mk-success-subtle: #123326;
+  --mk-success-subtle-text: #7ee2b3;
+  --mk-warning: #f0a93a;
+  --mk-warning-hover: #f5bb5c;
+  --mk-warning-contrast: #2a1a02;
+  --mk-warning-subtle: #33240f;
+  --mk-warning-subtle-text: #fbcf7a;
+  --mk-danger: #f06c62;
+  --mk-danger-hover: #f58a82;
+  --mk-danger-contrast: #2a0b09;
+  --mk-danger-text: #f58a82;
+  --mk-danger-subtle: #3a1a1a;
+  --mk-danger-subtle-text: #fca9a2;
+  --mk-info: #5b9cf9;
+  --mk-info-hover: #7cb1fb;
+  --mk-info-contrast: #04182e;
+  --mk-info-subtle: #12243c;
+  --mk-info-subtle-text: #a8ccfd;
+  --mk-neutral-subtle: #23232f;
+  --mk-neutral-subtle-hover: #2c2c3a;
+  --mk-neutral-subtle-text: #c3c3cf;
+  --mk-focus-ring: #8478f2;
+  --mk-shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --mk-shadow-sm: 0 2px 6px rgba(0, 0, 0, 0.4);
+  --mk-shadow-md: 0 8px 18px rgba(0, 0, 0, 0.5);
+  --mk-shadow-lg: 0 22px 50px rgba(0, 0, 0, 0.55);
+  --mk-shadow-xl: 0 32px 70px rgba(0, 0, 0, 0.65);
+  --mk-skeleton-base: #23232f;
+  --mk-skeleton-shine: #2e2e3c;
+  --mk-scrollbar-thumb: #2a2a38;
+  --mk-scrollbar-thumb-hover: #3a3a4c;
+  --mk-code-bg: #23232f;
+  --mk-chart-1: #8478f2;
+  --mk-chart-2: #2fc07f;
+  --mk-chart-3: #ff7d70;
+  --mk-chart-4: #f0a93a;
+  --mk-chart-5: #bb7de3;
+  --mk-chart-6: #4dc2bc;
+  --mk-chart-7: #e5709c;
+  --mk-chart-8: #86a0ff;
+}

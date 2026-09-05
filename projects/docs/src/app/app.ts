@@ -123,7 +123,7 @@ export class App {
           label: 'Theming',
           path: '/theming',
           keywords:
-            'theme css variables tokens dark light mode colors density contrast high-contrast prefers-contrast forced-colors theme-service',
+            'theme css variables tokens dark light mode colors density contrast high-contrast prefers-contrast forced-colors theme-service preset presets momentum manrope',
         },
         {
           label: 'Theme builder',
