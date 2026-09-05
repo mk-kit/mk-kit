@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.57.0",
+ "version": "0.58.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -84,6 +84,39 @@
      "properties": [],
      "queries": [],
      "docs": "/core-services"
+    },
+    {
+     "name": "MkAccentService",
+     "description": "Runtime accent — the user picks one of `MK_ACCENTS` and every kit\ncontrol recolours: the service writes the `--mk-primary` family\n(`primary`, `-hover`, `-active`, `-subtle`, `-subtle-hover`,\n`-subtle-text`), `--mk-focus-ring`, `--mk-selected-bg` / `-text` and three\naccent tokens of its own — `--mk-accent`, `--mk-accent-ink`,\n`--mk-accent-glow` — onto `<html>`, and mirrors the key as\n`data-mk-accent`. Hover / active are a touch darker in light and a touch\nlighter in dark (it follows `MkThemeService`). The choice persists\nin `localStorage` (`mk-kit-accent`); nothing is written until `set()` is\ncalled, so an app that never picks keeps the preset's own primary.\n\n```ts\nreadonly accent = inject(MkAccentService);\naccent.set('coral');           // every button, ring and chip turns coral\naccent.key();                  // 'coral'\nmkAccentSwatch(accent.key());  // for the picker\n```",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "service",
+     "providedIn": "root",
+     "methods": [
+      {
+       "name": "set",
+       "signature": "(key: MkAccentKey): void",
+       "description": "Pick an accent; persisted."
+      },
+      {
+       "name": "reset",
+       "signature": "(): void",
+       "description": "Back to the preset's own primary; the stored choice is cleared."
+      }
+     ],
+     "properties": [
+      {
+       "name": "key",
+       "type": "Signal<MkAccentKey | null>",
+       "description": "The chosen accent, or `null` while the preset's own primary is in use.",
+       "readonly": true
+      },
+      {
+       "name": "accent",
+       "type": "Signal<MkAccent>",
+       "description": "The chosen accent's definition (indigo when none is chosen).",
+       "readonly": true
+      }
+     ]
     },
     {
      "name": "MkBreakpointService",
@@ -374,6 +407,15 @@
      ]
     },
     {
+     "name": "mkAccentSwatch",
+     "description": "The swatch a picker shows for an accent (bumblebee is the black / yellow split).",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "function",
+     "signatures": [
+      "(key: MkAccentKey): string"
+     ]
+    },
+    {
      "name": "mkBodyLevelAncestor",
      "description": "The direct child of `document.body` an overlay-root descendant lives under,\ncrossing shadow boundaries on the way up — `null` when the node is not under\n`body` at all. The overlay service uses it to keep the overlay's own host\nout of the elements it makes `inert` behind a modal.",
      "file": "projects/mk-kit/core/overlay/overlay-root.ts",
@@ -425,6 +467,15 @@
      "kind": "function",
      "signatures": [
       "(root: HTMLElement): HTMLElement[]"
+     ]
+    },
+    {
+     "name": "mkHexAlpha",
+     "description": "`#rrggbb` → `rgba(r,g,b,a)`.",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "function",
+     "signatures": [
+      "(hex: string, alpha: number): string"
      ]
     },
     {
@@ -628,6 +679,20 @@
      "type": "InjectionToken<MkOverlayRootFn>"
     },
     {
+     "name": "MK_ACCENT_ORDER",
+     "description": "Picker order.",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "const",
+     "type": "readonly MkAccentKey[]"
+    },
+    {
+     "name": "MK_ACCENTS",
+     "description": "High-saturation, distinct, energising accents — the set the `momentum` preset was designed around.",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "const",
+     "type": "Record<MkAccentKey, MkAccent>"
+    },
+    {
      "name": "MK_DEFAULT_BREAKPOINTS",
      "description": "The default scale (same numbers as Tailwind, so mental models transfer).",
      "file": "projects/mk-kit/core/layout/breakpoint.service.ts",
@@ -675,6 +740,29 @@
      "file": "projects/core/src/query.ts",
      "kind": "const",
      "type": "ReadonlySet<MkQueryOperator>"
+    },
+    {
+     "name": "MkAccent",
+     "description": "`fill` = bars, rings and buttons · `ink` = small accent text on a light ground.",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "fill",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "ink",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "name",
+       "type": "string",
+       "description": ""
+      }
+     ]
     },
     {
      "name": "MkAnchoredPosition",
@@ -3305,6 +3393,13 @@
        "description": "Ask the bound control to re-run `validate()` now."
       }
      ]
+    },
+    {
+     "name": "MkAccentKey",
+     "description": "One of the eight kit accents (the Momentum palette).",
+     "file": "projects/mk-kit/core/theme/accent.service.ts",
+     "kind": "type",
+     "definition": "'indigo' | 'blue' | 'teal' | 'violet' | 'coral' | 'lime' | 'pink' | 'bumblebee'"
     },
     {
      "name": "MkAriaLivePoliteness",
