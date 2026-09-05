@@ -100,6 +100,7 @@ export class MkTranslate {
   private loader: MkTranslateLoader | null = null;
   private overridesLoader: MkTranslateLoader | null = null;
   private readonly dictionaries = new Map<string, MkFlatTranslations>();
+  private readonly declared = new Set<string>();
   private readonly pending = new Map<string, Promise<void>>();
   /** Bumped whenever a dictionary changes, so readers recompute. */
   private readonly version = signal(0);
@@ -126,6 +127,33 @@ export class MkTranslate {
   /** The active language as a plain string (for non-reactive call sites). */
   getCurrentLang(): string {
     return this.lang();
+  }
+
+  /** ngx-translate-compatible alias of {@link getCurrentLang}. */
+  get currentLang(): string {
+    return this.lang();
+  }
+
+  /** Languages known to the service: loaded ones plus any added with {@link addLangs}. */
+  getLangs(): string[] {
+    this.version();
+    return [...new Set([...this.declared, ...this.dictionaries.keys()])];
+  }
+
+  /** Declare languages up front (a switcher's list); loading still happens on `use()`. */
+  addLangs(langs: string[]): void {
+    for (const lang of langs) this.declared.add(lang);
+    this.bump();
+  }
+
+  /**
+   * ngx-translate-compatible alias: `setTranslation(lang, strings, true)`
+   * merges like {@link patch}, `false` (the default there) replaces like
+   * {@link set}.
+   */
+  setTranslation(lang: string, strings: MkTranslationTree | MkFlatTranslations, shouldMerge = false): void {
+    if (shouldMerge) this.patch(lang, strings);
+    else this.set(lang, strings);
   }
 
   /**

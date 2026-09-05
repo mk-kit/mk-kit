@@ -24,7 +24,10 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   (`{{ n | translatePlural: 'guests' }}`), `documentLang` (mirrors `use()`
   onto `<html lang>`, on by default), and **`@mk-kit/ui/translate/server`**
   with `mkFsTranslateLoader({ dirs })` — SSR reads the JSON from disk instead
-  of fetching its own endpoint.
+  of fetching its own endpoint. Migration aliases so an ngx-translate app
+  moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
+  `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
+  of a `TranslateModule` import.
 
 ## [0.54.0] — 2026-09-04
 

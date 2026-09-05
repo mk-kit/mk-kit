@@ -144,6 +144,19 @@ describe('MkTranslate', () => {
     expect(TestBed.inject(DOCUMENT).documentElement.getAttribute('lang')).toBe('pl');
   });
 
+  it('offers the ngx-translate aliases: currentLang, getLangs/addLangs, setTranslation', async () => {
+    const t = setup();
+    await t.use('pl');
+    expect(t.currentLang).toBe('pl');
+    t.addLangs(['pl', 'en', 'ru']);
+    expect(t.getLangs()).toEqual(['pl', 'en', 'ru']);
+    t.setTranslation('pl', { menu: { title: 'Scalone' } }, true);
+    expect(t.instant('menu.title')).toBe('Scalone');
+    expect(t.instant('onlyPl')).toBe('tylko po polsku');
+    t.setTranslation('pl', { menu: { title: 'Tylko to' } });
+    expect(t.instant('onlyPl')).toBe('onlyPl');
+  });
+
   it('loads each language once even when asked concurrently', async () => {
     const load = vi.fn(async (lang: string) => (lang === 'pl' ? PL : EN));
     const t = setup({ loader: () => ({ load }) });

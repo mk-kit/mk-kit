@@ -11919,7 +11919,7 @@ Members:
 
 ## @mk-kit/ui/translate
 
-17 exports. `import { … } from '@mk-kit/ui/translate';`
+18 exports. `import { … } from '@mk-kit/ui/translate';`
 
 ### MkTranslatePipe (pipe)
 
@@ -11980,6 +11980,9 @@ Methods:
 | Signature | Description |
 | --- | --- |
 | `getCurrentLang(): string` | The active language as a plain string (for non-reactive call sites). |
+| `getLangs(): string[]` | Languages known to the service: loaded ones plus any added with `addLangs`. |
+| `addLangs(langs: string[]): void` | Declare languages up front (a switcher's list); loading still happens on `use()`. |
+| `setTranslation(lang: string, strings: MkTranslationTree \| MkFlatTranslations, shouldMerge?: boolean): void` | ngx-translate-compatible alias: `setTranslation(lang, strings, true)` merges like `patch`, `false` (the default there) replaces like `set`. |
 | `use(lang: string): Promise<void>` | Load `lang` (once — later calls are cached) and make it active. Resolves when the strings are in memory; a failed load rejects and leaves the previous language active. |
 | `load(lang: string): Promise<void>` | Load a language into memory without switching to it. |
 | `instant(key: string, params?: MkTranslateParams): string` | Translate `key` in the active language, then the fallback; `{{name}}` placeholders come from `params`. A missing key renders as the key itself (or whatever `onMissing` returns) and is recorded in `missingKeys`. Reactive: reading it inside a template or a `computed()` re-runs on language switch and after `patch()`. |
@@ -11998,6 +12001,7 @@ Properties:
 | `ready` | `Signal<boolean>` | `true` once the active language's strings are in memory. |
 | `langChange` | `Observable<string>` | `lang` as an observable, for code still written around streams. |
 | `missingKeys` | `Signal<string[]>` | Keys asked for that neither the active nor the fallback language has. |
+| `currentLang` | `string` | ngx-translate-compatible alias of `getCurrentLang`. |
 
 ### mkFlattenTranslations (function)
 
@@ -12084,6 +12088,17 @@ Configuration token; set by `provideMkTranslate`.
 
 ```ts
 const MK_TRANSLATE_CONFIG: InjectionToken<MkTranslateConfig>;
+```
+
+### MkTranslateImports (const)
+
+Import: `import { MkTranslateImports } from '@mk-kit/ui/translate';`
+
+Everything a template needs, for `imports: [...MkTranslateImports]` — the
+one-line replacement for an ngx-translate `TranslateModule` import.
+
+```ts
+const MkTranslateImports: readonly [typeof MkTranslatePipe, typeof MkTranslatePluralPipe];
 ```
 
 ### MkHttpTranslateLoaderOptions (interface)

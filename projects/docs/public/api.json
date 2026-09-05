@@ -18009,6 +18009,21 @@
        "description": "The active language as a plain string (for non-reactive call sites)."
       },
       {
+       "name": "getLangs",
+       "signature": "(): string[]",
+       "description": "Languages known to the service: loaded ones plus any added with `addLangs`."
+      },
+      {
+       "name": "addLangs",
+       "signature": "(langs: string[]): void",
+       "description": "Declare languages up front (a switcher's list); loading still happens on `use()`."
+      },
+      {
+       "name": "setTranslation",
+       "signature": "(lang: string, strings: MkTranslationTree | MkFlatTranslations, shouldMerge?: boolean): void",
+       "description": "ngx-translate-compatible alias: `setTranslation(lang, strings, true)`\nmerges like `patch`, `false` (the default there) replaces like\n`set`."
+      },
+      {
        "name": "use",
        "signature": "(lang: string): Promise<void>",
        "description": "Load `lang` (once — later calls are cached) and make it active. Resolves\nwhen the strings are in memory; a failed load rejects and leaves the\nprevious language active."
@@ -18078,6 +18093,12 @@
        "type": "Signal<string[]>",
        "description": "Keys asked for that neither the active nor the fallback language has.",
        "readonly": true
+      },
+      {
+       "name": "currentLang",
+       "type": "string",
+       "description": "ngx-translate-compatible alias of `getCurrentLang`.",
+       "readonly": true
       }
      ],
      "docs": "/components/translate"
@@ -18142,6 +18163,13 @@
      "file": "projects/mk-kit/translate/translate.service.ts",
      "kind": "token",
      "type": "InjectionToken<MkTranslateConfig>"
+    },
+    {
+     "name": "MkTranslateImports",
+     "description": "Everything a template needs, for `imports: [...MkTranslateImports]` — the\none-line replacement for an ngx-translate `TranslateModule` import.",
+     "file": "projects/mk-kit/translate/translate.pipe.ts",
+     "kind": "const",
+     "type": "readonly [typeof MkTranslatePipe, typeof MkTranslatePluralPipe]"
     },
     {
      "name": "MkHttpTranslateLoaderOptions",

@@ -39,3 +39,9 @@ export class MkTranslatePluralPipe implements PipeTransform {
     return this.translate.plural(keyBase, Number(count) || 0, params);
   }
 }
+
+/**
+ * Everything a template needs, for `imports: [...MkTranslateImports]` — the
+ * one-line replacement for an ngx-translate `TranslateModule` import.
+ */
+export const MkTranslateImports = [MkTranslatePipe, MkTranslatePluralPipe] as const;
