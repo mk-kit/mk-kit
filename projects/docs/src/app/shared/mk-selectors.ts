@@ -168,6 +168,7 @@ export const MK_SELECTORS: Readonly<Record<string, string>> = {
   'mk-tooltip': 'MkTooltipPanel',
   'mk-tour-popup': 'MkTourPopup',
   'mk-transfer-list': 'MkTransferList',
+  'mk-translation-editor': 'MkTranslationEditor',
   'mk-tree': 'MkTree',
   'mk-tree-select': 'MkTreeSelect',
   'mk-treemap': 'MkTreemap',
