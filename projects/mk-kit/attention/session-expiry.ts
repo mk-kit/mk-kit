@@ -8,6 +8,7 @@ import {
   inject,
   Injectable,
   InjectionToken,
+  Injector,
   makeEnvironmentProviders,
   NgZone,
   OnDestroy,
@@ -147,6 +148,7 @@ export class MkSessionExpiry {
   private readonly config = inject(MK_SESSION_EXPIRY_CONFIG, { optional: true });
   private readonly dialog = inject(MkDialogService);
   private readonly zone = inject(NgZone);
+  private readonly injector = inject(Injector);
   private readonly isBrowser = isPlatformBrowser(inject(PLATFORM_ID));
   private timer: ReturnType<typeof setTimeout> | null = null;
   private started = false;
@@ -161,11 +163,14 @@ export class MkSessionExpiry {
   start(): void {
     if (this.started || !this.config) return;
     this.started = true;
-    effect(() => {
-      this.config!.expiresAt();
-      this.config!.enabled?.();
-      this.schedule();
-    });
+    effect(
+      () => {
+        this.config!.expiresAt();
+        this.config!.enabled?.();
+        this.schedule();
+      },
+      { injector: this.injector },
+    );
   }
 
   private clear(): void {
