@@ -2638,6 +2638,16 @@
        "description": "Announced when the item is dropped."
       },
       {
+       "name": "dndMovedToZone",
+       "type": "(zone: string) => string",
+       "description": "Announced as a lifted item reaches a drop zone (a target that is not a list)."
+      },
+      {
+       "name": "dndDroppedInZone",
+       "type": "(zone: string) => string",
+       "description": "Announced when the item is dropped on a zone."
+      },
+      {
        "name": "dndCancelled",
        "type": "string",
        "description": "Announced when the drag is cancelled."
@@ -4973,7 +4983,7 @@
    "exports": [
     {
      "name": "MkDrag",
-     "description": "Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /\npen) **and** by keyboard (WCAG 2.1.1). Every move is announced via\n`MkLiveAnnouncer`. Which element carries the keyboard interaction\ndepends on the handle:\n\n- **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):\n  the item itself is focusable and exposes `aria-roledescription=\"Draggable\n  item\"` with `role=\"button\"` — or `role=\"option\"` when it is an `<li>` of a\n  `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may\n  not take the `button` role).\n- **A focusable handle** (`<button mkDragHandle aria-label=\"…\">`, or any\n  handle with `tabindex`): the handle is the keyboard target and receives\n  the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the\n  item stays a plain container with no role and no `tabindex`, so it can hold\n  inputs, links and buttons of its own (no nested interactive controls) and\n  `<li>` items keep their list semantics.\n\nKeyboard: focus the item (or its handle) and press **Space/Enter** to pick\nit up, **Arrow** keys to move it (crossing into connected lists at the ends /\nacross the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.\n\nTouch: a swipe scrolls the page as usual — the drag only arms after a\nlong-press (`mkDragTouchDelay`, default 300 ms). While armed the item\ngets the `mk-drag--armed` class so consumers can style the lift moment.\nMouse and pen drags start immediately, as before.\n\nPerformance: pointer moves are rAF-coalesced (one hit-test + one set of\nstyle/DOM writes per frame) against list/item rects snapshotted when the\ndrag lifts, so a move never forces layout. The pending frame is flushed\nsynchronously on release so drops land exactly where the pointer ended.\n\n```html\n<div mkDrag [mkDragData]=\"row\" [mkDragDisabled]=\"row.locked\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ row.title }}\n</div>\n```",
+     "description": "Makes an item inside a `[mkDropList]` draggable — by pointer (mouse / touch /\npen) **and** by keyboard (WCAG 2.1.1). Every move is announced via\n`MkLiveAnnouncer`. Which element carries the keyboard interaction\ndepends on the handle:\n\n- **No handle, or a decorative one** (`<span mkDragHandle aria-hidden>`):\n  the item itself is focusable and exposes `aria-roledescription=\"Draggable\n  item\"` with `role=\"button\"` — or `role=\"option\"` when it is an `<li>` of a\n  `<ul mkDropList>`, which then becomes a labelled `listbox` (an `<li>` may\n  not take the `button` role).\n- **A focusable handle** (`<button mkDragHandle aria-label=\"…\">`, or any\n  handle with `tabindex`): the handle is the keyboard target and receives\n  the `aria-roledescription` / `aria-pressed` / `aria-grabbed` state; the\n  item stays a plain container with no role and no `tabindex`, so it can hold\n  inputs, links and buttons of its own (no nested interactive controls) and\n  `<li>` items keep their list semantics.\n\nKeyboard: focus the item (or its handle) and press **Space/Enter** to pick\nit up, **Arrow** keys to move it (crossing into connected lists at the ends /\nacross the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.\n\nBesides lists, an item can be released on a connected `[mkDropZone]` — a\ntarget that reports *where* it was dropped instead of an index (a timeline,\na priority band, a \"focus on this\" pane). Zones sit in the same keyboard\ntravel group as lists, in document order; while an item hovers a zone no\nplaceholder is shown and the zone streams `mkDropZoneMoved` events.\n\nTouch: a swipe scrolls the page as usual — the drag only arms after a\nlong-press (`mkDragTouchDelay`, default 300 ms). While armed the item\ngets the `mk-drag--armed` class so consumers can style the lift moment.\nMouse and pen drags start immediately, as before.\n\nPerformance: pointer moves are rAF-coalesced (one hit-test + one set of\nstyle/DOM writes per frame) against list/item rects snapshotted when the\ndrag lifts, so a move never forces layout. The pending frame is flushed\nsynchronously on release so drops land exactly where the pointer ended.\n\n```html\n<div mkDrag [mkDragData]=\"row\" [mkDragDisabled]=\"row.locked\">\n  <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ row.title }}\n</div>\n```",
      "file": "projects/mk-kit/dnd/drag.ts",
      "kind": "component",
      "selector": "[mkDrag]",
@@ -5148,6 +5158,117 @@
      "docs": "/components/drag-drop"
     },
     {
+     "name": "MkDropZone",
+     "description": "A drop **target** that is not a list: an item dragged out of a connected\n`[mkDropList]` can be released anywhere on it, and the zone reports *where*\n— client coordinates, the offset inside the zone and the 0–1 fraction along\neach axis — so the consumer can turn a position into meaning: a time on a\ntimeline, a priority band, a \"focus on this\" pane, a trash can.\n\nNothing reorders and no placeholder is shown while an item hovers a zone;\nthe zone gets the `mk-drop-zone--receiving` class and a stream of\n`mkDropZoneMoved` events instead. Zones and lists can overlap — the\ninnermost target under the pointer wins, so a column can hold three\npriority bands and still accept plain drops between the bands.\n\nWire a zone exactly like another list: give it an id and name that id in\nthe source list's `mkDropListConnectedTo`.\n\nKeyboard: a lifted item reaches zones with the arrow keys that cross lists\n(Left/Right in a vertical list, Up/Down in a horizontal one) — zones sit in\nthe same DOM-ordered travel group as connected lists; Space/Enter drops at\nthe zone's centre. Every step is announced.\n\n```html\n<ul mkDropList mkDropListId=\"backlog\" [mkDropListConnectedTo]=\"['now', 'rail']\" …>\n<section mkDropZone mkDropZoneId=\"now\" mkDropZoneLabel=\"Focus now\"\n         (mkDropZoneDropped)=\"focus($event.item.mkDragData())\">\n<div mkDropZone mkDropZoneId=\"rail\" mkDropZoneLabel=\"Today\"\n     (mkDropZoneMoved)=\"preview($event.fractionY)\"\n     (mkDropZoneDropped)=\"schedule($event.item.mkDragData(), $event.fractionY)\">\n```",
+     "file": "projects/mk-kit/dnd/drop-zone.ts",
+     "kind": "component",
+     "selector": "[mkDropZone]",
+     "selectors": [
+      "mkDropZone"
+     ],
+     "exportAs": "mkDropZone",
+     "inputs": [
+      {
+       "name": "mkDropZoneId",
+       "type": "string | undefined",
+       "description": "Stable id source lists name in `mkDropListConnectedTo`. Auto-generated when omitted."
+      },
+      {
+       "name": "mkDropZoneLabel",
+       "type": "string",
+       "description": "Human-readable name, used in screen-reader announcements when a lifted\nitem reaches the zone (\"Moved to Focus now\") and as the zone's accessible\nname. Set it: the fallback is the id, which may be generated gibberish.",
+       "default": "''"
+      },
+      {
+       "name": "mkDropZoneLabelledBy",
+       "type": "string",
+       "description": "Id of a visible element that names the zone (`aria-labelledby`); wins over the label as the accessible name.",
+       "default": "''"
+      },
+      {
+       "name": "mkDropZoneData",
+       "type": "Z | undefined",
+       "description": "Arbitrary payload handed back on every hover and drop event."
+      },
+      {
+       "name": "mkDropZoneDisabled",
+       "type": "boolean",
+       "description": "Disable dropping onto this zone (it leaves the travel group too).",
+       "default": "false"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "mkDropZoneEntered",
+       "type": "MkDropZoneHover<T, Z>",
+       "description": "An item entered the zone (pointer or keyboard)."
+      },
+      {
+       "name": "mkDropZoneMoved",
+       "type": "MkDropZoneHover<T, Z>",
+       "description": "The pointer moved while over the zone (one per frame, pointer only)."
+      },
+      {
+       "name": "mkDropZoneLeft",
+       "type": "MkDrag<T>",
+       "description": "The item left the zone without dropping (moved on, or the drag was cancelled)."
+      },
+      {
+       "name": "mkDropZoneDropped",
+       "type": "MkDropZoneEvent<T, Z>",
+       "description": "The item was released on the zone."
+      }
+     ],
+     "methods": [
+      {
+       "name": "setReceiving",
+       "signature": "(value: boolean): void",
+       "description": "Toggle the \"receiving\" highlight (called by the active drag)."
+      },
+      {
+       "name": "emitEntered",
+       "signature": "(event: MkDropZoneHover<T, Z>): void",
+       "description": "Called by the active `MkDrag` — not part of the consumer API."
+      },
+      {
+       "name": "emitMoved",
+       "signature": "(event: MkDropZoneHover<T, Z>): void",
+       "description": ""
+      },
+      {
+       "name": "emitLeft",
+       "signature": "(item: MkDrag<T>): void",
+       "description": ""
+      },
+      {
+       "name": "emitDrop",
+       "signature": "(event: MkDropZoneEvent<T, Z>): void",
+       "description": ""
+      }
+     ],
+     "properties": [
+      {
+       "name": "element",
+       "type": "HTMLElement",
+       "description": "The zone's host element (drop target bounds).",
+       "readonly": true
+      },
+      {
+       "name": "id",
+       "type": "Signal<string>",
+       "description": "Resolved id (input or generated).",
+       "readonly": true
+      },
+      {
+       "name": "label",
+       "type": "Signal<string>",
+       "description": "Announceable name: the label when set, otherwise the resolved id.",
+       "readonly": true
+      }
+     ],
+     "queries": []
+    },
+    {
      "name": "MkSortableList",
      "description": "Thin convenience wrapper over a single `[mkDropList]` for the common\n\"reorderable list\" case. Bind `items` two-way and provide an `<ng-template>`\nto render each row; drops are applied to the model for you (via\n`mkMoveItemInArray`).\n\nFor connected buckets / kanban, use `[mkDropList]` + `[mkDrag]` directly.\n\nThe list renders as a named `group` of `button` items: pass `label` (or\n`labelledBy` pointing at a visible heading) so screen readers say what is\nbeing reordered — the i18n `sortableListLabel` (\"Sortable list\") is the\nfallback.\n\n```html\n<mk-sortable-list [(items)]=\"rows\" label=\"Steps\">\n  <ng-template let-row let-i=\"index\">\n    <span mkDragHandle aria-hidden=\"true\">⠿</span> {{ i + 1 }}. {{ row.name }}\n  </ng-template>\n</mk-sortable-list>\n```",
      "file": "projects/mk-kit/dnd/sortable-list.ts",
@@ -5272,6 +5393,31 @@
        "name": "connectedGroup",
        "signature": "(list: MkDropList<any>): MkDropList<any>[]",
        "description": "The ordered travel group for `list`: `list` itself plus every enabled list\nit is `mkDropListConnectedTo`, in registration (roughly DOM) order. Used to\nresolve \"adjacent\" lists for keyboard column-to-column movement and to\nhit-test the pointer against candidate targets."
+      },
+      {
+       "name": "registerZone",
+       "signature": "(id: string, zone: MkDropZone<any>): void",
+       "description": "Register (or replace) the zone published under `id`."
+      },
+      {
+       "name": "unregisterZone",
+       "signature": "(id: string, zone: MkDropZone<any>): void",
+       "description": "Remove `zone` from the registry if it is still the holder of `id`."
+      },
+      {
+       "name": "getZone",
+       "signature": "(id: string): MkDropZone<any> | undefined",
+       "description": "Look up a zone by its `mkDropZoneId`."
+      },
+      {
+       "name": "connectedZones",
+       "signature": "(list: MkDropList<any>): MkDropZone<any>[]",
+       "description": "Every enabled zone named in `list`'s `mkDropListConnectedTo`, in registration order."
+      },
+      {
+       "name": "travelGroup",
+       "signature": "(list: MkDropList<any>): MkDropTarget[]",
+       "description": "The keyboard travel group for `list`: its connected lists **and** zones,\nin document order, so arrow keys walk targets the way they appear on\nscreen regardless of when each registered."
       }
      ],
      "properties": []
@@ -5334,11 +5480,94 @@
      ]
     },
     {
+     "name": "MkDropZoneEvent",
+     "description": "Emitted by `[mkDropZone]` (`mkDropZoneDropped`) when an item is released on\nit. Carries the same position fields as `MkDropZoneHover` plus where\nthe item came from — the consumer removes it from that list (or not: a\n\"focus on this\" zone may leave the card where it is).",
+     "file": "projects/mk-kit/dnd/drag-drop.types.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown, Z = unknown>",
+     "extends": [
+      "MkDropZoneHover<T, Z>"
+     ],
+     "members": [
+      {
+       "name": "previousContainer",
+       "type": "MkDropList<T>",
+       "description": "The list the item came from."
+      },
+      {
+       "name": "previousIndex",
+       "type": "number",
+       "description": "Index of the item within `previousContainer`'s data."
+      }
+     ]
+    },
+    {
+     "name": "MkDropZoneHover",
+     "description": "Where an item is over a `[mkDropZone]`, emitted on enter and on every\npointer frame (`mkDropZoneEntered` / `mkDropZoneMoved`). Keyboard entries\nreport the zone's centre.",
+     "file": "projects/mk-kit/dnd/drag-drop.types.ts",
+     "kind": "interface",
+     "typeParams": "<T = unknown, Z = unknown>",
+     "members": [
+      {
+       "name": "item",
+       "type": "MkDrag<T>",
+       "description": "The `MkDrag` directive instance being dragged."
+      },
+      {
+       "name": "zone",
+       "type": "MkDropZone<Z, any>",
+       "description": "The zone under the pointer."
+      },
+      {
+       "name": "x",
+       "type": "number",
+       "description": "Pointer position in client (viewport) coordinates."
+      },
+      {
+       "name": "y",
+       "type": "number",
+       "description": ""
+      },
+      {
+       "name": "offsetX",
+       "type": "number",
+       "description": "Pointer position relative to the zone's top-left corner, in CSS pixels."
+      },
+      {
+       "name": "offsetY",
+       "type": "number",
+       "description": ""
+      },
+      {
+       "name": "fractionX",
+       "type": "number",
+       "description": "Pointer position as a 0–1 fraction of the zone's width / height (clamped)."
+      },
+      {
+       "name": "fractionY",
+       "type": "number",
+       "description": ""
+      },
+      {
+       "name": "isPointerEvent",
+       "type": "boolean",
+       "description": "`true` for pointer (mouse/touch/pen) hovers, `false` for keyboard steps."
+      }
+     ]
+    },
+    {
      "name": "MkDropListOrientation",
      "description": "Layout axis a drop list lays its items along.",
      "file": "projects/mk-kit/dnd/drag-drop.types.ts",
      "kind": "type",
      "definition": "'vertical' | 'horizontal'"
+    },
+    {
+     "name": "MkDropTarget",
+     "description": "A keyboard-reachable drop target: a connected list or a connected zone.",
+     "file": "projects/mk-kit/dnd/drag-drop-registry.ts",
+     "kind": "type",
+     "definition": "MkDropList<any> | MkDropZone<any>"
     }
    ]
   },

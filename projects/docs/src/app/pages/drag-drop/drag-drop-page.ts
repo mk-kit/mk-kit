@@ -3,10 +3,13 @@ import {
   MkDrag,
   MkDragHandle,
   MkDropList,
+  MkDropZone,
   MkSortableList,
   mkMoveItemInArray,
   mkTransferArrayItem,
   type MkDropEvent,
+  type MkDropZoneEvent,
+  type MkDropZoneHover,
 } from '@mk-kit/ui';
 import { DocsExample } from '../../shared/docs-example';
 
@@ -46,7 +49,7 @@ interface NestedSection {
 @Component({
   selector: 'docs-drag-drop-page',
   changeDetection: ChangeDetectionStrategy.OnPush,
-  imports: [DocsExample, MkDrag, MkDragHandle, MkDropList, MkSortableList],
+  imports: [DocsExample, MkDrag, MkDragHandle, MkDropList, MkDropZone, MkSortableList],
   template: `
     <div class="docs-page docs-container">
       <h1>Drag &amp; drop</h1>
@@ -415,6 +418,136 @@ interface NestedSection {
         </tbody>
       </table>
 
+      <h2 id="zones">Drop zones</h2>
+      <p>
+        Not every target is a list. A <code class="docs-inline">[mkDropZone]</code>
+        is any element an item can be released on, and instead of an index it
+        reports <em>where</em>: client coordinates, the offset inside the zone
+        and the 0–1 fraction along each axis — a time on a timeline, a
+        priority band, a "focus on this" pane, a trash can. Wire it like another
+        list (an id, named in the source list's
+        <code class="docs-inline">mkDropListConnectedTo</code>). While an item
+        hovers a zone no placeholder is shown; the zone gets
+        <code class="docs-inline">mk-drop-zone--receiving</code> and a stream of
+        <code class="docs-inline">mkDropZoneMoved</code> events, so it can draw
+        its own preview. Zones and lists may overlap — the innermost target under
+        the pointer wins. Keyboard users reach zones with the arrow keys that
+        cross lists (they sit in the same document-ordered travel group) and
+        drop at the centre with Space or Enter.
+      </p>
+      <p>
+        Drag a task onto <strong>Focus now</strong> (it stays in the backlog) or
+        onto a time in <strong>Today</strong> (the fraction becomes a quarter-hour):
+      </p>
+      <docs-example [code]="zoneCode" column>
+        <div class="dnd-zones">
+          <ul
+            mkDropList
+            class="dnd-list"
+            mkDropListId="backlog"
+            mkDropListLabel="Backlog"
+            [mkDropListData]="backlog()"
+            [mkDropListConnectedTo]="['focus', 'rail']"
+            (mkDropListDropped)="onBacklogReorder($event)"
+          >
+            @for (t of backlog(); track t.id) {
+              <li mkDrag [mkDragData]="t" class="dnd-item">
+                <span class="dnd-grip" aria-hidden="true">⠿</span>
+                <span class="dnd-item__label">{{ t.label }}</span>
+              </li>
+            }
+            @if (backlog().length === 0) {
+              <li class="dnd-col__empty" aria-hidden="true">Everything is scheduled</li>
+            }
+          </ul>
+          <section
+            mkDropZone
+            class="dnd-zone"
+            mkDropZoneId="focus"
+            mkDropZoneLabel="Focus now"
+            (mkDropZoneDropped)="onFocusDrop($event)"
+          >
+            <span class="dnd-zone__label">Focus now</span>
+            @if (focused(); as f) {
+              <strong class="dnd-zone__value">{{ f.label }}</strong>
+            } @else {
+              <span class="dnd-zone__hint">Drop a task here to make it the one thing</span>
+            }
+          </section>
+          <div
+            mkDropZone
+            class="dnd-rail"
+            mkDropZoneId="rail"
+            mkDropZoneLabel="Today, 08:00 to 18:00"
+            (mkDropZoneMoved)="onRailMove($event)"
+            (mkDropZoneLeft)="onRailLeave()"
+            (mkDropZoneDropped)="onRailDrop($event)"
+          >
+            <span class="dnd-zone__label">Today</span>
+            @for (h of railHours; track h) {
+              <span class="dnd-rail__tick" [style.top.%]="railTop(h * 60)">{{ h }}:00</span>
+            }
+            @for (s of scheduled(); track s.task.id) {
+              <span class="dnd-rail__block" [style.top.%]="railTop(s.minutes)">
+                {{ clock(s.minutes) }} · {{ s.task.label }}
+              </span>
+            }
+            @if (railPreview(); as m) {
+              <span class="dnd-rail__pill" [style.top.%]="railTop(m)">{{ clock(m) }}</span>
+            }
+          </div>
+        </div>
+      </docs-example>
+      <table class="docs-props">
+        <thead>
+          <tr><th>MkDropZoneEvent field</th><th>Type</th><th>Notes</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><code class="docs-inline">item</code></td>
+            <td><code class="docs-inline">MkDrag&lt;T&gt;</code></td>
+            <td>The dragged directive — read <code class="docs-inline">mkDragData()</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">zone</code></td>
+            <td><code class="docs-inline">MkDropZone&lt;Z&gt;</code></td>
+            <td>The zone it landed on — its <code class="docs-inline">id()</code>, <code class="docs-inline">mkDropZoneData()</code>.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">x</code>, <code class="docs-inline">y</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Pointer position in client coordinates; the zone's centre for keyboard drops.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">offsetX</code>, <code class="docs-inline">offsetY</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Position relative to the zone's top-left corner, in CSS pixels.</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">fractionX</code>, <code class="docs-inline">fractionY</code></td>
+            <td><code class="docs-inline">number</code></td>
+            <td>Position as a 0–1 fraction of the zone's width / height (clamped).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">previousContainer</code>, <code class="docs-inline">previousIndex</code></td>
+            <td><code class="docs-inline">MkDropList&lt;T&gt;</code>, <code class="docs-inline">number</code></td>
+            <td>Where the item came from — remove it there, or leave it (a zone need not consume).</td>
+          </tr>
+          <tr>
+            <td><code class="docs-inline">isPointerEvent</code></td>
+            <td><code class="docs-inline">boolean</code></td>
+            <td><code class="docs-inline">true</code> for pointer drops, <code class="docs-inline">false</code> for keyboard.</td>
+          </tr>
+        </tbody>
+      </table>
+      <p>
+        <code class="docs-inline">mkDropZoneEntered</code> and
+        <code class="docs-inline">mkDropZoneMoved</code> carry the same position
+        fields (<code class="docs-inline">MkDropZoneHover</code>);
+        <code class="docs-inline">mkDropZoneLeft</code> fires when the item moves
+        on or the drag is cancelled, never after a drop.
+      </p>
+
       <h2 id="nested">Nested lists</h2>
       <p>
         Drop lists nest: a draggable section can own its own list of draggable
@@ -599,6 +732,85 @@ interface NestedSection {
         outline-offset: 2px;
       }
 
+      /* ---- Drop zones ---- */
+      .dnd-zones {
+        display: grid;
+        grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) 9rem;
+        gap: var(--mk-space-3);
+        width: 100%;
+        align-items: stretch;
+      }
+      @media (max-width: 640px) {
+        .dnd-zones { grid-template-columns: 1fr; }
+      }
+      .dnd-zones .dnd-list { max-width: none; }
+      .dnd-zone {
+        display: flex;
+        flex-direction: column;
+        gap: var(--mk-space-2);
+        padding: var(--mk-space-4);
+        border: var(--mk-border-width) dashed var(--mk-border-strong);
+        border-radius: var(--mk-radius-lg);
+        background: var(--mk-surface);
+        color: var(--mk-text);
+      }
+      .dnd-zone__label {
+        font-size: var(--mk-font-size-xs);
+        font-weight: var(--mk-font-weight-semibold, 600);
+        letter-spacing: var(--mk-letter-spacing-wide);
+        text-transform: uppercase;
+        color: var(--mk-text-muted);
+      }
+      .dnd-zone__value { font-size: var(--mk-font-size-lg); }
+      .dnd-zone__hint { color: var(--mk-text-muted); font-size: var(--mk-font-size-sm); }
+      .dnd-rail {
+        position: relative;
+        min-height: 18rem;
+        padding: var(--mk-space-2);
+        border: var(--mk-border-width) solid var(--mk-border);
+        border-radius: var(--mk-radius-lg);
+        background: var(--mk-surface);
+        overflow: hidden;
+      }
+      .dnd-rail .dnd-zone__label { position: absolute; top: var(--mk-space-2); left: var(--mk-space-2); }
+      .dnd-rail__tick {
+        position: absolute;
+        left: var(--mk-space-2);
+        right: var(--mk-space-2);
+        border-top: var(--mk-border-width) solid var(--mk-border-subtle);
+        font-size: var(--mk-font-size-xs);
+        color: var(--mk-text-subtle);
+        font-variant-numeric: tabular-nums;
+        pointer-events: none;
+      }
+      .dnd-rail__block,
+      .dnd-rail__pill {
+        position: absolute;
+        left: var(--mk-space-6);
+        right: var(--mk-space-2);
+        padding: var(--mk-space-1) var(--mk-space-2);
+        font-size: var(--mk-font-size-xs);
+        border-radius: var(--mk-radius-sm);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        pointer-events: none;
+      }
+      .dnd-rail__block {
+        background: var(--mk-primary-subtle);
+        color: var(--mk-primary-subtle-text);
+        border-left: var(--mk-border-width-strong) solid var(--mk-primary);
+      }
+      .dnd-rail__pill {
+        background: var(--mk-primary);
+        color: var(--mk-primary-contrast);
+        font-weight: var(--mk-font-weight-semibold, 600);
+        border-top: var(--mk-border-width-strong) solid var(--mk-primary);
+      }
+      :host ::ng-deep .mk-drop-zone--receiving {
+        outline: var(--mk-border-width) dashed var(--mk-primary);
+        outline-offset: 2px;
+      }
       /* ---- Kanban board ---- */
       .dnd-board {
         display: grid;
@@ -722,6 +934,90 @@ export class DragDropPage {
     const next = [...this.rows()];
     mkMoveItemInArray(next, event.previousIndex, event.currentIndex);
     this.rows.set(next);
+  }
+
+  // ----- Drop zones ---------------------------------------------------
+  protected readonly zoneCode = `<ul mkDropList mkDropListId="backlog" mkDropListLabel="Backlog"
+    [mkDropListData]="backlog()" [mkDropListConnectedTo]="['focus', 'rail']"
+    (mkDropListDropped)="onBacklogReorder($event)">
+  @for (t of backlog(); track t.id) {
+    <li mkDrag [mkDragData]="t">{{ t.label }}</li>
+  }
+</ul>
+
+<!-- a target that is not a list: reports WHERE the item was dropped -->
+<section mkDropZone mkDropZoneId="focus" mkDropZoneLabel="Focus now"
+         (mkDropZoneDropped)="focused.set($event.item.mkDragData())">
+  …
+</section>
+
+<div mkDropZone mkDropZoneId="rail" mkDropZoneLabel="Today, 08:00 to 18:00"
+     (mkDropZoneMoved)="preview.set(minutesAt($event.fractionY))"
+     (mkDropZoneLeft)="preview.set(null)"
+     (mkDropZoneDropped)="schedule($event.item.mkDragData(), minutesAt($event.fractionY))">
+  …
+</div>
+
+// 08:00–18:00 rail: the vertical fraction is the time, snapped to 15 min
+minutesAt(fraction: number): number {
+  return 8 * 60 + Math.round((10 * 60 * fraction) / 15) * 15;
+}`;
+
+  protected readonly backlog = signal<Task[]>([
+    { id: 1, label: 'Finish the Q3 deck' },
+    { id: 2, label: 'Call the dentist' },
+    { id: 3, label: 'Review the pull request' },
+    { id: 4, label: 'Meal-plan the week' },
+  ]);
+  protected readonly focused = signal<Task | null>(null);
+  protected readonly scheduled = signal<{ task: Task; minutes: number }[]>([]);
+  protected readonly railPreview = signal<number | null>(null);
+  protected readonly railHours = [8, 10, 12, 14, 16, 18];
+
+  private static readonly RAIL_START = 8 * 60;
+  private static readonly RAIL_END = 18 * 60;
+
+  protected railTop(minutes: number): number {
+    const { RAIL_START, RAIL_END } = DragDropPage;
+    return ((minutes - RAIL_START) / (RAIL_END - RAIL_START)) * 100;
+  }
+
+  protected clock(minutes: number): string {
+    const h = Math.floor(minutes / 60);
+    const m = minutes % 60;
+    return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+  }
+
+  private minutesAt(fraction: number): number {
+    const { RAIL_START, RAIL_END } = DragDropPage;
+    return RAIL_START + Math.round(((RAIL_END - RAIL_START) * fraction) / 15) * 15;
+  }
+
+  protected onBacklogReorder(event: MkDropEvent<Task>): void {
+    const next = [...this.backlog()];
+    mkMoveItemInArray(next, event.previousIndex, event.currentIndex);
+    this.backlog.set(next);
+  }
+
+  protected onFocusDrop(event: MkDropZoneEvent<Task>): void {
+    this.focused.set(event.item.mkDragData() ?? null);
+  }
+
+  protected onRailMove(event: MkDropZoneHover<Task>): void {
+    this.railPreview.set(this.minutesAt(event.fractionY));
+  }
+
+  protected onRailLeave(): void {
+    this.railPreview.set(null);
+  }
+
+  protected onRailDrop(event: MkDropZoneEvent<Task>): void {
+    const task = event.item.mkDragData();
+    this.railPreview.set(null);
+    if (!task) return;
+    const minutes = this.minutesAt(event.fractionY);
+    this.scheduled.update((list) => [...list.filter((s) => s.task.id !== task.id), { task, minutes }]);
+    this.backlog.update((list) => list.filter((t) => t.id !== task.id));
   }
 
   // ----- Connected kanban board ---------------------------------------

@@ -508,6 +508,8 @@ export const MK_UK_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Переміщено до: ${list}, позиція ${position} з ${total}.`,
   dndDropped: (position) => `Опущено на позиції ${position}.`,
+  dndMovedToZone: (zone) => `Переміщено до: ${zone}. Пробіл або Enter опускає тут.`,
+  dndDroppedInZone: (zone) => `Опущено в: ${zone}.`,
   dndCancelled: 'Переміщення скасовано. Елемент повернувся на початкове місце.',
 
   repeaterAddRow: 'Додати рядок',

@@ -687,6 +687,10 @@ export interface MkI18nStrings {
   dndMovedToList: (list: string, position: number, total: number) => string;
   /** Announced when the item is dropped. */
   dndDropped: (position: number) => string;
+  /** Announced as a lifted item reaches a drop zone (a target that is not a list). */
+  dndMovedToZone: (zone: string) => string;
+  /** Announced when the item is dropped on a zone. */
+  dndDroppedInZone: (zone: string) => string;
   /** Announced when the drag is cancelled. */
   dndCancelled: string;
 
@@ -1070,6 +1074,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Moved to ${list}, position ${position} of ${total}.`,
   dndDropped: (position) => `Dropped at position ${position}.`,
+  dndMovedToZone: (zone) => `Moved to ${zone}. Space or enter to drop here.`,
+  dndDroppedInZone: (zone) => `Dropped in ${zone}.`,
   dndCancelled: 'Movement cancelled. Item returned to its starting position.',
 
   repeaterAddRow: 'Add row',

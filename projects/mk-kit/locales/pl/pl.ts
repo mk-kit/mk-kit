@@ -508,6 +508,8 @@ export const MK_PL_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Przeniesiono do: ${list}, pozycja ${position} z ${total}.`,
   dndDropped: (position) => `Upuszczono na pozycji ${position}.`,
+  dndMovedToZone: (zone) => `Przeniesiono do: ${zone}. Spacja lub Enter upuszcza tutaj.`,
+  dndDroppedInZone: (zone) => `Upuszczono w: ${zone}.`,
   dndCancelled: 'Przenoszenie anulowane. Element wrócił na pierwotne miejsce.',
 
   repeaterAddRow: 'Dodaj wiersz',
