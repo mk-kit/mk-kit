@@ -140,7 +140,7 @@ import { DocsExample } from '../../shared/docs-example';
         files honest in CI: keys no template or <code class="docs-inline">instant()</code>
         call references (string literals and the dynamic prefixes the code
         builds — <code class="docs-inline">'Day' + n</code>,
-        <code class="docs-inline">`ns.$&#123;key&#125;`</code>,
+        <code class="docs-inline">ns.$&#123;key&#125;</code> in a template literal,
         <code class="docs-inline">translatePlural</code> bases), keys a locale
         lacks, keys a locale has that the base does not. Exit 1 on any finding;
         <code class="docs-inline">--fix</code> deletes the unused keys from
