@@ -1573,6 +1573,21 @@
        "description": ""
       },
       {
+       "name": "scannerTitle",
+       "type": "string",
+       "description": "Barcode scanner (`@mk-kit/ui/media/scanner`)."
+      },
+      {
+       "name": "scannerHint",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "scannerCameraError",
+       "type": "string",
+       "description": ""
+      },
+      {
        "name": "resultsCount",
        "type": "(count: number) => string",
        "description": "Announced when a filterable list updates (autocomplete, multi-select, command palette)."
@@ -24182,6 +24197,120 @@
      "file": "projects/mk-kit/locales/uk/uk.ts",
      "kind": "const",
      "type": "MkValidationStrings"
+    }
+   ]
+  },
+  {
+   "name": "media/scanner",
+   "import": "@mk-kit/ui/media/scanner",
+   "exports": [
+    {
+     "name": "MkBarcodeScanner",
+     "description": "Camera barcode / QR reader. Starts the rear camera when it appears, emits\n`scanned` once with the first decoded text and stops. The decoder\n(`html5-qrcode`, an optional peer dependency) is loaded on demand, so pages\nthat only *offer* scanning ship nothing extra until a scan starts. Use\ninline, or through `MkBarcodeScannerDialog`.\n\n```html\n<mk-barcode-scanner (scanned)=\"onCode($event)\" (failed)=\"show($event)\" />\n```",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "component",
+     "selector": "mk-barcode-scanner",
+     "selectors": [
+      "mk-barcode-scanner"
+     ],
+     "inputs": [
+      {
+       "name": "formats",
+       "type": "MkBarcodeFormat[]",
+       "description": "Symbologies to decode. Default: QR + the retail 1-D codes.",
+       "default": "MK_BARCODE_DEFAULT_FORMATS"
+      },
+      {
+       "name": "fps",
+       "type": "number",
+       "description": "Frames per second offered to the decoder. Default 10.",
+       "default": "10"
+      },
+      {
+       "name": "hint",
+       "type": "boolean",
+       "description": "Show the built-in hint line above the viewfinder. Default `true`.",
+       "default": "true"
+      },
+      {
+       "name": "continuous",
+       "type": "boolean",
+       "description": "Keep scanning after a hit instead of stopping. Default `false`.",
+       "default": "false"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "scanned",
+       "type": "string",
+       "description": "Decoded text."
+      },
+      {
+       "name": "failed",
+       "type": "string",
+       "description": "The camera could not start (permission, no device, insecure context)."
+      }
+     ],
+     "methods": [
+      {
+       "name": "stop",
+       "signature": "(): Promise<void>",
+       "description": "Stop the camera and release it. Safe to call twice."
+      }
+     ],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/images"
+    },
+    {
+     "name": "MkBarcodeScannerDialog",
+     "description": "The scanner in a dialog: resolves with the decoded text, or `null` when\ncancelled. Open it with `MkDialogService`:\n\n```ts\nconst code = await dialog.open<MkBarcodeScannerDialog, string | null>(MkBarcodeScannerDialog, { size: 'sm' }).afterClosed;\nif (code) this.search.setValue(code);\n```",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner-dialog.ts",
+     "kind": "component",
+     "selector": "mk-barcode-scanner-dialog",
+     "selectors": [
+      "mk-barcode-scanner-dialog"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/images"
+    },
+    {
+     "name": "MK_BARCODE_DEFAULT_FORMATS",
+     "description": "",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "const",
+     "type": "MkBarcodeFormat[]"
+    },
+    {
+     "name": "MkBarcodeScannerDialogData",
+     "description": "Optional data for `MkBarcodeScannerDialog`.",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner-dialog.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "title",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "formats",
+       "type": "MkBarcodeFormat[] | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkBarcodeFormat",
+     "description": "Symbologies the scanner reads; names follow `Html5QrcodeSupportedFormats`.",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "type",
+     "definition": "| 'QR_CODE' | 'EAN_13' | 'EAN_8' | 'CODE_128' | 'CODE_39' | 'UPC_A' | 'UPC_E' | 'DATA_MATRIX' | 'ITF' | 'CODABAR'"
     }
    ]
   },

@@ -916,6 +916,9 @@ Members:
 | `sessionExpiryExtending` | `string` |  |
 | `sessionExpiryLogout` | `string` |  |
 | `sessionExpiryBody` | `(countdown: string) => string` |  |
+| `scannerTitle` | `string` | Barcode scanner (`@mk-kit/ui/media/scanner`). |
+| `scannerHint` | `string` |  |
+| `scannerCameraError` | `string` |  |
 | `resultsCount` | `(count: number) => string` | Announced when a filterable list updates (autocomplete, multi-select, command palette). |
 | `previousPage` | `string` | Pagination: previous page control. |
 | `nextPage` | `string` | Pagination: next page control. |
@@ -16501,6 +16504,97 @@ Ukrainian validation messages rendered by `mk-form-field`.
 
 ```ts
 const MK_UK_VALIDATION: MkValidationStrings;
+```
+
+## @mk-kit/ui/media/scanner
+
+5 exports. `import { … } from '@mk-kit/ui/media/scanner';`
+
+### MkBarcodeScanner (component)
+
+Selector: `mk-barcode-scanner`
+
+Docs: https://mk-kit.dev/components/images
+
+Import: `import { MkBarcodeScanner } from '@mk-kit/ui/media/scanner';`
+
+Camera barcode / QR reader. Starts the rear camera when it appears, emits
+`scanned` once with the first decoded text and stops. The decoder
+(`html5-qrcode`, an optional peer dependency) is loaded on demand, so pages
+that only *offer* scanning ship nothing extra until a scan starts. Use
+inline, or through `MkBarcodeScannerDialog`.
+
+```html
+<mk-barcode-scanner (scanned)="onCode($event)" (failed)="show($event)" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `formats` | `MkBarcodeFormat[]` | `MK_BARCODE_DEFAULT_FORMATS` | Symbologies to decode. Default: QR + the retail 1-D codes. |
+| `fps` | `number` | `10` | Frames per second offered to the decoder. Default 10. |
+| `hint` | `boolean` | `true` | Show the built-in hint line above the viewfinder. Default `true`. |
+| `continuous` | `boolean` | `false` | Keep scanning after a hit instead of stopping. Default `false`. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `scanned` | `string` | Decoded text. |
+| `failed` | `string` | The camera could not start (permission, no device, insecure context). |
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `stop(): Promise<void>` | Stop the camera and release it. Safe to call twice. |
+
+### MkBarcodeScannerDialog (component)
+
+Selector: `mk-barcode-scanner-dialog`
+
+Docs: https://mk-kit.dev/components/images
+
+Import: `import { MkBarcodeScannerDialog } from '@mk-kit/ui/media/scanner';`
+
+The scanner in a dialog: resolves with the decoded text, or `null` when
+cancelled. Open it with `MkDialogService`:
+
+```ts
+const code = await dialog.open<MkBarcodeScannerDialog, string | null>(MkBarcodeScannerDialog, { size: 'sm' }).afterClosed;
+if (code) this.search.setValue(code);
+```
+
+### MK_BARCODE_DEFAULT_FORMATS (const)
+
+Import: `import { MK_BARCODE_DEFAULT_FORMATS } from '@mk-kit/ui/media/scanner';`
+
+```ts
+const MK_BARCODE_DEFAULT_FORMATS: MkBarcodeFormat[];
+```
+
+### MkBarcodeScannerDialogData (interface)
+
+Import: `import { MkBarcodeScannerDialogData } from '@mk-kit/ui/media/scanner';`
+
+Optional data for `MkBarcodeScannerDialog`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `title`? | `string \| undefined` |  |
+| `formats`? | `MkBarcodeFormat[] \| undefined` |  |
+
+### MkBarcodeFormat (type)
+
+Import: `import { MkBarcodeFormat } from '@mk-kit/ui/media/scanner';`
+
+Symbologies the scanner reads; names follow `Html5QrcodeSupportedFormats`.
+
+```ts
+type MkBarcodeFormat = | 'QR_CODE' | 'EAN_13' | 'EAN_8' | 'CODE_128' | 'CODE_39' | 'UPC_A' | 'UPC_E' | 'DATA_MATRIX' | 'ITF' | 'CODABAR';
 ```
 
 ## @mk-kit/ui/testing

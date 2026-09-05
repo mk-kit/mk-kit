@@ -259,6 +259,9 @@ export const MK_UK_I18N: MkI18nStrings = {
   sessionExpiryExtending: 'Продовження…',
   sessionExpiryLogout: 'Вийти зараз',
   sessionExpiryBody: (countdown) => `З міркувань безпеки вас буде вилучено із системи через ${countdown}. Незбережені зміни буде втрачено.`,
+  scannerTitle: 'Сканувати код',
+  scannerHint: 'Наведіть камеру на штрихкод або QR-код. Він зчитається автоматично.',
+  scannerCameraError: 'Не вдалося запустити камеру. Перевірте дозволи браузера.',
   resultsCount: (count) =>
     `${count} ${plural(count, 'результат', 'результати', 'результатів')}`,
 

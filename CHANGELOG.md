@@ -15,6 +15,13 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   before a session lapses — extend, sign out, or sign out at zero — re-armed
   on every token rotation. Five new `MkI18nStrings` (`sessionExpiry*`).
 
+- **`@mk-kit/ui/media/scanner`** — `<mk-barcode-scanner>` (rear camera,
+  QR + retail 1-D formats by default, `formats` / `fps` / `continuous`,
+  `scanned` / `failed`) and `MkBarcodeScannerDialog` (resolves with the code
+  or `null`). The decoder `html5-qrcode` is an **optional peer dependency**
+  loaded on demand, so nothing ships until a scan starts. Three new
+  `MkI18nStrings` (`scanner*`).
+
 ## [0.56.0] — 2026-09-05
 
 ### Added

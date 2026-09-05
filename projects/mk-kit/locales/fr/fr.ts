@@ -248,6 +248,9 @@ export const MK_FR_I18N: MkI18nStrings = {
   sessionExpiryExtending: 'Prolongation…',
   sessionExpiryLogout: 'Se déconnecter maintenant',
   sessionExpiryBody: (countdown) => `Pour des raisons de sécurité, vous serez déconnecté dans ${countdown}. Les modifications non enregistrées seront perdues.`,
+  scannerTitle: 'Scanner un code',
+  scannerHint: 'Dirigez la caméra vers un code-barres ou un QR code. Il est lu automatiquement.',
+  scannerCameraError: 'Impossible de démarrer la caméra. Vérifiez les autorisations du navigateur.',
   resultsCount: (count) =>
     `${count} ${plural(count, 'résultat', 'résultats')}`,
 

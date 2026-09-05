@@ -12,6 +12,8 @@ export const MK_SELECTORS: Readonly<Record<string, string>> = {
   'mk-badge': 'MkBadge',
   'mk-banner': 'MkBanner',
   'mk-bar-chart': 'MkBarChart',
+  'mk-barcode-scanner': 'MkBarcodeScanner',
+  'mk-barcode-scanner-dialog': 'MkBarcodeScannerDialog',
   'mk-block-editor': 'MkBlockEditor',
   'mk-block-inserter': 'MkBlockInserter',
   'mk-block-list': 'MkBlockList',
