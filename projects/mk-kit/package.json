@@ -39,7 +39,8 @@
     "@angular/core": "^22.0.0",
     "@angular/forms": "^22.0.0",
     "@angular/platform-browser": "^22.0.0",
-    "rxjs": "^7.8.0"
+    "rxjs": "^7.8.0",
+    "html5-qrcode": ">=2.3.0"
   },
   "dependencies": {
     "@mk-kit/core": "^0.1.0",
@@ -56,6 +57,11 @@
     "./presets/momentum.css": {
       "style": "./styles/presets/momentum.css",
       "default": "./styles/presets/momentum.css"
+    }
+  },
+  "peerDependenciesMeta": {
+    "html5-qrcode": {
+      "optional": true
     }
   }
 }

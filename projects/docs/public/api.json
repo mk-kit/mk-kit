@@ -1548,6 +1548,46 @@
        "description": ""
       },
       {
+       "name": "sessionExpiryTitle",
+       "type": "string",
+       "description": "Session-expiry dialog (`@mk-kit/ui/attention`)."
+      },
+      {
+       "name": "sessionExpiryExtend",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "sessionExpiryExtending",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "sessionExpiryLogout",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "sessionExpiryBody",
+       "type": "(countdown: string) => string",
+       "description": ""
+      },
+      {
+       "name": "scannerTitle",
+       "type": "string",
+       "description": "Barcode scanner (`@mk-kit/ui/media/scanner`)."
+      },
+      {
+       "name": "scannerHint",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "scannerCameraError",
+       "type": "string",
+       "description": ""
+      },
+      {
        "name": "resultsCount",
        "type": "(count: number) => string",
        "description": "Announced when a filterable list updates (autocomplete, multi-select, command palette)."
@@ -18563,6 +18603,314 @@
    ]
   },
   {
+   "name": "attention",
+   "import": "@mk-kit/ui/attention",
+   "exports": [
+    {
+     "name": "MkSessionExpiryDialog",
+     "description": "Last call before a session ends: counts down and offers to extend.\nReaching zero ends the session, so doing nothing still produces a definite,\nvisible outcome. Opened by `MkSessionExpiry`; usable on its own.",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "component",
+     "selector": "mk-session-expiry-dialog",
+     "selectors": [
+      "mk-session-expiry-dialog"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/attention"
+    },
+    {
+     "name": "MkNotificationSound",
+     "description": "Alert sounds for incoming work (orders, messages, tickets) with the\nbrowser's autoplay rules handled: an `AudioContext` stays suspended until a\nuser gesture, so a sound fired by a WebSocket message would be silent. The\ncontext is unlocked when the user enables sound (a click) and lazily on the\nfirst interaction anywhere in the app. The default sound is synthesised\n(a short C–E–G chime) — nothing to ship, no CORS, lowest latency; file\npresets are fetched and decoded once and fall back to the chime when they\nfail. The on/off preference lives in localStorage under a configurable key.\n\n```ts\nprovideMkNotificationSound({ presets: [MK_CHIME_PRESET, { id: 'ding', label: 'Ding', url: '/assets/ding.wav' }] })\nsound.primeOnFirstInteraction();          // at app start\nsound.play(settings.newOrderSound);       // on an event, honours the device mute\nsound.preview('ding');                    // settings page test button\n```",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "service",
+     "providedIn": "root",
+     "methods": [
+      {
+       "name": "isEnabled",
+       "signature": "(): boolean",
+       "description": "Whether the device has sound on."
+      },
+      {
+       "name": "hasBeenAsked",
+       "signature": "(): boolean",
+       "description": "Whether the user ever answered the \"enable sound?\" question on this device."
+      },
+      {
+       "name": "setEnabled",
+       "signature": "(enabled: boolean): void",
+       "description": "Persist the preference; call from a click so audio unlocks at once."
+      },
+      {
+       "name": "primeOnFirstInteraction",
+       "signature": "(): void",
+       "description": "Arm a one-time listener so the first pointer/key interaction unlocks audio."
+      },
+      {
+       "name": "chime",
+       "signature": "(): void",
+       "description": "The default chime, if the device has sound on."
+      },
+      {
+       "name": "play",
+       "signature": "(soundId: string, customUrl?: string | null): void",
+       "description": "Play the sound configured for an event: a preset id, `custom` (with\n`customUrl`) or `none` (silent). Unknown ids and failed loads fall back\nto the chime. Honours the device mute."
+      },
+      {
+       "name": "preview",
+       "signature": "(soundId: string, customUrl?: string | null): void",
+       "description": "Same as `play()` but ignores the device mute — for settings test buttons."
+      }
+     ],
+     "properties": [
+      {
+       "name": "presets",
+       "type": "MkSoundPreset[]",
+       "description": "The selectable presets (always includes the chime).",
+       "readonly": true
+      }
+     ],
+     "docs": "/components/attention"
+    },
+    {
+     "name": "MkSessionExpiry",
+     "description": "Watches `expiresAt()` and warns BEFORE the session lapses, so a session\nnever ends silently: the dialog offers to extend, or signs out at zero.\nRe-arms itself whenever `expiresAt()` changes (every token rotation),\nruns the timer outside the Angular zone and only in the browser. Started\nautomatically by `provideMkSessionExpiry`.",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "service",
+     "providedIn": "root",
+     "methods": [
+      {
+       "name": "start",
+       "signature": "(): void",
+       "description": "Begin watching. Idempotent; called by the provider's initializer."
+      }
+     ],
+     "properties": [
+      {
+       "name": "open",
+       "type": "WritableSignal<boolean>",
+       "description": "Whether the dialog is currently open.",
+       "readonly": true
+      }
+     ],
+     "docs": "/components/attention"
+    },
+    {
+     "name": "MkTabAttention",
+     "description": "Messenger-style tab attention: while unhandled work exists the favicon\ncarries a red counter badge, and — only while the tab is hidden — the\ntitle alternates with \"(N) label\" so a pinned tab flashes in the tab strip.\nFocusing the tab stops the blinking (someone is looking) but keeps the\nbadge until the count reaches zero. SSR-safe: every entry point bails\nwithout a `document`; the blink timer runs outside the Angular zone.\n\n```ts\nprivate attention = inject(MkTabAttention);\neffect(() => this.attention.set(this.pending().length, 'new orders'));\n```",
+     "file": "projects/mk-kit/attention/tab-attention.ts",
+     "kind": "service",
+     "providedIn": "root",
+     "methods": [
+      {
+       "name": "set",
+       "signature": "(count: number, label?: string): void",
+       "description": "Update the pending count and the label used in the blinking title."
+      },
+      {
+       "name": "clear",
+       "signature": "(): void",
+       "description": "Drop the badge and the blinking entirely and stop listening."
+      }
+     ],
+     "properties": [
+      {
+       "name": "count",
+       "type": "WritableSignal<number>",
+       "description": "The count currently shown (0 = nothing pending).",
+       "readonly": true
+      }
+     ],
+     "docs": "/components/attention"
+    },
+    {
+     "name": "provideMkNotificationSound",
+     "description": "Register presets / storage key for `MkNotificationSound`. Optional.",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "function",
+     "signatures": [
+      "(config: MkNotificationSoundConfig): { provide: InjectionToken<MkNotificationSoundConfig>; useValue: MkNotificationSoundConfig; }"
+     ]
+    },
+    {
+     "name": "provideMkSessionExpiry",
+     "description": "Register the session-expiry watcher; it starts with the application.\n\n```ts\nprovideMkSessionExpiry({\n  expiresAt: () => auth.tokenExpiresAt(),\n  extend: () => firstValueFrom(auth.refresh()),\n  onExpire: () => auth.logout(),\n  warnBeforeMs: 2 * 60_000,\n})\n```",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "function",
+     "signatures": [
+      "(config: MkSessionExpiryConfig): EnvironmentProviders"
+     ]
+    },
+    {
+     "name": "provideMkTabAttention",
+     "description": "Register options for `MkTabAttention`. Optional — the defaults work.",
+     "file": "projects/mk-kit/attention/tab-attention.ts",
+     "kind": "function",
+     "signatures": [
+      "(config: MkTabAttentionConfig): { provide: InjectionToken<MkTabAttentionConfig>; useValue: MkTabAttentionConfig; }"
+     ]
+    },
+    {
+     "name": "MK_NOTIFICATION_SOUND_CONFIG",
+     "description": "",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "token",
+     "type": "InjectionToken<MkNotificationSoundConfig>"
+    },
+    {
+     "name": "MK_SESSION_EXPIRY_CONFIG",
+     "description": "",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "token",
+     "type": "InjectionToken<MkSessionExpiryConfig>"
+    },
+    {
+     "name": "MK_TAB_ATTENTION_CONFIG",
+     "description": "",
+     "file": "projects/mk-kit/attention/tab-attention.ts",
+     "kind": "token",
+     "type": "InjectionToken<MkTabAttentionConfig>"
+    },
+    {
+     "name": "MK_CHIME_PRESET",
+     "description": "The always-available synthesised sound.",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "const",
+     "type": "MkSoundPreset"
+    },
+    {
+     "name": "MkNotificationSoundConfig",
+     "description": "Options for `MkNotificationSound`.",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "presets",
+       "type": "MkSoundPreset[] | undefined",
+       "description": "Selectable sounds; the ids `custom` and `none` are reserved. Default: the chime only.",
+       "optional": true
+      },
+      {
+       "name": "storageKey",
+       "type": "(() => string) | undefined",
+       "description": "localStorage key for the on/off preference — a function so it can vary per tenant / user.",
+       "optional": true
+      },
+      {
+       "name": "volume",
+       "type": "number | undefined",
+       "description": "Output gain for file presets (0–1). Default `0.8`.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkSessionExpiryConfig",
+     "description": "Options for `provideMkSessionExpiry`.",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "expiresAt",
+       "type": "() => number | null",
+       "description": "Epoch ms when the session lapses, or `null` when there is none. Read reactively."
+      },
+      {
+       "name": "warnBeforeMs",
+       "type": "number | undefined",
+       "description": "How long before the lapse the dialog appears. Default 2 minutes.",
+       "optional": true
+      },
+      {
+       "name": "extend",
+       "type": "() => Promise<unknown>",
+       "description": "Extend the session (refresh the token). Resolve = extended, reject = nothing to extend."
+      },
+      {
+       "name": "onExpire",
+       "type": "() => void",
+       "description": "End the session (sign out, navigate)."
+      },
+      {
+       "name": "enabled",
+       "type": "(() => boolean) | undefined",
+       "description": "Read reactively; `false` suspends the watcher (a kiosk / PIN mode, say).",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkSessionExpiryDialogData",
+     "description": "Data handed to `MkSessionExpiryDialog`.",
+     "file": "projects/mk-kit/attention/session-expiry.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "expiresAt",
+       "type": "number",
+       "description": ""
+      },
+      {
+       "name": "extend",
+       "type": "() => Promise<unknown>",
+       "description": ""
+      },
+      {
+       "name": "onExpire",
+       "type": "() => void",
+       "description": ""
+      }
+     ]
+    },
+    {
+     "name": "MkSoundPreset",
+     "description": "One selectable alert sound. `url: null` = the synthesised chime.",
+     "file": "projects/mk-kit/attention/notification-sound.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "id",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "url",
+       "type": "string | null",
+       "description": ""
+      }
+     ]
+    },
+    {
+     "name": "MkTabAttentionConfig",
+     "description": "Options for `MkTabAttention`, set with `provideMkTabAttention`.",
+     "file": "projects/mk-kit/attention/tab-attention.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "badgeColor",
+       "type": "string | undefined",
+       "description": "Badge fill colour (any CSS colour). Default `#e53935`.",
+       "optional": true
+      },
+      {
+       "name": "blinkMs",
+       "type": "number | undefined",
+       "description": "Title blink period in ms while the tab is hidden. Default `1200`.",
+       "optional": true
+      }
+     ]
+    }
+   ]
+  },
+  {
    "name": "feedback",
    "import": "@mk-kit/ui/feedback",
    "exports": [
@@ -23849,6 +24197,120 @@
      "file": "projects/mk-kit/locales/uk/uk.ts",
      "kind": "const",
      "type": "MkValidationStrings"
+    }
+   ]
+  },
+  {
+   "name": "media/scanner",
+   "import": "@mk-kit/ui/media/scanner",
+   "exports": [
+    {
+     "name": "MkBarcodeScanner",
+     "description": "Camera barcode / QR reader. Starts the rear camera when it appears, emits\n`scanned` once with the first decoded text and stops. The decoder\n(`html5-qrcode`, an optional peer dependency) is loaded on demand, so pages\nthat only *offer* scanning ship nothing extra until a scan starts. Use\ninline, or through `MkBarcodeScannerDialog`.\n\n```html\n<mk-barcode-scanner (scanned)=\"onCode($event)\" (failed)=\"show($event)\" />\n```",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "component",
+     "selector": "mk-barcode-scanner",
+     "selectors": [
+      "mk-barcode-scanner"
+     ],
+     "inputs": [
+      {
+       "name": "formats",
+       "type": "MkBarcodeFormat[]",
+       "description": "Symbologies to decode. Default: QR + the retail 1-D codes.",
+       "default": "MK_BARCODE_DEFAULT_FORMATS"
+      },
+      {
+       "name": "fps",
+       "type": "number",
+       "description": "Frames per second offered to the decoder. Default 10.",
+       "default": "10"
+      },
+      {
+       "name": "hint",
+       "type": "boolean",
+       "description": "Show the built-in hint line above the viewfinder. Default `true`.",
+       "default": "true"
+      },
+      {
+       "name": "continuous",
+       "type": "boolean",
+       "description": "Keep scanning after a hit instead of stopping. Default `false`.",
+       "default": "false"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "scanned",
+       "type": "string",
+       "description": "Decoded text."
+      },
+      {
+       "name": "failed",
+       "type": "string",
+       "description": "The camera could not start (permission, no device, insecure context)."
+      }
+     ],
+     "methods": [
+      {
+       "name": "stop",
+       "signature": "(): Promise<void>",
+       "description": "Stop the camera and release it. Safe to call twice."
+      }
+     ],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/images"
+    },
+    {
+     "name": "MkBarcodeScannerDialog",
+     "description": "The scanner in a dialog: resolves with the decoded text, or `null` when\ncancelled. Open it with `MkDialogService`:\n\n```ts\nconst code = await dialog.open<MkBarcodeScannerDialog, string | null>(MkBarcodeScannerDialog, { size: 'sm' }).afterClosed;\nif (code) this.search.setValue(code);\n```",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner-dialog.ts",
+     "kind": "component",
+     "selector": "mk-barcode-scanner-dialog",
+     "selectors": [
+      "mk-barcode-scanner-dialog"
+     ],
+     "inputs": [],
+     "outputs": [],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/images"
+    },
+    {
+     "name": "MK_BARCODE_DEFAULT_FORMATS",
+     "description": "",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "const",
+     "type": "MkBarcodeFormat[]"
+    },
+    {
+     "name": "MkBarcodeScannerDialogData",
+     "description": "Optional data for `MkBarcodeScannerDialog`.",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner-dialog.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "title",
+       "type": "string | undefined",
+       "description": "",
+       "optional": true
+      },
+      {
+       "name": "formats",
+       "type": "MkBarcodeFormat[] | undefined",
+       "description": "",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkBarcodeFormat",
+     "description": "Symbologies the scanner reads; names follow `Html5QrcodeSupportedFormats`.",
+     "file": "projects/mk-kit/media/scanner/barcode-scanner.ts",
+     "kind": "type",
+     "definition": "| 'QR_CODE' | 'EAN_13' | 'EAN_8' | 'CODE_128' | 'CODE_39' | 'UPC_A' | 'UPC_E' | 'DATA_MATRIX' | 'ITF' | 'CODABAR'"
     }
    ]
   },

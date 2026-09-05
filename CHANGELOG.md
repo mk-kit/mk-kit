@@ -16,6 +16,24 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   any finding, `--fix` deletes unused keys from every file, `--list`,
   `--json`, `--base`, `--langs`, `--prefix`, `--ext`.
 
+- **`@mk-kit/ui/attention`** — three services for apps that watch a queue
+  of incoming work. `MkTabAttention.set(count, label)` badges the favicon and
+  blinks the title only while the tab is hidden (`provideMkTabAttention` for
+  colour / period). `MkNotificationSound` plays a synthesised chime or file
+  presets (`provideMkNotificationSound({ presets, storageKey })`), unlocking
+  the `AudioContext` on enable and on first interaction; `play()` honours the
+  device mute, `preview()` does not. `provideMkSessionExpiry({ expiresAt,
+  extend, onExpire, warnBeforeMs?, enabled? })` opens `mk-session-expiry-dialog`
+  before a session lapses — extend, sign out, or sign out at zero — re-armed
+  on every token rotation. Five new `MkI18nStrings` (`sessionExpiry*`).
+
+- **`@mk-kit/ui/media/scanner`** — `<mk-barcode-scanner>` (rear camera,
+  QR + retail 1-D formats by default, `formats` / `fps` / `continuous`,
+  `scanned` / `failed`) and `MkBarcodeScannerDialog` (resolves with the code
+  or `null`). The decoder `html5-qrcode` is an **optional peer dependency**
+  loaded on demand, so nothing ships until a scan starts. Three new
+  `MkI18nStrings` (`scanner*`).
+
 ## [0.56.0] — 2026-09-05
 
 ### Added

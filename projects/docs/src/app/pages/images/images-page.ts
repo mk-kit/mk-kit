@@ -198,6 +198,21 @@ import { DocsExample } from '../../shared/docs-example';
         changes slide; the click that would follow a drag is swallowed so links
         inside slides don't activate from a swipe.
       </p>
+
+      <h2>Barcode scanner</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-barcode-scanner&gt;</code>
+        (<code class="docs-inline">@mk-kit/ui/media/scanner</code>) reads QR
+        and retail 1-D codes with the rear camera and emits
+        <code class="docs-inline">scanned</code> once; the decoder
+        <code class="docs-inline">html5-qrcode</code> is an optional peer
+        dependency loaded on demand, so nothing ships until a scan starts.
+        <code class="docs-inline">MkBarcodeScannerDialog</code> wraps it in a
+        dialog that resolves with the code or <code class="docs-inline">null</code>.
+      </p>
+      <docs-example [code]="scannerCode" column>
+        <p style="color: var(--mk-text-muted)">Needs a camera and a secure context — see the code tab.</p>
+      </docs-example>
     </div>
   `,
   styles: [
@@ -262,4 +277,13 @@ open(): void {
     </div>
   }
 </mk-carousel>`;
+
+  readonly scannerCode = `npm i html5-qrcode   // optional peer of @mk-kit/ui
+
+<mk-barcode-scanner (scanned)="onCode($event)" (failed)="show($event)" />
+
+// or as a dialog
+const code = await this.dialog
+  .open<MkBarcodeScannerDialog, string | null>(MkBarcodeScannerDialog, { size: 'sm' })
+  .afterClosed;`;
 }
