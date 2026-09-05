@@ -23,6 +23,7 @@ export * from '@mk-kit/ui/table';
 export * from '@mk-kit/ui/status';
 export * from '@mk-kit/ui/data';
 export * from '@mk-kit/ui/kanban';
+export * from '@mk-kit/ui/translate';
 export * from '@mk-kit/ui/feedback';
 export * from '@mk-kit/ui/rich-text';
 export * from '@mk-kit/ui/block-editor';

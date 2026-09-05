@@ -17977,6 +17977,270 @@
    ]
   },
   {
+   "name": "translate",
+   "import": "@mk-kit/ui/translate",
+   "exports": [
+    {
+     "name": "MkTranslatePipe",
+     "description": "`translate` — the key's string in the active language, with `{{name}}`\nplaceholders filled from `params`. Impure so a language switch (or a\n`patch()`) re-renders every use; the signal reads inside `instant()` mark\nthe host view dirty, so this stays cheap under OnPush and zoneless.\n\n```html\n{{ 'menu.title' | translate }}\n{{ 'cart.items' | translate: { count: 3 } }}\n```",
+     "file": "projects/mk-kit/translate/translate.pipe.ts",
+     "kind": "pipe",
+     "pipeName": "translate",
+     "signature": "(key: string | null | undefined, params?: MkTranslateParams): string"
+    },
+    {
+     "name": "MkTranslate",
+     "description": "App translations as signals: a `lang` you switch with `use()`, `instant()`\nfor code, the `translate` pipe for templates, and `plural()` for CLDR\ncount forms. Dictionaries are the plain nested JSON you already have; an\noptional overrides loader (a database of edits, say) is merged on top per\nlanguage. On the server the loaded strings ride to the browser through\n`TransferState`, so hydration never refetches or flashes raw keys.\n\n```ts\nprovideMkTranslate({\n  lang: 'pl',\n  fallbackLang: 'pl',\n  loader: mkHttpTranslateLoader({ prefix: '/assets/i18n/' }),\n});\n```\n```html\n{{ 'checkout.cart.total' | translate }}\n{{ 'checkout.cart.freeDeliveryMissing' | translate: { amount: 12 } }}\n```",
+     "file": "projects/mk-kit/translate/translate.service.ts",
+     "kind": "service",
+     "providedIn": "root",
+     "methods": [
+      {
+       "name": "getCurrentLang",
+       "signature": "(): string",
+       "description": "The active language as a plain string (for non-reactive call sites)."
+      },
+      {
+       "name": "use",
+       "signature": "(lang: string): Promise<void>",
+       "description": "Load `lang` (once — later calls are cached) and make it active. Resolves\nwhen the strings are in memory; a failed load rejects and leaves the\nprevious language active."
+      },
+      {
+       "name": "load",
+       "signature": "(lang: string): Promise<void>",
+       "description": "Load a language into memory without switching to it."
+      },
+      {
+       "name": "instant",
+       "signature": "(key: string, params?: MkTranslateParams): string",
+       "description": "Translate `key` in the active language, then the fallback; `{{name}}`\nplaceholders come from `params`. A missing key renders as the key\nitself (or whatever `onMissing` returns) and is recorded in\n`missingKeys`. Reactive: reading it inside a template or a\n`computed()` re-runs on language switch and after `patch()`."
+      },
+      {
+       "name": "has",
+       "signature": "(key: string, lang?: string): boolean",
+       "description": "Whether `key` exists in `lang` (default: the active language) or its fallback."
+      },
+      {
+       "name": "plural",
+       "signature": "(keyBase: string, count: number, params?: MkTranslateParams): string",
+       "description": "CLDR plural form: `keyBase.{zero|one|two|few|many|other}` picked with\n`Intl.PluralRules` for the active language, `other` as the fallback,\ninterpolated with `{ count, ...params }`.\n\n```json\n{ \"guests\": { \"one\": \"{{count}} osoba\", \"few\": \"{{count}} osoby\", \"many\": \"{{count}} osób\", \"other\": \"{{count}} osoby\" } }\n```"
+      },
+      {
+       "name": "translations",
+       "signature": "(lang?: string): MkFlatTranslations",
+       "description": "The flat dictionary of `lang` (default: active), `{}` before it loads."
+      },
+      {
+       "name": "loadedLangs",
+       "signature": "(): string[]",
+       "description": "Languages currently in memory."
+      },
+      {
+       "name": "patch",
+       "signature": "(lang: string, strings: MkTranslationTree | MkFlatTranslations): void",
+       "description": "Merge strings into `lang` at runtime — a translation editor previewing\nan edit, or a late-arriving overrides payload. Nested or flat."
+      },
+      {
+       "name": "set",
+       "signature": "(lang: string, strings: MkTranslationTree | MkFlatTranslations): void",
+       "description": "Replace `lang` entirely (tests, editors reloading from source)."
+      }
+     ],
+     "properties": [
+      {
+       "name": "lang",
+       "type": "WritableSignal<string>",
+       "description": "The active language. Read it in a `computed()` to follow switches.",
+       "readonly": true
+      },
+      {
+       "name": "ready",
+       "type": "Signal<boolean>",
+       "description": "`true` once the active language's strings are in memory.",
+       "readonly": true
+      },
+      {
+       "name": "langChange",
+       "type": "Observable<string>",
+       "description": "`lang` as an observable, for code still written around streams.",
+       "readonly": true
+      },
+      {
+       "name": "missingKeys",
+       "type": "Signal<string[]>",
+       "description": "Keys asked for that neither the active nor the fallback language has.",
+       "readonly": true
+      }
+     ],
+     "docs": "/components/translate"
+    },
+    {
+     "name": "mkFlattenTranslations",
+     "description": "`{ a: { b: 'x' } }` → `{ 'a.b': 'x' }`; already-dotted keys pass through.",
+     "file": "projects/mk-kit/translate/translate.service.ts",
+     "kind": "function",
+     "signatures": [
+      "(tree: MkTranslationTree | null | undefined, prefix?: string, out?: MkFlatTranslations): MkFlatTranslations"
+     ]
+    },
+    {
+     "name": "mkHttpTranslateLoader",
+     "description": "Fetch `<prefix><lang><suffix>` with `HttpClient` — the bundled JSON files\nin `assets/i18n/`. Needs `provideHttpClient()`; SSR apps that read the\nfiles from disk can supply their own `MkTranslateLoader` instead.",
+     "file": "projects/mk-kit/translate/translate.loaders.ts",
+     "kind": "function",
+     "signatures": [
+      "(options?: MkHttpTranslateLoaderOptions): MkTranslateLoaderFactory"
+     ]
+    },
+    {
+     "name": "mkInterpolate",
+     "description": "Replace `{{name}}` placeholders; unknown names are left in place.",
+     "file": "projects/mk-kit/translate/translate.service.ts",
+     "kind": "function",
+     "signatures": [
+      "(template: string, params?: MkTranslateParams): string"
+     ]
+    },
+    {
+     "name": "mkStaticTranslateLoader",
+     "description": "Strings given up front, keyed by language — tests, storybooks, tiny apps.\nA language not in the map resolves to `{}`.",
+     "file": "projects/mk-kit/translate/translate.loaders.ts",
+     "kind": "function",
+     "signatures": [
+      "(byLang: Record<string, MkTranslationTree>): MkTranslateLoaderFactory"
+     ]
+    },
+    {
+     "name": "mkUnflattenTranslations",
+     "description": "`{ 'a.b': 'x' }` → `{ a: { b: 'x' } }` — for editors that write files back.",
+     "file": "projects/mk-kit/translate/translate.service.ts",
+     "kind": "function",
+     "signatures": [
+      "(flat: MkFlatTranslations): MkTranslationTree"
+     ]
+    },
+    {
+     "name": "provideMkTranslate",
+     "description": "Register app translations. By default the initial language is loaded\nbefore the first render (`preload`), so no view ever shows raw keys and\nnothing caches them.\n\n```ts\nproviders: [\n  provideHttpClient(withFetch()),\n  provideMkTranslate({\n    lang: 'pl',\n    fallbackLang: 'pl',\n    loader: mkHttpTranslateLoader(),\n    overrides: () => inject(TranslationOverridesApi), // optional\n  }),\n]\n```",
+     "file": "projects/mk-kit/translate/translate.providers.ts",
+     "kind": "function",
+     "signatures": [
+      "(config: MkTranslateConfig): EnvironmentProviders"
+     ]
+    },
+    {
+     "name": "MK_TRANSLATE_CONFIG",
+     "description": "Configuration token; set by `provideMkTranslate`.",
+     "file": "projects/mk-kit/translate/translate.service.ts",
+     "kind": "token",
+     "type": "InjectionToken<MkTranslateConfig>"
+    },
+    {
+     "name": "MkHttpTranslateLoaderOptions",
+     "description": "Options for `mkHttpTranslateLoader`.",
+     "file": "projects/mk-kit/translate/translate.loaders.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "prefix",
+       "type": "string | undefined",
+       "description": "URL prefix; the language code is appended. Default `/assets/i18n/`.",
+       "optional": true
+      },
+      {
+       "name": "suffix",
+       "type": "string | undefined",
+       "description": "URL suffix after the language code. Default `.json`.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkTranslateConfig",
+     "description": "Options for `provideMkTranslate`.",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "lang",
+       "type": "string",
+       "description": "Language loaded first and used until `use()` switches it."
+      },
+      {
+       "name": "fallbackLang",
+       "type": "string | undefined",
+       "description": "Looked up when the active language lacks a key. Default: none.",
+       "optional": true
+      },
+      {
+       "name": "loader",
+       "type": "MkTranslateLoaderFactory",
+       "description": "Base strings — the bundled JSON, typically (`mkHttpTranslateLoader`)."
+      },
+      {
+       "name": "overrides",
+       "type": "MkTranslateLoaderFactory | undefined",
+       "description": "Optional second source merged OVER the base per language: edits kept in\na database, a tenant's wording, a translator's work in progress. A\nloader that throws or resolves `{}` leaves the base untouched.",
+       "optional": true
+      },
+      {
+       "name": "preload",
+       "type": "boolean | undefined",
+       "description": "Block application bootstrap until the initial language is loaded, so the\nfirst render never shows raw keys and `instant()` calls inside\n`computed()` never cache them. Default `true`.",
+       "optional": true
+      },
+      {
+       "name": "onMissing",
+       "type": "((key: string, lang: string) => string | undefined | void) | undefined",
+       "description": "Called for a key missing in both the active and the fallback language.\nReturn a string to render instead of the key. Missing keys are also\ncollected in `MkTranslate.missingKeys`.",
+       "optional": true
+      }
+     ]
+    },
+    {
+     "name": "MkTranslateLoader",
+     "description": "Where a language's strings come from. Return the tree (or a promise of\nit); the service flattens, caches per language and merges overrides.",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "load",
+       "type": "(lang: string): Promise<MkTranslationTree> | MkTranslationTree",
+       "description": ""
+      }
+     ]
+    },
+    {
+     "name": "MkTranslationTree",
+     "description": "A translation file: nested objects of strings. Keys are addressed with\ndots (`checkout.cart.total`), so `{ checkout: { cart: { total: '…' } } }`\nand `{ 'checkout.cart.total': '…' }` are the same dictionary. This is the\nplain JSON most apps already ship (ngx-translate's format included).",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "interface",
+     "members": []
+    },
+    {
+     "name": "MkFlatTranslations",
+     "description": "Flattened dictionary: dotted key → string.",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "type",
+     "definition": "Record<string, string>"
+    },
+    {
+     "name": "MkTranslateLoaderFactory",
+     "description": "A loader factory; runs inside an injection context, so `inject()` works.",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "type",
+     "definition": "() => MkTranslateLoader"
+    },
+    {
+     "name": "MkTranslateParams",
+     "description": "Values interpolated into `{{name}}` placeholders.",
+     "file": "projects/mk-kit/translate/translate.types.ts",
+     "kind": "type",
+     "definition": "Record<string, unknown>"
+    }
+   ]
+  },
+  {
    "name": "feedback",
    "import": "@mk-kit/ui/feedback",
    "exports": [
