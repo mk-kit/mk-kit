@@ -423,6 +423,11 @@ export class App {
           keywords: 'tooltip popover hovercard popconfirm hint',
         },
         {
+          label: 'Translate (i18n)',
+          path: '/components/translate',
+          keywords: 'translate i18n translation language locale pipe instant plural overrides',
+        },
+        {
           label: 'Status & notifications',
           path: '/components/status',
           keywords: 'result notification-center tour onboarding inbox status',

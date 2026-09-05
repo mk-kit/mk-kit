@@ -4,6 +4,31 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **`@mk-kit/ui/translate`** — app translations as signals, a drop-in for
+  the ngx-translate surface most apps actually use. `provideMkTranslate({
+  lang, fallbackLang, loader, overrides?, preload?, onMissing? })`, the
+  `translate` pipe (`{{ key | translate: params }}`), `MkTranslate` with
+  `lang` / `ready` signals, `use()`, `instant()`, `has()`, CLDR `plural()`,
+  `patch()` / `set()` for editors, `missingKeys`, and `langChange` for RxJS
+  call sites. Dictionaries are the nested JSON you already ship (dotted keys,
+  `{{name}}` placeholders); an optional overrides loader (a database of
+  edits) is merged over the base per language. Loads once per language, the
+  initial language before the first render, and on the server the strings
+  ride to the browser through `TransferState`. Loaders:
+  `mkHttpTranslateLoader({ prefix, suffix })`, `mkStaticTranslateLoader(map)`,
+  or any `{ load(lang) }`. Also the `translatePlural` pipe
+  (`{{ n | translatePlural: 'guests' }}`), `documentLang` (mirrors `use()`
+  onto `<html lang>`, on by default), and **`@mk-kit/ui/translate/server`**
+  with `mkFsTranslateLoader({ dirs })` — SSR reads the JSON from disk instead
+  of fetching its own endpoint. Migration aliases so an ngx-translate app
+  moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
+  `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
+  of a `TranslateModule` import.
+
 ## [0.54.0] — 2026-09-04
 
 ### Added

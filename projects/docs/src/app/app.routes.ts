@@ -114,6 +114,12 @@ export const routes: Routes = [
       import('./pages/dialogs/dialogs-page').then((m) => m.DialogsPage),
   },
   {
+    path: 'components/translate',
+    title: 'Translate — mk-kit',
+    loadComponent: () =>
+      import('./pages/translate/translate-page').then((m) => m.TranslatePage),
+  },
+  {
     path: 'components/status',
     title: 'Status & notifications — mk-kit',
     loadComponent: () =>
