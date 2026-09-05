@@ -115,6 +115,61 @@ interface TokenGroup {
       </div>
       <pre class="tp-code"><code>{{ contrastCode }}</code></pre>
 
+      <h2 id="presets">Presets</h2>
+      <p>
+        A preset is a second stylesheet that re-declares the tokens as a set —
+        type, radii, shadows, surfaces and every colour, in light and dark —
+        behind one attribute. Import it after the base theme and put
+        <code class="docs-inline">data-mk-preset</code> on
+        <code class="docs-inline">&lt;html&gt;</code> for the whole app, or on
+        any subtree to re-skin just that region. Each preset holds the same
+        text/surface pairs to WCAG AA as the base theme (the contrast smoke
+        test reads them all) and steps aside for
+        <code class="docs-inline">data-mk-contrast="high"</code>.
+      </p>
+      <h3>momentum</h3>
+      <p>
+        The look of the Momentum task app: Manrope set heavy and tight,
+        soft violet-grey surfaces, generous radii, feather-light card shadows
+        and an indigo accent meant to be swapped at runtime. The card below is
+        the base theme's playground card with only the attribute added — same
+        components, different soul. It follows this site's light / dark switch.
+      </p>
+      <div class="tp-preview mk-app tp-preset" data-mk-preset="momentum">
+        <mk-card variant="elevated">
+          <div class="tp-preview__head">
+            <strong>Today's momentum</strong>
+            <mk-badge tone="primary" variant="soft">4 of 10</mk-badge>
+          </div>
+          <p class="tp-muted">Nice — you're rolling. Two left on the board.</p>
+          <mk-progress-bar [value]="40" tone="primary" [showValue]="true" label="Board" />
+          <div class="tp-preview__row">
+            <button mkButton tone="primary">Start 15 min</button>
+            <button mkButton variant="soft" tone="primary">Not now</button>
+            <button mkButton variant="outline" tone="neutral">Break it down</button>
+          </div>
+          <div class="tp-preview__row">
+            <mk-switch [checked]="true">Nudge me in focus windows</mk-switch>
+          </div>
+          <mk-alert tone="success" variant="soft">Inbox clear ✨</mk-alert>
+        </mk-card>
+      </div>
+      <pre class="tp-code"><code>{{ presetCode }}</code></pre>
+      <p>
+        The preset sets <code class="docs-inline">--mk-font-sans</code> to
+        Manrope but does not load it — add the Google Fonts link (weights
+        500–800) or the stack falls back to the system sans. To swap the
+        accent at runtime write <code class="docs-inline">--mk-primary</code>,
+        its <code class="docs-inline">-hover</code> /
+        <code class="docs-inline">-active</code> /
+        <code class="docs-inline">-subtle</code> /
+        <code class="docs-inline">-subtle-hover</code> /
+        <code class="docs-inline">-subtle-text</code> family,
+        <code class="docs-inline">--mk-focus-ring</code> and
+        <code class="docs-inline">--mk-selected-bg</code> /
+        <code class="docs-inline">-text</code> on the same element.
+      </p>
+
       <h2>Live playground</h2>
       <p>
         Adjust the tokens below. They're applied as inline
@@ -283,6 +338,13 @@ interface TokenGroup {
       .tp-toggle__state {
         margin: 0;
       }
+      /* The preset demo is a real subtree of the preset: its own bg, font
+         and text colour come from the preset tokens, not the docs page. */
+      .tp-preset {
+        font-family: var(--mk-font-sans);
+        color: var(--mk-text);
+        margin: var(--mk-space-4) 0;
+      }
       .tp-code {
         margin: var(--mk-space-3) 0 var(--mk-space-6);
         padding: var(--mk-space-4) var(--mk-space-5);
@@ -311,6 +373,18 @@ this.theme.toggleContrast();   // flip normal <-> high
 
 /* or, per subtree, no service involved: */
 <section data-mk-contrast="high">…</section>`;
+
+  protected readonly presetCode = `/* styles.css */
+@import '@mk-kit/ui/styles.css';
+@import '@mk-kit/ui/presets/momentum.css';
+
+<!-- index.html -->
+<link rel="stylesheet"
+  href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;600;700;800&display=swap" />
+<html data-mk-preset="momentum">
+
+<!-- or just one region -->
+<section data-mk-preset="momentum">…</section>`;
 
   protected readonly primary = signal('#4f46e5');
   protected readonly primaryHover = signal('#4338ca');

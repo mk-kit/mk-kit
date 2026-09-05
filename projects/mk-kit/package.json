@@ -49,6 +49,10 @@
     "./styles.css": {
       "style": "./styles/mk-kit.css",
       "default": "./styles/mk-kit.css"
+    },
+    "./presets/momentum.css": {
+      "style": "./styles/presets/momentum.css",
+      "default": "./styles/presets/momentum.css"
     }
   }
 }

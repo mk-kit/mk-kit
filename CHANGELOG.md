@@ -28,6 +28,17 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   moves by search-and-replace: `currentLang`, `getLangs()` / `addLangs()`,
   `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
   of a `TranslateModule` import.
+- **Theme presets** — a second stylesheet that re-declares the token set
+  behind one attribute: `@import '@mk-kit/ui/presets/<name>.css'` after the
+  base theme and `data-mk-preset="<name>"` on `<html>` or any subtree. Light
+  and dark resolve like the base theme; a preset steps aside for
+  `data-mk-contrast="high"`. The first is **`momentum`**: Manrope set heavy
+  and tight, soft violet-grey surfaces, 11/13/16/20 px radii, feather-light
+  card shadows, an indigo accent meant to be swapped at runtime (the recipe
+  is on the theming page) and the Momentum bucket palette as
+  `--mk-chart-1…8`. The contrast smoke test reads every preset and holds it
+  to the same WCAG AA pairs as the base theme. `build:theme` now compiles the
+  whole `src/styles` tree, so a new preset is one `.scss` file.
 
 ## [0.54.0] — 2026-09-04
 
