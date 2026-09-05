@@ -1508,6 +1508,46 @@
        "description": "Empty data table / list."
       },
       {
+       "name": "translationEditorSearch",
+       "type": "string",
+       "description": "Translation editor (`@mk-kit/ui/translate/editor`)."
+      },
+      {
+       "name": "translationEditorAll",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorOverridden",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorMissing",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorKey",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorReset",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorExport",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "translationEditorKeys",
+       "type": "string",
+       "description": ""
+      },
+      {
        "name": "resultsCount",
        "type": "(count: number) => string",
        "description": "Announced when a filterable list updates (autocomplete, multi-select, command palette)."
@@ -24756,6 +24796,106 @@
      "file": "projects/mk-kit/testing/harness.ts",
      "kind": "type",
      "definition": "| 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown'"
+    }
+   ]
+  },
+  {
+   "name": "translate/editor",
+   "import": "@mk-kit/ui/translate/editor",
+   "exports": [
+    {
+     "name": "MkTranslationEditor",
+     "description": "Translation editor — keys as rows, locales as columns, click a cell to\nedit. The base strings are your bundled files; edits are **overrides**\nkept apart from them, so a rebuild never loses them and a cell can be\nrestored to the file text. Search by key or text, filter to the keys a\nlocale is missing or the ones already edited, export the grid as CSV.\nPersistence is yours: every edit is emitted as `changed`, feed the result\nback through `overrides`.\n\n```html\n<mk-translation-editor\n  [locales]=\"['pl', 'en', 'ru']\"\n  [base]=\"base()\"\n  [overrides]=\"overrides()\"\n  (changed)=\"save($event)\" />\n```",
+     "file": "projects/mk-kit/translate/editor/translation-editor.ts",
+     "kind": "component",
+     "selector": "mk-translation-editor",
+     "selectors": [
+      "mk-translation-editor"
+     ],
+     "inputs": [
+      {
+       "name": "locales",
+       "type": "string[]",
+       "description": "Locale codes, in column order. The first one is the reference language.",
+       "required": true
+      },
+      {
+       "name": "base",
+       "type": "Record<string, MkFlatTranslations>",
+       "description": "Bundled strings per locale, flat (`'a.b.c': 'text'`) or nested.",
+       "required": true
+      },
+      {
+       "name": "overrides",
+       "type": "Record<string, MkFlatTranslations>",
+       "description": "Edits per locale, flat. Missing locales are fine.",
+       "default": "{}"
+      },
+      {
+       "name": "readonly",
+       "type": "boolean",
+       "description": "Show but do not edit.",
+       "default": "false"
+      },
+      {
+       "name": "exportFilename",
+       "type": "string",
+       "description": "File name of the CSV export.",
+       "default": "'translations.csv'"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "changed",
+       "type": "MkTranslationChange",
+       "description": "An edit or a restore; persist it and update `overrides`."
+      }
+     ],
+     "methods": [],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/translate"
+    },
+    {
+     "name": "MkTranslationChange",
+     "description": "One edit made in the editor. `value: null` clears the override.",
+     "file": "projects/mk-kit/translate/editor/translation-editor.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "locale",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "key",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "value",
+       "type": "string | null",
+       "description": ""
+      },
+      {
+       "name": "previous",
+       "type": "string | null",
+       "description": "The text shown before the edit (override, or the base string)."
+      }
+     ]
+    },
+    {
+     "name": "MkTranslationRow",
+     "description": "A row of the editor: the key plus the effective text per locale.",
+     "file": "projects/mk-kit/translate/editor/translation-editor.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "key",
+       "type": "string",
+       "description": ""
+      }
+     ]
     }
    ]
   },

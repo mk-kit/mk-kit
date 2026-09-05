@@ -903,6 +903,14 @@ Members:
 | `noOptions` | `string` | Empty listbox with no options (select, time picker). |
 | `noResults` | `string` | Empty async/filtered results (autocomplete, multi-select, command palette). |
 | `noData` | `string` | Empty data table / list. |
+| `translationEditorSearch` | `string` | Translation editor (`@mk-kit/ui/translate/editor`). |
+| `translationEditorAll` | `string` |  |
+| `translationEditorOverridden` | `string` |  |
+| `translationEditorMissing` | `string` |  |
+| `translationEditorKey` | `string` |  |
+| `translationEditorReset` | `string` |  |
+| `translationEditorExport` | `string` |  |
+| `translationEditorKeys` | `string` |  |
 | `resultsCount` | `(count: number) => string` | Announced when a filterable list updates (autocomplete, multi-select, command palette). |
 | `previousPage` | `string` | Pagination: previous page control. |
 | `nextPage` | `string` | Pagination: next page control. |
@@ -16643,6 +16651,77 @@ Keys accepted by `MkTestElement.sendKeys` besides printable characters.
 ```ts
 type MkTestKey = | 'Enter' | 'Escape' | 'Tab' | 'Backspace' | 'Delete' | ' ' | 'ArrowUp' | 'ArrowDown' | 'ArrowLeft' | 'ArrowRight' | 'Home' | 'End' | 'PageUp' | 'PageDown';
 ```
+
+## @mk-kit/ui/translate/editor
+
+3 exports. `import { … } from '@mk-kit/ui/translate/editor';`
+
+### MkTranslationEditor (component)
+
+Selector: `mk-translation-editor`
+
+Docs: https://mk-kit.dev/components/translate
+
+Import: `import { MkTranslationEditor } from '@mk-kit/ui/translate/editor';`
+
+Translation editor — keys as rows, locales as columns, click a cell to
+edit. The base strings are your bundled files; edits are **overrides**
+kept apart from them, so a rebuild never loses them and a cell can be
+restored to the file text. Search by key or text, filter to the keys a
+locale is missing or the ones already edited, export the grid as CSV.
+Persistence is yours: every edit is emitted as `changed`, feed the result
+back through `overrides`.
+
+```html
+<mk-translation-editor
+  [locales]="['pl', 'en', 'ru']"
+  [base]="base()"
+  [overrides]="overrides()"
+  (changed)="save($event)" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `locales` (required) | `string[]` |  | Locale codes, in column order. The first one is the reference language. |
+| `base` (required) | `Record<string, MkFlatTranslations>` |  | Bundled strings per locale, flat (`'a.b.c': 'text'`) or nested. |
+| `overrides` | `Record<string, MkFlatTranslations>` | `{}` | Edits per locale, flat. Missing locales are fine. |
+| `readonly` | `boolean` | `false` | Show but do not edit. |
+| `exportFilename` | `string` | `'translations.csv'` | File name of the CSV export. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `changed` | `MkTranslationChange` | An edit or a restore; persist it and update `overrides`. |
+
+### MkTranslationChange (interface)
+
+Import: `import { MkTranslationChange } from '@mk-kit/ui/translate/editor';`
+
+One edit made in the editor. `value: null` clears the override.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `locale` | `string` |  |
+| `key` | `string` |  |
+| `value` | `string \| null` |  |
+| `previous` | `string \| null` | The text shown before the edit (override, or the base string). |
+
+### MkTranslationRow (interface)
+
+Import: `import { MkTranslationRow } from '@mk-kit/ui/translate/editor';`
+
+A row of the editor: the key plus the effective text per locale.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `key` | `string` |  |
 
 ## @mk-kit/ui/translate/server
 

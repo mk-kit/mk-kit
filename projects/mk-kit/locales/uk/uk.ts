@@ -246,6 +246,14 @@ export const MK_UK_I18N: MkI18nStrings = {
   noOptions: 'Немає варіантів',
   noResults: 'Немає результатів',
   noData: 'Немає даних для відображення',
+  translationEditorSearch: 'Пошук ключів і тексту',
+  translationEditorAll: 'Усі',
+  translationEditorOverridden: 'Змінені',
+  translationEditorMissing: 'Відсутні',
+  translationEditorKey: 'Ключ',
+  translationEditorReset: 'Відновити оригінальний текст',
+  translationEditorExport: 'Експортувати CSV',
+  translationEditorKeys: 'ключів',
   resultsCount: (count) =>
     `${count} ${plural(count, 'результат', 'результати', 'результатів')}`,
 

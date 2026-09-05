@@ -1,0 +1,75 @@
+:host {
+  display: flex;
+  flex-direction: column;
+  gap: var(--mk-space-3);
+  min-height: 0;
+}
+
+.mk-translation-editor__toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: var(--mk-space-2);
+}
+
+.mk-translation-editor__search {
+  flex: 1 1 16rem;
+  min-width: 12rem;
+}
+
+.mk-translation-editor__filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--mk-space-1);
+}
+
+.mk-translation-editor__count {
+  margin-inline-start: auto;
+  color: var(--mk-text-muted);
+  font-size: var(--mk-font-size-sm);
+}
+
+.mk-translation-editor__table {
+  flex: 1 1 auto;
+  min-height: 0;
+  max-height: 70vh;
+}
+
+.mk-translation-editor__key {
+  font-family: var(--mk-font-mono);
+  font-size: var(--mk-font-size-sm);
+  color: var(--mk-text-muted);
+  word-break: break-all;
+}
+
+.mk-translation-editor__cell {
+  display: flex;
+  align-items: center;
+  gap: var(--mk-space-1);
+  min-width: 0;
+
+  mk-inline-edit {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+}
+
+.mk-translation-editor__cell--overridden {
+  border-inline-start: 2px solid var(--mk-primary);
+  padding-inline-start: var(--mk-space-2);
+}
+
+.mk-translation-editor__cell--missing {
+  border-inline-start: 2px solid var(--mk-warning);
+  padding-inline-start: var(--mk-space-2);
+}
+
+.mk-translation-editor__reset {
+  flex: none;
+  opacity: 0.6;
+
+  &:hover,
+  &:focus-visible {
+    opacity: 1;
+  }
+}

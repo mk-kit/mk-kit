@@ -4,6 +4,19 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **`@mk-kit/ui/translate/editor`** — `<mk-translation-editor>`: keys as
+  rows, locales as columns, click a cell to edit (`mk-inline-edit`). Base
+  strings come from the bundled files; edits are **overrides** kept apart, so
+  a cell can be restored to the file text and a rebuild never loses an edit.
+  Search by key or text, chips for *edited* and *missing in &lt;locale&gt;*,
+  CSV export, `readonly`. Persistence is the host's: every edit is emitted as
+  `changed` (`{ locale, key, value | null, previous }`). Eight new
+  `MkI18nStrings` keys (`translationEditor*`) in every locale pack.
+
 ## [0.55.1] — 2026-09-05
 
 ### Fixed / improved (`@mk-kit/ui/translate`)
