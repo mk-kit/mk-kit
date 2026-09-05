@@ -41,6 +41,9 @@ import { createRequire } from 'node:module';
 import { join, relative, resolve } from 'node:path';
 import { brotliCompressSync, constants as zlib } from 'node:zlib';
 
+// Peer dependencies of the library (other than Angular / rxjs / tslib, handled above) stay external when measuring.
+const PEER_EXTERNALS = Object.keys(JSON.parse(readFileSync(new URL('../projects/mk-kit/package.json', import.meta.url), 'utf8')).peerDependencies ?? {}).filter((n) => !/^(@angular\/|rxjs$|tslib$)/.test(n));
+
 const require = createRequire(import.meta.url);
 const ROOT = resolve(new URL('..', import.meta.url).pathname);
 const FESM = join(ROOT, 'dist/mk-kit/fesm2022');
@@ -177,6 +180,8 @@ function mkPlugin(mode, entry) {
         return { path: fesmOf(e) };
       });
       b.onResolve({ filter: /^(@angular\/|rxjs(\/|$)|tslib$|@mk-kit\/validators(\/|$))/ }, (args) => ({ path: args.path, external: true }));
+      // Optional peer dependencies (html5-qrcode for the scanner, …) are the app's to install and pay for — never part of an entry's cost.
+      if (PEER_EXTERNALS.length) b.onResolve({ filter: new RegExp(`^(${PEER_EXTERNALS.map((n) => n.replace(/[.*+?^${}()|[\]\\/]/g, '\\$&')).join('|')})(/|$)`) }, (args) => ({ path: args.path, external: true }));
       b.onLoad({ filter: /fesm2022[\\/][\w-]+\.mjs$/ }, async (args) => {
         let contents = await link(args.path);
         if (mode === 'own') contents = contents.replace(/^export \* from '@mk-kit\/ui\/[\w/-]+';$/gm, '');

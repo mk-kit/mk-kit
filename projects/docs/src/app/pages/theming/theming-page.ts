@@ -6,6 +6,9 @@ import {
   signal,
 } from '@angular/core';
 import {
+  MK_ACCENTS,
+  MK_ACCENT_ORDER,
+  MkAccentService,
   MkAlert,
   MkBadge,
   MkButton,
@@ -13,6 +16,8 @@ import {
   MkProgressBar,
   MkSwitch,
   MkThemeService,
+  mkAccentSwatch,
+  type MkAccentKey,
 } from '@mk-kit/ui';
 
 interface TokenRow {
@@ -158,17 +163,38 @@ interface TokenGroup {
       <p>
         The preset sets <code class="docs-inline">--mk-font-sans</code> to
         Manrope but does not load it — add the Google Fonts link (weights
-        500–800) or the stack falls back to the system sans. To swap the
-        accent at runtime write <code class="docs-inline">--mk-primary</code>,
-        its <code class="docs-inline">-hover</code> /
-        <code class="docs-inline">-active</code> /
-        <code class="docs-inline">-subtle</code> /
-        <code class="docs-inline">-subtle-hover</code> /
-        <code class="docs-inline">-subtle-text</code> family,
-        <code class="docs-inline">--mk-focus-ring</code> and
-        <code class="docs-inline">--mk-selected-bg</code> /
-        <code class="docs-inline">-text</code> on the same element.
+        500–800) or the stack falls back to the system sans.
       </p>
+
+      <h3>Runtime accent</h3>
+      <p>
+        <code class="docs-inline">MkAccentService</code> (<code class="docs-inline">@mk-kit/ui/core</code>)
+        swaps the accent at runtime: <code class="docs-inline">set('coral')</code>
+        writes the <code class="docs-inline">--mk-primary</code> family
+        (<code class="docs-inline">-hover</code> / <code class="docs-inline">-active</code> /
+        <code class="docs-inline">-subtle</code> / <code class="docs-inline">-subtle-hover</code> /
+        <code class="docs-inline">-subtle-text</code>),
+        <code class="docs-inline">--mk-focus-ring</code>,
+        <code class="docs-inline">--mk-selected-bg</code> / <code class="docs-inline">-text</code>
+        and its own <code class="docs-inline">--mk-accent</code> /
+        <code class="docs-inline">--mk-accent-ink</code> /
+        <code class="docs-inline">--mk-accent-glow</code> onto
+        <code class="docs-inline">&lt;html&gt;</code>, follows light / dark for
+        the hover and ink shades, persists the choice and mirrors it as
+        <code class="docs-inline">data-mk-accent</code>. Eight accents ship as
+        <code class="docs-inline">MK_ACCENTS</code>; <code class="docs-inline">mkAccentSwatch(key)</code>
+        is the swatch for a picker. <code class="docs-inline">reset()</code>
+        returns to the preset's own primary. Try it — the whole docs site recolours:
+      </p>
+      <div class="tp-accents">
+        @for (k of accentKeys; track k) {
+          <button type="button" class="tp-accent" [class.on]="accent.key() === k" [style.--sw]="swatch(k)" (click)="accent.set(k)">
+            <span class="tp-accent__swatch"></span>{{ accentName(k) }}
+          </button>
+        }
+        <button type="button" class="tp-accent" (click)="accent.reset()">Reset</button>
+      </div>
+      <pre class="tp-code"><code>{{ accentCode }}</code></pre>
 
       <h2>Live playground</h2>
       <p>
@@ -269,6 +295,10 @@ interface TokenGroup {
   `,
   styles: [
     `
+      .tp-accents { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+      .tp-accent { display: inline-flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1px solid var(--mk-border); border-radius: 10px; background: var(--mk-surface); color: var(--mk-text); font: inherit; font-size: 13px; font-weight: 600; cursor: pointer; }
+      .tp-accent.on { border-color: var(--mk-primary); box-shadow: 0 0 0 2px var(--mk-primary-subtle); }
+      .tp-accent__swatch { width: 14px; height: 14px; border-radius: 50%; background: var(--sw); box-shadow: inset 0 0 0 1px rgba(0,0,0,.1); }
       .tp-grid {
         display: grid;
         grid-template-columns: 260px 1fr;
@@ -360,6 +390,19 @@ interface TokenGroup {
   ],
 })
 export class ThemingPage {
+  protected readonly accent = inject(MkAccentService);
+  protected readonly accentKeys = MK_ACCENT_ORDER;
+  protected readonly swatch = mkAccentSwatch;
+  protected accentName(k: MkAccentKey): string {
+    return MK_ACCENTS[k].name;
+  }
+  protected readonly accentCode = `import { MkAccentService, MK_ACCENT_ORDER, mkAccentSwatch } from '@mk-kit/ui/core';
+
+readonly accent = inject(MkAccentService);
+accent.set('coral');            // every kit control recolours, persisted
+accent.key();                   // 'coral' — or null while the preset's primary is in use
+mkAccentSwatch('bumblebee');    // the picker swatch`;
+
   protected readonly theme = inject(MkThemeService);
 
   protected readonly contrastCode = `private readonly theme = inject(MkThemeService);

@@ -1,5 +1,6 @@
 export * from './types';
 export * from './theme/theme.service';
+export * from './theme/accent.service';
 export * from './layout/breakpoint.service';
 export * from './a11y/live-announcer.service';
 export * from './a11y/focus-trap';

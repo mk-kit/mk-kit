@@ -4,6 +4,28 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.58.0] — 2026-09-05
+
+### Added
+
+- **`MkAccentService`** (`@mk-kit/ui/core`) — the runtime accent as a
+  service instead of a recipe. `set(key)` writes the `--mk-primary` family,
+  `--mk-focus-ring`, `--mk-selected-bg` / `-text` and its own `--mk-accent` /
+  `--mk-accent-ink` / `--mk-accent-glow` onto `<html>`, follows light / dark
+  for the hover and ink shades, persists to `localStorage` (`mk-kit-accent`)
+  and mirrors the key as `data-mk-accent`; `reset()` goes back to the
+  preset's primary. Nothing is written until an accent is chosen. The eight
+  Momentum accents ship as `MK_ACCENTS` / `MK_ACCENT_ORDER` with
+  `mkAccentSwatch(key)` for pickers and `mkHexAlpha()`. Both Momentum and
+  mk-board carried this code; now they share it. Live picker on the theming
+  page.
+
+### Fixed
+
+- `gen-cost` measured an optional peer dependency (`html5-qrcode`) as part of
+  the scanner entry when it happened to be installed. Peer dependencies are
+  external now; `cost.json` covers all 37 entry points (321 KiB brotli).
+
 ## [0.57.0] — 2026-09-05
 
 ### Added
