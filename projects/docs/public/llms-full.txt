@@ -911,6 +911,14 @@ Members:
 | `translationEditorReset` | `string` |  |
 | `translationEditorExport` | `string` |  |
 | `translationEditorKeys` | `string` |  |
+| `sessionExpiryTitle` | `string` | Session-expiry dialog (`@mk-kit/ui/attention`). |
+| `sessionExpiryExtend` | `string` |  |
+| `sessionExpiryExtending` | `string` |  |
+| `sessionExpiryLogout` | `string` |  |
+| `sessionExpiryBody` | `(countdown: string) => string` |  |
+| `scannerTitle` | `string` | Barcode scanner (`@mk-kit/ui/media/scanner`). |
+| `scannerHint` | `string` |  |
+| `scannerCameraError` | `string` |  |
 | `resultsCount` | `(count: number) => string` | Announced when a filterable list updates (autocomplete, multi-select, command palette). |
 | `previousPage` | `string` | Pagination: previous page control. |
 | `nextPage` | `string` | Pagination: next page control. |
@@ -12327,6 +12335,261 @@ Values interpolated into `{{name}}` placeholders.
 type MkTranslateParams = Record<string, unknown>;
 ```
 
+## @mk-kit/ui/attention
+
+16 exports. `import { … } from '@mk-kit/ui/attention';`
+
+### MkSessionExpiryDialog (component)
+
+Selector: `mk-session-expiry-dialog`
+
+Docs: https://mk-kit.dev/components/attention
+
+Import: `import { MkSessionExpiryDialog } from '@mk-kit/ui/attention';`
+
+Last call before a session ends: counts down and offers to extend.
+Reaching zero ends the session, so doing nothing still produces a definite,
+visible outcome. Opened by `MkSessionExpiry`; usable on its own.
+
+### MkNotificationSound (service)
+
+Docs: https://mk-kit.dev/components/attention
+
+Import: `import { MkNotificationSound } from '@mk-kit/ui/attention';`
+
+Alert sounds for incoming work (orders, messages, tickets) with the
+browser's autoplay rules handled: an `AudioContext` stays suspended until a
+user gesture, so a sound fired by a WebSocket message would be silent. The
+context is unlocked when the user enables sound (a click) and lazily on the
+first interaction anywhere in the app. The default sound is synthesised
+(a short C–E–G chime) — nothing to ship, no CORS, lowest latency; file
+presets are fetched and decoded once and fall back to the chime when they
+fail. The on/off preference lives in localStorage under a configurable key.
+
+```ts
+provideMkNotificationSound({ presets: [MK_CHIME_PRESET, { id: 'ding', label: 'Ding', url: '/assets/ding.wav' }] })
+sound.primeOnFirstInteraction();          // at app start
+sound.play(settings.newOrderSound);       // on an event, honours the device mute
+sound.preview('ding');                    // settings page test button
+```
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `isEnabled(): boolean` | Whether the device has sound on. |
+| `hasBeenAsked(): boolean` | Whether the user ever answered the "enable sound?" question on this device. |
+| `setEnabled(enabled: boolean): void` | Persist the preference; call from a click so audio unlocks at once. |
+| `primeOnFirstInteraction(): void` | Arm a one-time listener so the first pointer/key interaction unlocks audio. |
+| `chime(): void` | The default chime, if the device has sound on. |
+| `play(soundId: string, customUrl?: string \| null): void` | Play the sound configured for an event: a preset id, `custom` (with `customUrl`) or `none` (silent). Unknown ids and failed loads fall back to the chime. Honours the device mute. |
+| `preview(soundId: string, customUrl?: string \| null): void` | Same as `play()` but ignores the device mute — for settings test buttons. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `presets` | `MkSoundPreset[]` | The selectable presets (always includes the chime). |
+
+### MkSessionExpiry (service)
+
+Docs: https://mk-kit.dev/components/attention
+
+Import: `import { MkSessionExpiry } from '@mk-kit/ui/attention';`
+
+Watches `expiresAt()` and warns BEFORE the session lapses, so a session
+never ends silently: the dialog offers to extend, or signs out at zero.
+Re-arms itself whenever `expiresAt()` changes (every token rotation),
+runs the timer outside the Angular zone and only in the browser. Started
+automatically by `provideMkSessionExpiry`.
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `start(): void` | Begin watching. Idempotent; called by the provider's initializer. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `open` | `WritableSignal<boolean>` | Whether the dialog is currently open. |
+
+### MkTabAttention (service)
+
+Docs: https://mk-kit.dev/components/attention
+
+Import: `import { MkTabAttention } from '@mk-kit/ui/attention';`
+
+Messenger-style tab attention: while unhandled work exists the favicon
+carries a red counter badge, and — only while the tab is hidden — the
+title alternates with "(N) label" so a pinned tab flashes in the tab strip.
+Focusing the tab stops the blinking (someone is looking) but keeps the
+badge until the count reaches zero. SSR-safe: every entry point bails
+without a `document`; the blink timer runs outside the Angular zone.
+
+```ts
+private attention = inject(MkTabAttention);
+effect(() => this.attention.set(this.pending().length, 'new orders'));
+```
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `set(count: number, label?: string): void` | Update the pending count and the label used in the blinking title. |
+| `clear(): void` | Drop the badge and the blinking entirely and stop listening. |
+
+Properties:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `count` | `WritableSignal<number>` | The count currently shown (0 = nothing pending). |
+
+### provideMkNotificationSound (function)
+
+Import: `import { provideMkNotificationSound } from '@mk-kit/ui/attention';`
+
+Register presets / storage key for `MkNotificationSound`. Optional.
+
+```ts
+function provideMkNotificationSound(config: MkNotificationSoundConfig): { provide: InjectionToken<MkNotificationSoundConfig>; useValue: MkNotificationSoundConfig; }
+```
+
+### provideMkSessionExpiry (function)
+
+Import: `import { provideMkSessionExpiry } from '@mk-kit/ui/attention';`
+
+Register the session-expiry watcher; it starts with the application.
+
+```ts
+provideMkSessionExpiry({
+  expiresAt: () => auth.tokenExpiresAt(),
+  extend: () => firstValueFrom(auth.refresh()),
+  onExpire: () => auth.logout(),
+  warnBeforeMs: 2 * 60_000,
+})
+```
+
+```ts
+function provideMkSessionExpiry(config: MkSessionExpiryConfig): EnvironmentProviders
+```
+
+### provideMkTabAttention (function)
+
+Import: `import { provideMkTabAttention } from '@mk-kit/ui/attention';`
+
+Register options for `MkTabAttention`. Optional — the defaults work.
+
+```ts
+function provideMkTabAttention(config: MkTabAttentionConfig): { provide: InjectionToken<MkTabAttentionConfig>; useValue: MkTabAttentionConfig; }
+```
+
+### MK_NOTIFICATION_SOUND_CONFIG (token)
+
+Import: `import { MK_NOTIFICATION_SOUND_CONFIG } from '@mk-kit/ui/attention';`
+
+```ts
+const MK_NOTIFICATION_SOUND_CONFIG: InjectionToken<MkNotificationSoundConfig>;
+```
+
+### MK_SESSION_EXPIRY_CONFIG (token)
+
+Import: `import { MK_SESSION_EXPIRY_CONFIG } from '@mk-kit/ui/attention';`
+
+```ts
+const MK_SESSION_EXPIRY_CONFIG: InjectionToken<MkSessionExpiryConfig>;
+```
+
+### MK_TAB_ATTENTION_CONFIG (token)
+
+Import: `import { MK_TAB_ATTENTION_CONFIG } from '@mk-kit/ui/attention';`
+
+```ts
+const MK_TAB_ATTENTION_CONFIG: InjectionToken<MkTabAttentionConfig>;
+```
+
+### MK_CHIME_PRESET (const)
+
+Import: `import { MK_CHIME_PRESET } from '@mk-kit/ui/attention';`
+
+The always-available synthesised sound.
+
+```ts
+const MK_CHIME_PRESET: MkSoundPreset;
+```
+
+### MkNotificationSoundConfig (interface)
+
+Import: `import { MkNotificationSoundConfig } from '@mk-kit/ui/attention';`
+
+Options for `MkNotificationSound`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `presets`? | `MkSoundPreset[] \| undefined` | Selectable sounds; the ids `custom` and `none` are reserved. Default: the chime only. |
+| `storageKey`? | `(() => string) \| undefined` | localStorage key for the on/off preference — a function so it can vary per tenant / user. |
+| `volume`? | `number \| undefined` | Output gain for file presets (0–1). Default `0.8`. |
+
+### MkSessionExpiryConfig (interface)
+
+Import: `import { MkSessionExpiryConfig } from '@mk-kit/ui/attention';`
+
+Options for `provideMkSessionExpiry`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `expiresAt` | `() => number \| null` | Epoch ms when the session lapses, or `null` when there is none. Read reactively. |
+| `warnBeforeMs`? | `number \| undefined` | How long before the lapse the dialog appears. Default 2 minutes. |
+| `extend` | `() => Promise<unknown>` | Extend the session (refresh the token). Resolve = extended, reject = nothing to extend. |
+| `onExpire` | `() => void` | End the session (sign out, navigate). |
+| `enabled`? | `(() => boolean) \| undefined` | Read reactively; `false` suspends the watcher (a kiosk / PIN mode, say). |
+
+### MkSessionExpiryDialogData (interface)
+
+Import: `import { MkSessionExpiryDialogData } from '@mk-kit/ui/attention';`
+
+Data handed to `MkSessionExpiryDialog`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `expiresAt` | `number` |  |
+| `extend` | `() => Promise<unknown>` |  |
+| `onExpire` | `() => void` |  |
+
+### MkSoundPreset (interface)
+
+Import: `import { MkSoundPreset } from '@mk-kit/ui/attention';`
+
+One selectable alert sound. `url: null` = the synthesised chime.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` |  |
+| `label` | `string` |  |
+| `url` | `string \| null` |  |
+
+### MkTabAttentionConfig (interface)
+
+Import: `import { MkTabAttentionConfig } from '@mk-kit/ui/attention';`
+
+Options for `MkTabAttention`, set with `provideMkTabAttention`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `badgeColor`? | `string \| undefined` | Badge fill colour (any CSS colour). Default `#e53935`. |
+| `blinkMs`? | `number \| undefined` | Title blink period in ms while the tab is hidden. Default `1200`. |
+
 ## @mk-kit/ui/feedback
 
 55 exports. `import { … } from '@mk-kit/ui/feedback';`
@@ -16241,6 +16504,97 @@ Ukrainian validation messages rendered by `mk-form-field`.
 
 ```ts
 const MK_UK_VALIDATION: MkValidationStrings;
+```
+
+## @mk-kit/ui/media/scanner
+
+5 exports. `import { … } from '@mk-kit/ui/media/scanner';`
+
+### MkBarcodeScanner (component)
+
+Selector: `mk-barcode-scanner`
+
+Docs: https://mk-kit.dev/components/images
+
+Import: `import { MkBarcodeScanner } from '@mk-kit/ui/media/scanner';`
+
+Camera barcode / QR reader. Starts the rear camera when it appears, emits
+`scanned` once with the first decoded text and stops. The decoder
+(`html5-qrcode`, an optional peer dependency) is loaded on demand, so pages
+that only *offer* scanning ship nothing extra until a scan starts. Use
+inline, or through `MkBarcodeScannerDialog`.
+
+```html
+<mk-barcode-scanner (scanned)="onCode($event)" (failed)="show($event)" />
+```
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `formats` | `MkBarcodeFormat[]` | `MK_BARCODE_DEFAULT_FORMATS` | Symbologies to decode. Default: QR + the retail 1-D codes. |
+| `fps` | `number` | `10` | Frames per second offered to the decoder. Default 10. |
+| `hint` | `boolean` | `true` | Show the built-in hint line above the viewfinder. Default `true`. |
+| `continuous` | `boolean` | `false` | Keep scanning after a hit instead of stopping. Default `false`. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `scanned` | `string` | Decoded text. |
+| `failed` | `string` | The camera could not start (permission, no device, insecure context). |
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `stop(): Promise<void>` | Stop the camera and release it. Safe to call twice. |
+
+### MkBarcodeScannerDialog (component)
+
+Selector: `mk-barcode-scanner-dialog`
+
+Docs: https://mk-kit.dev/components/images
+
+Import: `import { MkBarcodeScannerDialog } from '@mk-kit/ui/media/scanner';`
+
+The scanner in a dialog: resolves with the decoded text, or `null` when
+cancelled. Open it with `MkDialogService`:
+
+```ts
+const code = await dialog.open<MkBarcodeScannerDialog, string | null>(MkBarcodeScannerDialog, { size: 'sm' }).afterClosed;
+if (code) this.search.setValue(code);
+```
+
+### MK_BARCODE_DEFAULT_FORMATS (const)
+
+Import: `import { MK_BARCODE_DEFAULT_FORMATS } from '@mk-kit/ui/media/scanner';`
+
+```ts
+const MK_BARCODE_DEFAULT_FORMATS: MkBarcodeFormat[];
+```
+
+### MkBarcodeScannerDialogData (interface)
+
+Import: `import { MkBarcodeScannerDialogData } from '@mk-kit/ui/media/scanner';`
+
+Optional data for `MkBarcodeScannerDialog`.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `title`? | `string \| undefined` |  |
+| `formats`? | `MkBarcodeFormat[] \| undefined` |  |
+
+### MkBarcodeFormat (type)
+
+Import: `import { MkBarcodeFormat } from '@mk-kit/ui/media/scanner';`
+
+Symbologies the scanner reads; names follow `Html5QrcodeSupportedFormats`.
+
+```ts
+type MkBarcodeFormat = | 'QR_CODE' | 'EAN_13' | 'EAN_8' | 'CODE_128' | 'CODE_39' | 'UPC_A' | 'UPC_E' | 'DATA_MATRIX' | 'ITF' | 'CODABAR';
 ```
 
 ## @mk-kit/ui/testing

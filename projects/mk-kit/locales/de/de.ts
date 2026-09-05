@@ -242,6 +242,14 @@ export const MK_DE_I18N: MkI18nStrings = {
   translationEditorReset: 'Originaltext wiederherstellen',
   translationEditorExport: 'CSV exportieren',
   translationEditorKeys: 'Schlüssel',
+  sessionExpiryTitle: 'Ihre Sitzung läuft gleich ab',
+  sessionExpiryExtend: 'Angemeldet bleiben',
+  sessionExpiryExtending: 'Wird verlängert…',
+  sessionExpiryLogout: 'Jetzt abmelden',
+  sessionExpiryBody: (countdown) => `Aus Sicherheitsgründen werden Sie in ${countdown} abgemeldet. Nicht gespeicherte Änderungen gehen verloren.`,
+  scannerTitle: 'Code scannen',
+  scannerHint: 'Richten Sie die Kamera auf einen Barcode oder QR-Code. Er wird automatisch gelesen.',
+  scannerCameraError: 'Die Kamera konnte nicht gestartet werden. Prüfen Sie die Browser-Berechtigungen.',
   resultsCount: (count) =>
     `${count} ${plural(count, 'Ergebnis', 'Ergebnisse')}`,
 

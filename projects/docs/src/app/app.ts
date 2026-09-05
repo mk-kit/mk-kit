@@ -423,6 +423,11 @@ export class App {
           keywords: 'tooltip popover hovercard popconfirm hint',
         },
         {
+          label: 'Attention',
+          path: '/components/attention',
+          keywords: 'favicon badge title blink tab attention notification sound chime session expiry countdown',
+        },
+        {
           label: 'Translate (i18n)',
           path: '/components/translate',
           keywords: 'translate i18n translation language locale pipe instant plural overrides',
