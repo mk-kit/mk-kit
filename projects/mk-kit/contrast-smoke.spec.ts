@@ -10,6 +10,7 @@
  * Add a pair here whenever a component picks a text token for a surface.
  */
 import css from './src/styles/mk-kit.css' with { loader: 'text' };
+import momentumCss from './src/styles/presets/momentum.css' with { loader: 'text' };
 import { type MkRgb, mkContrastRatio, mkParseRgb } from '@mk-kit/ui/data/charts';
 
 const AA = 4.5;
@@ -25,10 +26,14 @@ const baseCss = (() => {
   return cut > 0 ? css.slice(0, cut) : css;
 })();
 
-/** `--mk-<name>` for the light theme (first declaration) or dark (last). */
-function token(name: string, theme: 'light' | 'dark'): MkRgb {
-  const matches = [...baseCss.matchAll(new RegExp(`--mk-${name}:\\s*(#[0-9a-fA-F]{3,6})\\s*;`, 'g'))];
-  expect(matches.length, `token --mk-${name} declared in mk-kit.css`).toBeGreaterThan(0);
+/**
+ * `--mk-<name>` for the light theme (first declaration) or dark (last), read
+ * from `source` — the base theme by default, or a preset stylesheet, which
+ * follows the same light-first / dark-last layout.
+ */
+function token(name: string, theme: 'light' | 'dark', source = baseCss): MkRgb {
+  const matches = [...source.matchAll(new RegExp(`--mk-${name}:\\s*(#[0-9a-fA-F]{3,6})\\s*;`, 'g'))];
+  expect(matches.length, `token --mk-${name} declared`).toBeGreaterThan(0);
   const raw = theme === 'light' ? matches[0][1] : matches[matches.length - 1][1];
   const rgb = mkParseRgb(raw);
   expect(rgb, `--mk-${name} (${theme}) parses`).not.toBeNull();
@@ -65,4 +70,34 @@ describe('theme token contrast (WCAG AA)', () => {
     expect(mkContrastRatio(token('text-disabled', 'light'), token('surface', 'light'))).toBeLessThan(AA);
     expect(mkContrastRatio(token('text-disabled', 'dark'), token('surface', 'dark'))).toBeLessThan(AA);
   });
+});
+
+/**
+ * Presets re-declare the colour tokens, so they are held to the same pairs.
+ * A preset that leaves a token out inherits the base value — `token()` then
+ * fails loudly instead of silently testing the wrong colour, which is the
+ * point: every pair below must be fully covered by the preset itself.
+ */
+describe('preset "momentum" token contrast (WCAG AA)', () => {
+  for (const theme of ['light', 'dark'] as const) {
+    for (const { text, bg, where } of PAIRS) {
+      it(`${theme}: --mk-${text} on --mk-${bg} ≥ 4.5:1 (${where})`, () => {
+        expect(
+          mkContrastRatio(token(text, theme, momentumCss), token(bg, theme, momentumCss)),
+        ).toBeGreaterThanOrEqual(AA);
+      });
+    }
+    it(`${theme}: --mk-primary-contrast on --mk-primary ≥ 4.5:1 (solid button labels)`, () => {
+      expect(
+        mkContrastRatio(token('primary-contrast', theme, momentumCss), token('primary', theme, momentumCss)),
+      ).toBeGreaterThanOrEqual(AA);
+    });
+    for (const tone of ['success', 'warning', 'danger', 'info'] as const) {
+      it(`${theme}: --mk-${tone}-subtle-text on --mk-${tone}-subtle ≥ 4.5:1 (soft badges, alerts)`, () => {
+        expect(
+          mkContrastRatio(token(`${tone}-subtle-text`, theme, momentumCss), token(`${tone}-subtle`, theme, momentumCss)),
+        ).toBeGreaterThanOrEqual(AA);
+      });
+    }
+  }
 });

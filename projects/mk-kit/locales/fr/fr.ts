@@ -497,6 +497,8 @@ export const MK_FR_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Déplacé vers : ${list}, position ${position} sur ${total}.`,
   dndDropped: (position) => `Déposé en position ${position}.`,
+  dndMovedToZone: (zone) => `Déplacé vers : ${zone}. Espace ou Entrée dépose ici.`,
+  dndDroppedInZone: (zone) => `Déposé dans : ${zone}.`,
   dndCancelled: 'Déplacement annulé. L’élément est revenu à sa place d’origine.',
 
   repeaterAddRow: 'Ajouter une ligne',

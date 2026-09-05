@@ -496,6 +496,8 @@ export const MK_DE_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Verschoben nach: ${list}, Position ${position} von ${total}.`,
   dndDropped: (position) => `Auf Position ${position} abgelegt.`,
+  dndMovedToZone: (zone) => `Verschoben nach: ${zone}. Leertaste oder Enter legt hier ab.`,
+  dndDroppedInZone: (zone) => `Abgelegt in: ${zone}.`,
   dndCancelled: 'Verschieben abgebrochen. Der Eintrag ist zurück an seinem Platz.',
 
   repeaterAddRow: 'Zeile hinzufügen',

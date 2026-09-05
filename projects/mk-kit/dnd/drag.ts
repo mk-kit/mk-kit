@@ -15,10 +15,11 @@ import {
   signal,
 } from '@angular/core';
 import { MK_I18N, MkLiveAnnouncer } from '@mk-kit/ui/core';
-import { MkDragDropRegistry } from './drag-drop-registry';
+import { MkDragDropRegistry, type MkDropTarget } from './drag-drop-registry';
 import { MkDragHandle } from './drag-handle';
 import { MkDropList } from './drop-list';
-import type { MkDropEvent } from './drag-drop.types';
+import type { MkDropZone } from './drop-zone';
+import type { MkDropEvent, MkDropZoneEvent, MkDropZoneHover } from './drag-drop.types';
 
 /** Pixels the pointer must travel before a press turns into a drag. */
 const DRAG_THRESHOLD = 5;
@@ -51,6 +52,12 @@ const SETTLE_MS = 180;
  * Keyboard: focus the item (or its handle) and press **Space/Enter** to pick
  * it up, **Arrow** keys to move it (crossing into connected lists at the ends /
  * across the perpendicular axis), **Space/Enter** to drop, **Escape** to cancel.
+ *
+ * Besides lists, an item can be released on a connected `[mkDropZone]` — a
+ * target that reports *where* it was dropped instead of an index (a timeline,
+ * a priority band, a "focus on this" pane). Zones sit in the same keyboard
+ * travel group as lists, in document order; while an item hovers a zone no
+ * placeholder is shown and the zone streams `mkDropZoneMoved` events.
  *
  * Touch: a swipe scrolls the page as usual — the drag only arms after a
  * long-press ({@link mkDragTouchDelay}, default 300 ms). While armed the item
@@ -185,6 +192,8 @@ export class MkDrag<T = unknown> {
   private targetIndex = 0;
   private homeIndex = 0;
   private placeholder: HTMLElement | null = null;
+  /** The zone the item hovers (pointer) or sits on (keyboard); `null` while a list is the target. */
+  private targetZone: MkDropZone<any> | null = null;
 
   // --- pointer session state ---
   private pointerId: number | null = null;
@@ -257,6 +266,12 @@ export class MkDrag<T = unknown> {
   private cachedGroup: MkDropList<any>[] = [];
   /** List bounds snapshotted at lift / after invalidation. */
   private readonly listRects = new Map<MkDropList<any>, DOMRect>();
+  /** Connected zones resolved once at lift, and their bounds. */
+  private cachedZones: MkDropZone<any>[] = [];
+  private readonly zoneRects = new Map<MkDropZone<any>, DOMRect>();
+  /** Last pointer position a frame applied — the drop position on a zone. */
+  private lastX = 0;
+  private lastY = 0;
   /** Item bounds per list, aligned with `itemElementsExcept(this)`. */
   private readonly itemRects = new Map<MkDropList<any>, DOMRect[]>();
   /** Lists whose snapshots a placeholder move invalidated (re-measured next frame). */
@@ -459,22 +474,105 @@ export class MkDrag<T = unknown> {
     }
     const x = this.pendingX;
     const y = this.pendingY;
-    const list = this.listUnderPoint(x, y) ?? this.targetList;
-    const index = list ? this.indexInList(list, x, y) : this.targetIndex;
+    this.lastX = x;
+    this.lastY = y;
+    const hit = this.targetUnderPoint(x, y);
     // Writes: follow the cursor, then settle the placeholder.
     if (this.preview) {
       const dx = x - this.offsetX - this.originLeft;
       const dy = y - this.offsetY - this.originTop;
       this.preview.style.transform = `translate3d(${dx}px, ${dy}px, 0)`;
     }
+    if (hit && !(hit instanceof MkDropList)) {
+      this.hoverZone(hit, x, y);
+      return;
+    }
+    // Over nothing: the last target keeps the item (a zone included).
+    if (!hit && this.targetZone) return;
+    const list = hit ?? this.targetList;
     if (!list) return;
-    if (list !== this.targetList) {
+    const index = this.indexInList(list, x, y);
+    const wasOnZone = this.targetZone !== null;
+    if (wasOnZone) this.leaveZone();
+    if (list !== this.targetList || wasOnZone) {
       this.targetList?.setReceiving(false);
       this.targetList = list;
       list.setReceiving(true);
     }
     this.targetIndex = index;
     this.syncPlaceholder();
+  }
+
+  /** Pointer entered / moved over `zone`: no placeholder, the zone gets the position. */
+  private hoverZone(zone: MkDropZone<any>, x: number, y: number): void {
+    const hover = this.zoneHover(zone, x, y, true);
+    if (zone === this.targetZone) {
+      zone.emitMoved(hover);
+      return;
+    }
+    this.leaveZone();
+    this.targetList?.setReceiving(false);
+    this.detachPlaceholder();
+    this.targetZone = zone;
+    zone.setReceiving(true);
+    zone.emitEntered(hover);
+  }
+
+  /** Leave the current zone, if any (the zone is told, so it can clear its preview). */
+  private leaveZone(): void {
+    const zone = this.targetZone;
+    if (!zone) return;
+    this.targetZone = null;
+    zone.setReceiving(false);
+    zone.emitLeft(this as MkDrag<any>);
+  }
+
+  /**
+   * Take the placeholder out of the lists while the item is over a zone. The
+   * next `syncPlaceholder` re-inserts it (the idempotence guard is reset), and
+   * the list it left is re-measured because its layout just changed.
+   */
+  private detachPlaceholder(): void {
+    const ph = this.placeholder;
+    if (!ph) return;
+    const prev = this.lastSyncList;
+    ph.remove();
+    this.lastSyncList = null;
+    this.lastSyncIndex = -1;
+    if (prev) this.dirtyLists.add(prev);
+  }
+
+  /** Position of the item over `zone` — cached bounds on the pointer path, live otherwise. */
+  private zoneHover(
+    zone: MkDropZone<any>,
+    x: number,
+    y: number,
+    isPointerEvent: boolean,
+  ): MkDropZoneHover<any, any> {
+    const r = this.zoneRects.get(zone) ?? zone.element.getBoundingClientRect();
+    const clamp = (v: number) => Math.min(1, Math.max(0, v));
+    return {
+      item: this as MkDrag<any>,
+      zone,
+      x,
+      y,
+      offsetX: x - r.left,
+      offsetY: y - r.top,
+      fractionX: r.width ? clamp((x - r.left) / r.width) : 0,
+      fractionY: r.height ? clamp((y - r.top) / r.height) : 0,
+      isPointerEvent,
+    };
+  }
+
+  private zoneEvent(
+    zone: MkDropZone<any>,
+    x: number,
+    y: number,
+    isPointerEvent: boolean,
+    previousContainer: MkDropList<any>,
+    previousIndex: number,
+  ): MkDropZoneEvent<any, any> {
+    return { ...this.zoneHover(zone, x, y, isPointerEvent), previousContainer, previousIndex };
   }
 
   private finishPointer(cancel: boolean): void {
@@ -499,7 +597,8 @@ export class MkDrag<T = unknown> {
     this.flushMoveFrame(!cancel);
 
     const settle = () => this.commitPointer(cancel);
-    if (cancel || this.prefersReducedMotion() || !this.preview) {
+    // A zone has no placeholder to settle onto — commit straight away.
+    if (cancel || this.targetZone || this.prefersReducedMotion() || !this.preview) {
       settle();
       return;
     }
@@ -526,10 +625,24 @@ export class MkDrag<T = unknown> {
 
   private commitPointer(cancel: boolean): void {
     if (this.destroyed) return;
+    const zone = this.targetZone;
     const container = this.targetList;
     const previousContainer = this.home;
     const currentIndex = this.targetIndex;
     const previousIndex = this.homeIndex;
+
+    if (!cancel && zone && previousContainer) {
+      // Build the event before cleanup clears the cached bounds; detach the
+      // zone first so cleanup does not report a "left".
+      const event = this.zoneEvent(zone, this.lastX, this.lastY, true, previousContainer, previousIndex);
+      this.targetZone = null;
+      zone.setReceiving(false);
+      this.cleanupDom();
+      this.dragging.set(false);
+      zone.emitDrop(event);
+      this.announceDroppedInZone(zone, 'polite');
+      return;
+    }
 
     this.cleanupDom();
     this.dragging.set(false);
@@ -564,6 +677,9 @@ export class MkDrag<T = unknown> {
     }
 
     // Picked up: capture the movement / drop / cancel keys.
+    // On a zone there is no position to step through — every arrow walks the
+    // travel group (previous / next target), Space/Enter drops at the centre.
+    const onZone = this.targetZone !== null;
     const horizontal = this.targetList?.mkDropListOrientation() === 'horizontal';
     switch (key) {
       case ' ':
@@ -577,19 +693,19 @@ export class MkDrag<T = unknown> {
         break;
       case 'ArrowUp':
         e.preventDefault();
-        horizontal ? this.stepList(-1) : this.stepPrimary(-1);
+        onZone || horizontal ? this.stepTarget(-1) : this.stepPrimary(-1);
         break;
       case 'ArrowDown':
         e.preventDefault();
-        horizontal ? this.stepList(1) : this.stepPrimary(1);
+        onZone || horizontal ? this.stepTarget(1) : this.stepPrimary(1);
         break;
       case 'ArrowLeft':
         e.preventDefault();
-        horizontal ? this.stepPrimary(-1) : this.stepList(-1);
+        onZone || !horizontal ? this.stepTarget(-1) : this.stepPrimary(-1);
         break;
       case 'ArrowRight':
         e.preventDefault();
-        horizontal ? this.stepPrimary(1) : this.stepList(1);
+        onZone || !horizontal ? this.stepTarget(1) : this.stepPrimary(1);
         break;
       default:
         break;
@@ -642,28 +758,73 @@ export class MkDrag<T = unknown> {
     this.announceMove(false);
   }
 
-  private stepList(step: 1 | -1): void {
-    const list = this.targetList;
-    if (!list) return;
-    const adj = this.adjacentList(list, step);
-    if (!adj) return;
-    this.moveToList(adj, Math.min(this.targetIndex, this.maxIndex(adj)), true);
+  /**
+   * Cross to the previous / next target on the perpendicular axis: connected
+   * lists **and** zones, in document order (see `MkDragDropRegistry.travelGroup`).
+   */
+  private stepTarget(step: 1 | -1): void {
+    const current: MkDropTarget | null = this.targetZone ?? this.targetList;
+    if (!current || !this.home) return;
+    const group = this.registry.travelGroup(this.home);
+    const i = group.indexOf(current);
+    if (i < 0) return;
+    const next = group[i + step];
+    if (!next) return;
+    if (next instanceof MkDropList) {
+      const wasOnZone = this.targetZone !== null;
+      this.leaveZone();
+      this.moveToList(next, Math.min(this.targetIndex, this.maxIndex(next)), true, wasOnZone);
+    } else {
+      this.moveToZone(next);
+    }
   }
 
-  private moveToList(list: MkDropList<any>, index: number, crossed: boolean): void {
+  private moveToZone(zone: MkDropZone<any>): void {
+    this.leaveZone();
+    this.targetList?.setReceiving(false);
+    this.detachPlaceholder();
+    this.targetZone = zone;
+    zone.setReceiving(true);
+    const r = zone.element.getBoundingClientRect();
+    zone.emitEntered(this.zoneHover(zone, r.left + r.width / 2, r.top + r.height / 2, false));
+    this.announcer.announce(this.i18n.dndMovedToZone(zone.label()), 'assertive');
+  }
+
+  private moveToList(list: MkDropList<any>, index: number, crossed: boolean, fromZone = false): void {
     this.targetList?.setReceiving(false);
     this.targetList = list;
     this.targetIndex = index;
     list.setReceiving(true);
     this.syncPlaceholder();
-    this.announceMove(crossed);
+    // Coming back from a zone into the same list still crossed a target.
+    this.announceMove(crossed || fromZone);
   }
 
   private dropKeyboard(): void {
+    const zone = this.targetZone;
     const container = this.targetList;
     const previousContainer = this.home;
     const currentIndex = this.targetIndex;
     const previousIndex = this.homeIndex;
+
+    if (zone && previousContainer) {
+      const r = zone.element.getBoundingClientRect();
+      const event = this.zoneEvent(
+        zone,
+        r.left + r.width / 2,
+        r.top + r.height / 2,
+        false,
+        previousContainer,
+        previousIndex,
+      );
+      this.targetZone = null;
+      zone.setReceiving(false);
+      this.cleanupDom();
+      this.lifted.set(false);
+      zone.emitDrop(event);
+      this.announceDroppedInZone(zone, 'assertive');
+      return;
+    }
 
     this.cleanupDom();
     this.lifted.set(false);
@@ -708,6 +869,11 @@ export class MkDrag<T = unknown> {
     this.announcer.announce(this.i18n.dndDropped(index + 1), politeness);
   }
 
+  /** Confirmation after a drop on a zone. */
+  private announceDroppedInZone(zone: MkDropZone<any>, politeness: 'polite' | 'assertive'): void {
+    this.announcer.announce(this.i18n.dndDroppedInZone(zone.label()), politeness);
+  }
+
   /** The drag was cancelled and the item snapped back. */
   private announceCancelled(politeness: 'polite' | 'assertive'): void {
     this.announcer.announce(this.i18n.dndCancelled, politeness);
@@ -732,9 +898,14 @@ export class MkDrag<T = unknown> {
   /** Snapshot every connected list's bounds + item bounds (at lift / scroll). */
   private snapshotRects(): void {
     this.cachedGroup = this.home ? this.registry.connectedGroup(this.home) : [];
+    this.cachedZones = this.home ? this.registry.connectedZones(this.home) : [];
     this.listRects.clear();
     this.itemRects.clear();
+    this.zoneRects.clear();
     for (const list of this.cachedGroup) this.measureList(list);
+    for (const zone of this.cachedZones) {
+      this.zoneRects.set(zone, zone.element.getBoundingClientRect());
+    }
   }
 
   /** (Re)measure one list's bounds and item bounds into the cache. */
@@ -747,23 +918,27 @@ export class MkDrag<T = unknown> {
   }
 
   /**
-   * Which connected list (if any) the pointer is currently over. Pointer path
-   * only — reads the rects snapshotted at lift, not live layout.
+   * Which connected list or zone (if any) the pointer is currently over.
+   * Pointer path only — reads the rects snapshotted at lift, not live layout.
    */
-  private listUnderPoint(x: number, y: number): MkDropList<any> | null {
-    // Every candidate whose bounds contain the point. Lists nested inside the
-    // dragged item itself are never targets (an item cannot be dropped into
-    // its own descendants).
-    const hits: MkDropList<any>[] = [];
+  private targetUnderPoint(x: number, y: number): MkDropTarget | null {
+    // Every candidate whose bounds contain the point. Targets nested inside the
+    // dragged item itself are never hit (an item cannot be dropped into its
+    // own descendants).
+    const hits: MkDropTarget[] = [];
+    const inside = (r: DOMRect) => x >= r.left && x <= r.right && y >= r.top && y <= r.bottom;
     for (const list of this.cachedGroup) {
       if (list.element !== this.element && this.element.contains(list.element)) continue;
-      const r = this.listRects.get(list) ?? list.element.getBoundingClientRect();
-      if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) hits.push(list);
+      if (inside(this.listRects.get(list) ?? list.element.getBoundingClientRect())) hits.push(list);
+    }
+    for (const zone of this.cachedZones) {
+      if (this.element.contains(zone.element)) continue;
+      if (inside(this.zoneRects.get(zone) ?? zone.element.getBoundingClientRect())) hits.push(zone);
     }
     if (hits.length <= 1) return hits[0] ?? null;
-    // Nested lists: the innermost hit wins — the one that contains no other hit.
+    // Nested targets: the innermost hit wins — the one that contains no other hit.
     return (
-      hits.find((list) => !hits.some((other) => other !== list && list.element.contains(other.element))) ??
+      hits.find((t) => !hits.some((other) => other !== t && t.element.contains(other.element))) ??
       hits[0]
     );
   }
@@ -875,9 +1050,12 @@ export class MkDrag<T = unknown> {
     this.element.style.display = '';
     this.home?.setReceiving(false);
     this.targetList?.setReceiving(false);
+    this.leaveZone();
     this.cachedGroup = [];
+    this.cachedZones = [];
     this.listRects.clear();
     this.itemRects.clear();
+    this.zoneRects.clear();
     this.dirtyLists.clear();
     this.scrollDirty = false;
     this.lastSyncList = null;

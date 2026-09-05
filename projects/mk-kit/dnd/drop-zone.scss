@@ -1,0 +1,20 @@
+/* mk-drop-zone — a drop target that is not a list.
+ * Layout-neutral so it can be applied to any element; the receiving state is
+ * the only visual the directive adds. Consumers restyle it freely. */
+
+:host {
+  display: block;
+  position: relative;
+}
+
+/* An item is hovering the zone (pointer) or a lifted item sits on it (keyboard). */
+:host(.mk-drop-zone--receiving) {
+  outline: var(--mk-border-width-strong) dashed var(--mk-primary);
+  outline-offset: calc(-1 * var(--mk-border-width-strong));
+  border-radius: var(--mk-radius-md);
+  background-color: color-mix(in srgb, var(--mk-primary) 8%, transparent);
+}
+
+:host(.mk-drop-zone--disabled) {
+  cursor: not-allowed;
+}

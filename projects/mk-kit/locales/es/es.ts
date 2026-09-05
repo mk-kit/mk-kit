@@ -496,6 +496,8 @@ export const MK_ES_I18N: MkI18nStrings = {
   dndMovedToList: (list, position, total) =>
     `Movido a: ${list}, posición ${position} de ${total}.`,
   dndDropped: (position) => `Soltado en la posición ${position}.`,
+  dndMovedToZone: (zone) => `Movido a: ${zone}. Espacio o Intro lo suelta aquí.`,
+  dndDroppedInZone: (zone) => `Soltado en: ${zone}.`,
   dndCancelled: 'Movimiento cancelado. El elemento ha vuelto a su sitio original.',
 
   repeaterAddRow: 'Añadir una fila',
