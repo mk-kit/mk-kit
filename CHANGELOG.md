@@ -4,6 +4,18 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [Unreleased]
+
+### Added
+
+- **`mk-translate` CLI** (`bin` of `@mk-kit/ui`, no dependencies, Node 20+):
+  `mk-translate check --dir src/assets/i18n --src src` reports keys nothing
+  references (string literals plus the dynamic prefixes the code builds —
+  `'Day' + n`, `` `ns.${key}` ``, `translatePlural` / `plural()` bases), keys
+  a locale lacks and keys a locale has that the base does not; exit 1 on
+  any finding, `--fix` deletes unused keys from every file, `--list`,
+  `--json`, `--base`, `--langs`, `--prefix`, `--ext`.
+
 ## [0.56.0] — 2026-09-05
 
 ### Added
