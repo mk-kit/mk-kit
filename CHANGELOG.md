@@ -29,7 +29,10 @@ versions are published to npm on `v*` tags. Dates are ISO-8601.
   `setTranslation(lang, strings, merge?)`, and `MkTranslateImports` in place
   of a `TranslateModule` import. `use()` switches synchronously when the
   language is already loaded; a key first missed while a template renders
-  is recorded without tripping NG0600.
+  is recorded without tripping NG0600. SSR hand-off is configurable with
+  `transfer: 'used' | 'all' | 'none'` — the default `'used'` ships only the
+  keys the server render read (a few KB instead of the whole file) and the
+  browser loads the rest in the background; `isPartial()` tells.
 
 ## [0.54.0] — 2026-09-04
 
