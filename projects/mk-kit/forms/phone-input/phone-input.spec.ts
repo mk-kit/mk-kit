@@ -75,6 +75,38 @@ describe('MkPhoneInput', () => {
     expect(changes).toEqual([]);
   });
 
+  it('accepts the same number again after a form reset (writeValue(null))', () => {
+    // Regression: the mask directive cached the last formatted value, so a
+    // reset followed by re-entering the same digits (typing or browser
+    // autofill) showed the number in the field while the form stayed null.
+    const changes: unknown[] = [];
+    cmp.registerOnChange((v) => changes.push(v));
+    cmp.country.set('PL');
+    fixture.detectChanges();
+    const el = fixture.nativeElement.querySelector(
+      '.mk-phone-input__field',
+    ) as HTMLInputElement;
+
+    el.value = '601234567';
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+    expect(el.value).toBe('601 234 567');
+    expect(cmp.value()).toBe('+48601234567');
+
+    // form.reset() → writeValue(null): the field is cleared by the binding.
+    cmp.writeValue(null);
+    fixture.detectChanges();
+    expect(cmp.value()).toBeNull();
+    expect(el.value).toBe('');
+
+    el.value = '601234567';
+    el.dispatchEvent(new Event('input', { bubbles: true }));
+    fixture.detectChanges();
+    expect(el.value).toBe('601 234 567');
+    expect(cmp.value()).toBe('+48601234567');
+    expect(changes).toEqual(['+48601234567', '+48601234567']);
+  });
+
   it('re-formats the national number when the country changes', () => {
     cmp.writeValue('+48601234567');
     (cmp as any).query.set('');

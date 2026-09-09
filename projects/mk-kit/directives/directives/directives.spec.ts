@@ -565,6 +565,26 @@ describe('MkMask', () => {
     fixture.destroy();
   });
 
+  it('re-emits after the value was replaced from outside (form reset) and the same text is entered again', () => {
+    const host = fixture.componentInstance;
+    input.value = '5551234567';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(host.raw()).toBe('5551234567');
+
+    // A reset / writeValue / [value] binding clears the field behind the
+    // directive's back…
+    input.value = '';
+    host.raw.set('');
+    host.masked.set('');
+
+    // …and the user (or browser autofill) enters the very same number.
+    input.value = '5551234567';
+    input.dispatchEvent(new Event('input', { bubbles: true }));
+    expect(input.value).toBe('(555) 123-4567');
+    expect(host.raw()).toBe('5551234567');
+    expect(host.masked()).toBe('(555) 123-4567');
+  });
+
   it('formats the input and emits masked + unmasked values', () => {
     input.value = '5551234567';
     input.dispatchEvent(new Event('input'));
