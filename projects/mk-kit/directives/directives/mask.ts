@@ -137,7 +137,11 @@ export class MkMask {
     el.value = masked;
     this.setCaret(el, oldValue, oldCaret, masked);
 
-    if (masked === this._masked) return;
+    // Always emit — no "same as last time" short-circuit. The host value can
+    // be replaced from outside (form reset, writeValue, a `[value]` binding)
+    // without this directive hearing about it, so a cached last-masked value
+    // goes stale: re-entering the same number after a reset used to be
+    // swallowed and the form kept `null` while the field showed the number.
     this._masked = masked;
     this._unmasked = unmasked;
     this.maskedChange.emit(masked);

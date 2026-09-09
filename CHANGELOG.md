@@ -4,6 +4,20 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.58.1] — 2026-09-09
+
+### Fixed
+
+- **`MkMask` swallowed a re-entered value after an external reset.** The
+  directive skipped emitting when the newly formatted text equalled the last
+  one it had produced, but nothing told it when the host `<input>` was
+  cleared from outside (`form.reset()`, `writeValue`, a `[value]` binding).
+  Entering the same number again — typed or browser-autofilled — updated
+  the field and nothing else, so `MkPhoneInput` kept `null` while showing
+  the number. Found on a restaurant contact form whose second submission
+  went out with `phone: null`. `(unmaskedChange)` / `(maskedChange)` now
+  fire on every input event.
+
 ## [0.58.0] — 2026-09-05
 
 ### Added
