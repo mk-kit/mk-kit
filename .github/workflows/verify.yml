@@ -30,6 +30,9 @@ jobs:
       - name: Build + test validators package
         run: npm run build:validators && npm run test:validators
 
+      - name: Build + test auth package
+        run: npm run build:auth && npm run test:auth
+
       - name: Build library
         run: npm run build:lib
 

@@ -184,6 +184,12 @@ export const routes: Routes = [
       ),
   },
   {
+    path: 'auth',
+    title: 'Sign-in (@mk-kit/auth) — mk-kit',
+    loadComponent: () =>
+      import('./pages/auth/auth-page').then((m) => m.AuthPage),
+  },
+  {
     path: 'theme-builder',
     title: 'Theme builder — mk-kit',
     loadComponent: () =>

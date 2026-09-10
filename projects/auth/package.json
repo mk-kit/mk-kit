@@ -1,0 +1,24 @@
+{
+  "name": "@mk-kit/auth",
+  "version": "0.1.0",
+  "description": "Sign-in plumbing for self-hosted apps: OpenID Connect (code + PKCE) with Fastify routes, and Cloudflare Access JWT verification — the identity comes out, the app keeps its own users, sessions and permissions.",
+  "license": "MIT",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./index.js",
+  "types": "./index.d.ts",
+  "exports": {
+    ".": { "types": "./index.d.ts", "default": "./index.js" },
+    "./server": { "types": "./server.d.ts", "default": "./server.js" }
+  },
+  "files": ["*.js", "*.d.ts", "README.md", "LICENSE"],
+  "engines": { "node": ">=20" },
+  "dependencies": { "openid-client": "^6.8.8" },
+  "peerDependencies": { "fastify": ">=4" },
+  "peerDependenciesMeta": { "fastify": { "optional": true } },
+  "keywords": ["oidc", "openid-connect", "pkce", "sso", "cloudflare-access", "fastify", "pocket-id", "authelia", "mk-kit"],
+  "homepage": "https://mk-kit.dev",
+  "repository": { "type": "git", "url": "git+https://github.com/mk-kit/mk-kit.git", "directory": "projects/auth" },
+  "bugs": "https://github.com/mk-kit/mk-kit/issues",
+  "publishConfig": { "access": "public" }
+}

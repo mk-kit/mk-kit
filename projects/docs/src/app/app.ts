@@ -142,6 +142,12 @@ export class App {
             'overlay overlay-service focus-trap live-announcer hotkeys history undo redo i18n date-names theme-service overlay-ref',
         },
         {
+          label: 'Sign-in (auth)',
+          path: '/auth',
+          keywords:
+            'auth authentication sign-in login sso oidc openid connect pkce pocket-id authelia keycloak cloudflare access passkeys identity session',
+        },
+        {
           label: 'Blog',
           path: '/blog',
           keywords: 'blog posts articles news primeng migration licensing mit open-core',
