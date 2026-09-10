@@ -51,7 +51,10 @@
 .mk-dialog__body {
   flex: 1 1 auto;
   min-height: 0;
-  overflow-y: auto;
+  // `overflow-y: auto` alone makes the browser compute `overflow-x: auto` too,
+  // and a control one pixel wider than the body (an input at 100% plus its
+  // border) then shows a needless horizontal scrollbar under every form.
+  overflow: hidden auto;
   overscroll-behavior: contain;
   padding: var(--mk-space-5);
   font-size: var(--mk-font-size-md);

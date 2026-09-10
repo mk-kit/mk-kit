@@ -73,7 +73,7 @@ describe('MkOverlayService autoFocus', () => {
     const ref = service.open(TwoButtons, { autoFocus: false });
     await Promise.resolve();
     ref.close();
-    await Promise.resolve();
+    await new Promise((r) => requestAnimationFrame(r)); // restore happens a frame later, after the closing key event
     expect(document.activeElement).toBe(trigger);
   });
 });

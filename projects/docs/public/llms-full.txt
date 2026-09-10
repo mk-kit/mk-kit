@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.58.1 — full API reference
+# @mk-kit/ui 0.59.0 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -3192,7 +3192,7 @@ Members:
 | Name | Type | Description |
 | --- | --- | --- |
 | `preventDefault`? | `boolean \| undefined` | Call `preventDefault()` on the event when the hotkey fires. Default `false`. |
-| `allowInInput`? | `boolean \| undefined` | Also fire while an editable field (input/textarea/select/contentEditable) is focused. Default `false`. |
+| `allowInInput`? | `boolean \| undefined` | Also fire while a text field (text-like input/textarea/select/contentEditable) is focused. Default `false`. |
 
 ### MkMaskResult (interface)
 
@@ -4862,6 +4862,7 @@ Members:
 | `disabled`? | `boolean \| undefined` | Disable selection/toggling of this node (still focusable). |
 | `expanded`? | `boolean \| undefined` | Expand this node initially. |
 | `icon`? | `string \| undefined` | Optional leading glyph (any short string / emoji). |
+| `iconName`? | `string \| undefined` | Name of a registered icon (see `MkIconRegistry`), rendered with `mk-icon`; wins over `icon`. |
 
 ### MkDrawerSide (type)
 
@@ -7680,6 +7681,7 @@ Members:
 | `disabled`? | `boolean \| undefined` | Disable selection/toggling of this node (still focusable). |
 | `expanded`? | `boolean \| undefined` | Expand this node initially. |
 | `icon`? | `string \| undefined` | Optional leading glyph (any short string / emoji). |
+| `iconName`? | `string \| undefined` | Name of a registered icon (see `MkIconRegistry`), rendered with `mk-icon`; wins over `icon`. |
 
 ### MkUploadFile (interface)
 
@@ -9199,6 +9201,7 @@ Members:
 | `filter`? | `false \| MkTableFilterKind \| undefined` | The header-row filter control for this column (rendered when the table is `MkTable.filterable`). Omitted, a filterable table gives the column a text filter; `false` leaves its filter cell empty.  - `'text'` — case-insensitive *contains* on the displayed (formatted) text. - `'select'` — equality against one of `filterOptions`; without   options, the distinct values found in `data`. - `'number'` / `'date'` — the control keeps rows whose value is **≥** the   entry. Set `{ min, max }` through `MkTable.filters` for an   inclusive range. Dates compare by local calendar day. |
 | `filterOptions`? | `readonly (string \| number \| MkTableFilterOption)[] \| undefined` | Options of a `select` filter — strings / numbers, or `{ value, label }`. Omitted: every distinct value of the column in `data`, sorted. |
 | `filterPlaceholder`? | `string \| undefined` | Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`). |
+| `compare`? | `((a: T, b: T) => number) \| undefined` | Custom ordering for this column, used instead of the built-in value comparison whenever it sorts. Return a negative number when `a` comes first. The table negates it for descending order, so keep the function pure. Lets a file list keep folders first, or a status column sort by rank rather than alphabet. |
 
 ### MkTableDataSourceOptions (interface)
 

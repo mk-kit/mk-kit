@@ -33,7 +33,9 @@
           ></span>
         }
       </span>
-      @if (row.node.icon) {
+      @if (row.node.iconName) {
+        <mk-icon class="mk-tree__icon" [name]="row.node.iconName" size="sm" aria-hidden="true" />
+      } @else if (row.node.icon) {
         <span class="mk-tree__icon" aria-hidden="true">{{ row.node.icon }}</span>
       }
       <span class="mk-tree__label">{{ row.node.label }}</span>

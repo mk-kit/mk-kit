@@ -11,6 +11,7 @@ import {
   signal,
   viewChildren,
 } from '@angular/core';
+import { MkIcon } from '@mk-kit/ui/icon';
 
 /** A node in an {@link MkTree}. `children` makes it expandable. */
 export interface MkTreeNode {
@@ -26,6 +27,8 @@ export interface MkTreeNode {
   expanded?: boolean;
   /** Optional leading glyph (any short string / emoji). */
   icon?: string;
+  /** Name of a registered icon (see `MkIconRegistry`), rendered with `mk-icon`; wins over `icon`. */
+  iconName?: string;
 }
 
 /** One visible row after flattening the tree for keyboard + rendering. */
@@ -57,6 +60,7 @@ interface MkTreeRow {
   selector: 'mk-tree',
   templateUrl: './tree.html',
   styleUrl: './tree.scss',
+  imports: [MkIcon],
   changeDetection: ChangeDetectionStrategy.OnPush,
   host: {
     class: 'mk-tree',

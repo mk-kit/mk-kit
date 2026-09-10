@@ -1610,6 +1610,7 @@ export class HomePage {
   ];
 
   protected readonly faqs: Faq[] = [
+    { q: 'Is there a real app built with it?', a: 'Yes — <a href="https://github.com/mkornas/mk-drive">mk-drive</a>, a self-hosted web drive (uploads, previews, share links, accounts) built entirely on @mk-kit/ui and kept in the open as the showcase. It found five library bugs in its first week; all fixed in 0.59.0. Read the write-up on the blog.' },
     { q: 'Is it really free?', a: 'Yes. The library is MIT licensed — use it in commercial products, fork it, ship it. There is no revenue or head-count threshold. Pro and Team only add pre-built screens, premium widgets and support on top.' },
     { q: 'Which Angular versions are supported?', a: 'mk-kit targets the current Angular major (22). Each new Angular major gets a matching mk-kit release within weeks; the previous major keeps receiving fixes for six months.' },
     { q: 'How does it compare to Angular Material or PrimeNG?', a: 'Material is a design language with a smaller admin surface. PrimeNG is a huge general-purpose suite that is now commercial for most companies. mk-kit is narrower on purpose: built for admin panels and internal tools, themed with plain CSS variables, and written for signals and standalone components from day one.' },

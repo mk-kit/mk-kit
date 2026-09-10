@@ -123,6 +123,14 @@ export interface MkTableColumn<T = Record<string, unknown>> {
   filterOptions?: readonly (string | number | MkTableFilterOption)[];
   /** Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`). */
   filterPlaceholder?: string;
+  /**
+   * Custom ordering for this column, used instead of the built-in
+   * value comparison whenever it sorts. Return a negative number when `a`
+   * comes first. The table negates it for descending order, so keep the
+   * function pure. Lets a file list keep folders first, or a status column
+   * sort by rank rather than alphabet.
+   */
+  compare?: (a: T, b: T) => number;
 }
 
 /** Payload emitted by {@link MkTable.sortChange}. */
@@ -1222,7 +1230,8 @@ export class MkTable<T = Record<string, unknown>> {
     const key = this.sortKey();
     const dir = this.sortDir();
     if (!key || !dir) return rows;
-    const compare = (a: T, b: T): number => {
+    const custom = this.columns().find((c) => c.key === key)?.compare;
+    const compare = custom ?? ((a: T, b: T): number => {
       const av = (a as Record<string, unknown>)[key];
       const bv = (b as Record<string, unknown>)[key];
       if (av == null && bv == null) return 0;
@@ -1230,7 +1239,7 @@ export class MkTable<T = Record<string, unknown>> {
       if (bv == null) return 1;
       if (typeof av === 'number' && typeof bv === 'number') return av - bv;
       return sortCollator().compare(String(av), String(bv));
-    };
+    });
     // Negate the comparator for desc (instead of reversing) so the sort stays
     // stable and null ordering is consistent in both directions.
     return [...rows].sort(dir === 'desc' ? (a, b) => -compare(a, b) : compare);

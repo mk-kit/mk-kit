@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.58.1",
+ "version": "0.59.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -4996,7 +4996,7 @@
       {
        "name": "allowInInput",
        "type": "boolean | undefined",
-       "description": "Also fire while an editable field (input/textarea/select/contentEditable) is focused. Default `false`.",
+       "description": "Also fire while a text field (text-like input/textarea/select/contentEditable) is focused. Default `false`.",
        "optional": true
       }
      ]
@@ -7320,6 +7320,12 @@
        "name": "icon",
        "type": "string | undefined",
        "description": "Optional leading glyph (any short string / emoji).",
+       "optional": true
+      },
+      {
+       "name": "iconName",
+       "type": "string | undefined",
+       "description": "Name of a registered icon (see `MkIconRegistry`), rendered with `mk-icon`; wins over `icon`.",
        "optional": true
       }
      ]
@@ -11659,6 +11665,12 @@
        "type": "string | undefined",
        "description": "Optional leading glyph (any short string / emoji).",
        "optional": true
+      },
+      {
+       "name": "iconName",
+       "type": "string | undefined",
+       "description": "Name of a registered icon (see `MkIconRegistry`), rendered with `mk-icon`; wins over `icon`.",
+       "optional": true
       }
      ]
     },
@@ -14184,6 +14196,12 @@
        "name": "filterPlaceholder",
        "type": "string | undefined",
        "description": "Placeholder of the filter control (text: `i18n.filter`; number / date: `i18n.filterMin`).",
+       "optional": true
+      },
+      {
+       "name": "compare",
+       "type": "((a: T, b: T) => number) | undefined",
+       "description": "Custom ordering for this column, used instead of the built-in\nvalue comparison whenever it sorts. Return a negative number when `a`\ncomes first. The table negates it for descending order, so keep the\nfunction pure. Lets a file list keep folders first, or a status column\nsort by rank rather than alphabet.",
        "optional": true
       }
      ]
