@@ -46,6 +46,18 @@ describe('MkTree chevron click', () => {
 
   afterEach(() => fixture.destroy());
 
+  it('renders a registered icon for iconName and falls back to the text glyph', () => {
+    fixture.componentRef.setInput('nodes', [
+      { label: 'Folder', value: 'f', iconName: 'folder' },
+      { label: 'Glyph', value: 'g', icon: '★' },
+    ] satisfies MkTreeNode[]);
+    fixture.detectChanges();
+    const [withIcon, withGlyph] = rows();
+    expect(withIcon.querySelector('mk-icon.mk-tree__icon')).not.toBeNull();
+    expect(withGlyph.querySelector('mk-icon')).toBeNull();
+    expect(withGlyph.querySelector('.mk-tree__icon')?.textContent?.trim()).toBe('★');
+  });
+
   it('clicking the chevron expands without selecting', () => {
     const selectionChange = vi.fn();
     tree.selectionChange.subscribe(selectionChange);

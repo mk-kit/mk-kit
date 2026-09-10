@@ -24,7 +24,7 @@ export interface MkParsedHotkey {
 export interface MkHotkeyOptions {
   /** Call `preventDefault()` on the event when the hotkey fires. Default `false`. */
   preventDefault?: boolean;
-  /** Also fire while an editable field (input/textarea/select/contentEditable) is focused. Default `false`. */
+  /** Also fire while a text field (text-like input/textarea/select/contentEditable) is focused. Default `false`. */
   allowInInput?: boolean;
 }
 
@@ -49,6 +49,8 @@ const KEY_ALIASES: Record<string, string> = {
 const MODIFIER_KEYS = new Set(['control', 'shift', 'alt', 'meta', 'os', 'altgraph']);
 
 /** True on Apple platforms, where `mod` maps to the Command (meta) key. */
+const NON_TEXT_INPUTS = new Set(['checkbox', 'radio', 'button', 'submit', 'reset', 'file', 'range', 'color', 'image']);
+
 export function mkIsMacPlatform(): boolean {
   return typeof navigator !== 'undefined' && (navigator.platform ?? '').includes('Mac');
 }
@@ -287,7 +289,10 @@ export class MkHotkeysService {
     const el = target as HTMLElement | null;
     if (!el || typeof el.tagName !== 'string') return false;
     const tag = el.tagName;
-    if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    if (tag === 'TEXTAREA' || tag === 'SELECT') return true;
+    // Only inputs that take typed text swallow shortcuts; a focused checkbox,
+    // radio, button or file picker should not block them.
+    if (tag === 'INPUT') return !NON_TEXT_INPUTS.has(((el as HTMLInputElement).type ?? 'text').toLowerCase());
     return el.isContentEditable === true;
   }
 }

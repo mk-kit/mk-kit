@@ -4,6 +4,34 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.59.0] — 2026-09-10
+
+Fixes and small additions found while building [mk-drive](https://github.com/mkornas/mk-drive), the file-drive showcase app.
+
+### Added
+
+- **`MkTableColumn.compare`** — a per-column comparator used instead of the
+  built-in value comparison whenever that column sorts (negated for
+  descending). A file list can keep folders first; a status column can sort
+  by rank instead of alphabet.
+- **`MkTreeNode.iconName`** — a registered icon name rendered with `mk-icon`
+  next to the label (the text `icon` glyph stays as the fallback).
+
+### Fixed
+
+- **A dialog confirmed with Enter re-activated its trigger button.** The
+  focus trap restored focus to the opener synchronously inside the closing
+  `keydown`, so the same key's `keypress` landed on the button and opened the
+  dialog again. Focus is now restored on the next animation frame, after the
+  key event has run its course.
+- **Shortcuts stayed silent while a checkbox, radio or button had focus.**
+  `MkHotkeysService` treated every `<input>` as a text field; only text-like
+  inputs (and textarea/select/contentEditable) block shortcuts now.
+- **A stray horizontal scrollbar under dialog forms.** `.mk-dialog__body` set
+  only `overflow-y: auto`, which makes browsers compute `overflow-x: auto` as
+  well; a control one pixel wider than the body then scrolled sideways. The
+  body is `overflow: hidden auto` now.
+
 ## [0.58.1] — 2026-09-09
 
 ### Fixed

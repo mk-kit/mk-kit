@@ -113,6 +113,26 @@ describe('MkHotkeysService', () => {
     input.remove();
   });
 
+  it('fires while a checkbox, radio or button input is focused — they are not text fields', () => {
+    const handler = vi.fn();
+    service.register('delete', handler);
+    for (const type of ['checkbox', 'radio', 'button']) {
+      const input = document.createElement('input');
+      input.type = type;
+      document.body.appendChild(input);
+      input.focus();
+      input.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }));
+      input.remove();
+    }
+    expect(handler).toHaveBeenCalledTimes(3);
+    const text = document.createElement('input');
+    document.body.appendChild(text);
+    text.focus();
+    text.dispatchEvent(new KeyboardEvent('keydown', { key: 'Delete', bubbles: true }));
+    text.remove();
+    expect(handler).toHaveBeenCalledTimes(3);
+  });
+
   it('fires inside an input when allowInInput is set', () => {
     const handler = vi.fn();
     service.register('ctrl+k', handler, { allowInInput: true });

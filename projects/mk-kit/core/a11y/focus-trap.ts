@@ -68,7 +68,15 @@ export class MkFocusTrap {
     this.previouslyFocused = null;
     if (!previous) return;
     if (previous.isConnected) {
-      previous.focus?.();
+      // Restore after the current input event has fully run its course. A
+      // dialog confirmed with Enter closes on `keydown`; restoring focus to the
+      // trigger button synchronously hands the same key's `keypress` to that
+      // button, which re-activates it — the dialog pops right back up.
+      const restore = () => {
+        if (previous.isConnected && !this.active) previous.focus?.();
+      };
+      if (typeof requestAnimationFrame === 'function') requestAnimationFrame(restore);
+      else restore();
     } else {
       // The trigger left the DOM while the trap was active (a deleted row, a
       // route change). Focusing a detached node is a silent no-op at best —

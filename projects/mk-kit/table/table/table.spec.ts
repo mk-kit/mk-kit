@@ -347,6 +347,21 @@ describe('MkTable — data-grid pro', () => {
     expect((table as any).isEditing(0, GRID_COLUMNS[1])).toBe(true);
   });
 
+  it('uses a column\'s own compare() when set, negated for desc', () => {
+    fixture.componentRef.setInput('data', [
+      { id: 1, name: 'zebra.txt', notes: 'file' },
+      { id: 2, name: 'Apples', notes: 'dir' },
+      { id: 3, name: 'banana.txt', notes: 'file' },
+      { id: 4, name: 'Cars', notes: 'dir' },
+    ]);
+    const foldersFirst = (a: Row, b: Row) => (a.notes !== b.notes ? (a.notes === 'dir' ? -1 : 1) : a.name.localeCompare(b.name));
+    fixture.componentRef.setInput('columns', [{ key: 'name', header: 'Name', sortable: true, compare: foldersFirst }, GRID_COLUMNS[1]]);
+    (table as any).onSort({ key: 'name', header: 'Name', sortable: true, compare: foldersFirst });
+    expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([2, 4, 3, 1]);
+    (table as any).onSort({ key: 'name', header: 'Name', sortable: true, compare: foldersFirst });
+    expect((table as any).sortedData().map((r: Row) => r.id)).toEqual([1, 3, 4, 2]);
+  });
+
   it('keeps desc sort stable and null-consistent (negated comparator)', () => {
     fixture.componentRef.setInput('data', [
       { id: 2, name: 'b', notes: '' },

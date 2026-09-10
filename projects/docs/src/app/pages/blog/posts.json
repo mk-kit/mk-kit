@@ -1,23 +1,45 @@
 [
   {
+    "slug": "building-mk-drive",
+    "title": "Building a file drive with mk-kit, and what it broke",
+    "date": "2026-09-10",
+    "summary": "mk-drive is a self-hosted web drive built on @mk-kit/ui as a real showcase. Twenty components on one screen found five library bugs \u2014 all fixed in 0.59.0 \u2014 and this is the list.",
+    "tags": [
+      "showcase",
+      "release",
+      "mk-drive"
+    ]
+  },
+  {
     "slug": "switching-from-primeng",
     "title": "Switching from PrimeNG? Here's the MIT path.",
     "date": "2026-08-28",
-    "summary": "What the PrimeUI licence changes, your four options, and how far the migrate-primeng schematic gets you — with the honest gaps listed up front.",
-    "tags": ["migration", "primeng", "licensing"]
+    "summary": "What the PrimeUI licence changes, your four options, and how far the migrate-primeng schematic gets you \u2014 with the honest gaps listed up front.",
+    "tags": [
+      "migration",
+      "primeng",
+      "licensing"
+    ]
   },
   {
     "slug": "switching-from-angular-material",
     "title": "Moving from Angular Material to mk-kit, view by view",
     "date": "2026-08-28",
     "summary": "The component map, the icon alias provider that keeps your Material names, error handling without ErrorStateMatcher, theming with CSS variables, and the order to do it in.",
-    "tags": ["migration", "angular-material", "theming"]
+    "tags": [
+      "migration",
+      "angular-material",
+      "theming"
+    ]
   },
   {
     "slug": "why-mk-kit-stays-mit",
     "title": "Why mk-kit stays MIT (and how the lights stay on)",
     "date": "2026-08-28",
-    "summary": "The promise in writing: every release MIT, nothing moves behind a paywall, no runtime checks — and the open-core model that pays for it.",
-    "tags": ["licensing", "open-core"]
+    "summary": "The promise in writing: every release MIT, nothing moves behind a paywall, no runtime checks \u2014 and the open-core model that pays for it.",
+    "tags": [
+      "licensing",
+      "open-core"
+    ]
   }
 ]
