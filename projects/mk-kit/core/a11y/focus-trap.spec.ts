@@ -78,6 +78,7 @@ describe('MkFocusTrap focus restore', () => {
     await Promise.resolve(); // the trap focuses in a microtask
 
     trap.release();
+    await new Promise((r) => requestAnimationFrame(r)); // restore happens a frame later, after the closing key event
     expect(document.activeElement).toBe(trigger);
     trigger.remove();
   });
