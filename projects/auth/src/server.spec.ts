@@ -2,7 +2,7 @@ import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import Fastify, { type FastifyInstance } from 'fastify';
 import { SignJWT, exportJWK, generateKeyPair, type KeyLike } from 'jose';
 import { createHash } from 'node:crypto';
-import { AccessVerifier, createOidc, registerOidcRoutes, safeNext, signValue, verifyValue, type MkIdentity } from './server.js';
+import { AccessVerifier, createOidc, registerOidcRoutes, safeNext, signValue, verifyValue, type MkIdentity, type Oidc } from './server.js';
 import { identityFromClaims, pkce } from './index.js';
 
 /** A tiny OpenID provider: discovery, authorize (auto-consent), token (PKCE-checked), userinfo, jwks. */
@@ -61,6 +61,7 @@ async function mockProvider() {
 describe('OIDC end to end against an in-process provider', () => {
   let idp: FastifyInstance;
   let issuer: string;
+  let client: Oidc;
   let app: FastifyInstance;
   const signedIn: MkIdentity[] = [];
 
@@ -69,6 +70,7 @@ describe('OIDC end to end against an in-process provider', () => {
     idp = p.idp;
     issuer = p.issuer;
     const oidc = await createOidc({ issuer, clientId: 'mk-drive', clientSecret: 's3cret', allowInsecure: true });
+    client = oidc;
     app = Fastify();
     registerOidcRoutes(app, {
       oidc,
@@ -116,6 +118,17 @@ describe('OIDC end to end against an in-process provider', () => {
     expect(id.groups).toEqual(['family']);
     expect(id.picture).toBe('https://example.com/anna.png');
     expect(id.issuer).toBe(issuer);
+    expect(id.idToken).toMatch(/^eyJ/);
+  });
+
+  it('endSessionUrl carries the return address and, when given, the ID token as the hint', async () => {
+    const plain = new URL(client.endSessionUrl('https://app.test/login')!);
+    expect(plain.origin + plain.pathname).toBe(`${issuer}/logout`);
+    expect(plain.searchParams.get('post_logout_redirect_uri')).toBe('https://app.test/login');
+    expect(plain.searchParams.get('id_token_hint')).toBeNull();
+    const hinted = new URL(client.endSessionUrl('https://app.test/login', 'eyJ.fake.token')!);
+    expect(hinted.searchParams.get('id_token_hint')).toBe('eyJ.fake.token');
+    expect(hinted.searchParams.get('post_logout_redirect_uri')).toBe('https://app.test/login');
   });
 
   it('refuses a callback without its cookie, with a wrong state, or with a replayed code', async () => {
