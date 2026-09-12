@@ -1,6 +1,6 @@
 ---
 kanban-plugin: board
-updated: 2026-09-11
+updated: 2026-09-12
 ---
 
 # mk-kit
@@ -17,6 +17,7 @@ One card per line, ranked top-down inside each column. `#p0`..`#p3` = priority, 
 - [ ] **@mk-kit/server — adopt in mk-drive** delete the duplicated ~1,000 lines, keep grants/locations/shares; every mk-drive test passes unchanged = the kit's acceptance test [[plan-server-kit]] #p2 #server
 - [ ] **@mk-kit/server — adopt in momentum, planner, mk-board** single-account / allow-list modes, replace their own sessions and tokens [[plan-server-kit]] #p3 #server
 - [ ] **@mk-kit/server — docs + release** page on mk-kit.dev like /auth, release-server.yml, publish 0.1.0 [[plan-server-kit]] #p3 #server
+- [ ] **@mk-kit/auth/angular — the sign-in frame** one `mk-auth-card` (provider name, optional password form, reason, provider-down state), an identity service (`me` signal, `signIn(next)`, `signOut()` that follows the server's redirect) and the 401 interceptor; mk-drive and mk-dashboard drop their copies. Not a portal, not a shared session: every app keeps its own cookie and door. After the server kit's first phase. #p2 #auth
 
 ## Later
 
