@@ -18,6 +18,8 @@ export interface MkIdentity {
   groups?: string[];
   /** Every claim the issuer sent, for anything not modelled above. */
   claims: Record<string, unknown>;
+  /** The raw ID token from an OpenID provider — keep it with the session and pass it back as `id_token_hint` on logout, so the provider ends its session without asking. Absent for Cloudflare Access. */
+  idToken?: string;
 }
 
 const enc = new TextEncoder();

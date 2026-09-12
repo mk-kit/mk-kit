@@ -1,6 +1,6 @@
 {
   "name": "@mk-kit/auth",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Sign-in plumbing for self-hosted apps: OpenID Connect (code + PKCE) with Fastify routes, and Cloudflare Access JWT verification — the identity comes out, the app keeps its own users, sessions and permissions.",
   "license": "MIT",
   "type": "module",

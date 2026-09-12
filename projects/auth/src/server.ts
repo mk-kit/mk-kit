@@ -84,13 +84,19 @@ export class Oidc {
         /* userinfo is a bonus; the ID token already carries what we need */
       }
     }
-    return identityFromClaims(this.issuer, claims);
+    const identity = identityFromClaims(this.issuer, claims);
+    return tokens.id_token ? { ...identity, idToken: tokens.id_token } : identity;
   }
 
-  /** The provider's logout URL when it offers one (RP-initiated logout), else `null`. */
-  endSessionUrl(postLogoutRedirectUri?: string): string | null {
+  /**
+   * The provider's logout URL when it offers one (RP-initiated logout), else `null`.
+   * Pass the session's `idToken` as `idTokenHint`: most providers (Pocket ID among
+   * them) only redirect straight back when they can tell whose session ends;
+   * without it they show a confirmation page first.
+   */
+  endSessionUrl(postLogoutRedirectUri?: string, idTokenHint?: string): string | null {
     if (!this.config.serverMetadata().end_session_endpoint) return null;
-    return oidc.buildEndSessionUrl(this.config, postLogoutRedirectUri ? { post_logout_redirect_uri: postLogoutRedirectUri } : {}).href;
+    return oidc.buildEndSessionUrl(this.config, { ...(postLogoutRedirectUri ? { post_logout_redirect_uri: postLogoutRedirectUri } : {}), ...(idTokenHint ? { id_token_hint: idTokenHint } : {}) }).href;
   }
 }
 
