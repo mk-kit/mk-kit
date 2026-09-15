@@ -22,10 +22,11 @@ const oidc = await createOidc({ issuer: 'https://id.example.com', clientId: 'my-
 registerOidcRoutes(app, {
   oidc,
   cookieSecret: process.env.COOKIE_SECRET!,          // signs the transient state/nonce/verifier cookie
-  redirectUri: (req) => `${origin(req)}/auth/callback`, // must be registered at the provider
+  redirectUri: () => `${process.env.PUBLIC_URL}/auth/callback`, // must be registered at the provider
   onSignedIn: async (identity, { reply, next }) => {
-    const user = users.byEmail(identity.email);       // your rule: who is allowed in
-    if (!user) return reply.code(403).send('no account for ' + identity.email);
+    // your rule: who is allowed in — an email the provider has not verified proves nothing
+    const user = identity.emailVerified ? users.byEmail(identity.email) : undefined;
+    if (!user) return reply.code(403).send('no account for this sign-in');
     reply.header('Set-Cookie', sessions.create(user)); // your session
     return reply.redirect(next, 303);
   },
@@ -49,9 +50,14 @@ interface MkIdentity {
 }
 ```
 
-The transient cookie is `HttpOnly; SameSite=Lax; Path=<callback>`, signed with
-`cookieSecret`, and expires after ten minutes. A same-origin `next` is kept;
-anything else falls back to `/`.
+The transient cookie is `__Host-mk_oidc` with `HttpOnly; SameSite=Lax; Secure; Path=/`
+when the redirect URI is https (`mk_oidc` on `Path=<callback>` over plain http),
+signed with `cookieSecret`, and expires after ten minutes. A same-origin `next`
+path is kept (checked again at the callback); anything that a browser could read
+as another host — `//x`, `/\x`, control characters or whitespace — falls back to `/`.
+
+Build `redirectUri` from the app's configured public URL, not from the `Host` or
+`X-Forwarded-Host` of the request.
 
 ## Server: Cloudflare Access
 
@@ -68,7 +74,8 @@ app.addHook('onRequest', async (req, reply) => {
 ```
 
 Keys are fetched from the team's `certs` endpoint, cached for six hours, and
-refreshed at once when an unknown `kid` shows up (rotation).
+refreshed when an unknown `kid` shows up (rotation) — at most once a minute, and
+the keys already held stay in use while the endpoint fails.
 
 ## Framework-free root
 

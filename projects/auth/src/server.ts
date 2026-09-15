@@ -114,15 +114,24 @@ function b64url(buf: Buffer): string {
   return buf.toString('base64url');
 }
 
-/** `payload.signature`, payload = base64url(JSON), signature = HMAC-SHA256 — tamper-evident, not encrypted. */
+/** Shortest secret `signValue` / `verifyValue` accept: an empty or guessable key lets anyone sign their own cookie. */
+const MIN_SECRET_LENGTH = 16;
+
+function assertSecret(secret: string): void {
+  if (typeof secret !== 'string' || secret.trim().length < MIN_SECRET_LENGTH) throw new TypeError(`the signing secret must be at least ${MIN_SECRET_LENGTH} characters (use 32 random bytes)`);
+}
+
+/** `payload.signature`, payload = base64url(JSON), signature = HMAC-SHA256 — tamper-evident, not encrypted. Throws on a secret shorter than 16 characters. */
 export function signValue(secret: string, value: unknown): string {
+  assertSecret(secret);
   const payload = b64url(Buffer.from(JSON.stringify(value)));
   const sig = b64url(createHmac('sha256', secret).update(payload).digest());
   return `${payload}.${sig}`;
 }
 
-/** The value back, or `null` when missing, tampered with or (when it carries `exp`) expired. */
+/** The value back, or `null` when missing, tampered with or (when it carries `exp`) expired. Throws on a secret shorter than 16 characters. */
 export function verifyValue<T = unknown>(secret: string, signed: string | undefined, now = Date.now()): T | null {
+  assertSecret(secret);
   if (!signed) return null;
   const dot = signed.lastIndexOf('.');
   if (dot <= 0) return null;
@@ -161,7 +170,7 @@ interface RouteApp {
 
 export interface OidcRoutesOptions<Req = RouteRequest, Rep = RouteReply> {
   oidc: Oidc;
-  /** Secret for the transient cookie (state, nonce, verifier). 32+ random bytes; may rotate freely. */
+  /** Secret for the transient cookie (state, nonce, verifier). 32+ random bytes; may rotate freely. Shorter than 16 characters throws. */
   cookieSecret: string;
   /** The absolute callback URL for this request — the host the browser is on, plus `paths.callback`. */
   redirectUri: (req: Req) => string;
@@ -189,15 +198,38 @@ function cookieValue(header: string | string[] | undefined, name: string): strin
   if (!raw) return undefined;
   for (const part of raw.split(';')) {
     const [k, ...v] = part.trim().split('=');
-    if (k === name) return decodeURIComponent(v.join('='));
+    if (k !== name) continue;
+    try {
+      return decodeURIComponent(v.join('='));
+    } catch {
+      /* a malformed escape is no value, not a crash */
+    }
   }
   return undefined;
 }
 
-/** Only same-origin paths make sense as a return target. */
+const SAFE_NEXT_BASE = 'http://x.invalid';
+const SAFE_NEXT_MAX = 2048;
+
+/**
+ * Only same-origin paths make sense as a return target. Browsers drop tabs and
+ * newlines from a `Location` and read `\` as `/`, so `/\t/evil.example` would
+ * leave the site: control characters, whitespace and backslashes are refused
+ * outright, the value must start with a single `/`, and it must still resolve
+ * to this origin when parsed as a URL. Non-ASCII comes back percent-encoded (a
+ * raw `ę` is not a valid `Location` header), and anything longer than 2048
+ * characters is refused (it would not fit in the login cookie).
+ */
 export function safeNext(raw: unknown, fallback = '/'): string {
-  if (typeof raw !== 'string' || !raw.startsWith('/') || raw.startsWith('//') || raw.startsWith('/\\')) return fallback;
-  return raw;
+  if (typeof raw !== 'string' || raw.length > SAFE_NEXT_MAX || !raw.startsWith('/') || raw.startsWith('//')) return fallback;
+  if (/[\s\x00-\x1f\x7f\\]/.test(raw)) return fallback;
+  try {
+    const next = raw.replace(/[^\x00-\x7f]+/g, encodeURI);
+    if (next.length > SAFE_NEXT_MAX || new URL(next, SAFE_NEXT_BASE).origin !== SAFE_NEXT_BASE) return fallback;
+    return next;
+  } catch {
+    return fallback; // a lone surrogate
+  }
 }
 
 /**
@@ -205,13 +237,18 @@ export function safeNext(raw: unknown, fallback = '/'): string {
  * Register on a Fastify instance (any object with a compatible `get`).
  */
 export function registerOidcRoutes<Req extends RouteRequest = RouteRequest, Rep extends RouteReply = RouteReply>(app: RouteApp, options: OidcRoutesOptions<Req, Rep>): void {
+  assertSecret(options.cookieSecret);
   const loginPath = options.paths?.login ?? '/auth/login';
   const callbackPath = options.paths?.callback ?? '/auth/callback';
-  const name = options.cookie?.name ?? 'mk_oidc';
   const ttl = options.ttlMs ?? 10 * 60_000;
   const secure = (req: Req) => (options.cookie?.secure ? options.cookie.secure(req) : options.redirectUri(req).startsWith('https://'));
+  // Over https the cookie is `__Host-`: a sibling subdomain (or a plain-http response
+  // for the same host) cannot plant its own signed login cookie and sign the victim
+  // in as someone else. The prefix requires `Path=/`.
+  const cookieName = (req: Req) => options.cookie?.name ?? (secure(req) ? '__Host-mk_oidc' : 'mk_oidc');
   const setCookie = (req: Req, reply: RouteReply, value: string, maxAge: number) => {
-    const attrs = [`${name}=${encodeURIComponent(value)}`, `Path=${callbackPath}`, 'HttpOnly', 'SameSite=Lax', `Max-Age=${maxAge}`];
+    const name = cookieName(req);
+    const attrs = [`${name}=${encodeURIComponent(value)}`, `Path=${name.startsWith('__Host-') ? '/' : callbackPath}`, 'HttpOnly', 'SameSite=Lax', `Max-Age=${maxAge}`];
     if (secure(req)) attrs.push('Secure');
     reply.header('Set-Cookie', attrs.join('; '));
   };
@@ -229,7 +266,7 @@ export function registerOidcRoutes<Req extends RouteRequest = RouteRequest, Rep 
   app.get(callbackPath, async (req, reply) => {
     const r = req as Req;
     const fail = (e: Error) => (options.onError ? options.onError(e, { req: r, reply: reply as Rep }) : reply.code(400).header('Content-Type', 'text/plain; charset=utf-8').send(`Sign-in failed: ${e.message}`));
-    const transient = verifyValue<Transient>(options.cookieSecret, cookieValue(req.headers.cookie, name));
+    const transient = verifyValue<Transient>(options.cookieSecret, cookieValue(req.headers.cookie, cookieName(r)));
     setCookie(r, reply, '', 0);
     if (!transient) return fail(new Error('the sign-in attempt expired or was tampered with — try again'));
     const callbackUrl = new URL(req.url, options.redirectUri(r));
@@ -239,7 +276,7 @@ export function registerOidcRoutes<Req extends RouteRequest = RouteRequest, Rep 
     } catch (e) {
       return fail(e instanceof Error ? e : new Error(String(e)));
     }
-    return options.onSignedIn(identity, { req: r, reply: reply as Rep, next: transient.next });
+    return options.onSignedIn(identity, { req: r, reply: reply as Rep, next: safeNext(transient.next) });
   });
 }
 
@@ -254,9 +291,14 @@ export interface AccessOptions {
   aud: string;
   /** Override the certs URL (tests). */
   certsUrl?: string;
-  /** How long fetched keys are trusted before a refresh (default 6 h); unknown `kid`s always trigger a refresh. */
+  /** How long fetched keys are trusted before a refresh (default 6 h); an unknown `kid` triggers a refresh, at most once a minute. */
   keysTtlMs?: number;
 }
+
+/** A token with an unknown `kid` refreshes the keys at most this often, so made-up `kid`s cannot turn every request into a fetch. */
+const FORCED_REFRESH_MIN_MS = 60_000;
+/** Clock skew allowed on `exp` and `nbf`, in seconds. */
+const ACCESS_SKEW_S = 30;
 
 interface Jwk {
   kid: string;
@@ -277,6 +319,7 @@ export class AccessVerifier {
   private readonly ttl: number;
   private keys = new Map<string, ReturnType<typeof createPublicKey>>();
   private fetchedAt = 0;
+  private attemptedAt = 0;
   private fetching: Promise<void> | null = null;
 
   constructor(opts: AccessOptions) {
@@ -288,26 +331,36 @@ export class AccessVerifier {
   }
 
   private async loadKeys(force = false): Promise<void> {
-    if (!force && Date.now() - this.fetchedAt < this.ttl && this.keys.size) return;
-    if (this.fetching) return this.fetching;
-    this.fetching = (async () => {
-      const res = await fetch(this.certsUrl, { signal: AbortSignal.timeout(10_000) });
-      if (!res.ok) throw new Error(`certs endpoint ${res.status}`);
-      const body = (await res.json()) as { keys: Jwk[] };
-      const next = new Map<string, ReturnType<typeof createPublicKey>>();
-      for (const k of body.keys ?? []) {
-        try {
-          next.set(k.kid, createPublicKey({ key: { kty: k.kty, n: k.n, e: k.e }, format: 'jwk' }));
-        } catch {
-          /* skip malformed */
-        }
+    if (!this.fetching) {
+      const now = Date.now();
+      const recent = now - this.attemptedAt < FORCED_REFRESH_MIN_MS;
+      if (force ? recent : this.keys.size > 0 && (now - this.fetchedAt < this.ttl || recent)) return;
+      this.attemptedAt = now;
+      this.fetching = this.fetchKeys().finally(() => (this.fetching = null));
+    }
+    try {
+      await this.fetching;
+    } catch (e) {
+      if (!this.keys.size) throw e; // keep verifying with the keys we have while the certs endpoint is down or rate-limiting
+    }
+  }
+
+  private async fetchKeys(): Promise<void> {
+    const res = await fetch(this.certsUrl, { signal: AbortSignal.timeout(10_000) });
+    if (!res.ok) throw new Error(`certs endpoint ${res.status}`);
+    const body = (await res.json()) as { keys: Jwk[] };
+    const next = new Map<string, ReturnType<typeof createPublicKey>>();
+    for (const k of body.keys ?? []) {
+      try {
+        next.set(k.kid, createPublicKey({ key: { kty: k.kty, n: k.n, e: k.e }, format: 'jwk' }));
+      } catch {
+        /* skip malformed */
       }
-      if (next.size) {
-        this.keys = next;
-        this.fetchedAt = Date.now();
-      }
-    })().finally(() => (this.fetching = null));
-    return this.fetching;
+    }
+    if (next.size) {
+      this.keys = next;
+      this.fetchedAt = Date.now();
+    }
   }
 
   /** The identity behind a valid token; throws with a reason otherwise. */
@@ -316,6 +369,7 @@ export class AccessVerifier {
     if (parts.length !== 3) throw new Error('malformed token');
     const header = JSON.parse(b64urlDecode(parts[0]).toString('utf8')) as { alg: string; kid: string };
     if (header.alg !== 'RS256') throw new Error(`unsupported alg ${header.alg}`);
+    if (typeof header.kid !== 'string') throw new Error('unknown signing key');
     await this.loadKeys();
     let key = this.keys.get(header.kid);
     if (!key) {
@@ -324,9 +378,10 @@ export class AccessVerifier {
       if (!key) throw new Error('unknown signing key');
     }
     if (!cryptoVerify('RSA-SHA256', Buffer.from(`${parts[0]}.${parts[1]}`), key, b64urlDecode(parts[2]))) throw new Error('bad signature');
-    const claims = JSON.parse(b64urlDecode(parts[1]).toString('utf8')) as Record<string, unknown> & { exp?: number; iss?: string; aud?: string | string[] };
+    const claims = JSON.parse(b64urlDecode(parts[1]).toString('utf8')) as Record<string, unknown> & { exp?: number; nbf?: number; iss?: string; aud?: string | string[] };
     const now = Math.floor(Date.now() / 1000);
-    if (typeof claims.exp !== 'number' || claims.exp < now - 30) throw new Error('token expired');
+    if (typeof claims.exp !== 'number' || claims.exp < now - ACCESS_SKEW_S) throw new Error('token expired');
+    if (typeof claims.nbf === 'number' && claims.nbf > now + ACCESS_SKEW_S) throw new Error('token not yet valid');
     if (claims.iss !== this.issuer) throw new Error('wrong issuer');
     const auds = Array.isArray(claims.aud) ? claims.aud : [claims.aud];
     if (!auds.includes(this.aud)) throw new Error('wrong audience');
