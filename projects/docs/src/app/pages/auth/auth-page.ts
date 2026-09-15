@@ -12,9 +12,10 @@ const oidc = await createOidc({
 registerOidcRoutes(app, {
   oidc,
   cookieSecret: process.env.APP_COOKIE_SECRET,  // signs the ten-minute login cookie
-  redirectUri: (req) => 'https://' + req.headers.host + '/auth/callback',
+  redirectUri: () => process.env.APP_PUBLIC_URL + '/auth/callback',  // not the Host header
   onSignedIn: async (identity, { reply, next }) => {
-    const user = users.byEmail(identity.email);  // your rule: who is allowed in
+    // your rule: who is allowed in — an unverified email proves nothing
+    const user = identity.emailVerified ? users.byEmail(identity.email) : undefined;
     if (!user) return reply.redirect('/login?reason=no-account', 303);
     reply.header('Set-Cookie', sessions.create(user));
     return reply.redirect(next, 303);
@@ -109,10 +110,12 @@ const LOGIN_BUTTON = `@if (meta().sso; as sso) {
       <pre class="auth-code"><code>{{ identity }}</code></pre>
       <p>
         The transient cookie is <code class="docs-inline">HttpOnly; SameSite=Lax</code>,
-        scoped to the callback path, signed with
+        <code class="docs-inline">__Host-</code> prefixed over https (so another
+        subdomain cannot plant one), signed with
         <code class="docs-inline">cookieSecret</code> and expires after ten
-        minutes. A same-origin <code class="docs-inline">next</code> is kept;
-        anything else falls back to <code class="docs-inline">/</code>.
+        minutes. A same-origin <code class="docs-inline">next</code> path is kept;
+        anything a browser could read as another host falls back to
+        <code class="docs-inline">/</code>.
         <code class="docs-inline">onError</code> lets you send a failed attempt
         back to your sign-in page with a reason instead of the default plain-text 400.
       </p>
@@ -121,8 +124,8 @@ const LOGIN_BUTTON = `@if (meta().sso; as sso) {
       <pre class="auth-code"><code>{{ serverAccess }}</code></pre>
       <p>
         Keys are fetched from the team's <code class="docs-inline">certs</code>
-        endpoint, cached for six hours and refreshed at once when an unknown
-        <code class="docs-inline">kid</code> shows up. The verifier returns the
+        endpoint, cached for six hours and refreshed when an unknown
+        <code class="docs-inline">kid</code> shows up, at most once a minute. The verifier returns the
         same <code class="docs-inline">MkIdentity</code> as the OIDC flow, so one
         code path maps either to a local user.
       </p>
