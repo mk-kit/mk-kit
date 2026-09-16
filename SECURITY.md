@@ -6,7 +6,7 @@ Please do **not** open a public issue for security problems.
 
 Use GitHub's private vulnerability reporting for this repository
 (**Security → Report a vulnerability**), or email the maintainer at
-`kornas.mateusz@gmail.com` with "mk-kit security" in the subject.
+`hi@mateuszkornas.com` with "mk-kit security" in the subject.
 
 Include the affected component or entry point, a minimal reproduction, and
 the impact you see (for example: HTML injection through `mk-markdown` input,

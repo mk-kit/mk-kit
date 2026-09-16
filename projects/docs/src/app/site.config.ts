@@ -3,7 +3,7 @@ export const SITE = {
   /** AZ Widgets tenant slug (contact form, consent banner, analytics). */
   azTenant: 'mk-kit',
   /** Fallback recipient when the contact widget is unavailable. */
-  contactEmail: 'kornas.mateusz@gmail.com',
+  contactEmail: 'hi@mateuszkornas.com',
   /** Licence key service (mk-kit/keys — Cloudflare Worker). */
   keysUrl: 'https://keys.mk-kit.dev',
   /**

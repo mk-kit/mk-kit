@@ -867,7 +867,7 @@ class DocsPermissionPolicy extends MkPermissionPolicy {
 })
 export class UtilitiesPage {
   protected readonly boxOpen = signal(false);
-  protected readonly token = 'sk_live_9f2b7c1a4e8d';
+  protected readonly token = 'demo_key_9f2b7c1a4e8d';
   protected readonly lastCopied = signal('');
   protected readonly showField = signal(false);
   protected readonly autofocusCode = `<input mkAutofocus placeholder="…" />`;
