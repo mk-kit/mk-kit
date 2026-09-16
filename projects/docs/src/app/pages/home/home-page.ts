@@ -597,7 +597,7 @@ interface Mapping {
             <ul class="creator__points">
               <li>I build and maintain mk-kit myself — issues and feature requests land in my inbox.</li>
               <li>Every component ships with tests, an accessibility pass and docs before it is released.</li>
-              <li>I use it in my own products every day — the Gastronaut admin runs on it.</li>
+              <li>I use it in my own products every day — every screen I ship is built with it.</li>
             </ul>
             <div class="creator__footer">
               <div class="creator__sign">
