@@ -511,6 +511,8 @@ export const MK_UK_I18N: MkI18nStrings = {
   backToTop: 'Повернутися нагору',
   breadcrumbLabel: 'Навігаційний ланцюжок',
   fabLabel: 'Дії',
+  appSwitcherLabel: 'Застосунки',
+  appSwitcherError: 'Не вдалося завантажити список застосунків.',
   diffBefore: 'До',
   diffAfter: 'Після',
   diffChanges: 'Зміни',

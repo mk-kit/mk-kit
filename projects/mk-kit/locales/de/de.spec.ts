@@ -21,6 +21,7 @@ import {
  */
 const SAME_AS_ENGLISH = new Set([
   'ok',
+  'appSwitcherLabel',
   'iban',
   'jsonLabel',
   'minimum',

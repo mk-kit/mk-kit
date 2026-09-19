@@ -12,6 +12,7 @@ export * from './pagination';
 export * from './menu';
 export * from './split-button';
 export * from './app-shell';
+export * from './app-switcher';
 export * from './nav-list';
 export * from './stepper';
 export * from './tree';

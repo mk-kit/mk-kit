@@ -23,6 +23,7 @@ import { TestBed } from '@angular/core/testing';
 import axe from 'axe-core';
 
 import { MkButton } from '@mk-kit/ui/button';
+import { MkAppSwitcher } from '@mk-kit/ui/navigation/app-switcher';
 import { MkChip } from '@mk-kit/ui/chip';
 import { MkFormField } from '@mk-kit/ui/forms/form-field';
 import { MkInput } from '@mk-kit/ui/forms/input';
@@ -733,6 +734,17 @@ class CalendarHost {
   readonly date = new Date(2026, 7, 15);
 }
 
+@Component({
+  imports: [MkAppSwitcher],
+  template: `<mk-app-switcher [apps]="apps" current="a" />`,
+})
+class AppSwitcherHost {
+  readonly apps = [
+    { id: 'a', name: 'Alpha', url: 'https://a.example' },
+    { id: 'b', name: 'Beta', url: 'https://b.example', icon: 'β' },
+  ];
+}
+
 const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: string[] }> = [
   { name: 'button', host: ButtonHost },
   { name: 'form-field + input', host: FormFieldInputHost },
@@ -784,6 +796,7 @@ const CASES: ReadonlyArray<{ name: string; host: Type<unknown>; disabledRules?: 
   { name: 'repeater (reorderable rows with inputs)', host: RepeaterHost },
   { name: 'heatmap with values', host: HeatmapHost },
   { name: 'calendar', host: CalendarHost },
+  { name: 'app switcher (closed)', host: AppSwitcherHost },
 ];
 
 describe('a11y smoke (axe-core)', () => {

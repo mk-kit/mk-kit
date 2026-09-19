@@ -499,6 +499,8 @@ export const MK_DE_I18N: MkI18nStrings = {
   backToTop: 'Nach oben',
   breadcrumbLabel: 'Pfadnavigation',
   fabLabel: 'Aktionen',
+  appSwitcherLabel: 'Apps',
+  appSwitcherError: 'Die App-Liste konnte nicht geladen werden.',
   diffBefore: 'Vorher',
   diffAfter: 'Nachher',
   diffChanges: 'Änderungen',

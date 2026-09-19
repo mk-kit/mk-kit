@@ -5,6 +5,7 @@ export const MK_SELECTORS: Readonly<Record<string, string>> = {
   'mk-accordion-item': 'MkAccordionItem',
   'mk-alert': 'MkAlert',
   'mk-app-shell': 'MkAppShell',
+  'mk-app-switcher': 'MkAppSwitcher',
   'mk-autocomplete': 'MkAutocomplete',
   'mk-avatar': 'MkAvatar',
   'mk-avatar-group': 'MkAvatarGroup',

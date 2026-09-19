@@ -500,6 +500,8 @@ export const MK_FR_I18N: MkI18nStrings = {
   backToTop: 'Retour en haut',
   breadcrumbLabel: 'Fil d’Ariane',
   fabLabel: 'Actions',
+  appSwitcherLabel: 'Applications',
+  appSwitcherError: 'La liste des applications n’a pas pu être chargée.',
   diffBefore: 'Avant',
   diffAfter: 'Après',
   diffChanges: 'Modifications',

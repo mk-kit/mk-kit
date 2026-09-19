@@ -14,6 +14,7 @@ import {
   MkMenu,
   MkMenuItem,
   MkMenuTrigger,
+  MkAppSwitcher,
   MkBackToTop,
   MkFab,
   MkFabAction,
@@ -47,7 +48,7 @@ import { DocsExample } from '../../shared/docs-example';
     MkNavItem,
     MkFab,
     MkFabAction,
-    MkBackToTop, MkIcon],
+    MkBackToTop, MkAppSwitcher, MkIcon],
   template: `
     <div class="docs-page docs-container">
       <h1>Navigation &amp; layout</h1>
@@ -469,6 +470,24 @@ import { DocsExample } from '../../shared/docs-example';
         <p style="color: var(--mk-text-muted);">Scroll this page down to reveal the button.</p>
       </docs-example>
 
+      <h2>App switcher</h2>
+      <p>
+        <code class="docs-inline">&lt;mk-app-switcher&gt;</code> is the "apps grid"
+        of a family of applications: a header button that opens a grid of links
+        to the other apps, the current one marked and listed first. Give it the
+        list (<code class="docs-inline">apps</code>) or a registry URL
+        (<code class="docs-inline">src</code> — JSON, an array or
+        <code class="docs-inline">{{ '{' }} apps {{ '}' }}</code>) that every app
+        of the suite shares; it is fetched the first time the panel opens. It
+        belongs in <code class="docs-inline">mk-app-shell</code>'s
+        <code class="docs-inline">mkAppHeader</code> slot.
+      </p>
+      <docs-example [code]="appSwitcherCode" [column]="true">
+        <div style="display: flex; justify-content: flex-end;">
+          <mk-app-switcher [apps]="suite" current="docs" />
+        </div>
+      </docs-example>
+
       <mk-back-to-top [threshold]="300" />
     </div>
   `,
@@ -498,6 +517,26 @@ export class NavigationPage {
   <button mkFabAction>Folder</button>
 </mk-fab>`;
   protected readonly backToTopCode = `<mk-back-to-top [threshold]="300" />`;
+
+  protected readonly suite = [
+    { id: 'docs', name: 'Docs', url: 'https://mk-kit.dev', icon: '📘', description: 'This site' },
+    { id: 'board', name: 'Board', url: 'https://example.com/board', icon: '▦' },
+    { id: 'drive', name: 'Drive', url: 'https://example.com/drive', icon: '⛁', color: '#0e9f6e' },
+    { id: 'invoice', name: 'Invoice', url: 'https://example.com/invoice', icon: '€', color: '#b45309' },
+    { id: 'notes', name: 'Notes', url: 'https://example.com/notes', icon: '✎', color: '#7c3aed' },
+  ];
+  protected readonly appSwitcherCode = `<!-- in every app of the suite -->
+<mk-app-shell>
+  <ng-container mkAppHeader>
+    <mk-app-switcher src="https://home.example.com/apps.json" current="sales" />
+  </ng-container>
+</mk-app-shell>
+
+<!-- apps.json -->
+{ "apps": [
+  { "id": "sales", "name": "Sales", "url": "https://sales.example.com", "icon": "$", "color": "#0e9f6e" },
+  { "id": "notes", "name": "Notes", "url": "https://notes.example.com", "icon": "✎" }
+] }`;
 
   // Tabs
   protected readonly pillTab = signal(1);

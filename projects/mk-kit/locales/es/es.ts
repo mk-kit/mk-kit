@@ -499,6 +499,8 @@ export const MK_ES_I18N: MkI18nStrings = {
   backToTop: 'Volver arriba',
   breadcrumbLabel: 'Ruta de navegación',
   fabLabel: 'Acciones',
+  appSwitcherLabel: 'Aplicaciones',
+  appSwitcherError: 'No se pudo cargar la lista de aplicaciones.',
   diffBefore: 'Antes',
   diffAfter: 'Después',
   diffChanges: 'Cambios',
