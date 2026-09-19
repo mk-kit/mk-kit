@@ -376,7 +376,7 @@ export class App {
           label: 'Navigation',
           path: '/components/navigation',
           keywords:
-            'tabs accordion breadcrumb pagination menu fab back-to-top nav-list app-shell',
+            'tabs accordion breadcrumb pagination menu fab back-to-top nav-list app-shell app-switcher',
         },
         {
           label: 'Structure',

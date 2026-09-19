@@ -1,0 +1,59 @@
+<button
+  #trigger
+  type="button"
+  class="mk-app-switcher__trigger"
+  [attr.aria-label]="ariaLabel()"
+  [attr.aria-expanded]="open()"
+  [attr.aria-controls]="open() ? panelId : null"
+  (click)="toggle()"
+>
+  <svg class="mk-app-switcher__glyph" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <circle cx="5" cy="5" r="2" /><circle cx="12" cy="5" r="2" /><circle cx="19" cy="5" r="2" />
+    <circle cx="5" cy="12" r="2" /><circle cx="12" cy="12" r="2" /><circle cx="19" cy="12" r="2" />
+    <circle cx="5" cy="19" r="2" /><circle cx="12" cy="19" r="2" /><circle cx="19" cy="19" r="2" />
+  </svg>
+</button>
+
+@if (open()) {
+  <div
+    #panel
+    class="mk-app-switcher__panel"
+    role="group"
+    [id]="panelId"
+    [attr.aria-label]="ariaLabel()"
+    [style.--_cols]="columns()"
+    mkAnchoredPanel
+    [mkAnchoredPanelFor]="triggerEl()"
+    placement="bottom-end"
+    [gap]="8"
+    (dismiss)="close(false)"
+    (keydown.escape)="close()"
+    (keydown)="onPanelKeydown($event)"
+    (focusout)="onPanelFocusout($event)"
+  >
+    @if (loading()) {
+      <p class="mk-app-switcher__note" aria-live="polite">{{ i18n.loading }}</p>
+    } @else if (failed()) {
+      <p class="mk-app-switcher__note" role="alert">{{ i18n.appSwitcherError }}</p>
+    } @else if (!items().length) {
+      <p class="mk-app-switcher__note">{{ i18n.noData }}</p>
+    } @else {
+      <div class="mk-app-switcher__grid">
+        @for (app of items(); track app.id) {
+          <a
+            class="mk-app-switcher__tile"
+            [href]="app.url"
+            [attr.target]="newTab() && !isCurrent(app) ? '_blank' : null"
+            [attr.rel]="newTab() && !isCurrent(app) ? 'noopener' : null"
+            [attr.aria-current]="isCurrent(app) ? 'page' : null"
+            [attr.title]="app.description || null"
+            (click)="close(false)"
+          >
+            <span class="mk-app-switcher__icon" [style.--_tile]="app.color || null" aria-hidden="true">{{ initial(app) }}</span>
+            <span class="mk-app-switcher__name">{{ app.name }}</span>
+          </a>
+        }
+      </div>
+    }
+  </div>
+}

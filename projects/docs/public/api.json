@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.59.0",
+ "version": "0.60.0",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -2759,6 +2759,16 @@
        "name": "fabLabel",
        "type": "string",
        "description": "FAB default label."
+      },
+      {
+       "name": "appSwitcherLabel",
+       "type": "string",
+       "description": "App switcher: trigger / panel label, and the note when the registry cannot be fetched."
+      },
+      {
+       "name": "appSwitcherError",
+       "type": "string",
+       "description": ""
       },
       {
        "name": "diffBefore",
@@ -5908,6 +5918,82 @@
      "docs": "/components/navigation"
     },
     {
+     "name": "MkAppSwitcher",
+     "description": "The \"apps grid\" of a family of applications: a header button that opens a\ngrid of links to the other apps, the current one marked. Give it the list\n(`apps`) or a registry to fetch it from (`src` — JSON, either an array or\n`{ apps: [...] }`), so every app of a suite shows the same switcher from one\nshared file.\n\n```html\n<mk-app-shell>\n  <ng-container mkAppHeader>\n    <mk-app-switcher src=\"https://home.example.com/apps.json\" current=\"sales\" />\n  </ng-container>\n</mk-app-shell>\n```\n\nThe registry is fetched lazily, the first time the panel opens, and once\nper page. The panel is a disclosure (a labelled group of links, not a menu):\nTab moves through the tiles, arrows too, Escape closes and returns focus.",
+     "file": "projects/mk-kit/navigation/app-switcher/app-switcher.ts",
+     "kind": "component",
+     "selector": "mk-app-switcher",
+     "selectors": [
+      "mk-app-switcher"
+     ],
+     "exportAs": "mkAppSwitcher",
+     "inputs": [
+      {
+       "name": "apps",
+       "type": "MkAppLink[]",
+       "description": "The apps, when the host has the list.",
+       "default": "[]"
+      },
+      {
+       "name": "src",
+       "type": "string",
+       "description": "A registry URL to fetch the apps from (JSON: an array or `{ apps }`). Used when `apps` is empty.",
+       "default": "''"
+      },
+      {
+       "name": "current",
+       "type": "string",
+       "description": "The app this switcher is shown in — its `id` or `url`; marked as current and listed first.",
+       "default": "''"
+      },
+      {
+       "name": "label",
+       "type": "string",
+       "description": "Accessible name of the trigger. Defaults to the i18n `appSwitcherLabel`.",
+       "default": "''"
+      },
+      {
+       "name": "columns",
+       "type": "number",
+       "description": "Tiles per row.",
+       "default": "3"
+      },
+      {
+       "name": "newTab",
+       "type": "boolean",
+       "description": "Open links in a new tab.",
+       "default": "false"
+      }
+     ],
+     "outputs": [
+      {
+       "name": "openChange",
+       "type": "boolean",
+       "description": "Emits when the panel opens or closes."
+      }
+     ],
+     "methods": [
+      {
+       "name": "toggle",
+       "signature": "(): void",
+       "description": ""
+      },
+      {
+       "name": "show",
+       "signature": "(): void",
+       "description": ""
+      },
+      {
+       "name": "close",
+       "signature": "(restoreFocus?: boolean): void",
+       "description": ""
+      }
+     ],
+     "properties": [],
+     "queries": [],
+     "docs": "/components/navigation"
+    },
+    {
      "name": "MkBackToTop",
      "description": "BackToTop — a floating button that appears once the page (or a scroll target)\nhas scrolled past `threshold`, and smooth-scrolls back to the top on click.\n\n```html\n<mk-back-to-top [threshold]=\"600\" />\n```\nPass `[target]` to watch/scroll a specific scroll container instead of the\nwindow.",
      "file": "projects/mk-kit/navigation/back-to-top/back-to-top.ts",
@@ -7220,6 +7306,47 @@
      "properties": [],
      "queries": [],
      "docs": "/components/navigation"
+    },
+    {
+     "name": "MkAppLink",
+     "description": "One app in the switcher.",
+     "file": "projects/mk-kit/navigation/app-switcher/app-switcher.ts",
+     "kind": "interface",
+     "members": [
+      {
+       "name": "id",
+       "type": "string",
+       "description": "Stable id; `current` matches on it (or on `url`)."
+      },
+      {
+       "name": "name",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "url",
+       "type": "string",
+       "description": ""
+      },
+      {
+       "name": "description",
+       "type": "string | undefined",
+       "description": "One line under the name.",
+       "optional": true
+      },
+      {
+       "name": "icon",
+       "type": "string | undefined",
+       "description": "A short glyph for the tile — an emoji or one or two letters. Defaults to the name's initial.",
+       "optional": true
+      },
+      {
+       "name": "color",
+       "type": "string | undefined",
+       "description": "Tile colour; any CSS colour. Defaults to the primary tone.",
+       "optional": true
+      }
+     ]
     },
     {
      "name": "MkCommand",

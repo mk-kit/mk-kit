@@ -689,6 +689,9 @@ export interface MkI18nStrings {
   breadcrumbLabel: string;
   /** FAB default label. */
   fabLabel: string;
+  /** App switcher: trigger / panel label, and the note when the registry cannot be fetched. */
+  appSwitcherLabel: string;
+  appSwitcherError: string;
   /** Diff view labels. */
   diffBefore: string;
   diffAfter: string;
@@ -1096,6 +1099,8 @@ export const MK_DEFAULT_I18N: MkI18nStrings = {
   backToTop: 'Back to top',
   breadcrumbLabel: 'Breadcrumb',
   fabLabel: 'Actions',
+  appSwitcherLabel: 'Apps',
+  appSwitcherError: 'The list of apps could not be loaded.',
   diffBefore: 'Before',
   diffAfter: 'After',
   diffChanges: 'Changes',

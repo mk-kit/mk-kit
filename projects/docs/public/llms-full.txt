@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.59.0 — full API reference
+# @mk-kit/ui 0.60.0 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -1226,6 +1226,8 @@ Members:
 | `backToTop` | `string` | Back-to-top button label. |
 | `breadcrumbLabel` | `string` | Breadcrumb nav landmark label. |
 | `fabLabel` | `string` | FAB default label. |
+| `appSwitcherLabel` | `string` | App switcher: trigger / panel label, and the note when the registry cannot be fetched. |
+| `appSwitcherError` | `string` |  |
 | `diffBefore` | `string` | Diff view labels. |
 | `diffAfter` | `string` |  |
 | `diffChanges` | `string` |  |
@@ -3774,7 +3776,7 @@ type MkDropTarget = MkDropList<any> | MkDropZone<any>;
 
 ## @mk-kit/ui/navigation
 
-37 exports. `import { … } from '@mk-kit/ui/navigation';`
+39 exports. `import { … } from '@mk-kit/ui/navigation';`
 
 ### MkAccordion (component)
 
@@ -3897,6 +3899,57 @@ Properties:
 | Name | Type | Description |
 | --- | --- | --- |
 | `isMobile` | `WritableSignal<boolean>` | True when the viewport is at/below the mobile breakpoint. |
+
+### MkAppSwitcher (component)
+
+Selector: `mk-app-switcher` · exportAs: `mkAppSwitcher`
+
+Docs: https://mk-kit.dev/components/navigation
+
+Import: `import { MkAppSwitcher } from '@mk-kit/ui/navigation';`
+
+The "apps grid" of a family of applications: a header button that opens a
+grid of links to the other apps, the current one marked. Give it the list
+(`apps`) or a registry to fetch it from (`src` — JSON, either an array or
+`{ apps: [...] }`), so every app of a suite shows the same switcher from one
+shared file.
+
+```html
+<mk-app-shell>
+  <ng-container mkAppHeader>
+    <mk-app-switcher src="https://home.example.com/apps.json" current="sales" />
+  </ng-container>
+</mk-app-shell>
+```
+
+The registry is fetched lazily, the first time the panel opens, and once
+per page. The panel is a disclosure (a labelled group of links, not a menu):
+Tab moves through the tiles, arrows too, Escape closes and returns focus.
+
+Inputs:
+
+| Name | Type | Default | Description |
+| --- | --- | --- | --- |
+| `apps` | `MkAppLink[]` | `[]` | The apps, when the host has the list. |
+| `src` | `string` | `''` | A registry URL to fetch the apps from (JSON: an array or `{ apps }`). Used when `apps` is empty. |
+| `current` | `string` | `''` | The app this switcher is shown in — its `id` or `url`; marked as current and listed first. |
+| `label` | `string` | `''` | Accessible name of the trigger. Defaults to the i18n `appSwitcherLabel`. |
+| `columns` | `number` | `3` | Tiles per row. |
+| `newTab` | `boolean` | `false` | Open links in a new tab. |
+
+Outputs:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `openChange` | `boolean` | Emits when the panel opens or closes. |
+
+Methods:
+
+| Signature | Description |
+| --- | --- |
+| `toggle(): void` |  |
+| `show(): void` |  |
+| `close(restoreFocus?: boolean): void` |  |
 
 ### MkBackToTop (component)
 
@@ -4825,6 +4878,23 @@ Inputs:
 | Name | Type | Default | Description |
 | --- | --- | --- | --- |
 | `mkMenuTriggerFor` (required) | `MkMenu` |  | The menu instance to control. |
+
+### MkAppLink (interface)
+
+Import: `import { MkAppLink } from '@mk-kit/ui/navigation';`
+
+One app in the switcher.
+
+Members:
+
+| Name | Type | Description |
+| --- | --- | --- |
+| `id` | `string` | Stable id; `current` matches on it (or on `url`). |
+| `name` | `string` |  |
+| `url` | `string` |  |
+| `description`? | `string \| undefined` | One line under the name. |
+| `icon`? | `string \| undefined` | A short glyph for the tile — an emoji or one or two letters. Defaults to the name's initial. |
+| `color`? | `string \| undefined` | Tile colour; any CSS colour. Defaults to the primary tone. |
 
 ### MkCommand (interface)
 

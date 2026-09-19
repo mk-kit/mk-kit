@@ -71,6 +71,7 @@ import { MkStep, MkStepper } from '@mk-kit/ui/navigation/stepper';
 import { MkTree, type MkTreeNode } from '@mk-kit/ui/navigation/tree';
 import { MkScrollArea } from '@mk-kit/ui/navigation/scroll-area';
 import { MkBackToTop } from '@mk-kit/ui/navigation/back-to-top';
+import { MkAppSwitcher } from '@mk-kit/ui/navigation/app-switcher';
 import { MkAlert } from '@mk-kit/ui/feedback/alert';
 import { MkTooltip } from '@mk-kit/ui/feedback/tooltip';
 import { MkBadge, MkBadgeOverlay } from '@mk-kit/ui/status';
@@ -127,6 +128,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
     MkTree,
     MkScrollArea,
     MkBackToTop,
+    MkAppSwitcher,
     MkAlert,
     MkTooltip,
     MkBadge,
@@ -247,6 +249,7 @@ import { MkVirtualScroll } from '@mk-kit/ui/data/virtual-scroll';
       <mk-virtual-scroll [items]="items" [itemHeight]="32" style="height: 10rem" />
 
       <mk-back-to-top />
+      <mk-app-switcher [apps]="[{ id: 'x', name: 'X', url: 'https://x.example' }]" current="x" />
     </main>
   `,
 })
@@ -366,6 +369,7 @@ describe('SSR render smoke (@angular/platform-server)', () => {
       'mk-scroll-area',
       'mk-virtual-scroll',
       'mk-back-to-top',
+      'mk-app-switcher',
     ];
     for (const marker of markers) {
       expect(html, `SSR output is missing "${marker}"`).toContain(marker);

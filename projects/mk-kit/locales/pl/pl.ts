@@ -511,6 +511,8 @@ export const MK_PL_I18N: MkI18nStrings = {
   backToTop: 'Wróć na górę',
   breadcrumbLabel: 'Ścieżka nawigacji',
   fabLabel: 'Akcje',
+  appSwitcherLabel: 'Aplikacje',
+  appSwitcherError: 'Nie udało się pobrać listy aplikacji.',
   diffBefore: 'Przed',
   diffAfter: 'Po',
   diffChanges: 'Zmiany',

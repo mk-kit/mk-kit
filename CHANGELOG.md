@@ -4,6 +4,19 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.60.0] — 2026-09-19
+
+### Added
+
+- **`mk-app-switcher`** (navigation) — the "apps grid" of a family of
+  applications: a 44px header button that opens a grid of links to the other
+  apps, the current one marked and listed first. Takes the list (`apps`) or a
+  registry URL (`src`; JSON array or `{ apps }`) shared by every app of the
+  suite, fetched lazily the first time the panel opens. Disclosure semantics
+  (`aria-expanded` / `aria-controls`, a labelled `group` of links), arrow /
+  Home / End between tiles, Escape returns focus. New i18n strings
+  `appSwitcherLabel` and `appSwitcherError`, translated in every locale.
+
 ## [0.59.0] — 2026-09-10
 
 Fixes and small additions found while building [mk-drive](https://github.com/mkornas/mk-drive), the file-drive showcase app.

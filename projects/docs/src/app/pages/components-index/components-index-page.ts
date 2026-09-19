@@ -197,6 +197,7 @@ const INDEX: ReadonlyArray<IndexGroup> = [
       { name: 'mkMenuTriggerFor', desc: 'Open an mk-menu from any element.', path: '/components/navigation' },
       { name: 'mk-pagination', desc: 'Page navigation with sizes and jump controls.', path: '/components/navigation' },
       { name: 'mk-back-to-top', desc: 'Floating scroll-to-top button.', path: '/components/navigation' },
+      { name: 'mk-app-switcher', desc: 'Apps grid: a header button with links to the suite\'s other apps, from a list or a shared registry.', path: '/components/navigation' },
       { name: 'mk-fab / mkFabAction', desc: 'Floating action button with expandable speed-dial actions.', path: '/components/navigation' },
       { name: 'mk-toolbar', desc: 'Horizontal action bar with sections.', path: '/components/structure' },
       { name: 'mk-page-header', desc: 'Title, breadcrumb and action row for a page.', path: '/components/structure' },
