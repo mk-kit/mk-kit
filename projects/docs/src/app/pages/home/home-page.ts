@@ -597,14 +597,14 @@ interface Mapping {
             <ul class="creator__points">
               <li>I build and maintain mk-kit myself — issues and feature requests land in my inbox.</li>
               <li>Every component ships with tests, an accessibility pass and docs before it is released.</li>
-              <li>I use it in my own products every day — every screen I ship is built with it.</li>
+              <li>I use it in my own products every day — every app at <a href="https://mkapps.dev" target="_blank" rel="noopener">mkapps.dev</a> is built with it.</li>
             </ul>
             <div class="creator__footer">
               <div class="creator__sign">
                 <strong>Mateusz Kornaś</strong>
                 <span>Creator of mk-kit</span>
               </div>
-              <a mkButton variant="outline" tone="neutral" href="https://mateuszkornas.com" target="_blank" rel="noopener">
+              <a mkButton variant="outline" tone="neutral" href="https://mateuszkornas.com/en/projects/" target="_blank" rel="noopener">
                 See what else I make ↗
               </a>
             </div>
@@ -655,6 +655,7 @@ interface Mapping {
             <a routerLink="/changelog">Changelog</a>
             <a href="https://github.com/mk-kit/mk-kit" target="_blank" rel="noopener">GitHub</a>
             <a href="https://www.npmjs.com/package/@mk-kit/ui" target="_blank" rel="noopener">npm</a>
+            <a href="https://mkapps.dev" target="_blank" rel="noopener">Built with it: mk apps</a>
           </nav>
         </div>
       </footer>
@@ -1216,6 +1217,14 @@ interface Mapping {
         color: var(--mk-success);
         font-weight: var(--mk-font-weight-bold);
         margin-right: 0.5em;
+      }
+      .creator__points a {
+        color: inherit;
+        text-decoration: underline;
+        text-underline-offset: 3px;
+      }
+      .creator__points a:hover {
+        color: var(--mk-primary);
       }
       .creator__footer {
         display: flex;
