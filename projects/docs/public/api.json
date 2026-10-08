@@ -1,6 +1,6 @@
 {
  "package": "@mk-kit/ui",
- "version": "0.60.0",
+ "version": "0.60.1",
  "site": "https://mk-kit.dev",
  "entries": [
   {
@@ -13069,6 +13069,15 @@
      ]
     },
     {
+     "name": "isNumericDatePattern",
+     "description": "True when `pattern` writes day, month and year as numbers ('dd.MM.yyyy',\n'MM/dd/yy HH:mm') — then it, not `Date.parse`, decides how numeric text\nreads.",
+     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "kind": "function",
+     "signatures": [
+      "(pattern: string): boolean"
+     ]
+    },
+    {
      "name": "isSameDay",
      "description": "True when both dates fall on the same calendar day (local time).",
      "file": "projects/core/src/dates.ts",
@@ -13084,6 +13093,15 @@
      "kind": "function",
      "signatures": [
       "(a: Date, b: Date): boolean"
+     ]
+    },
+    {
+     "name": "parseDateByPattern",
+     "description": "Parse `text` by the numeric day/month/year order of a display `pattern` —\n`dd.MM.yyyy` reads day first, `MM/dd/yyyy` month first. `Date.parse` must\nnever see such text: it reads '09.10.2026' as September 10 in every engine.\n\nReturns `null` when the pattern has no numeric `d`/`M`/`y` triple (e.g.\n'MMM d, yyyy'), when `text` is not three numbers, or when they do not form\na real date ('31.02.2026' is rejected, not rolled over). Two-digit years\nare 20xx. The result is local midnight.",
+     "file": "projects/mk-kit/datetime/datetime/date-utils.ts",
+     "kind": "function",
+     "signatures": [
+      "(text: string, pattern: string): Date | null"
      ]
     },
     {

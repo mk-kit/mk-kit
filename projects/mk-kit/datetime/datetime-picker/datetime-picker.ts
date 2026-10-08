@@ -33,7 +33,9 @@ import { MkFormField } from '@mk-kit/ui/forms';
 import { MkCalendar } from '../calendar/calendar';
 import {
   formatDate,
+  isNumericDatePattern,
   isSameDay,
+  parseDateByPattern,
   parseISODate,
   startOfDay,
 } from '../datetime/date-utils';
@@ -305,7 +307,8 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
   }
 
   /**
-   * Accepts `YYYY-MM-DD[ T]HH:mm[ am|pm]`, a bare ISO date (→ midnight), any
+   * Accepts `YYYY-MM-DD[ T]HH:mm[ am|pm]`, a bare ISO date (→ midnight), a
+   * date in a numeric `displayFormat`'s order (+ optional time), any
    * `Date.parse`-able date followed by a time, or a full `Date.parse`-able
    * string. Seconds are dropped.
    */
@@ -316,6 +319,17 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
       if (!day) return null;
       if (!iso[2]) return day;
       const mins = parseTime(iso[2]);
+      return mins === null ? null : combine(day, mins);
+    }
+    // A numeric display format decides how a numeric date reads — Date.parse
+    // guesses month-first ('09.10.2026' → September 10).
+    const format = this.effectiveFormat();
+    if (isNumericDatePattern(format) && !/[a-z]/i.test(text.replace(/\s*[ap]m$/i, ''))) {
+      const m = /^(\S+)(?:[\s,T]+(.+))?$/.exec(text);
+      const day = m ? parseDateByPattern(m[1], format) : null;
+      if (!day) return null;
+      if (!m![2]) return day;
+      const mins = parseTime(m![2]);
       return mins === null ? null : combine(day, mins);
     }
     const split = /^(.*\S)[\s,]+(\d{1,2}(?::\d{2})?\s*(?:am|pm)?)$/i.exec(text);
@@ -503,6 +517,10 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
       this.setValue(null);
       return;
     }
+    // The field still shows the current value: nothing to commit. Re-parsing
+    // our own display text could only move the value (and clamp it).
+    const v = this.value();
+    if (v && text === formatDate(v, this.effectiveFormat(), this.i18n.dateNames)) return;
     const parsed = this.parse(text);
     if (parsed) {
       this.setValue(this.clamp(parsed));
@@ -510,7 +528,6 @@ export class MkDateTimePicker implements ControlValueAccessor, Validator {
       // Invalid entry — revert to the current model's display. The signal may
       // already hold that string (the model did not change), so the `[value]`
       // binding would not re-apply it: write the DOM value directly as well.
-      const v = this.value();
       const text = v ? formatDate(v, this.effectiveFormat(), this.i18n.dateNames) : '';
       this.inputText.set(text);
       const el = this.inputRef()?.nativeElement;
