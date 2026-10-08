@@ -1,4 +1,4 @@
-# @mk-kit/ui 0.60.0 — full API reference
+# @mk-kit/ui 0.60.1 — full API reference
 
 Generated from the library sources. Browsable version: https://mk-kit.dev/api · JSON: https://mk-kit.dev/api.json · Guides: https://mk-kit.dev/llms.txt
 
@@ -7915,7 +7915,7 @@ type MkUploadValueFormat = 'file' | 'item';
 
 ## @mk-kit/ui/datetime
 
-37 exports. `import { … } from '@mk-kit/ui/datetime';`
+39 exports. `import { … } from '@mk-kit/ui/datetime';`
 
 ### MkCalendar (component)
 
@@ -8560,6 +8560,18 @@ True when `a` is strictly before `b` (full timestamp comparison).
 function isBefore(a: Date, b: Date): boolean
 ```
 
+### isNumericDatePattern (function)
+
+Import: `import { isNumericDatePattern } from '@mk-kit/ui/datetime';`
+
+True when `pattern` writes day, month and year as numbers ('dd.MM.yyyy',
+'MM/dd/yy HH:mm') — then it, not `Date.parse`, decides how numeric text
+reads.
+
+```ts
+function isNumericDatePattern(pattern: string): boolean
+```
+
 ### isSameDay (function)
 
 Import: `import { isSameDay } from '@mk-kit/ui/datetime';`
@@ -8578,6 +8590,23 @@ True when both dates fall in the same calendar month of the same year.
 
 ```ts
 function isSameMonth(a: Date, b: Date): boolean
+```
+
+### parseDateByPattern (function)
+
+Import: `import { parseDateByPattern } from '@mk-kit/ui/datetime';`
+
+Parse `text` by the numeric day/month/year order of a display `pattern` —
+`dd.MM.yyyy` reads day first, `MM/dd/yyyy` month first. `Date.parse` must
+never see such text: it reads '09.10.2026' as September 10 in every engine.
+
+Returns `null` when the pattern has no numeric `d`/`M`/`y` triple (e.g.
+'MMM d, yyyy'), when `text` is not three numbers, or when they do not form
+a real date ('31.02.2026' is rejected, not rolled over). Two-digit years
+are 20xx. The result is local midnight.
+
+```ts
+function parseDateByPattern(text: string, pattern: string): Date | null
 ```
 
 ### parseISODate (function)

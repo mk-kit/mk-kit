@@ -12,6 +12,7 @@ import { MkDateTimePicker } from './datetime-picker';
       [max]="max()"
       [step]="step()"
       [hour12]="hour12()"
+      [displayFormat]="displayFormat()"
       clearable
     />
   `,
@@ -22,6 +23,7 @@ class Host {
   readonly max = signal<Date | null>(null);
   readonly step = signal(30);
   readonly hour12 = signal(false);
+  readonly displayFormat = signal<string | null>(null);
 }
 
 describe('MkDateTimePicker', () => {
@@ -324,4 +326,40 @@ describe('MkDateTimePicker', () => {
       f.destroy();
     });
   });
+
+  describe('numeric displayFormat', () => {
+    // `Date.parse('09.10.2026')` is September 10 — a day-first value used to
+    // be swapped on every blur.
+    beforeEach(async () => {
+      host.displayFormat.set('dd.MM.yyyy HH:mm');
+      await settle();
+    });
+
+    it('keeps the value when focus leaves the untouched field', async () => {
+      host.value.set(new Date(2026, 9, 9, 18, 30));
+      await settle();
+      expect(input().value).toBe('09.10.2026 18:30');
+      fixture.debugElement.children[0].nativeElement.dispatchEvent(
+        new FocusEvent('focusout', { bubbles: true, relatedTarget: null }),
+      );
+      await settle();
+      const v = host.value()!;
+      expect([v.getMonth(), v.getDate(), v.getHours(), v.getMinutes()]).toEqual([9, 9, 18, 30]);
+    });
+
+    it('parses typed day-first text with a time', async () => {
+      await type('09.10.2026 18:30');
+      const v = host.value()!;
+      expect([v.getFullYear(), v.getMonth(), v.getDate(), v.getHours(), v.getMinutes()]).toEqual(
+        [2026, 9, 9, 18, 30],
+      );
+    });
+
+    it('parses typed day-first text without a time as midnight', async () => {
+      await type('09.10.2026');
+      const v = host.value()!;
+      expect([v.getMonth(), v.getDate(), v.getHours()]).toEqual([9, 9, 0]);
+    });
+  });
 });
+

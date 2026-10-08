@@ -4,6 +4,21 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.60.1] — 2026-10-08
+
+### Fixed
+
+- **`mk-date-picker` / `mk-datetime-picker` moved a picked date to another
+  day.** After a calendar pick the field re-parsed its own display text on
+  blur with `Date.parse`, which reads `09.10.2026` as September 10 — so with
+  a day-first `displayFormat` every day 1–12 (day ≠ month) was swapped and
+  then clamped into `min`/`max`. Found on a restaurant booking form whose
+  reservations and confirmation e-mails landed on days the guest never
+  picked. Blur no longer re-commits text that still shows the current
+  value, and a numeric `displayFormat` (`dd.MM.yyyy`, `MM/dd/yyyy`, …) now
+  decides how typed numeric dates read; impossible dates (`31.02.2026`) are
+  rejected instead of rolled over.
+
 ## [0.60.0] — 2026-09-19
 
 ### Added

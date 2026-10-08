@@ -36,6 +36,8 @@ import {
   formatDate,
   isAfter,
   isBefore,
+  isNumericDatePattern,
+  parseDateByPattern,
   parseISODate,
   startOfDay,
 } from '../datetime/date-utils';
@@ -235,6 +237,10 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
       this.setValue(null);
       return;
     }
+    // The field still shows the current value: nothing to commit. Re-parsing
+    // our own display text could only move the value (and clamp it).
+    const v = this.value();
+    if (v && text === formatDate(v, this.displayFormat(), this.i18n.dateNames)) return;
     const parsed = this.parse(text);
     if (parsed) {
       this.setValue(clampDate(parsed, this.min(), this.max()));
@@ -242,7 +248,6 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
       // Invalid entry — revert to the current model's display. The signal may
       // already hold that string (the model did not change), so the `[value]`
       // binding would not re-apply it: write the DOM value directly as well.
-      const v = this.value();
       const text = v ? formatDate(v, this.displayFormat(), this.i18n.dateNames) : '';
       this.inputText.set(text);
       const el = this.inputRef()?.nativeElement;
@@ -253,6 +258,12 @@ export class MkDatePicker implements ControlValueAccessor, Validator {
   private parse(text: string): Date | null {
     const iso = parseISODate(text);
     if (iso) return iso;
+    // A numeric display format decides how numeric text reads — Date.parse
+    // guesses month-first ('09.10.2026' → September 10).
+    const format = this.displayFormat();
+    if (isNumericDatePattern(format) && !/[a-z]/i.test(text)) {
+      return parseDateByPattern(text, format);
+    }
     const ms = Date.parse(text);
     return Number.isNaN(ms) ? null : startOfDay(new Date(ms));
   }
