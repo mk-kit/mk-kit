@@ -337,5 +337,53 @@ describe('MkAnchoredPanel (directive lifecycle)', () => {
         delete (window as any).visualViewport;
       }
     });
+
+    it('works in the panned visual viewport (iOS keyboard) and applies layout coordinates', async () => {
+      // iOS with the keyboard up: a 393×400 visual viewport scrolled 300px down
+      // inside the layout viewport.
+      const vv = Object.assign(new EventTarget(), { width: 393, height: 400, offsetLeft: 0, offsetTop: 300 });
+      Object.defineProperty(window, 'visualViewport', { value: vv, configurable: true });
+
+      try {
+        const fixture = TestBed.createComponent(AnchoredHost);
+        fixture.detectChanges();
+        fixture.componentInstance.open.set(true);
+        fixture.detectChanges();
+        await fixture.whenStable();
+
+        const trigger = fixture.nativeElement.querySelector('button');
+        const panel = document.querySelector('.panel') as HTMLElement;
+        panel.getBoundingClientRect = () => rect(0, 0, 300, 200) as DOMRect;
+
+        // A scroll frame: the anchor at layout y 420 is 120px into what the
+        // user sees, so the panel stays open (compared with the visual height
+        // 400 directly, layout y 420 read as "below the screen" and dismissed).
+        trigger.getBoundingClientRect = () => rect(420, 20, 300, 40) as DOMRect;
+        vv.dispatchEvent(new Event('scroll'));
+        await new Promise((r) => setTimeout(r, 50));
+        expect(fixture.componentInstance.dismissed()).toBe(0);
+        // Placed below the anchor, in layout coordinates: 420 + 40 + 4.
+        expect(panel.style.top).toBe('464px');
+        expect(panel.getAttribute('data-placement')).toBe('bottom-start');
+
+        // A resize (clamped) pass: 120 + 40 + 4 + 200 = 364 fits in the 400px
+        // visual viewport, so no flip above the anchor.
+        vv.dispatchEvent(new Event('resize'));
+        await new Promise((r) => setTimeout(r, 50));
+        expect(panel.style.top).toBe('464px');
+        expect(panel.getAttribute('data-placement')).toBe('bottom-start');
+
+        // Scrolled out of what the user sees (above the visual viewport, still
+        // inside the layout one): dismissed.
+        trigger.getBoundingClientRect = () => rect(200, 20, 300, 40) as DOMRect;
+        vv.dispatchEvent(new Event('scroll'));
+        await new Promise((r) => setTimeout(r, 50));
+        expect(fixture.componentInstance.dismissed()).toBe(1);
+
+        fixture.destroy();
+      } finally {
+        delete (window as any).visualViewport;
+      }
+    });
   });
 });

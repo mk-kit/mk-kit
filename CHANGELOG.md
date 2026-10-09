@@ -4,6 +4,22 @@ All notable changes to **`@mk-kit/ui`** (published as `@mkornas/ui` up to
 0.33.0). The format follows [Keep a Changelog](https://keepachangelog.com/);
 versions are published to npm on `v*` tags. Dates are ISO-8601.
 
+## [0.60.2] — 2026-10-09
+
+### Fixed
+
+- **Dropdowns opened in the wrong place, or closed at once, on an iPhone with
+  the keyboard up.** iOS pans the visual viewport inside the layout one to keep
+  a focused field above the keyboard. `MkAnchoredPanel` measured against the
+  visual viewport's size but ignored its offset, while the anchor rect and
+  `position: fixed` are in layout coordinates: a panned page read the anchor
+  as "below the screen", so the first scroll frame dismissed the panel, and a
+  clamped pass flipped it above the field, out of sight under the header or the
+  keyboard. The anchor is now shifted into visual-viewport coordinates for the
+  flip, clamp and out-of-view maths, and the result shifted back. Affects every
+  panel built on it: `mk-autocomplete`, `mk-select`, `mk-multi-select`,
+  `mk-menu`, the date and time pickers, `mk-popover` and the rest.
+
 ## [0.60.1] — 2026-10-08
 
 ### Fixed
