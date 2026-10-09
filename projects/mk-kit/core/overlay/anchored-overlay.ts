@@ -199,8 +199,8 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     const view = this.document.defaultView;
     if (!view) return;
 
-    const anchor = this.resolveAnchorRect();
-    if (!anchor) return;
+    const layoutAnchor = this.resolveAnchorRect();
+    if (!layoutAnchor) return;
 
     // Prefer the visual viewport when it exists and is measured: on iOS the
     // software keyboard shrinks only `visualViewport`, never the layout
@@ -212,6 +212,28 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
     const useVisual = visual != null && visual.width > 0 && visual.height > 0;
     const vw = useVisual ? visual.width : this.document.documentElement.clientWidth;
     const vh = useVisual ? visual.height : this.document.documentElement.clientHeight;
+    // The visual viewport can also be PANNED inside the layout one: iOS scrolls
+    // it to keep a focused field above the keyboard, and pinch-zoom moves it
+    // too. `getBoundingClientRect` and `position: fixed` both work in layout
+    // viewport coordinates, while the flip/clamp/out-of-view maths below works
+    // in the visual viewport's. So the anchor is shifted into visual
+    // coordinates for the maths, and the result shifted back before it is
+    // applied. Without this a panned page dismissed the panel on the first
+    // scroll frame ("anchor below the viewport") or clamped it to the wrong
+    // place, under the keyboard or over the page header.
+    const ox = useVisual ? (visual.offsetLeft ?? 0) : 0;
+    const oy = useVisual ? (visual.offsetTop ?? 0) : 0;
+    const anchor: MkRectLike =
+      ox || oy
+        ? {
+            top: layoutAnchor.top - oy,
+            bottom: layoutAnchor.bottom - oy,
+            left: layoutAnchor.left - ox,
+            right: layoutAnchor.right - ox,
+            width: layoutAnchor.width,
+            height: layoutAnchor.height,
+          }
+        : layoutAnchor;
 
     // Anchor scrolled fully out of view — the panel would float detached.
     // Zero-size anchor rects and a zero-size viewport are skipped: they mean
@@ -275,8 +297,8 @@ export class MkAnchoredPanel implements AfterViewInit, OnDestroy {
         rtl: this.isAnchorRtl(),
       },
     );
-    el.style.top = `${pos.top}px`;
-    el.style.left = `${pos.left}px`;
+    el.style.top = `${pos.top + oy}px`;
+    el.style.left = `${pos.left + ox}px`;
     el.setAttribute('data-placement', pos.placement);
   }
 
